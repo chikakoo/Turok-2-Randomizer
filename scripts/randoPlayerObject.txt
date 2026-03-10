@@ -1,0 +1,25 @@
+class RandoPlayerObject : ScriptObject
+{
+	// Constructor
+	// @actor: The actor that was loaded
+    RandoPlayerObject(kActor @actor)
+    {
+    }
+	
+	// Checks if the map is the intro map and resets if so.
+	// This indicates that it is a new game.
+	void OnSpawn(void)
+	{
+		if (Game.ActiveMapID() == kLevel_Level1Intro_1)
+		{
+			// Set so we always replace on the first map
+			// Not doing this won't replace them if you just quit from the first map
+			// and then started a new game
+			g_previousMapId = kLevel_Level1Intro_1; 
+			
+			// Force off so resets have to happen (failsafe)
+			g_perSaveInitialized = false;
+			ResetOnSaveLoad();
+		}
+	}
+}

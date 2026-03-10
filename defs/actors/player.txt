@@ -1,0 +1,68 @@
+#include "defs/common.txt"
+
+Player kActor_Player
+{
+    className                   "kexPuppet"
+    health                      100
+    initialScale                "1.0 1.0 1.0"
+    
+    posture.standingDef         "Player_Standing"
+    posture.crouchingDef        "Player_Crouching"
+    posture.swimmingDef         "Player_Swimming"
+    
+    flags.allowTracking         TRUE
+    flags.castShadow            TRUE
+    
+    oxygen.airGulpTimer         40
+    oxygen.outOfAirSfxTime      2.5
+    oxygen.voiceWarning         355
+    
+    jump.maxSpeed               21.2992
+    jump.minSpeed               9.5744
+    
+    deathCinematic.ground       "cinemas/Death-ground.txt"
+    deathCinematic.climb        "cinemas/Death-clibmb.txt"
+    deathCinematic.fall         "cinemas/Death-fall.txt"
+    deathCinematic.lava         "cinemas/Death-lava.txt"
+    deathCinematic.hazard       "cinemas/Death-qsand.txt"
+    deathCinematic.drown        "cinemas/Death-water.txt"
+    deathCinematic.regen        "cinemas/Regeneration.txt"
+    deathCinematic.skinnedMesh  "char/Cinema_Turok.skinnedmesh"
+    deathCinematic.anim         "anims/Cinema_Turok.anim"
+    
+    Begin_Component "kexWorldComponent"
+        radius                  39.936
+        wallRadius              33.8
+        height                  92.16
+        deadHeight              30.72
+        bTrackGround            TRUE
+    End_Component
+    
+    Begin_Component "kexMovementComponent"
+        mass                    30.72
+        gravity                 0.6
+        friction                0.5
+        airFriction             0.5
+        waterFriction           0.95
+        waterGravity            0.2
+    End_Component
+    
+    Begin_Component "kexRenderMeshComponent"
+        mesh                    "char/Turok_0120.skinnedmesh"
+        anim                    "anims/Turok_0120.anim"
+    End_Component
+    
+    Begin_Component "kexPlayerSpringBobComponent"
+        destViewHeight          100.0
+        decay                   0.35
+        strongDamp              0.8
+        weakDamp                0.08
+    End_Component
+    
+    Begin_Component "kexAnimTrackComponent"
+    End_Component
+	
+	Begin_Component "kexScriptComponent"
+		scriptClass           "RandoPlayerObject"
+	End_Component
+}

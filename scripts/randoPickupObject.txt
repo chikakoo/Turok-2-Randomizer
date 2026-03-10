@@ -1,0 +1,138 @@
+class RandoPickupObject : ScriptObject
+{
+	// Used in ReplaceActor to copy the position properties
+    kActor@ self;
+	kStr m_id;
+	kStr m_name;
+	bool m_collected;
+	
+	// Constructor
+	// @actor: The actor that was loaded
+    RandoPickupObject(kActor @actor)
+    {
+	    @self = actor;
+		m_id = GetUniqueId();
+		m_name = GetName(); // Must have the id first to get the name
+		m_collected = false;
+    }
+	
+	// Gets a unique id for the pickup.
+	// Will be the key for the rando dictionary for replacements
+	kStr GetUniqueId(void)
+	{
+		if (self is null)
+		{
+			Sys.Print("ERROR: Attempted to get ID, but the actor is null!");
+			return "";
+		}
+		
+		kVec3 position = self.Origin();
+		return "" + Game.ActiveMapID() + "_" + 
+			int(position.x) + "_" +
+			int(position.y) + "_" +
+			int(position.z);
+	}
+	
+	// Tries to get the name out of the dictionary.
+	// If not there, returns a placeholder.
+	kStr GetName(void)
+	{
+		ReplacementEntry replacementEntry;
+		TryGetReplacement(m_id, replacementEntry);
+		
+		if (replacementEntry is null)
+		{
+			return "<NO NAME SET>";
+		}
+		else 
+		{
+			return replacementEntry.name;
+		}
+	}
+	
+	// On save, saves what locations are marked as collected.
+	void OnSerialize(kDict& out dict)
+    {
+		SERIALIZE(m_collected);
+	}
+	
+	// On load, restores what locations were marked as collected.
+	void OnDeserialize(kDict& in dict)
+    {
+		// Clear collections on save load
+	    ResetOnSaveLoad();
+	
+		// Set saved collections
+		DESERIALIZE_BOOL(m_collected);
+	}
+	
+	// Called when the actor is touched.
+	// Marks it as collected so it won't respawn.
+	// This is NOT called unless the pickup is collected.
+	void OnTouch(kActor@ pInstigator)
+	{
+		Sys.Print("COLLECTED: " + ToString());
+		
+		m_collected = true;
+		MarkLocationCollected(m_id);
+	}
+	
+	// Called when the actor is spawned in the map.
+	// Replaces the actor with a different one, in the same position.
+	// If it was already replaced or collected, don't do anything.
+	void OnSpawn(void)
+	{
+		// These are after Deserialize, so unset them here
+		g_perSaveInitialized = false;
+		
+		if (IsLocationCollected(m_id))
+		{
+			Sys.Print("COLLECTED ON SPAWN: " + ToString());
+			self.Remove();
+			return;
+		}
+
+		ReplacementEntry replacement;
+		EnsureMapInit(); // Resets replacement flags if map is now different
+		
+		if (!TryGetReplacement(m_id, replacement))
+		{
+			Sys.Print("ID NOT MAPPED: " + m_id + " | TYPE: " + self.Type());
+			return;
+		}
+		
+		kActor@ replacedActor = ActorFactory.Spawn(
+			replacement.value,
+			self.Origin(),
+			self.Yaw(),
+			self.Pitch(),
+			self.Roll(),
+			true, // Hidden? (unsure if that's what this is)
+			self.WorldComponent().RegionIndex());
+			
+		//Sys.Print("Replaced: " + replacement.name + " (" + m_id + ")");
+		
+	    self.Remove();
+	}
+	
+	kStr ToString()
+	{
+		return m_name + " (" + m_id + ")";
+	}
+	
+	// Debug helper to print the flags of an actor
+	void PrintFlags(int flags)
+	{
+		kStr flagStr = "Flags:";
+
+		for (int i = 0; i < 24; i++)
+		{
+			if ((flags & (1 << i)) != 0)
+			{
+				flagStr += " " + i;
+			}
+		}
+		
+		Sys.Print(flagStr);
+	}
+}

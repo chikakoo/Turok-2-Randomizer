@@ -1,0 +1,85 @@
+//
+// Copyright(C) 2014-2015 Samuel Villarreal
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either version 2
+// of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// DESCRIPTION:
+//      Main Script Module
+//
+
+#define MAX(a,b) ((a)>(b)?(a):(b))
+#define MIN(a,b) ((a)<(b)?(a):(b))
+
+bool DeserializeBool(kDict& in dict, const kStr& in key)
+{
+    kStr szOut;
+    
+    if(dict.GetString(key, szOut))
+    {
+        return szOut == "true";
+    }
+    
+    return false;
+}
+
+#ifdef KEX_DEBUG
+    #define DEBUG_PRINT(x) Sys.Print(x)
+#else
+    #define DEBUG_PRINT(x)
+#endif
+
+#define SERIALIZE(x)            dict.Add(#x, ""+x)
+#define DESERIALIZE_FLOAT(x)    dict.GetFloat(#x, x)
+#define DESERIALIZE_INT(x)      dict.GetInt(#x, x)
+#define DESERIALIZE_BOOL(x)     x = DeserializeBool(dict, #x)
+
+#include "defs/common.txt"
+#include "scripts/animations.txt"
+#include "scripts/actions.txt"
+#include "scripts/weapons.txt"
+#include "scripts/ridingGun.txt"
+#include "scripts/destructibles.txt"
+#include "scripts/door.txt"
+#include "scripts/actionObject.txt"
+#include "scripts/missileController.txt"
+#include "scripts/interactiveAnim.txt"
+#include "scripts/turret.txt"
+#include "scripts/totem.txt"
+#include "scripts/blindBoss.txt"
+#include "scripts/queenBoss.txt"
+#include "scripts/motherBoss.txt"
+#include "scripts/primagenBoss.txt"
+#include "scripts/netcallbacks.txt"
+
+#include "scripts/randoPickupObject.txt"
+#include "scripts/randoPlayerObject.txt"
+#include "scripts/replacementEntry.txt"
+
+/*
+==============================================================
+main
+==============================================================
+*/
+
+void main(void)
+{
+	InitActorReplacements();
+	
+    InitDestructibleModeTable();
+    InitActionObjectModeTable();
+    InitInteractiveAnimModeTable();
+    InitTurretModeTable();
+    InitDoorModeTable();
+    InitBlindBossModeTable();
+    InitQueenBossModeTable();
+    InitMotherBossModeTable();
+    InitPrimagenBossModeTable();
+}

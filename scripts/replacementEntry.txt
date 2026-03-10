@@ -1,0 +1,136 @@
+// Represents an actor to be replaced
+// - key: The key of the actor - currently, its id
+//  - RegionId_X_Y_Z
+// - value: The actor id (see common.txt for the macros)
+class ReplacementEntry
+{
+	kStr name;
+    kStr key;
+    int value;
+	bool wasReplaced;
+	
+	ReplacementEntry() {}
+    ReplacementEntry(const kStr &in n, const kStr &in k, int v)
+    {
+        name = n;
+        key = k;
+        value = v;
+        wasReplaced = false;
+    }
+}
+
+// The global for the actor replacements
+array<ReplacementEntry> g_actorReplacements;
+
+// The global for location ids already collected
+array<kStr> g_collectedLocations;
+
+// The previous map that OnSpawn tried to replace an actor on
+int16 g_previousMapId = 0;
+
+// Whether we've initialized the state on a save load yet.
+// Set on the first OnDeserialize and unset on the first OnSpawn call.
+bool g_perSaveInitialized = false;
+
+// Whether we've just started spawning actors.
+// Used to determine whether we need to unset the wasReplaced flags.
+// Set on the first OnDeserialize and unset on the first OnSpawn call.
+bool g_spawnCycleInitialized = false;
+
+// Initialize the replacement array
+void InitActorReplacements()
+{
+	#include "scripts/randoReplacements.txt"
+}
+
+// Add to the array.
+// - name: The friendly name of the actor
+// - key: The key to replace (the id of the actor)
+// - value: The value to replace it with (the enum id of the actor)
+void AddReplacement(const kStr &in name, const kStr &in key, const int &in value)
+{
+	g_actorReplacements.insertLast(ReplacementEntry(name, key, value));
+}
+
+// Tries to get the replacement for the given actor id.
+// Will return false if not found.
+// - key: The key to replace (the id of the actor)
+// - replacementEntry: The retrieved entry (set even if the entry was replaced)
+// Returns a boolean indicating whether the entry was found.
+bool TryGetReplacement(const kStr &in key, ReplacementEntry &out replacementEntry)
+{
+    for (uint i = 0; i < g_actorReplacements.length(); i++)
+    {
+        ReplacementEntry @entry = g_actorReplacements[i];
+        if (entry.key == key)
+        {
+			replacementEntry = entry;
+					
+            if (entry.wasReplaced)
+			{
+				return false;
+			}
+                
+            entry.wasReplaced = true;  // Prevent loops in this map instance
+            return true;
+        }
+    }
+    return false;
+}
+
+// Checks if the location is in the collected array.
+// id: The id to check
+bool IsLocationCollected(const kStr &in id)
+{
+    for (uint i = 0; i < g_collectedLocations.length(); i++)
+    {
+        if (g_collectedLocations[i] == id)
+		{
+			return true;
+		}
+    }
+
+    return false;
+}
+
+// Marks the given location as collected by putting it in the array.
+// id: The id to mark as collected
+void MarkLocationCollected(const kStr &in id)
+{
+    g_collectedLocations.insertLast(id);
+}
+
+// Reset the collected locations/replacement flags on a save load
+// This flag is unset in OnSpawn
+void ResetOnSaveLoad()
+{
+	if (!g_perSaveInitialized)
+	{
+		g_perSaveInitialized = true;
+
+		// Reset all per-save state
+		g_collectedLocations.removeRange(0, g_collectedLocations.length());
+		ResetReplacementFlags();
+	}
+}
+
+// Called on every replacement attempt.
+// If the map is now different, reset the replacement flags.
+void EnsureMapInit()
+{
+    int16 mapId = Game.ActiveMapID();
+    if (mapId != g_previousMapId)
+    {
+        g_previousMapId = mapId;
+        ResetReplacementFlags();
+    }
+}
+
+// Resets all of the wasReplaced flags.
+void ResetReplacementFlags()
+{
+    for (uint i = 0; i < g_actorReplacements.length(); i++)
+    {
+        g_actorReplacements[i].wasReplaced = false;
+    }
+}

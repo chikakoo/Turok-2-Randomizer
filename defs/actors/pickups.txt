@@ -1,0 +1,106 @@
+#include "defs/common.txt"
+
+//-----------------------------------------------------------------------------
+//
+// life forces
+//
+//-----------------------------------------------------------------------------
+
+LifeForce1 kActor_Item_LifeForce1
+{
+    className                   "kexLifeForcePickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
+    
+    initialScale              "0.5 0.5 0.5"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+    Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Pickup_Life_Force_1.staticmesh"
+        mesh.cheat_1          "models/Pickup_Life_Force_1_01.staticmesh"
+        mesh.cheat_2          "models/Pickup_Life_Force_1_02.staticmesh"
+    End_Component
+    Begin_Component "kexScriptComponent"
+        scriptClass           "RandoPickupObject"
+        triggerRadius         81.92
+    End_Component
+}
+
+LifeForce10 kActor_Item_LifeForce10
+{
+    className                   "kexLifeForcePickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
+    pickup.lifeforce.amount     10
+    
+    initialScale              "0.5 0.5 0.5"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+    Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Pickup_Life_Force_10.staticmesh"
+        mesh.cheat_1          "models/Pickup_Life_Force_10_01.staticmesh"
+        mesh.cheat_2          "models/Pickup_Life_Force_10_02.staticmesh"
+    End_Component
+}
+
+//-----------------------------------------------------------------------------
+//
+// misc
+//
+//-----------------------------------------------------------------------------
+
+FlashLight 1802
+{
+    className                   "kexFlashLightPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
+    pickup.pickupMessage        "$str_100"
+    pickup.callout              kVoice_Flashlight
+    
+    initialScale              "0.5 0.5 0.5"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+    Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Pickup_Flashlight.staticmesh"
+    End_Component
+}
+
+//-----------------------------------------------------------------------------
+//
+// inventory nuke parts
+//
+//-----------------------------------------------------------------------------
+
+NukePart 4500
+{
+    className                               "kexInventoryPickup"
+    placeable                               TRUE
+    flags.noDamage                          TRUE
+    pickup.pickupSound                      "sounds/shaders/Pickup For Whatever.ksnd"
+    pickup.pickupMessage                    "$str_135"
+    pickup.callout                          385
+    pickup.inventory.giveItemOnAssemble     kActor_Item_WpnNuke
+    pickup.inventory.assembleCount          6
+    
+    initialScale              "0.5 0.5 0.5"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+    Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Nuke_Part.staticmesh"
+    End_Component
+}
