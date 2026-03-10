@@ -4,6 +4,7 @@ class RandoPickupObject : ScriptObject
     kActor@ self;
 	kStr m_id;
 	kStr m_name;
+	kStr m_actorName;
 	bool m_collected;
 	
 	// Constructor
@@ -97,7 +98,11 @@ class RandoPickupObject : ScriptObject
 		
 		if (!TryGetReplacement(m_id, replacement))
 		{
-			Sys.Print("ID NOT MAPPED: " + m_id + " | TYPE: " + self.Type());
+			if (replacement !is null && !replacement.wasReplaced)
+			{
+				Sys.Print("ID NOT MAPPED: " + m_id + " (" + GetFriendlyActorName(self.Type()) + ")");
+			}
+			
 			return;
 		}
 		
@@ -109,8 +114,6 @@ class RandoPickupObject : ScriptObject
 			self.Roll(),
 			true, // Hidden? (unsure if that's what this is)
 			self.WorldComponent().RegionIndex());
-			
-		//Sys.Print("Replaced: " + replacement.name + " (" + m_id + ")");
 		
 	    self.Remove();
 	}

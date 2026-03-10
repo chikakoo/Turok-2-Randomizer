@@ -112,6 +112,10 @@ TekArrows kActor_Item_AmmoTekArrows
     Begin_Component "kexStaticMeshComponent"
         mesh                  "models/Pickup_Ammo_Tek_Arrows.staticmesh"
     End_Component
+	Begin_Component "kexScriptComponent"
+		scriptClass           "RandoPickupObject"
+		triggerRadius         81.92
+	End_Component
 }
 
 QuiverTek kActor_Item_AmmoQuiverTek
@@ -133,6 +137,10 @@ QuiverTek kActor_Item_AmmoQuiverTek
     Begin_Component "kexStaticMeshComponent"
         mesh                  "models/Pickup_Ammo_Quiver_of_Tek_Arrows.staticmesh"
     End_Component
+	Begin_Component "kexScriptComponent"
+		scriptClass           "RandoPickupObject"
+		triggerRadius         81.92
+	End_Component
 }
 
 Clip kActor_Item_AmmoClip
@@ -154,6 +162,10 @@ Clip kActor_Item_AmmoClip
     Begin_Component "kexStaticMeshComponent"
         mesh                  "models/Pickup_Ammo_Bullet_Clip.staticmesh"
     End_Component
+	Begin_Component "kexScriptComponent"
+		scriptClass           "RandoPickupObject"
+		triggerRadius         81.92
+	End_Component
 }
 
 BulletBox kActor_Item_AmmoBulletBox
@@ -175,6 +187,10 @@ BulletBox kActor_Item_AmmoBulletBox
     Begin_Component "kexStaticMeshComponent"
         mesh                  "models/Pickup_Ammo_Box_Of_Bullets.staticmesh"
     End_Component
+	Begin_Component "kexScriptComponent"
+		scriptClass           "RandoPickupObject"
+		triggerRadius         81.92
+	End_Component
 }
 
 TranqDarts kActor_Item_AmmoTranqDarts
@@ -196,6 +212,10 @@ TranqDarts kActor_Item_AmmoTranqDarts
     Begin_Component "kexStaticMeshComponent"
         mesh                  "models/Pickup_Ammo_Tranquilzer_Darts.staticmesh"
     End_Component
+	Begin_Component "kexScriptComponent"
+		scriptClass           "RandoPickupObject"
+		triggerRadius         81.92
+	End_Component
 }
 
 TranqPack kActor_Item_AmmoTranqPack
@@ -217,6 +237,10 @@ TranqPack kActor_Item_AmmoTranqPack
     Begin_Component "kexStaticMeshComponent"
         mesh                  "models/Pickup_Ammo_Tranquilzer_Darts_Pak.staticmesh"
     End_Component
+	Begin_Component "kexScriptComponent"
+		scriptClass           "RandoPickupObject"
+		triggerRadius         81.92
+	End_Component
 }
 
 Charge kActor_Item_AmmoCharge
@@ -238,6 +262,10 @@ Charge kActor_Item_AmmoCharge
     Begin_Component "kexStaticMeshComponent"
         mesh                  "models/Pickup_Ammo_Charge_Darts.staticmesh"
     End_Component
+	Begin_Component "kexScriptComponent"
+		scriptClass           "RandoPickupObject"
+		triggerRadius         81.92
+	End_Component
 }
 
 ChargePack kActor_Item_AmmoChargePack
@@ -259,6 +287,10 @@ ChargePack kActor_Item_AmmoChargePack
     Begin_Component "kexStaticMeshComponent"
         mesh                  "models/Pickup_Ammo_Charge_Darts_Pak.staticmesh"
     End_Component
+	Begin_Component "kexScriptComponent"
+		scriptClass           "RandoPickupObject"
+		triggerRadius         81.92
+	End_Component
 }
 
 Shells kActor_Item_AmmoShells
@@ -280,6 +312,10 @@ Shells kActor_Item_AmmoShells
     Begin_Component "kexStaticMeshComponent"
         mesh                  "models/Pickup_Ammo_Shotgun_Shells.staticmesh"
     End_Component
+	Begin_Component "kexScriptComponent"
+		scriptClass           "RandoPickupObject"
+		triggerRadius         81.92
+	End_Component
 }
 
 ShellBox kActor_Item_AmmoShellBox
@@ -301,6 +337,10 @@ ShellBox kActor_Item_AmmoShellBox
     Begin_Component "kexStaticMeshComponent"
         mesh                  "models/Pickup_Ammo_Box_Of_Shotgun_Shells.staticmesh"
     End_Component
+	Begin_Component "kexScriptComponent"
+		scriptClass           "RandoPickupObject"
+		triggerRadius         81.92
+	End_Component
 }
 
 ExpShells kActor_Item_AmmoExpShells
@@ -322,6 +362,10 @@ ExpShells kActor_Item_AmmoExpShells
     Begin_Component "kexStaticMeshComponent"
         mesh                  "models/Pickup_Ammo_Explosive_Shotgun_Shells.staticmesh"
     End_Component
+	Begin_Component "kexScriptComponent"
+		scriptClass           "RandoPickupObject"
+		triggerRadius         81.92
+	End_Component
 }
 
 Plasma kActor_Item_AmmoPlasma
@@ -343,6 +387,10 @@ Plasma kActor_Item_AmmoPlasma
     Begin_Component "kexStaticMeshComponent"
         mesh                  "models/Pickup_Ammo_Plasma_Rounds.staticmesh"
     End_Component
+	Begin_Component "kexScriptComponent"
+		scriptClass           "RandoPickupObject"
+		triggerRadius         81.92
+	End_Component
 }
 
 PlasmaPack kActor_Item_AmmoPlasmaPack
@@ -364,6 +412,10 @@ PlasmaPack kActor_Item_AmmoPlasmaPack
     Begin_Component "kexStaticMeshComponent"
         mesh                  "models/Pickup_Ammo_Plasma_Pak.staticmesh"
     End_Component
+	Begin_Component "kexScriptComponent"
+		scriptClass           "RandoPickupObject"
+		triggerRadius         81.92
+	End_Component
 }
 
 SunfirePods kActor_Item_AmmoSunfirePods
@@ -386,6 +438,10 @@ SunfirePods kActor_Item_AmmoSunfirePods
     Begin_Component "kexStaticMeshComponent"
         mesh                  "models/Pickup_Sunfire_Pod.staticmesh"
     End_Component
+	Begin_Component "kexScriptComponent"
+		scriptClass           "RandoPickupObject"
+		triggerRadius         81.92
+	End_Component
 }
 
 Bores kActor_Item_AmmoBores
@@ -407,6 +463,10 @@ Bores kActor_Item_AmmoBores
     Begin_Component "kexStaticMeshComponent"
         mesh                  "models/Pickup_Ammo_Bores.staticmesh"
     End_Component
+	Begin_Component "kexScriptComponent"
+		scriptClass           "RandoPickupObject"
+		triggerRadius         81.92
+	End_Component
 }
 
 Grenade kActor_Item_AmmoGrenade
@@ -428,6 +488,10 @@ Grenade kActor_Item_AmmoGrenade
     Begin_Component "kexStaticMeshComponent"
         mesh                  "models/Pickup_Ammo_Grenade.staticmesh"
     End_Component
+	Begin_Component "kexScriptComponent"
+		scriptClass           "RandoPickupObject"
+		triggerRadius         81.92
+	End_Component
 }
 
 PFM kActor_Item_AmmoPFM
@@ -449,6 +513,10 @@ PFM kActor_Item_AmmoPFM
     Begin_Component "kexStaticMeshComponent"
         mesh                  "models/Pickup_Ammo_PFM.staticmesh"
     End_Component
+	Begin_Component "kexScriptComponent"
+		scriptClass           "RandoPickupObject"
+		triggerRadius         81.92
+	End_Component
 }
 
 GrenadeBox kActor_Item_AmmoGrenadeBox
@@ -470,6 +538,10 @@ GrenadeBox kActor_Item_AmmoGrenadeBox
     Begin_Component "kexStaticMeshComponent"
         mesh                  "models/Pickup_Ammo_Box_Of_Grenades.staticmesh"
     End_Component
+	Begin_Component "kexScriptComponent"
+		scriptClass           "RandoPickupObject"
+		triggerRadius         81.92
+	End_Component
 }
 
 Missiles kActor_Item_AmmoMissiles
@@ -491,6 +563,10 @@ Missiles kActor_Item_AmmoMissiles
     Begin_Component "kexStaticMeshComponent"
         mesh                  "models/Pickup_Ammo_Scorpion_Missiles.staticmesh"
     End_Component
+	Begin_Component "kexScriptComponent"
+		scriptClass           "RandoPickupObject"
+		triggerRadius         81.92
+	End_Component
 }
 
 Spears kActor_Item_AmmoSpears
@@ -512,6 +588,10 @@ Spears kActor_Item_AmmoSpears
     Begin_Component "kexStaticMeshComponent"
         mesh                  "models/Pickup_Ammo_Spears.staticmesh"
     End_Component
+	Begin_Component "kexScriptComponent"
+		scriptClass           "RandoPickupObject"
+		triggerRadius         81.92
+	End_Component
 }
 
 Torpedo kActor_Item_AmmoTorpedo
@@ -533,6 +613,10 @@ Torpedo kActor_Item_AmmoTorpedo
     Begin_Component "kexStaticMeshComponent"
         mesh                  "models/Pickup_Ammo_Torpedo.staticmesh"
     End_Component
+	Begin_Component "kexScriptComponent"
+		scriptClass           "RandoPickupObject"
+		triggerRadius         81.92
+	End_Component
 }
 
 GasTank kActor_Item_AmmoGasTank
@@ -554,6 +638,10 @@ GasTank kActor_Item_AmmoGasTank
     Begin_Component "kexStaticMeshComponent"
         mesh                  "models/Pickup_Ammo_Flame_thrower_tanks.staticmesh"
     End_Component
+	Begin_Component "kexScriptComponent"
+		scriptClass           "RandoPickupObject"
+		triggerRadius         81.92
+	End_Component
 }
 
 Nuke kActor_Item_AmmoNuke
@@ -575,4 +663,8 @@ Nuke kActor_Item_AmmoNuke
     Begin_Component "kexStaticMeshComponent"
         mesh                  "models/Pickup_Ammo_Nuke_Ammo.staticmesh"
     End_Component
+	Begin_Component "kexScriptComponent"
+		scriptClass           "RandoPickupObject"
+		triggerRadius         81.92
+	End_Component
 }

@@ -134,3 +134,72 @@ void ResetReplacementFlags()
         g_actorReplacements[i].wasReplaced = false;
     }
 }
+
+// Gets a friendly name given the actor type, for debugging
+// actorType: The type of actor to get a name for
+kStr GetFriendlyActorName(const int &in actorType)
+{
+	switch(actorType)
+	{
+		// Pickups
+		case kActor_Item_LifeForce1:
+			return "Life Force 1";
+		case kActor_Item_LifeForce10:
+			return "Life Force 10";
+		
+		// Ammo
+		case kActor_Item_AmmoArrows:
+			return "Arrows";
+		case kActor_Item_AmmoQuiver:
+			return "Quiver of Arrows";
+		case kActor_Item_AmmoTekArrows:
+			return "Tek Arrows";
+		case kActor_Item_AmmoQuiverTek:
+			return "Quiver of Tek Arrows";
+		case kActor_Item_AmmoClip:
+			return "Pistol Clip";
+		case kActor_Item_AmmoBulletBox:
+			return "Box of Bullets";
+		case kActor_Item_AmmoTranqDarts:
+			return "Tranq Darts";
+		case kActor_Item_AmmoTranqPack:
+			return "Pack of Tranq Darts";
+		case kActor_Item_AmmoCharge:
+			return "Charge Darts";
+		case kActor_Item_AmmoChargePack:
+			return "Pack of Charge Darts";
+		case kActor_Item_AmmoShells:
+			return "Shotgun Shells";
+		case kActor_Item_AmmoShellBox:
+			return "Box of Shotgun Shells";
+		case kActor_Item_AmmoExpShells:
+			return "Explosive Shotgun Shells";
+		case kActor_Item_AmmoPlasma:
+			return "Plasma Rounds";
+		case kActor_Item_AmmoPlasmaPack:
+			return "Pack of Plasma Rounds";
+		case kActor_Item_AmmoSunfirePods:
+			return "Sunfire Pods";
+		case kActor_Item_AmmoBores:
+			return "Bores";
+		case kActor_Item_AmmoGrenade:
+			return "Grenade";
+		case kActor_Item_AmmoGrenadeBox:
+			return "Box of Grenades";
+		case kActor_Item_AmmoPFM:
+			return "Mine";
+		case kActor_Item_AmmoMissiles:
+			return "Missiles";
+		case kActor_Item_AmmoSpears:
+			return "Spears";
+		case kActor_Item_AmmoTorpedo:
+			return "Torpedo";
+		case kActor_Item_AmmoGasTank:
+			return "Flamethrower Tank";
+		case kActor_Item_AmmoNuke:
+			return "Nuke Ammo";
+	}
+	
+	// Unmapped - return the type as a string
+	return "" + actorType; 
+}

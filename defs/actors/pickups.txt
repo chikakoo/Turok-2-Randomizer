@@ -49,6 +49,10 @@ LifeForce10 kActor_Item_LifeForce10
         mesh.cheat_1          "models/Pickup_Life_Force_10_01.staticmesh"
         mesh.cheat_2          "models/Pickup_Life_Force_10_02.staticmesh"
     End_Component
+	Begin_Component "kexScriptComponent"
+        scriptClass           "RandoPickupObject"
+        triggerRadius         81.92
+    End_Component
 }
 
 //-----------------------------------------------------------------------------
