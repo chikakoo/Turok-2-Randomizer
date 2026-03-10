@@ -28,7 +28,7 @@ class RandoPickupObject : ScriptObject
 		}
 		
 		kVec3 position = self.Origin();
-		return "" + Game.ActiveMapID() + "_" + 
+		return "" + Game.ActiveMapID() + "_" +
 			int(position.x) + "_" +
 			int(position.y) + "_" +
 			int(position.z);
@@ -96,14 +96,14 @@ class RandoPickupObject : ScriptObject
 		ReplacementEntry replacement;
 		EnsureMapInit(); // Resets replacement flags if map is now different
 		
-		if (!TryGetReplacement(m_id, replacement))
-		{
-			if (replacement !is null && !replacement.wasReplaced)
-			{
-				Sys.Print("ID NOT MAPPED: " + m_id + " (" + GetFriendlyActorName(self.Type()) + ")");
+		if (!TryGetReplacement(m_id, replacement)) 
+		{ 
+			if (!replacement.wasReplaced) 
+			{ 
+				Sys.Print("ID NOT MAPPED: " + m_id + " (" + GetFriendlyActorName(self.Type()) + ")"); 
 			}
 			
-			return;
+			return; 
 		}
 		
 		kActor@ replacedActor = ActorFactory.Spawn(

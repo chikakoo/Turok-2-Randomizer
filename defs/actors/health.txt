@@ -1,0 +1,125 @@
+#include "defs/common.txt"
+
+//-----------------------------------------------------------------------------
+//
+// health
+//
+//-----------------------------------------------------------------------------
+
+Health2 kActor_Item_Health2
+{
+    className                   "kexHealthPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.health.amount        2
+    pickup.health.mortalwound   0
+    pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
+    pickup.pickupMessage        "$str_090"
+    
+    initialScale              "0.5 0.5 0.5"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+    End_Component
+    Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Pickup_Health_2.staticmesh"
+    End_Component
+	Begin_Component "kexScriptComponent"
+		scriptClass           "RandoPickupObject"
+		triggerRadius         81.92
+	End_Component
+}
+
+Health10 kActor_Item_Health10
+{
+    className                   "kexHealthPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.health.amount        10
+    pickup.health.mortalwound   1
+    pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
+    pickup.pickupMessage        "$str_091"
+    
+    initialScale              "0.5 0.5 0.5"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+    End_Component
+    Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Pickup_Health_10.staticmesh"
+    End_Component
+	Begin_Component "kexScriptComponent"
+		scriptClass           "RandoPickupObject"
+		triggerRadius         81.92
+	End_Component
+}
+
+HealthFull kActor_Item_HealthFull
+{
+    className                   "kexHealthPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.health.amount        0
+    pickup.health.mortalwound   1
+    pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
+    pickup.pickupMessage        "$str_094"
+    pickup.callout              kVoice_FullHealth
+    
+    initialScale              "0.5 0.5 0.5"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+    End_Component
+    Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Pickup_Full_health.staticmesh"
+    End_Component
+	Begin_Component "kexScriptComponent"
+		scriptClass           "RandoPickupObject"
+		triggerRadius         81.92
+	End_Component
+}
+
+HealthUltra kActor_Item_HealthUltra
+{
+    className                   "kexHealthPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.health.amount        100
+    pickup.health.mortalwound   0
+    pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
+    pickup.pickupMessage        "$str_095"
+    pickup.callout              kVoice_UltraHealth
+    
+    initialScale              "0.5 0.5 0.5"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+    End_Component
+    Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Pickup_Ultra_Health.staticmesh"
+    End_Component
+	Begin_Component "kexScriptComponent"
+		scriptClass           "RandoPickupObject"
+		triggerRadius         81.92
+	End_Component
+}
+
+HealthFull_MP kActor_Item_HealthMP
+{
+    className                   "kexHealthPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.health.amount        0
+    pickup.health.mortalwound   1
+    pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
+    pickup.pickupMessage        "$str_094"
+    
+    initialScale              "0.5 0.5 0.5"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+    End_Component
+    Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Pickup_Full_Health_0529.staticmesh"
+    End_Component
+}

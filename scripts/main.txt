@@ -41,6 +41,8 @@ bool DeserializeBool(kDict& in dict, const kStr& in key)
 #define DESERIALIZE_INT(x)      dict.GetInt(#x, x)
 #define DESERIALIZE_BOOL(x)     x = DeserializeBool(dict, #x)
 
+#define kActor_MissionItem_PoAPowerCell 4200
+
 #include "defs/common.txt"
 #include "scripts/animations.txt"
 #include "scripts/actions.txt"

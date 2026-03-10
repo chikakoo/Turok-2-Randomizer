@@ -56,7 +56,7 @@ void AddReplacement(const kStr &in name, const kStr &in key, const int &in value
 // Will return false if not found.
 // - key: The key to replace (the id of the actor)
 // - replacementEntry: The retrieved entry (set even if the entry was replaced)
-// Returns a boolean indicating whether the entry was found.
+// Returns true if the replacement was found; false otherwise.
 bool TryGetReplacement(const kStr &in key, ReplacementEntry &out replacementEntry)
 {
     for (uint i = 0; i < g_actorReplacements.length(); i++)
@@ -141,12 +141,64 @@ kStr GetFriendlyActorName(const int &in actorType)
 {
 	switch(actorType)
 	{
-		// Pickups
+		// Life Forces
 		case kActor_Item_LifeForce1:
 			return "Life Force 1";
 		case kActor_Item_LifeForce10:
 			return "Life Force 10";
-		
+			
+		// Health
+		case kActor_Item_Health2:
+			return "Silver Health";
+		case kActor_Item_Health10:
+			return "Blue Health";
+		case kActor_Item_HealthFull:
+			return "Full Health (Red)";
+		case kActor_Item_HealthUltra:
+			return "Ultra Health (Gold)";
+			
+		// Weapons
+		case kActor_Item_WpnWarBlade:
+			return "War Blade";
+		case kActor_Item_WpnTekBow:
+			return "Tek Bow";
+		case kActor_Item_WpnPistol:
+			return "Pistol";
+		case kActor_Item_WpnMag60:
+			return "Mag60";
+		case kActor_Item_WpnTranq:
+			return "Tranquilizer Gun";
+		case kActor_Item_WpnChargeDart:
+			return "Charge Dart Rifle";
+		case kActor_Item_WpnShotgun:
+			return "Shotgun";
+		case kActor_Item_WpnScatter:
+			return "Shredder";
+		case kActor_Item_WpnPlasmaRifle:
+			return "Plasma Rifle";
+		case kActor_Item_WpnFireStorm:
+			return "Firestorm Cannon";
+		case kActor_Item_WpnSunfirePod:
+			return "Sunfire Pod";
+		case kActor_Item_WpnCerebralBore:
+			return "Cerebral Bore";
+		case kActor_Item_WpnPFMLayer:
+			return "PFM Layer";
+		case kActor_Item_WpnGrenadeLauncher:
+			return "Grenade Launcher";	
+		case kActor_Item_WpnMissileLauncher:
+			return "Scorpion Launcher";
+		case kActor_Item_WpnFlameThrower:
+			return "Flamethrower";
+		case kActor_Item_WpnRazorWind:
+			return "Razor Wind";
+		case kActor_Item_WpnNuke:
+			return "Nuke";
+		case kActor_Item_WpnSpearGun:
+			return "Harpoon Gun";
+		case kActor_Item_WpnTorpedoLauncher:
+			return "Torpedo Launcher";
+			
 		// Ammo
 		case kActor_Item_AmmoArrows:
 			return "Arrows";
@@ -198,6 +250,10 @@ kStr GetFriendlyActorName(const int &in actorType)
 			return "Flamethrower Tank";
 		case kActor_Item_AmmoNuke:
 			return "Nuke Ammo";
+			
+		// Mission items
+		case kActor_MissionItem_PoAPowerCell:
+			return "PoA Power Cell";
 	}
 	
 	// Unmapped - return the type as a string

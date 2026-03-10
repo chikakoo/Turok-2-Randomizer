@@ -2,9 +2,23 @@
 
 // Port of Adia - Start (51)
 AddReplacement("PoA Start - LF1 on Box", "51_702_-660_-153", kActor_Item_AmmoQuiver);
-AddReplacement("PoA Start - LF1 in Ship 1", "51_-1342_116_-1095", kActor_Item_AmmoQuiver);
-AddReplacement("PoA Start - LF1 in Ship 2", "51_-1405_86_-1095", kActor_Item_AmmoQuiver);
+AddReplacement("PoA Start - LF1 in Left Ship Half 1", "51_-1342_116_-1095", kActor_Item_AmmoQuiver);
+AddReplacement("PoA Start - LF1 in Left Ship Half 2", "51_-1405_86_-1095", kActor_Item_AmmoQuiver);
 AddReplacement("PoA Start - LF1 After First Ladder 1", "51_2203_1180_0", kActor_Item_AmmoQuiver);
 AddReplacement("PoA Start - LF1 After First Ladder 2", "51_2273_1115_0", kActor_Item_AmmoQuiver);
 AddReplacement("PoA Start - LF1 After First Ladder 3", "51_2306_985_0", kActor_Item_AmmoQuiver);
 AddReplacement("PoA Start - LF1 After First Ladder 4", "51_2304_892_52", kActor_Item_AmmoQuiver);
+AddReplacement("PoA Start - LF10 in Left Ship Half", "51_-1465_56_-1095", kActor_Item_AmmoQuiver);
+AddReplacement("PoA Start - LF10 in Right Ship Half 1", "51_-1122_412_-1075", kActor_Item_AmmoQuiver);
+AddReplacement("PoA Start - LF10 in Right Ship Half 2", "51_-1021_347_-1075", kActor_Item_AmmoQuiver);
+AddReplacement("PoA Start - LF10 in Right Ship Half 3", "51_-916_276_-1075", kActor_Item_AmmoQuiver);
+AddReplacement("PoA Start - LF10 Underwater Alcove 1", "51_708_-919_-1198", kActor_Item_AmmoQuiver);
+AddReplacement("PoA Start - LF10 Underwater Alcove 2", "51_739_-384_-1198", kActor_Item_AmmoQuiver);
+AddReplacement("PoA Start - LF10 Underwater Alcove 3", "51_746_100_-1198", kActor_Item_AmmoQuiver);
+AddReplacement("PoA Start - LF10 Underwater Alcove 4", "51_746_601_-1198", kActor_Item_AmmoQuiver);
+AddReplacement("PoA Start - LF10 Underwater Alcove 5", "51_739_1134_-1198", kActor_Item_AmmoQuiver);
+AddReplacement("PoA Start - Arrows on Boxes", "51_562_514_-102", kActor_Item_AmmoQuiver);
+AddReplacement("PoA Start - Power Cell", "51_2304_0_0", kActor_Item_AmmoQuiver);
+AddReplacement("PoA Start - Pistol", "51_2615_1227_359", kActor_Item_WpnNuke);
+
+
