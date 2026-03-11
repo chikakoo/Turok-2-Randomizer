@@ -1,5 +1,7 @@
 class RandoPlayerObject : ScriptObject
 {
+    kActor@ self;
+	
 	// An array of ascii characters so we can get the index easily
 	array<kStr> m_asciiChars = {
 		"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
@@ -13,6 +15,7 @@ class RandoPlayerObject : ScriptObject
 	// @actor: The actor that was loaded
     RandoPlayerObject(kActor @actor)
     {
+		@self = actor;
     }
 	
 	// Resets the state of the globals on a save load
@@ -97,6 +100,12 @@ class RandoPlayerObject : ScriptObject
 		}
 		
 		int data = g_AP.IncomingMessageData;
+		
+		// Can't define variables in switch blocks...
+		// TODO: put the trap code in its own function
+		int16 nRegionIdx = self.WorldComponent()
+			.GetNearPositionAndRegionIndex(self.Origin(), self.Origin());
+		
 		switch(g_AP.IncomingMessageType)
 		{
 			case AP_IN_MSGTYPE_GET_WEAPON:
@@ -110,6 +119,9 @@ class RandoPlayerObject : ScriptObject
 			case AP_IN_MSGTYPE_GET_TRAP:
 				Hud.AddMessage("It's a trap! " + data);
 				Sys.Print("It's a trap! " + data);
+				
+				ActorFactory.Spawn(data, self.Origin(), 0, 0, 0, true, nRegionIdx);
+				
 				break;
 		}
 		

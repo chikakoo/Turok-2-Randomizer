@@ -58,8 +58,11 @@ class RandoPickupObject : ScriptObject
 	// This is NOT called unless the pickup is collected.
 	void OnTouch(kActor@ pInstigator)
 	{
-		Sys.Print("COLLECTED: " + ToString());
-		CollectLocation(m_id);
+		if (m_id != 0)
+		{
+			Sys.Print("COLLECTED: " + ToString());
+			CollectLocation(m_id);
+		}
 	}
 	
 	// Called when the actor is spawned in the map.
