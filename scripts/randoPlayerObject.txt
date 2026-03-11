@@ -58,6 +58,9 @@ class RandoPlayerObject : ScriptObject
 			int8 c = data[i];
 			if (c == "|"[0])
 			{
+				// Send out all collected locations as well as adding to the list
+				g_outgoingMessageQueue.insertLast(
+					APOutgoingMessage(AP_OUT_MSGTYPE_SEND_CHECK, current.Atoi()));
 				g_collectedLocations.insertLast(current.Atoi());
 				current = "";
 			}
@@ -98,9 +101,11 @@ class RandoPlayerObject : ScriptObject
 		{
 			case AP_IN_MSGTYPE_GET_WEAPON:
 				Hud.AddMessage("Weapon get: " + data);
+				Sys.Print("Weapon get: " + data);
 				break;
 			case AP_IN_MSGTYPE_GET_AMMO:
 				Hud.AddMessage("Ammo get: " + data);
+				Sys.Print("Ammo get: " + data);
 				break;
 			case AP_IN_MSGTYPE_GET_TRAP:
 				Hud.AddMessage("It's a trap! " + data);
@@ -123,13 +128,16 @@ class RandoPlayerObject : ScriptObject
 			return;
 		}
 		
-		g_AP.OutgoingStatus = AP_PROCESSING;
-		
 		APOutgoingMessage message = g_outgoingMessageQueue[0];
 		
 		g_AP.OutgoingMessageType = message.type;
 		g_AP.OutgoingMessageData = message.data;
 		
 		g_outgoingMessageQueue.removeAt(0);
+		
+		Sys.Print("Sent data to AP: " + message.data);
+		
+		// Now the python script knows it can read the data we set
+		g_AP.OutgoingStatus = AP_PROCESSING;
 	}
 }

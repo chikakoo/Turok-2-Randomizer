@@ -54,6 +54,13 @@ class APOutgoingMessage
 {
 	APMessageType type;
 	int data;
+	
+	APOutgoingMessage() {}
+	APOutgoingMessage(const APMessageType &in t, const int &in d)
+	{
+		type = t;
+		data = d;
+	}
 }
 
 // A global for all outgoing messages - this is here in case we cannot send out
@@ -89,10 +96,16 @@ enum APMessageType
 
 void InitAP()
 {
-    g_AP.Magic = 0x4150524B; // APRK
+	g_AP.Magic = 0x4150524B; // APRK
     g_AP.Version = 1;
-	g_AP.IncomingStatus = AP_READY;
-	g_AP.OutgoingStatus = AP_READY;
+
+    g_AP.IncomingStatus = AP_READY;
+    g_AP.IncomingMessageType = AP_MSGTYPE_NONE;
+    g_AP.IncomingMessageData = 0;
+
+    g_AP.OutgoingStatus = AP_READY;
+    g_AP.OutgoingMessageType = AP_MSGTYPE_NONE;
+    g_AP.OutgoingMessageData = 0;
 }
 
 #define MAX(a,b) ((a)>(b)?(a):(b))

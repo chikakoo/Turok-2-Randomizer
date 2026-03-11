@@ -110,9 +110,8 @@ bool IsLocationCollected(const int &in id)
 void CollectLocation(const int &in id)
 {
     g_collectedLocations.insertLast(id);
-	
-	//TODO: fix this by creating an outgoing message, not an int
-	//g_outgoingMessageQueue.insertLast(id);
+	g_outgoingMessageQueue.insertLast(
+		APOutgoingMessage(AP_OUT_MSGTYPE_SEND_CHECK, id));
 }
 
 // Reset the collected locations/replacement flags on a save load
