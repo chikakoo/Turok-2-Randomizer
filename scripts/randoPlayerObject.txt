@@ -77,21 +77,41 @@ class RandoPlayerObject : ScriptObject
 		//}
 	}
 	
-	// Checks for any outgoing messages
-	//void OnTick(void)
-	//{
-	//	ProcessIncomingMessages();
-	//	ProcessOutgoingMessages();
-	//}
+	// Checks for incoming and outgoing messages
+	void OnTick(void)
+	{
+		ProcessIncomingMessages();
+		ProcessOutgoingMessages();
+	}
 	
 	void ProcessIncomingMessages(void)
 	{
 		// Do not process if we are still processing the last message
-		if (g_AP.IncomingStatus != AP_READY ||
+		if (g_AP.IncomingStatus != AP_PROCESSING ||
 			g_AP.IncomingMessageType == AP_MSGTYPE_NONE)
 		{
 			return;
 		}
+		
+		int data = g_AP.IncomingMessageData;
+		switch(g_AP.IncomingMessageType)
+		{
+			case AP_IN_MSGTYPE_GET_WEAPON:
+				Hud.AddMessage("Weapon get: " + data);
+				break;
+			case AP_IN_MSGTYPE_GET_AMMO:
+				Hud.AddMessage("Ammo get: " + data);
+				break;
+			case AP_IN_MSGTYPE_GET_TRAP:
+				Hud.AddMessage("It's a trap! " + data);
+				Sys.Print("It's a trap! " + data);
+				break;
+		}
+		
+		// Set this back to ready so AP knows it can send more
+		g_AP.IncomingMessageType = AP_MSGTYPE_NONE;
+		g_AP.IncomingMessageData = 0;
+		g_AP.IncomingStatus = AP_READY;
 	}
 	
 	void ProcessOutgoingMessages(void)

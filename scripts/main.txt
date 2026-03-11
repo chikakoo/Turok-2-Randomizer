@@ -36,6 +36,20 @@ class APMemory
 
 APMemory g_AP;
 
+void PrintAPMemory()
+{
+	Sys.Print("Magic: " + g_AP.Magic);
+	Sys.Print("Version: " + g_AP.Version);
+	
+	Sys.Print("IncomingStatus: " + g_AP.IncomingStatus);
+	Sys.Print("IncomingMessageType: " + g_AP.IncomingMessageType);
+	Sys.Print("IncomingMessageData: " + g_AP.IncomingMessageData);
+	
+	Sys.Print("OutgoingStatus: " + g_AP.OutgoingStatus);
+	Sys.Print("OutgoingMessageType: " + g_AP.OutgoingMessageType);
+	Sys.Print("OutgoingMessageData: " + g_AP.OutgoingMessageData);
+}
+
 class APOutgoingMessage
 {
 	APMessageType type;
@@ -53,9 +67,6 @@ enum APStatus
 	// Incoming Message: We are ready for AP to send us data
 	// Outgoing Message: We can set data for Archipelago to read
 	AP_READY = 0,
-	
-	// AP should NOT modify values
-	// We should NOT set data for AP to read
 	
 	// Incoming Message: We are NOT ready for AP to send us data (we are processing the last one)
 	// Outgoing Message: We CANNOT set data for Archipelago to read (we are waiting for AP to process the last one)
