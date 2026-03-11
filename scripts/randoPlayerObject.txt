@@ -1,25 +1,79 @@
 class RandoPlayerObject : ScriptObject
 {
+	// An array of ascii characters so we can get the index easily
+	array<kStr> m_asciiChars = {
+		"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
+		"", "", ' ', '!', '"', "", "", '%', '&', '\'', '(', ')', '*', '+', ',', '-', ".", "/", '0', '1', '2', '3', '4', '5', '6',
+		'7', '8', '9', ':', ';', '<', '=', '>', '?', '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
+		'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '[', '\\', ']', '^', '_', '`', 'a', 'b', 'c', 'd', 'e', 'f',
+		'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '{', '|', '}', '~', ""
+	};
+	
 	// Constructor
 	// @actor: The actor that was loaded
     RandoPlayerObject(kActor @actor)
     {
     }
 	
-	// Checks if the map is the intro map and resets if so.
-	// This indicates that it is a new game.
+	// Resets the state of the globals on a save load
 	void OnSpawn(void)
 	{
-		if (Game.ActiveMapID() == kLevel_Level1Intro_1)
+		ResetOnSaveLoad();
+	}
+	
+	// Serializes the collectedLocations by converting it to a trailing-pipe string
+	// e.g. "51_1_2_3|52_4_5_6|" for two locations
+	void OnSerialize(kDict& out dict)
+    {
+		kStr collectedLocations;
+		for (uint i = 0; i < g_collectedLocations.length(); i++)
 		{
-			// Set so we always replace on the first map
-			// Not doing this won't replace them if you just quit from the first map
-			// and then started a new game
-			g_previousMapId = kLevel_Level1Intro_1; 
-			
-			// Force off so resets have to happen (failsafe)
-			g_perSaveInitialized = false;
-			ResetOnSaveLoad();
+			collectedLocations += g_collectedLocations[i] + "|";
 		}
+		
+		if (collectedLocations.Length() == 0)
+		{
+			return;
+		}
+	
+		//Sys.Print("SERIALIZING: " + collectedLocations);
+		SERIALIZE(collectedLocations);
+	}
+	
+	// Deserializes the collected locations by converting the trailing pipe string (see above)
+	// into its parts, then putting it back into the collectedLocations global.
+	// This will reset the global.
+	//
+	// This also resets the repalcement flags in case there's data from the previous save.
+	void OnDeserialize(kDict& in dict)
+    {
+		kStr data;
+		dict.GetString("collectedLocations", data);
+	
+		g_collectedLocations.resize(0);
+		kStr current = "";
+		
+		for (uint i = 0; i < data.Length(); i++)
+		{
+			int8 c = data[i];
+			if (c == "|"[0])
+			{
+				g_collectedLocations.insertLast(current);
+				current = "";
+			}
+			else
+			{
+				// TODO: Handle if the index doesn't exist
+				current += m_asciiChars[c];
+			}
+		}
+		
+		// Reset the replacement flags in case there's stale data
+		ResetReplacementFlags();
+		
+		//for (uint i = 0; i < g_collectedLocations.length(); i++)
+		//{
+		//	Sys.Print("DESERIZLIZED: " + g_collectedLocations[i]);
+		//}
 	}
 }

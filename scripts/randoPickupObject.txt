@@ -5,7 +5,6 @@ class RandoPickupObject : ScriptObject
 	kStr m_id;
 	kStr m_name;
 	kStr m_actorName;
-	bool m_collected;
 	
 	// Constructor
 	// @actor: The actor that was loaded
@@ -14,7 +13,6 @@ class RandoPickupObject : ScriptObject
 	    @self = actor;
 		m_id = GetUniqueId();
 		m_name = GetName(); // Must have the id first to get the name
-		m_collected = false;
     }
 	
 	// Gets a unique id for the pickup.
@@ -51,30 +49,12 @@ class RandoPickupObject : ScriptObject
 		}
 	}
 	
-	// On save, saves what locations are marked as collected.
-	void OnSerialize(kDict& out dict)
-    {
-		SERIALIZE(m_collected);
-	}
-	
-	// On load, restores what locations were marked as collected.
-	void OnDeserialize(kDict& in dict)
-    {
-		// Clear collections on save load
-	    ResetOnSaveLoad();
-	
-		// Set saved collections
-		DESERIALIZE_BOOL(m_collected);
-	}
-	
 	// Called when the actor is touched.
 	// Marks it as collected so it won't respawn.
 	// This is NOT called unless the pickup is collected.
 	void OnTouch(kActor@ pInstigator)
 	{
 		Sys.Print("COLLECTED: " + ToString());
-		
-		m_collected = true;
 		MarkLocationCollected(m_id);
 	}
 	
@@ -82,7 +62,7 @@ class RandoPickupObject : ScriptObject
 	// Replaces the actor with a different one, in the same position.
 	// If it was already replaced or collected, don't do anything.
 	void OnSpawn(void)
-	{
+	{		
 		// These are after Deserialize, so unset them here
 		g_perSaveInitialized = false;
 		

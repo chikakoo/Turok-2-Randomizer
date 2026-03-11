@@ -15,6 +15,26 @@
 //      Main Script Module
 //
 
+// Archipelago bridge - do not move where this is
+class APMemory
+{
+    int Magic;
+    int Version;
+    int ItemRecv;
+    int ItemPlayer;
+    int LocationSend;
+    int LocationIndex;
+    int DeathLink;
+}
+
+APMemory g_AP;
+
+void InitAP()
+{
+    g_AP.Magic = 0x4150524B; // APRK
+    g_AP.Version = 1;
+}
+
 #define MAX(a,b) ((a)>(b)?(a):(b))
 #define MIN(a,b) ((a)<(b)?(a):(b))
 
@@ -73,6 +93,7 @@ main
 
 void main(void)
 {
+	InitAP();
 	InitActorReplacements();
 	
     InitDestructibleModeTable();
@@ -84,4 +105,15 @@ void main(void)
     InitQueenBossModeTable();
     InitMotherBossModeTable();
     InitPrimagenBossModeTable();
+}
+
+void TestIncrement(void)
+{
+	g_AP.LocationSend++;
+	Sys.Print("VALUE: " + g_AP.LocationSend);
+}
+
+void GetAPItem(void)
+{
+	Sys.Print("" + g_AP.LocationSend);
 }

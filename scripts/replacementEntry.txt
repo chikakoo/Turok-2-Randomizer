@@ -104,11 +104,9 @@ void MarkLocationCollected(const kStr &in id)
 // This flag is unset in OnSpawn
 void ResetOnSaveLoad()
 {
-	if (!g_perSaveInitialized)
+	if (Game.ActiveMapID() == kLevel_Level1Intro_1)
 	{
-		g_perSaveInitialized = true;
-
-		// Reset all per-save state
+		g_previousMapId = kLevel_Level1Intro_1;
 		g_collectedLocations.removeRange(0, g_collectedLocations.length());
 		ResetReplacementFlags();
 	}
