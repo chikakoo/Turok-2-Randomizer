@@ -2,8 +2,9 @@ class RandoPickupObject : ScriptObject
 {
 	// Used in ReplaceActor to copy the position properties
     kActor@ self;
-	kStr m_id;
+	kStr m_position;
 	kStr m_name;
+	int m_id;
 	kStr m_actorName;
 	
 	// Constructor
@@ -11,13 +12,15 @@ class RandoPickupObject : ScriptObject
     RandoPickupObject(kActor @actor)
     {
 	    @self = actor;
-		m_id = GetUniqueId();
-		m_name = GetName(); // Must have the id first to get the name
+		m_position = GetPositionString();
+		
+		// Must have the replacement entry for this to work
+		SetNameAndId();
     }
 	
 	// Gets a unique id for the pickup.
 	// Will be the key for the rando dictionary for replacements
-	kStr GetUniqueId(void)
+	kStr GetPositionString(void)
 	{
 		if (self is null)
 		{
@@ -32,20 +35,21 @@ class RandoPickupObject : ScriptObject
 			int(position.z);
 	}
 	
-	// Tries to get the name out of the dictionary.
-	// If not there, returns a placeholder.
-	kStr GetName(void)
+	// Tries to get the name/id out of the dictionary.
+	// If not there, returns a placeholder for the name.
+	void SetNameAndId(void)
 	{
 		ReplacementEntry replacementEntry;
-		TryGetReplacement(m_id, replacementEntry);
+		TryGetReplacement(m_position, replacementEntry);
 		
 		if (replacementEntry is null)
 		{
-			return "<NO NAME SET>";
+			m_name = "<NO NAME SET>";
 		}
 		else 
 		{
-			return replacementEntry.name;
+			m_name = replacementEntry.name;
+			m_id = replacementEntry.key;
 		}
 	}
 	
@@ -55,7 +59,7 @@ class RandoPickupObject : ScriptObject
 	void OnTouch(kActor@ pInstigator)
 	{
 		Sys.Print("COLLECTED: " + ToString());
-		MarkLocationCollected(m_id);
+		CollectLocation(m_id);
 	}
 	
 	// Called when the actor is spawned in the map.
@@ -76,11 +80,11 @@ class RandoPickupObject : ScriptObject
 		ReplacementEntry replacement;
 		EnsureMapInit(); // Resets replacement flags if map is now different
 		
-		if (!TryGetReplacement(m_id, replacement)) 
+		if (!TryGetReplacement(m_position, replacement)) 
 		{ 
 			if (!replacement.wasReplaced) 
 			{ 
-				Sys.Print("ID NOT MAPPED: " + m_id + " (" + GetFriendlyActorName(self.Type()) + ")"); 
+				Sys.Print("NOT MAPPED: " + ToString() + " (" + GetFriendlyActorName(self.Type()) + ")"); 
 			}
 			
 			return; 
@@ -100,7 +104,7 @@ class RandoPickupObject : ScriptObject
 	
 	kStr ToString()
 	{
-		return m_name + " (" + m_id + ")";
+		return m_name + " (" + m_position + ")" + " (" + m_id + ")";
 	}
 	
 	// Debug helper to print the flags of an actor

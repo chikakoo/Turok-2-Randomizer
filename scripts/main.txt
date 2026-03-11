@@ -20,19 +20,68 @@ class APMemory
 {
     int Magic;
     int Version;
-    int ItemRecv;
-    int ItemPlayer;
-    int LocationSend;
-    int LocationIndex;
-    int DeathLink;
+	
+	// Whether we're ready for AP to send data
+	// After we process it, we will change this status to ready
+	int IncomingStatus;
+	int IncomingMessageType;
+	int IncomingMessageData;
+	
+	// Whether we're waiting for AP to read data
+	// After they process it, they will change this status to ready
+	int OutgoingStatus;
+	int OutgoingMessageType;
+	int OutgoingMessageData;
 }
 
 APMemory g_AP;
+
+class APOutgoingMessage
+{
+	APMessageType type;
+	int data;
+}
+
+// A global for all outgoing messages - this is here in case we cannot send out
+// a check in time for the next one to come in
+// The player will check whether we're good to send out the next one every tick
+// We will also fill this with EVERY checked location when the game loads, to resync
+array<APOutgoingMessage> g_outgoingMessageQueue;
+
+enum APStatus
+{
+	// Incoming Message: We are ready for AP to send us data
+	// Outgoing Message: We can set data for Archipelago to read
+	AP_READY = 0,
+	
+	// AP should NOT modify values
+	// We should NOT set data for AP to read
+	
+	// Incoming Message: We are NOT ready for AP to send us data (we are processing the last one)
+	// Outgoing Message: We CANNOT set data for Archipelago to read (we are waiting for AP to process the last one)
+	AP_PROCESSING
+}
+
+enum APMessageType
+{
+	// Default, should be ignored on both ends
+	AP_MSGTYPE_NONE = 0,
+	
+	// Incoming message types (dummy for now, but this is the idea)
+	AP_IN_MSGTYPE_GET_WEAPON,
+	AP_IN_MSGTYPE_GET_AMMO,
+	AP_IN_MSGTYPE_GET_TRAP,
+	
+	// Outgoing message types
+	AP_OUT_MSGTYPE_SEND_CHECK
+}
 
 void InitAP()
 {
     g_AP.Magic = 0x4150524B; // APRK
     g_AP.Version = 1;
+	g_AP.IncomingStatus = AP_READY;
+	g_AP.OutgoingStatus = AP_READY;
 }
 
 #define MAX(a,b) ((a)>(b)?(a):(b))
@@ -107,13 +156,14 @@ void main(void)
     InitPrimagenBossModeTable();
 }
 
+// TODO: remove this when done
 void TestIncrement(void)
 {
-	g_AP.LocationSend++;
-	Sys.Print("VALUE: " + g_AP.LocationSend);
+	g_AP.Version++;
+	Sys.Print("VALUE: " + g_AP.Version);
 }
 
 void GetAPItem(void)
 {
-	Sys.Print("" + g_AP.LocationSend);
+	Sys.Print("" + g_AP.Version);
 }

@@ -22,13 +22,13 @@ class RandoPlayerObject : ScriptObject
 	}
 	
 	// Serializes the collectedLocations by converting it to a trailing-pipe string
-	// e.g. "51_1_2_3|52_4_5_6|" for two locations
+	// e.g. "51001|51002" for two locations
 	void OnSerialize(kDict& out dict)
     {
 		kStr collectedLocations;
 		for (uint i = 0; i < g_collectedLocations.length(); i++)
 		{
-			collectedLocations += g_collectedLocations[i] + "|";
+			collectedLocations += "" + g_collectedLocations[i] + "|";
 		}
 		
 		if (collectedLocations.Length() == 0)
@@ -58,7 +58,7 @@ class RandoPlayerObject : ScriptObject
 			int8 c = data[i];
 			if (c == "|"[0])
 			{
-				g_collectedLocations.insertLast(current);
+				g_collectedLocations.insertLast(current.Atoi());
 				current = "";
 			}
 			else
@@ -75,5 +75,41 @@ class RandoPlayerObject : ScriptObject
 		//{
 		//	Sys.Print("DESERIZLIZED: " + g_collectedLocations[i]);
 		//}
+	}
+	
+	// Checks for any outgoing messages
+	//void OnTick(void)
+	//{
+	//	ProcessIncomingMessages();
+	//	ProcessOutgoingMessages();
+	//}
+	
+	void ProcessIncomingMessages(void)
+	{
+		// Do not process if we are still processing the last message
+		if (g_AP.IncomingStatus != AP_READY ||
+			g_AP.IncomingMessageType == AP_MSGTYPE_NONE)
+		{
+			return;
+		}
+	}
+	
+	void ProcessOutgoingMessages(void)
+	{
+		// Do not process if AP is still processing the last message
+		if (g_AP.OutgoingStatus != AP_READY || 
+			g_outgoingMessageQueue.length() == 0)
+		{
+			return;
+		}
+		
+		g_AP.OutgoingStatus = AP_PROCESSING;
+		
+		APOutgoingMessage message = g_outgoingMessageQueue[0];
+		
+		g_AP.OutgoingMessageType = message.type;
+		g_AP.OutgoingMessageData = message.data;
+		
+		g_outgoingMessageQueue.removeAt(0);
 	}
 }

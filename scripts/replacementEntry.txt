@@ -1,19 +1,28 @@
 // Represents an actor to be replaced
-// - key: The key of the actor - currently, its id
-//  - RegionId_X_Y_Z
+// - name: The friendly name of the actor
+// - key: The key of the actor its AP id = MapID### (e.g. 51001 is item 2 on map 51)
+// - position: The quantized position of the actor on the map
+//  - MapId_X_Y_Z
 // - value: The actor id (see common.txt for the macros)
+// - wasReplaced: Whether this actor was already replaced (used to prevent replacement loops)
 class ReplacementEntry
 {
 	kStr name;
-    kStr key;
+    int key;
+	kStr position;
     int value;
 	bool wasReplaced;
 	
 	ReplacementEntry() {}
-    ReplacementEntry(const kStr &in n, const kStr &in k, int v)
+    ReplacementEntry(
+		const kStr &in n, 
+		const int &in k, 
+		const kStr &in p, 
+		const int &in v)
     {
         name = n;
         key = k;
+		position = p;
         value = v;
         wasReplaced = false;
     }
@@ -23,7 +32,7 @@ class ReplacementEntry
 array<ReplacementEntry> g_actorReplacements;
 
 // The global for location ids already collected
-array<kStr> g_collectedLocations;
+array<int> g_collectedLocations;
 
 // The previous map that OnSpawn tried to replace an actor on
 int16 g_previousMapId = 0;
@@ -31,11 +40,6 @@ int16 g_previousMapId = 0;
 // Whether we've initialized the state on a save load yet.
 // Set on the first OnDeserialize and unset on the first OnSpawn call.
 bool g_perSaveInitialized = false;
-
-// Whether we've just started spawning actors.
-// Used to determine whether we need to unset the wasReplaced flags.
-// Set on the first OnDeserialize and unset on the first OnSpawn call.
-bool g_spawnCycleInitialized = false;
 
 // Initialize the replacement array
 void InitActorReplacements()
@@ -45,24 +49,31 @@ void InitActorReplacements()
 
 // Add to the array.
 // - name: The friendly name of the actor
-// - key: The key to replace (the id of the actor)
+// - key: The key to replace (the AP id of the actor)
+// - position: The position of the actor, to identify it on the map
 // - value: The value to replace it with (the enum id of the actor)
-void AddReplacement(const kStr &in name, const kStr &in key, const int &in value)
+void AddReplacement(
+	const kStr &in name, 
+	const int &in key, 
+	const kStr &in position,
+	const int &in value)
 {
-	g_actorReplacements.insertLast(ReplacementEntry(name, key, value));
+	g_actorReplacements.insertLast(
+		ReplacementEntry(name, key, position, value));
 }
 
 // Tries to get the replacement for the given actor id.
 // Will return false if not found.
-// - key: The key to replace (the id of the actor)
+// - position: The position of the actor to replace
+//  - we CANNOT use the key because it can't be calculated from the Turok data
 // - replacementEntry: The retrieved entry (set even if the entry was replaced)
 // Returns true if the replacement was found; false otherwise.
-bool TryGetReplacement(const kStr &in key, ReplacementEntry &out replacementEntry)
+bool TryGetReplacement(const kStr &in position, ReplacementEntry &out replacementEntry)
 {
     for (uint i = 0; i < g_actorReplacements.length(); i++)
     {
         ReplacementEntry @entry = g_actorReplacements[i];
-        if (entry.key == key)
+        if (entry.position == position)
         {
 			replacementEntry = entry;
 					
@@ -80,7 +91,7 @@ bool TryGetReplacement(const kStr &in key, ReplacementEntry &out replacementEntr
 
 // Checks if the location is in the collected array.
 // id: The id to check
-bool IsLocationCollected(const kStr &in id)
+bool IsLocationCollected(const int &in id)
 {
     for (uint i = 0; i < g_collectedLocations.length(); i++)
     {
@@ -94,10 +105,14 @@ bool IsLocationCollected(const kStr &in id)
 }
 
 // Marks the given location as collected by putting it in the array.
+// Also puts it in the outgoing message queue for AP.
 // id: The id to mark as collected
-void MarkLocationCollected(const kStr &in id)
+void CollectLocation(const int &in id)
 {
     g_collectedLocations.insertLast(id);
+	
+	//TODO: fix this by creating an outgoing message, not an int
+	//g_outgoingMessageQueue.insertLast(id);
 }
 
 // Reset the collected locations/replacement flags on a save load
