@@ -3,10 +3,14 @@ import time
 import struct
 import msvcrt
 
-# Enum values
+"""
+Enum values from the Turok 2 scripts
+"""
+# APStatus - if these are not 0 or 1, they are invalid
 AP_READY = 0
 AP_PROCESSING = 1
 
+# APMessageType (IN are values to send, OUT are values we receive)
 AP_MSGTYPE_NONE = 0
 
 AP_IN_MSGTYPE_GET_WEAPON = 1
@@ -15,7 +19,7 @@ AP_IN_MSGTYPE_GET_TRAP = 3
 
 AP_OUT_MSGTYPE_SEND_CHECK = 4
 
-# Memory offsets
+# Memory offsets - this is how the struct is layed out
 MAGIC = 0
 VERSION = 4
 SIGNATURE1 = 8
@@ -38,41 +42,61 @@ pattern = (b"\x4B\x52\x50\x41" +
     b"\xEF\xBE\x37\x13")
 
 def connect_to_process():
+    """
+    Connects to the defined process. If it fails, it sleeps for
+    5 seconds before trying again.
+    """
     global pm
 
+    print(f"Attempting to connect to {PROCESS}...")
     while True:
         try:
             pm = pymem.Pymem(PROCESS)
             print(f"Connected to {PROCESS}")
             return
         except Exception:
-            print(f"Could not connect to {PROCESS}... Trying again shortly.")
             time.sleep(5)
     
 # Print the memory block to see if it's correct
 # Turn off if not debugging
 def print_memory_block():
+    """
+    Prints 64 bytes of the current AP memory block for debugging purposes.
+    """
     block = pm.read_bytes(ap_base, 64)
     for i in range(0, 64, 4):
         val = struct.unpack("<I", block[i:i+4])[0]
         print(f"{i:02X}: {val} (0x{val:08X})")
 
 def scan_for_ap_base():
+    """
+    Scans the process for the AP memory block.
+    
+    If there is an ap_base defined, it will see if it's still valid and will use that instead.
+    
+    Otherwise, does the scan. If it fails more than 5 times, it will attempt to reconnect
+    to the game to prevent a scenerio where it's connected to a non-existent process.
+    """
+    global ap_base
+
+    # Try last known address first
+    if ap_base is not None and is_ap_block_valid():
+        print(f"Reusing AP block at {hex(ap_base)}")
+        return ap_base
+        
     attempt = 0
     while True:
         try:            
-            addr = pymem.pattern.pattern_scan_all(
+            ap_base = pymem.pattern.pattern_scan_all(
                 pm.process_handle,
                 pattern
             )
             
-            #print_memory_block()
-            
-            if not addr or not is_valid_ap_block(addr):
+            if not ap_base or not is_ap_block_valid():
                 raise
             
-            print(f"Found AP block at {hex(addr)}")
-            return addr
+            print(f"Found AP block at {hex(ap_base)}")
+            return ap_base
                 
         except:
             attempt += 1
@@ -82,28 +106,48 @@ def scan_for_ap_base():
                 attempt = 0
             
             print("Did not find AP memory block... trying again shortly.")
-            time.sleep(3)
+            time.sleep(5)
             
-def is_valid_ap_block(addr):
-    if pm.read_int(addr + VERSION) != 1:
+def is_ap_block_valid():
+    """
+    Checks that the AP block is valid by validating our header, and status values.
+    
+    If they are not valid, we need to connect and scan again because the struct may 
+    have moved or the game may have closed.
+    """
+    try:
+        return (read_int(MAGIC) == 0x4150524B and
+            read_int(VERSION) == 1 and
+            read_int(SIGNATURE1) == 0x43110DAD and
+            read_int(SIGNATURE2) == 0x1337BEEF and
+            read_int(IN_STATUS) in (0,1) and 
+            read_int(OUT_STATUS) in (0,1))
+    except Exception:
         return False
 
-    incoming_status = pm.read_int(addr + IN_STATUS)
-    outgoing_status = pm.read_int(addr + OUT_STATUS)
-    
-    return (incoming_status in (0,1) and 
-        outgoing_status in (0,1))
-        
-connect_to_process()
-ap_base = scan_for_ap_base()
-
 def read_int(offset):
+    """
+    Helper to read the int for the given offset.
+    """
     return pm.read_int(ap_base + offset)
 
 def write_int(offset, value):
+    """
+    Helper to write an int to the given offset.
+    """
     pm.write_int(ap_base + offset, value)
+    
+connect_to_process()
+ap_base = None
+ap_base = scan_for_ap_base()
 
 def send_message(msg_type, data):
+    """
+    Sends a message to the game by:
+    - Checking the IN_STATUS - if not AP_READY, do nothing, as the game is currently processing one
+    - Writing the IN_TYPE and IN_DATA, so the game knows the type and what value to use
+    - Writing the IN_STATUS to AP_PROCESSING so the game knows to process what we just gave it
+    """
     status = read_int(IN_STATUS)
 
     if status != AP_READY:
@@ -117,6 +161,14 @@ def send_message(msg_type, data):
 
 
 def process_outgoing():
+    """
+    Process a message from the game by:
+    - Checking the OUT_STATUS - if not AP_PROCESSING, do nothing, as the game hasn't sent anything.
+    - Writing the OUT_TYPE and OUT_DATA so we have the data the game sent us.
+    - Doing something based on the type - currently only AP_OUT_MSGTYPE_SEND_CHECK does something.
+      - This will eventually send the info to AP that the check was received.
+    - Setting AP_READY to OUT_STATUS to let the game know it can send something else.
+    """
     status = read_int(OUT_STATUS)
 
     if status != AP_PROCESSING:
@@ -132,11 +184,14 @@ def process_outgoing():
 
 
 def process_console():
+    """
+    Test console that reads input in a non-blocking way. Takes several commands and
+    sends the info to the game.
+    """
     if not msvcrt.kbhit():
         return
 
     cmd = input().strip()
-
     parts = cmd.split()
 
     if parts[0] == "weapon":
@@ -150,6 +205,9 @@ def process_console():
         
     elif parts[0] == "dump":
         print_memory_block()
+        
+    elif parts[0] == "throw":
+        raise Exception("The user told me to!")
 
     elif parts[0] == "quit":
         exit()
@@ -157,9 +215,15 @@ def process_console():
 print("AP bridge started")
 print("Commands: weapon X, ammo X, trap X, dump")
 
+
+"""
+This is the main execution loop.
+Each loop, checks if the AP block is not valid, throw an exception and try to connect again.
+Tries to process outgoing messages, as well as console commands.
+"""
 while True:
     try:
-        if read_int(MAGIC) != 0x4150524B:
+        if not is_ap_block_valid():
             raise Exception("AP block disappeared")
             
         process_outgoing()
