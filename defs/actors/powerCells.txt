@@ -4,7 +4,7 @@
 //
 // inventory power cells
 //
-// Note that in the rando mod, we can't use the macros defined in main
+// Note that in the rando mod, we can't use the macros defined in common
 //
 //-----------------------------------------------------------------------------
 

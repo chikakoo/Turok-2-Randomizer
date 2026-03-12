@@ -20,6 +20,8 @@ class APMemory
 {
     int Magic;
     int Version;
+	int Signature1;
+	int Signature2;
 	
 	// Whether we're ready for AP to send data
 	// After we process it, we will change this status to ready
@@ -40,6 +42,8 @@ void PrintAPMemory()
 {
 	Sys.Print("Magic: " + g_AP.Magic);
 	Sys.Print("Version: " + g_AP.Version);
+	Sys.Print("Signature1: " + g_AP.Signature1);
+	Sys.Print("Signature2: " + g_AP.Signature2);
 	
 	Sys.Print("IncomingStatus: " + g_AP.IncomingStatus);
 	Sys.Print("IncomingMessageType: " + g_AP.IncomingMessageType);
@@ -98,6 +102,8 @@ void InitAP()
 {
 	g_AP.Magic = 0x4150524B; // APRK
     g_AP.Version = 1;
+	g_AP.Signature1 = 0x43110DAD;
+	g_AP.Signature2 = 0x1337BEEF;
 
     g_AP.IncomingStatus = AP_READY;
     g_AP.IncomingMessageType = AP_MSGTYPE_NONE;
