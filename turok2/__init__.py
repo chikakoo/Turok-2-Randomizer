@@ -27,7 +27,7 @@ class Turok2World(World):
     
     settings: typing.ClassVar[Turok2Settings]
 
-    location_name_to_id = locations.LOCATION_NAME_TO_ID
+    location_name_to_id = {name: data["ap_id"] for name, data in locations.LOCATION_TABLE.items()}
     item_name_to_id = items.ITEM_NAME_TO_ID
     origin_region_name = "Entire Game"
 
