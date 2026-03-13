@@ -5,6 +5,7 @@ from collections.abc import Mapping
 from worlds.AutoWorld import World
 from . import items, locations, regions, rules, web_world
 from . import options as turok2_options
+from .turok2_seed import gen_turok2_seed
 
 class Turok2Settings(settings.Group):
     class Turok2Path(settings.FilePath):
@@ -42,3 +43,6 @@ class Turok2World(World):
         
     def get_filler_item_name(self) -> str:
         return items.get_random_filler_item_name(self)
+        
+    def generate_output(self, output_directory: str) -> None:
+        gen_turok2_seed(self, output_directory)

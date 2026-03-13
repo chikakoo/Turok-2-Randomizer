@@ -102,7 +102,8 @@ ITEM_NAME_TO_ID = {
 }
 
 ID_TO_ITEM = {
-    data["id"]: data for data in ITEM_TABLE.values()
+    data["id"]: (name, data)
+    for name, data in ITEM_TABLE.items()
 }
 
 DEFAULT_ITEM_CLASSIFICATIONS = {
@@ -110,28 +111,36 @@ DEFAULT_ITEM_CLASSIFICATIONS = {
     for name, data in ITEM_TABLE.items()
 }
 
-PROGRESSION_ITEMS = [
-    name for name, data in ITEM_TABLE.items()
-    if data["class"] == ItemClassification.progression
-]
+def get_progression_items():
+    return [
+        (name, data)
+        for name, data in ITEM_TABLE.items()
+        if data["class"] == ItemClassification.progression
+    ]
 
-# "Filler" items just have the filler classification, meaning they aren't useful
-FILLER_ITEMS = [
-    name for name, data in ITEM_TABLE.items()
-    if data["class"] == ItemClassification.filler
-]
 
-# "Useful" items aren't progression, but the player might want them
-# They are often in the filler item pool because they aren't required
-USEFUL_ITEMS = [
-    name for name, data in ITEM_TABLE.items()
-    if data["class"] == ItemClassification.useful
-]
+def get_filler_items():
+    return [
+        (name, data)
+        for name, data in ITEM_TABLE.items()
+        if data["class"] == ItemClassification.filler
+    ]
 
-TRAPS = [
-    name for name, data in ITEM_TABLE.items()
-    if data["class"] == ItemClassification.trap
-]
+
+def get_useful_items():
+    return [
+        (name, data)
+        for name, data in ITEM_TABLE.items()
+        if data["class"] == ItemClassification.useful
+    ]
+
+
+def get_traps():
+    return [
+        (name, data)
+        for name, data in ITEM_TABLE.items()
+        if data["class"] == ItemClassification.trap
+    ]
 
 class Turok2Item(Item):
     game = "Turok 2"
@@ -141,15 +150,13 @@ def get_random_filler_item_name(world: Turok2World) -> str:
     world.py will use this to generate filler items.
     This will generate a random filler by weight based on filler/useful items.
     '''
-    items = FILLER_ITEMS + USEFUL_ITEMS
-    weights = {
-        name: data["weight"]
-        for name, data in filler_possibilities
-    }
+    items = get_filler_items() + get_useful_items()
+    names = [name for name, _ in items]
+    weights = [data.get("weight", 3) for _, data in items]
     
-    return world.random.choices(items, weights=weights, k=1)[0]
+    return world.random.choices(names, weights=weights, k=1)[0]
     
-def create_item_with_correct_classification(world: Turok2World, name: str) -> APQuestItem:
+def create_item_with_correct_classification(world: Turok2World, name: str) -> Turok2Item:
     '''
     Creates an item by name. This is here in case we ever need to change the
     classification of any item based on the options the player chooses.
@@ -163,9 +170,9 @@ def create_item_with_correct_classification(world: Turok2World, name: str) -> AP
         world.player
     )
     
-def create_all_items(world: APQuestWorld) -> None:
+def create_all_items(world: Turok2World) -> None:
     '''
-    Creates all of the items that will go int the item pool.
+    Creates all of the items that will go into the item pool.
     There must be exactly as many items as locations.
     '''
     
@@ -175,10 +182,9 @@ def create_all_items(world: APQuestWorld) -> None:
     itempool = []
 
     # All progression items are included
-    for item in PROGRESSION_ITEMS:
-        count = item.count if item.count is not None else 1
-        for _ in range(item.count):
-            itempool.append(world.create_item(item))
+    for name, data in get_progression_items():
+        for _ in range(data.get("count", 1)):
+            itempool.append(world.create_item(name))
 
     number_of_items = len(itempool)
     
@@ -186,7 +192,7 @@ def create_all_items(world: APQuestWorld) -> None:
     
     # Add filler items to the pool - includes items marked as filler and useful
     number_of_unfilled_locations = len(world.multiworld.get_unfilled_locations(world.player))
-    needed_number_of_filler_items = number_of_unfilled_locations - number_of_items
+    needed_number_of_filler_items = max(0, number_of_unfilled_locations - number_of_items)
     itempool += [world.create_filler() for _ in range(needed_number_of_filler_items)]
 
     world.multiworld.itempool += itempool
@@ -194,17 +200,17 @@ def create_all_items(world: APQuestWorld) -> None:
     # If we make options for this...
     # To start with items, do world.push_precollected(created_item)
     
-def map_ap_item_to_game(ap_item_id):
+def map_ap_item_to_game(ap_item_id) -> tuple[int, int]:
     """
     Maps the given AP item id to the game so that the appropriate message
     type and actor id can be sent.
     
     If the item is not mapped returns NONE so the game will ignore the item.
     """
-    item = ID_TO_ITEM.get(ap_item_id)
+    name, item = ID_TO_ITEM.get(ap_item_id, (None, None))
     
     if not item:
-        print(f"Unknown AP item id {ap_item_id}")
+        print(f"Unknown AP item {ap_item_id}: {name}")
         return AP_IN_MSGTYPE_NONE, 0
         
     return item["msg_type"], item["actor_id"]

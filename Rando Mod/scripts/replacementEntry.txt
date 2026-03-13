@@ -44,7 +44,7 @@ bool g_perSaveInitialized = false;
 // Initialize the replacement array
 void InitActorReplacements()
 {
-	#include "scripts/randoReplacements.txt"
+	#include "rando/randoReplacements.txt"
 }
 
 // Add to the array.

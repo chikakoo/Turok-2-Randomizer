@@ -15,7 +15,7 @@ def create_all_regions(world: Turok2World) -> None:
     The logic for how they connect is done in connect_regions.
     '''
     entireGame = Region("Entire Game", world.player, world.multiworld)
-    regiions = [entireGame]
+    regions = [entireGame]
     world.multiworld.regions += regions
     
 def connect_regions(world: Turok2World) -> None:
