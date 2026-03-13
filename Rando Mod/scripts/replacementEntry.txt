@@ -105,11 +105,19 @@ bool IsLocationCollected(const int &in id)
 }
 
 // Marks the given location as collected by putting it in the array.
-// Also puts it in the outgoing message queue for AP.
+// We handle sending to AP in SendCheckToAP - see that documentation.
 // id: The id to mark as collected
 void CollectLocation(const int &in id)
 {
     g_collectedLocations.insertLast(id);
+}
+
+// Puts the location in the outgoing message queue for AP.
+// This is different from collecting it, as you could touch health/ammo that
+// you cannot pick up. We still want to send that to AP.
+// id: The id to send to AP
+void SendCheckToAP(const int &in id)
+{
 	g_outgoingMessageQueue.insertLast(
 		APOutgoingMessage(AP_OUT_MSGTYPE_SEND_CHECK, id));
 }

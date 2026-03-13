@@ -8,12 +8,26 @@ from CommonClient import CommonContext, server_loop, gui_enabled
 from ..items import map_ap_item_to_game
 
 class Turok2Context(CommonContext):
-    #TODO STILL:
-    # Set self.finished_game when the game is done
     game = "Turok 2"
+    
+    # 1: Our starting inventory can be set and sent to us
+    # 0: We do NOT get sent items from our own world (as we'd get dups)
+    # 1: We get items sent to us from other worlds
+    items_handling = 0b101
 
     def __init__(self, server_address, password):
         super().__init__(server_address, password)
+        
+    async def server_auth(self, password_requested: bool = False) -> None:
+        if password_requested and not self.password:
+            self.ui.allow_intro_song()
+            await super().server_auth(password_requested)
+        await self.get_username()
+        await self.send_connect(game=self.game)
+        
+    # ======================
+    # Game integration below
+    # ======================
     
     # APStatus - if these are not 0 or 1, they are invalid
     AP_READY = 0
@@ -29,6 +43,7 @@ class Turok2Context(CommonContext):
     AP_IN_MSGTYPE_GET_TRAP = 5
 
     AP_OUT_MSGTYPE_SEND_CHECK = 6
+    AP_OUT_GAME_FINISHED = 7
 
     # Memory offsets - this is how the struct is layed out
     MAGIC = 0
@@ -229,12 +244,17 @@ class Turok2Context(CommonContext):
         # Send this check to Archipelago - msg_data is the location id
         if msg_type == self.AP_OUT_MSGTYPE_SEND_CHECK:
             await self.check_locations([msg_data])
-
+        elif msgType == self.AP_OUT_GAME_FINISHED:
+            self.finished_game = true
+        else:
+            print(f"Tried to send unexpected type/data: {msg_type}/{msg_data}")
+            
         # Mark block ready for next message
         self.write_int(self.OUT_STATUS, self.AP_READY)
     
 async def main(args: Namespace, exe_name) -> None:
     ctx = Turok2Context(args.url, None)
+    ctx.auth = args.name
     ctx.exe_name = exe_name
 
     if gui_enabled:

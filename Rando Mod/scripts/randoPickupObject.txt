@@ -16,6 +16,11 @@ class RandoPickupObject : ScriptObject
 		
 		// Must have the replacement entry for this to work
 		SetNameAndId();
+		
+		// Turn on the flag so that collision can be detected
+		// We need to be able to detect touching health/ammo
+		// pickups even when we don't have full so we can send the AP check
+		self.WorldComponent().Flags() |= WCF_INVOKE_COLLIDE_CALLBACK;
     }
 	
 	// Gets a unique id for the pickup.
@@ -53,9 +58,27 @@ class RandoPickupObject : ScriptObject
 		}
 	}
 	
-	// Called when the actor is touched.
+	// This is called when the actor is collided with, even if not collected.
+	// Note that health and ammo ARE sent to AP still when touched
+	// so that it knows you could have received it.
+	void OnCollide(kActor@ pCollider)
+	{
+		if (m_id != 0 && 
+			!(pCollider is null) &&
+			pCollider.InstanceOf("kexPuppet"))
+		{
+			Sys.Print("SENT TO AP: " + ToString());
+			SendCheckToAP(m_id);
+			
+			// Turn the flag off now, since we already sent the check
+			// It will turn back on when the map reloads, but at least
+			// we don't be spamming AP with useless messages every tick!
+			self.WorldComponent().Flags() &= ~WCF_INVOKE_COLLIDE_CALLBACK;
+		}
+	}
+	
+	// Called when the actor is collected.
 	// Marks it as collected so it won't respawn.
-	// This is NOT called unless the pickup is collected.
 	void OnTouch(kActor@ pInstigator)
 	{
 		if (m_id != 0)
