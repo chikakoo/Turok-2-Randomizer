@@ -22,14 +22,13 @@ class Turok2Context(CommonContext):
     # APMessageType (IN are values to send, OUT are values we receive)
     AP_MSGTYPE_NONE = 0
 
-    AP_IN_MSGTYPE_NONE = 0
     AP_IN_MSGTYPE_GET_PICKUP = 1
     AP_IN_MSGTYPE_GET_WEAPON = 2
-    AP_IN_MSGTYPE_GET_MISSION_ITEMS = 3
+    AP_IN_MSGTYPE_GET_MISSION_ITEM = 3
     AP_IN_MSGTYPE_GET_AMMO = 4
     AP_IN_MSGTYPE_GET_TRAP = 5
 
-    AP_OUT_MSGTYPE_SEND_CHECK = 5
+    AP_OUT_MSGTYPE_SEND_CHECK = 6
 
     # Memory offsets - this is how the struct is layed out
     MAGIC = 0

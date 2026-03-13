@@ -89,13 +89,16 @@ enum APMessageType
 	// Default, should be ignored on both ends
 	AP_MSGTYPE_NONE = 0,
 	
-	// Incoming message types (dummy for now, but this is the idea)
-	AP_IN_MSGTYPE_GET_WEAPON,
-	AP_IN_MSGTYPE_GET_AMMO,
-	AP_IN_MSGTYPE_GET_TRAP,
+	// Incoming message types
+    AP_IN_MSGTYPE_GET_PICKUP = 1,
+    AP_IN_MSGTYPE_GET_WEAPON = 2,
+    AP_IN_MSGTYPE_GET_MISSION_ITEM = 3,
+    AP_IN_MSGTYPE_GET_AMMO = 4,
+    AP_IN_MSGTYPE_GET_TRAP = 5,
 	
 	// Outgoing message types
-	AP_OUT_MSGTYPE_SEND_CHECK
+	AP_OUT_MSGTYPE_SEND_CHECK = 6
+	// TODO: probably one for when the goal is reached
 }
 
 void InitAP()
@@ -186,6 +189,9 @@ void main(void)
     InitPrimagenBossModeTable();
 }
 
+
+// --------------------------
+// Test block
 // TODO: remove this when done
 void TestIncrement(void)
 {
@@ -196,4 +202,12 @@ void TestIncrement(void)
 void GetAPItem(void)
 {
 	Sys.Print("" + g_AP.Version);
+}
+
+void APTest(void)
+{
+	LocalPlayer.Inventory().Give(4200);
+	int total = LocalPlayer.Inventory().GetCount(4200);
+	LocalPlayer.Actor().PlaySound("sounds/shaders/Ammo Pickup.ksnd");
+	Hud.AddMessage("Got Power Cell (" + total + ")!");
 }

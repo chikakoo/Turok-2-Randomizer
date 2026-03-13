@@ -100,35 +100,92 @@ class RandoPlayerObject : ScriptObject
 		}
 		
 		int data = g_AP.IncomingMessageData;
-		
-		// Can't define variables in switch blocks...
-		// TODO: put the trap code in its own function
-		int16 nRegionIdx = self.WorldComponent()
-			.GetNearPositionAndRegionIndex(self.Origin(), self.Origin());
-		
 		switch(g_AP.IncomingMessageType)
 		{
+			case AP_IN_MSGTYPE_GET_PICKUP:
+				HandleGetPickup(data);
+				break;
 			case AP_IN_MSGTYPE_GET_WEAPON:
-				Hud.AddMessage("Weapon get: " + data);
-				Sys.Print("Weapon get: " + data);
+				HandleGetWeapon(data);
 				break;
 			case AP_IN_MSGTYPE_GET_AMMO:
-				Hud.AddMessage("Ammo get: " + data);
-				Sys.Print("Ammo get: " + data);
+				HandleGetAmmo(data);
+				break;
+			case AP_IN_MSGTYPE_GET_MISSION_ITEM:
+				HandleGetMissionItem(data);
 				break;
 			case AP_IN_MSGTYPE_GET_TRAP:
-				Hud.AddMessage("It's a trap! " + data);
-				Sys.Print("It's a trap! " + data);
-				
-				ActorFactory.Spawn(data, self.Origin(), 0, 0, 0, true, nRegionIdx);
-				
+				HandleTrap(data);
 				break;
+			default:
+				Sys.Print("Did not handle incoming message: " + g_AP.IncomingMessageType);
 		}
 		
 		// Set this back to ready so AP knows it can send more
 		g_AP.IncomingMessageType = AP_MSGTYPE_NONE;
 		g_AP.IncomingMessageData = 0;
 		g_AP.IncomingStatus = AP_READY;
+	}
+	
+	void SpawnActorUnderPlayer(int& in actorId)
+	{
+		int16 nRegionIdx = self.WorldComponent()
+			.GetNearPositionAndRegionIndex(self.Origin(), self.Origin());
+		ActorFactory.Spawn(actorId, self.Origin(), 0, 0, 0, true, nRegionIdx);
+	}
+	
+	// Pickups aren't that important, so let's just spawn it under the player.
+	// They SHOULD just pick it up most of the time!
+	void HandleGetPickup(int& in data)
+	{
+		Sys.Print("Pickup get: " + data);
+		SpawnActorUnderPlayer(data);
+	}
+	
+	// Gives the player the given weapon and completely fills the ammo
+	void HandleGetWeapon(int& in data)
+	{
+		Sys.Print("Weapon get: " + data);
+		LocalPlayer.GiveWeapon(data, 1000);
+	}
+	
+	// Handles getting ammo
+	// Currently just maxes out the current weapon's ammo
+	// TODO: Figure out what we want this to actually do
+	// - if we want it to give it only if you own the weapon, we need to look up the weapon
+	// - else we can give ammo to all owned weapons, or something of that nature
+	// - else else we just spawn the given actor id under the player and
+	//   if they don't have the matching weapon, oh well
+	void HandleGetAmmo(int& in data)
+	{
+		Sys.Print("Ammo get: " + data);
+		int currentWeaponId = LocalPlayer.CurrentWeaponID();
+		LocalPlayer.GiveWeapon(currentWeaponId, 1000);
+	}
+	
+	void HandleGetMissionItem(int& in data)
+	{
+		Sys.Print("Mission item get: " + data);
+		
+		LocalPlayer.Inventory().Give(data);
+		int total = LocalPlayer.Inventory().GetCount(data);
+		
+		// TODO: look these up based on the actor id instead
+		LocalPlayer.Actor().PlaySound("sounds/shaders/Ammo Pickup.ksnd");
+		Hud.AddMessage("Got Power Cell (" + total + ")!");
+	}
+	
+	// Handles traps - for now, this will just spawn the actor given in data.
+	// We will want different types for the different ids here, though eventually.
+	// Trap ideas: 
+	// - more enemy spawns (or just have it be a random one)
+	// - ammo traps (self.ConsumeAmmo/ConsumeAltAmmo)
+	// - player damage traps (self.InflictDamage(kDamageInfo))
+	void HandleTrap(int& in data)
+	{
+		Hud.AddMessage("It's a trap! " + data);
+		Sys.Print("It's a trap! " + data);
+		SpawnActorUnderPlayer(data);
 	}
 	
 	void ProcessOutgoingMessages(void)

@@ -5,7 +5,7 @@ from BaseClasses import Item, ItemClassification
 if TYPE_CHECKING:
     from .world import Turok2World
     
-AP_IN_MSGTYPE_NONE = 0
+AP_MSGTYPE_NONE = 0
 AP_IN_MSGTYPE_GET_PICKUP = 1
 AP_IN_MSGTYPE_GET_WEAPON = 2
 AP_IN_MSGTYPE_GET_MISSION_ITEMS = 3
@@ -62,7 +62,7 @@ ITEM_TABLE = {
     "Beacon Power Cell": {
         "id": 200000,
         "actor_id": 4200,
-        "msg_type": AP_IN_MSGTYPE_GET_MISSION_ITEMS,
+        "msg_type": AP_IN_MSGTYPE_GET_MISSION_ITEM,
         "class": ItemClassification.progression,
         "count": 1 # TODO: this is actually like 4, or something
     },
@@ -211,7 +211,7 @@ def map_ap_item_to_game(ap_item_id) -> tuple[int, int]:
     
     if not item:
         print(f"Unknown AP item {ap_item_id}: {name}")
-        return AP_IN_MSGTYPE_NONE, 0
+        return AP_MSGTYPE_NONE, 0
         
     return item["msg_type"], item["actor_id"]
  
