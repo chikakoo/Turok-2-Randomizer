@@ -20,15 +20,6 @@ class RandoPickupObject : ScriptObject
 		// We need to be able to detect touching health/ammo
 		// pickups even when we don't have full so we can send the AP check
 		self.WorldComponent().Flags() |= WCF_INVOKE_COLLIDE_CALLBACK;
-		
-		// AP actors need to set these properties manually
-		if (self.Type() == kActor_Item_APItem)
-		{
-			Sys.Print("CONVERTING AP ITEM");
-			self.WorldComponent().Radius() = 40.96;
-			self.WorldComponent().Radius() = 61.44;
-			self.WorldComponent().Flags() |= WCF_NONSOLID;
-		}
     }
 	
 	// Gets a unique id for the pickup.
@@ -65,6 +56,12 @@ class RandoPickupObject : ScriptObject
 			m_name = replacementEntry.name;
 			m_id = replacementEntry.key;
 			m_displayString = replacementEntry.displayString;
+			
+			// Anything spawned from ActorFactory.Spawn needs to set these to avoid having collision
+			// These are the values for life tiles, which should be fine for everything
+			self.WorldComponent().Radius() = 40.96;
+			self.WorldComponent().Height() = 61.44;
+			self.WorldComponent().Flags() |= WCF_NONSOLID;
 		}
 	}
 	

@@ -1,6 +1,8 @@
+#include "defs/randoConstants.txt"
+
 // Off-world AP item - using life force so it will be collected no matter what
 // For now, you'll get a life force, but whatever
-APItem 100000 // kActor_Item_APItem (Cannot use the macro here)
+APItem kActor_Item_APItem
 {
     className                   "kexLifeForcePickup"
     placeable                   TRUE

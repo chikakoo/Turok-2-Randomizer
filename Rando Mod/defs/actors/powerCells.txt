@@ -1,15 +1,13 @@
-#include "defs/common.txt"
+#include "defs/randoConstants.txt"
 
 //-----------------------------------------------------------------------------
 //
 // inventory power cells
 //
-// Note that in the rando mod, we can't use the macros defined in common
-//
 //-----------------------------------------------------------------------------
 
 
-Actor 4200 //kActor_MissionItem_PoAPowerCell
+Actor kActor_MissionItem_PoAPowerCell
 { 
 	className "kexInventoryPickup" 
 	placeable TRUE 

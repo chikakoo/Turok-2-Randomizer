@@ -143,8 +143,6 @@ bool DeserializeBool(kDict& in dict, const kStr& in key)
 #define DESERIALIZE_INT(x)      dict.GetInt(#x, x)
 #define DESERIALIZE_BOOL(x)     x = DeserializeBool(dict, #x)
 
-#define kActor_MissionItem_PoAPowerCell 4200
-
 #include "defs/common.txt"
 #include "defs/randoConstants.txt"
 #include "scripts/animations.txt"
@@ -207,8 +205,13 @@ void GetAPItem(void)
 
 void APTest(void)
 {
-	LocalPlayer.Inventory().Give(4200);
-	int total = LocalPlayer.Inventory().GetCount(4200);
-	LocalPlayer.Actor().PlaySound("sounds/shaders/Ammo Pickup.ksnd");
-	Hud.AddMessage("Got Power Cell (" + total + ")!");
+	kActor @actor = LocalPlayer.Actor().CastToActor();
+	int nRegionIdx = actor.WorldComponent().RegionIndex();
+	kVec3 origin = kVec3(actor.Origin());
+	
+	ActorFactory.Spawn(kActor_Item_Health10, 
+		origin, 
+		0, 0, 0, 
+		true, 
+		nRegionIdx);
 }
