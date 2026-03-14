@@ -86,8 +86,11 @@ class RandoPlayerObject : ScriptObject
 	// Checks for incoming and outgoing messages
 	void OnTick(void)
 	{
-		ProcessIncomingMessages();
-		ProcessOutgoingMessages();
+		if (!CinemaPlayer.Playing())
+		{
+			ProcessIncomingMessages();
+			ProcessOutgoingMessages();
+		}
 	}
 	
 	void ProcessIncomingMessages(void)
@@ -129,9 +132,9 @@ class RandoPlayerObject : ScriptObject
 	
 	void SpawnActorNearPlayer(int& in actorId)
 	{
-		kVec3 origin1 = kVec3(actor.Origin());
-		kVec3 origin2 = kVec3(actor.Origin());
-		kVec3 origin3 = kVec3(actor.Origin());
+		kVec3 origin1 = kVec3(self.Origin());
+		kVec3 origin2 = kVec3(self.Origin());
+		kVec3 origin3 = kVec3(self.Origin());
 		int16 regionIdx = self.WorldComponent()
 			.GetNearPositionAndRegionIndex(origin1, origin2);
 		
@@ -142,7 +145,7 @@ class RandoPlayerObject : ScriptObject
 	{
 		kActor @actor = LocalPlayer.Actor().CastToActor();
 		int regionIdx = actor.WorldComponent().RegionIndex();
-		kVec3 origin = kVec3(actor.Origin());
+		kVec3 origin = kVec3(self.Origin());
 		
 		ActorFactory.Spawn(actorId, origin, 0, 0, 0, true, regionIdx);
 	}
