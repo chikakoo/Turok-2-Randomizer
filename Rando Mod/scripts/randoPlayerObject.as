@@ -121,7 +121,7 @@ class RandoPlayerObject : ScriptObject
 				HandleTrap(data);
 				break;
 			default:
-				Sys.Print("Did not handle incoming message: " + g_AP.IncomingMessageType);
+				Sys.Print("Did not handle incoming message: " + g_AP.IncomingMessageType + ". Data: " + data);
 		}
 		
 		// Set this back to ready so AP knows it can send more

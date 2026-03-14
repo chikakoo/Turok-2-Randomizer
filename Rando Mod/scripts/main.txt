@@ -14,108 +14,10 @@
 // DESCRIPTION:
 //      Main Script Module
 //
+// Mod note: we shouldn't change the extension of any of the original files to .as
 
-// Archipelago bridge - do not move where this is
-class APMemory
-{
-    int Magic;
-    int Version;
-	int Signature1;
-	int Signature2;
-	
-	// Whether we're ready for AP to send data
-	// After we process it, we will change this status to ready
-	int IncomingStatus;
-	int IncomingMessageType;
-	int IncomingMessageData;
-	
-	// Whether we're waiting for AP to read data
-	// After they process it, they will change this status to ready
-	int OutgoingStatus;
-	int OutgoingMessageType;
-	int OutgoingMessageData;
-}
-
-APMemory g_AP;
-
-void PrintAPMemory()
-{
-	Sys.Print("Magic: " + g_AP.Magic);
-	Sys.Print("Version: " + g_AP.Version);
-	Sys.Print("Signature1: " + g_AP.Signature1);
-	Sys.Print("Signature2: " + g_AP.Signature2);
-	
-	Sys.Print("IncomingStatus: " + g_AP.IncomingStatus);
-	Sys.Print("IncomingMessageType: " + g_AP.IncomingMessageType);
-	Sys.Print("IncomingMessageData: " + g_AP.IncomingMessageData);
-	
-	Sys.Print("OutgoingStatus: " + g_AP.OutgoingStatus);
-	Sys.Print("OutgoingMessageType: " + g_AP.OutgoingMessageType);
-	Sys.Print("OutgoingMessageData: " + g_AP.OutgoingMessageData);
-}
-
-class APOutgoingMessage
-{
-	APMessageType type;
-	int data;
-	
-	APOutgoingMessage() {}
-	APOutgoingMessage(const APMessageType &in t, const int &in d)
-	{
-		type = t;
-		data = d;
-	}
-}
-
-// A global for all outgoing messages - this is here in case we cannot send out
-// a check in time for the next one to come in
-// The player will check whether we're good to send out the next one every tick
-// We will also fill this with EVERY checked location when the game loads, to resync
-array<APOutgoingMessage> g_outgoingMessageQueue;
-
-enum APStatus
-{
-	// Incoming Message: We are ready for AP to send us data
-	// Outgoing Message: We can set data for Archipelago to read
-	AP_READY = 0,
-	
-	// Incoming Message: We are NOT ready for AP to send us data (we are processing the last one)
-	// Outgoing Message: We CANNOT set data for Archipelago to read (we are waiting for AP to process the last one)
-	AP_PROCESSING
-}
-
-enum APMessageType
-{
-	// Default, should be ignored on both ends
-	AP_MSGTYPE_NONE = 0,
-	
-	// Incoming message types
-    AP_IN_MSGTYPE_GET_PICKUP = 1,
-    AP_IN_MSGTYPE_GET_WEAPON = 2,
-    AP_IN_MSGTYPE_GET_MISSION_ITEM = 3,
-    AP_IN_MSGTYPE_GET_AMMO = 4,
-    AP_IN_MSGTYPE_GET_TRAP = 5,
-	
-	// Outgoing message types
-	AP_OUT_MSGTYPE_SEND_CHECK = 6
-	// TODO: probably one for when the goal is reached
-}
-
-void InitAP()
-{
-	g_AP.Magic = 0x4150524B; // APRK
-    g_AP.Version = 1;
-	g_AP.Signature1 = 0x43110DAD;
-	g_AP.Signature2 = 0x1337BEEF;
-
-    g_AP.IncomingStatus = AP_READY;
-    g_AP.IncomingMessageType = AP_MSGTYPE_NONE;
-    g_AP.IncomingMessageData = 0;
-
-    g_AP.OutgoingStatus = AP_READY;
-    g_AP.OutgoingMessageType = AP_MSGTYPE_NONE;
-    g_AP.OutgoingMessageData = 0;
-}
+// Include this at the top just to be sure that the memory block is stable
+#include "scripts/apMemory.as"
 
 #define MAX(a,b) ((a)>(b)?(a):(b))
 #define MIN(a,b) ((a)<(b)?(a):(b))
@@ -144,7 +46,8 @@ bool DeserializeBool(kDict& in dict, const kStr& in key)
 #define DESERIALIZE_BOOL(x)     x = DeserializeBool(dict, #x)
 
 #include "defs/common.txt"
-#include "defs/randoConstants.txt"
+#include "defs/randoConstants.as"
+
 #include "scripts/animations.txt"
 #include "scripts/actions.txt"
 #include "scripts/weapons.txt"
@@ -162,9 +65,9 @@ bool DeserializeBool(kDict& in dict, const kStr& in key)
 #include "scripts/primagenBoss.txt"
 #include "scripts/netcallbacks.txt"
 
-#include "scripts/randoPickupObject.txt"
-#include "scripts/randoPlayerObject.txt"
-#include "scripts/replacementEntry.txt"
+#include "scripts/randoPickupObject.as"
+#include "scripts/randoPlayerObject.as"
+#include "scripts/replacementEntry.as"
 
 /*
 ==============================================================
@@ -190,7 +93,7 @@ void main(void)
 
 
 // --------------------------
-// Test block
+// Mod test block
 // TODO: remove this when done
 void TestIncrement(void)
 {
@@ -205,13 +108,5 @@ void GetAPItem(void)
 
 void APTest(void)
 {
-	kActor @actor = LocalPlayer.Actor().CastToActor();
-	int nRegionIdx = actor.WorldComponent().RegionIndex();
-	kVec3 origin = kVec3(actor.Origin());
-	
-	ActorFactory.Spawn(kActor_Item_Health10, 
-		origin, 
-		0, 0, 0, 
-		true, 
-		nRegionIdx);
+	Sys.Print("" + AP_IN_MSGTYPE_GET_PICKUP);
 }

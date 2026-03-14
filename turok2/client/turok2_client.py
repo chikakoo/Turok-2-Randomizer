@@ -1,8 +1,6 @@
 import asyncio
 import pymem
-import time
-import struct
-import msvcrt
+from .ap_memory_constants import APStatus, APMessageType, APMemoryOffset
 from argparse import Namespace
 from CommonClient import CommonContext, server_loop, gui_enabled
 from ..items import map_ap_item_to_game
@@ -28,36 +26,6 @@ class Turok2Context(CommonContext):
     # ======================
     # Game integration below
     # ======================
-    
-    # APStatus - if these are not 0 or 1, they are invalid
-    AP_READY = 0
-    AP_PROCESSING = 1
-
-    # APMessageType (IN are values to send, OUT are values we receive)
-    AP_MSGTYPE_NONE = 0
-
-    AP_IN_MSGTYPE_GET_PICKUP = 1
-    AP_IN_MSGTYPE_GET_WEAPON = 2
-    AP_IN_MSGTYPE_GET_MISSION_ITEM = 3
-    AP_IN_MSGTYPE_GET_AMMO = 4
-    AP_IN_MSGTYPE_GET_TRAP = 5
-
-    AP_OUT_MSGTYPE_SEND_CHECK = 6
-    AP_OUT_GAME_FINISHED = 7
-
-    # Memory offsets - this is how the struct is layed out
-    MAGIC = 0
-    VERSION = 4
-    SIGNATURE1 = 8
-    SIGNATURE2 = 12
-
-    IN_STATUS = 16
-    IN_TYPE = 20
-    IN_DATA = 24
-
-    OUT_STATUS = 28
-    OUT_TYPE = 32
-    OUT_DATA = 36
 
     pattern = (b"\x4B\x52\x50\x41" + 
         b"\x01\x00\x00\x00" + 
@@ -118,7 +86,7 @@ class Turok2Context(CommonContext):
                 print(f"Found AP block at {hex(self.ap_base)}")
                 return self.ap_base
                     
-            except:
+            except Exception:
                 attempt += 1
                 if attempt > 5:
                     print("Couldn't find AP memory block after 5 tries, trying to reconnect to game.")
@@ -136,25 +104,34 @@ class Turok2Context(CommonContext):
         have moved or the game may have closed.
         """
         try:
-            return (self.read_int(self.MAGIC) == 0x4150524B and
-                self.read_int(self.VERSION) == 1 and
-                self.read_int(self.SIGNATURE1) == 0x43110DAD and
-                self.read_int(self.SIGNATURE2) == 0x1337BEEF and
-                self.read_int(self.IN_STATUS) in (0,1) and 
-                self.read_int(self.OUT_STATUS) in (0,1))
+            return (self.read_int(APMemoryOffset.MAGIC) == 0x4150524B and
+                self.read_int(APMemoryOffset.VERSION) == 1 and
+                self.read_int(APMemoryOffset.SIGNATURE1) == 0x43110DAD and
+                self.read_int(APMemoryOffset.SIGNATURE2) == 0x1337BEEF and
+                self.read_int(APMemoryOffset.IN_STATUS) in (
+                    APStatus.AP_READY.value,
+                    APStatus.AP_PROCESSING.value
+                ) and 
+                self.read_int(APMemoryOffset.OUT_STATUS) in (
+                    APStatus.AP_READY.value,
+                    APStatus.AP_PROCESSING.value
+                )
+            )
         except Exception:
             return False
 
-    def read_int(self, offset):
+    def read_int(self, offset: APMemoryOffset):
         """
         Helper to read the int for the given offset.
         """
-        return self.pm.read_int(self.ap_base + offset)
+        return self.pm.read_int(self.ap_base + getattr(offset, "value", offset))
 
-    def write_int(self, offset, value):
+    def write_int(self, offset: APMemoryOffset, value):
         """
         Helper to write an int to the given offset.
         """
+        offset = getattr(offset, "value", offset)
+        value = getattr(value, "value", value)
         self.pm.write_int(self.ap_base + offset, value)
         
     async def bridge_loop_async(self):
@@ -194,6 +171,7 @@ class Turok2Context(CommonContext):
         """
         TODO: doc
         """
+        
         highest_index = 0
         while True:
             if not self.game_connected:
@@ -219,12 +197,12 @@ class Turok2Context(CommonContext):
         - Writing the IN_TYPE and IN_DATA, so the game knows the type and what value to use
         - Writing the IN_STATUS to AP_PROCESSING so the game knows to process what we just gave it
         """
-        while self.read_int(self.IN_STATUS) != self.AP_READY:
+        while self.read_int(APMemoryOffset.IN_STATUS) != APStatus.AP_READY.value:
             await asyncio.sleep(0.05)
 
-        self.write_int(self.IN_TYPE, msg_type)
-        self.write_int(self.IN_DATA, data)
-        self.write_int(self.IN_STATUS, self.AP_PROCESSING)
+        self.write_int(APMemoryOffset.IN_TYPE, msg_type)
+        self.write_int(APMemoryOffset.IN_DATA, data)
+        self.write_int(APMemoryOffset.IN_STATUS, APStatus.AP_PROCESSING)
         
     async def process_outgoing(self):
         """
@@ -235,22 +213,22 @@ class Turok2Context(CommonContext):
           - This will eventually send the info to AP that the check was received.
         - Setting AP_READY to OUT_STATUS to let the game know it can send something else.
         """
-        if self.read_int(self.OUT_STATUS) != self.AP_PROCESSING:
+        if self.read_int(APMemoryOffset.OUT_STATUS) != APStatus.AP_PROCESSING.value:
             return
 
-        msg_type = self.read_int(self.OUT_TYPE)
-        msg_data = self.read_int(self.OUT_DATA)
+        msg_type = self.read_int(APMemoryOffset.OUT_TYPE)
+        msg_data = self.read_int(APMemoryOffset.OUT_DATA)
 
         # Send this check to Archipelago - msg_data is the location id
-        if msg_type == self.AP_OUT_MSGTYPE_SEND_CHECK:
+        if msg_type == APMessageType.AP_OUT_MSGTYPE_SEND_CHECK.value:
             await self.check_locations([msg_data])
-        elif msgType == self.AP_OUT_GAME_FINISHED:
-            self.finished_game = true
+        elif msg_type == APMessageType.AP_OUT_MSGTYPE_GAME_FINISHED.value:
+            self.finished_game = True
         else:
             print(f"Tried to send unexpected type/data: {msg_type}/{msg_data}")
             
         # Mark block ready for next message
-        self.write_int(self.OUT_STATUS, self.AP_READY)
+        self.write_int(APMemoryOffset.OUT_STATUS, APStatus.AP_READY)
     
 async def main(args: Namespace, exe_name) -> None:
     ctx = Turok2Context(args.url, None)

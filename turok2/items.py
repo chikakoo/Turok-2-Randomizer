@@ -1,58 +1,52 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from BaseClasses import Item, ItemClassification
+from .client.ap_memory_constants import APMessageType
 
 if TYPE_CHECKING:
     from .world import Turok2World
-    
-AP_MSGTYPE_NONE = 0
-AP_IN_MSGTYPE_GET_PICKUP = 1
-AP_IN_MSGTYPE_GET_WEAPON = 2
-AP_IN_MSGTYPE_GET_MISSION_ITEM = 3
-AP_IN_MSGTYPE_GET_AMMO = 4
-AP_IN_MSGTYPE_GET_TRAP = 5
     
 ITEM_TABLE = {
     # Pickups
     "Life Tile 1": {
         "id": 100000, 
         "actor_id": 1705,
-        "msg_type": AP_IN_MSGTYPE_GET_PICKUP,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_PICKUP.value,
         "class": ItemClassification.filler,
         "weight": 8
     },
     "Life Tile 2": {
         "id": 100001, 
         "actor_id": 1706, 
-        "msg_type": AP_IN_MSGTYPE_GET_PICKUP,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_PICKUP.value,
         "class": ItemClassification.filler,
         "weight": 3
     },
     "Silver Health": {
         "id": 100002,
         "actor_id": 1701,
-        "msg_type": AP_IN_MSGTYPE_GET_PICKUP,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_PICKUP.value,
         "class": ItemClassification.useful,
         "weight": 3
     },
     "Blue Health": {
         "id": 100003,
         "actor_id": 1702,
-        "msg_type": AP_IN_MSGTYPE_GET_PICKUP,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_PICKUP.value,
         "class": ItemClassification.useful,
         "weight": 5
     },
     "Full Health": {
         "id": 100004,
         "actor_id": 1703,
-        "msg_type": AP_IN_MSGTYPE_GET_PICKUP,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_PICKUP.value,
         "class": ItemClassification.useful,
         "weight": 2
     },
     "Ultra Health": {
         "id": 100005,
         "actor_id": 1704,
-        "msg_type": AP_IN_MSGTYPE_GET_PICKUP,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_PICKUP.value,
         "class": ItemClassification.useful,
         "weight": 1
     },
@@ -62,7 +56,7 @@ ITEM_TABLE = {
     "Beacon Power Cell": {
         "id": 200000,
         "actor_id": 4200,
-        "msg_type": AP_IN_MSGTYPE_GET_MISSION_ITEM,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_MISSION_ITEM.value,
         "class": ItemClassification.progression,
         "count": 1 # TODO: this is actually like 4, or something
     },
@@ -71,7 +65,7 @@ ITEM_TABLE = {
     "Pistol": {
         "id": 300000,
         "actor_id": 2004,
-        "msg_type": AP_IN_MSGTYPE_GET_WEAPON,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
         "class": ItemClassification.progression,
         "count": 1 # This will unlock the pistol, we may want options for how many of these
     },
@@ -82,7 +76,7 @@ ITEM_TABLE = {
     "Clip (Pistol)": {
         "id": 400000,
         "actor_id": 2500,
-        "msg_type": AP_IN_MSGTYPE_GET_AMMO,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_AMMO.value,
         "class": ItemClassification.filler,
         "weight": 4
     },
@@ -91,7 +85,7 @@ ITEM_TABLE = {
     "Endtrail Trap": {
         "id": 900000,
         "actor_id": 201,
-        "msg_type": AP_IN_MSGTYPE_GET_TRAP,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_TRAP.value,
         "class": ItemClassification.trap
     }
 }
@@ -210,8 +204,8 @@ def map_ap_item_to_game(ap_item_id) -> tuple[int, int]:
     name, item = ID_TO_ITEM.get(ap_item_id, (None, None))
     
     if not item:
-        print(f"Unknown AP item {ap_item_id}: {name}")
-        return AP_MSGTYPE_NONE, 0
+        print(f"Unknown AP item id {ap_item_id}")
+        return APMessageType.AP_MSGTYPE_NONE.value, 0
         
-    return item["msg_type"], item["actor_id"]
+    return item["msg_type"], item.get("actor_id", 0)
  
