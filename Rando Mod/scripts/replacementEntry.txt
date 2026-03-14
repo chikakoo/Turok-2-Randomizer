@@ -4,6 +4,7 @@
 // - position: The quantized position of the actor on the map
 //  - MapId_X_Y_Z
 // - value: The actor id (see common.txt for the macros)
+// - displayString: The display string to display when collected (only filled for AP items)
 // - wasReplaced: Whether this actor was already replaced (used to prevent replacement loops)
 class ReplacementEntry
 {
@@ -11,9 +12,11 @@ class ReplacementEntry
     int key;
 	kStr position;
     int value;
+	kStr displayString;
 	bool wasReplaced;
 	
 	ReplacementEntry() {}
+	
     ReplacementEntry(
 		const kStr &in n, 
 		const int &in k, 
@@ -24,6 +27,21 @@ class ReplacementEntry
         key = k;
 		position = p;
         value = v;
+		displayString = "";
+        wasReplaced = false;
+    }
+	
+	ReplacementEntry(
+		const kStr &in n, 
+		const int &in k, 
+		const kStr &in p, 
+		const kStr &in d)
+    {
+        name = n;
+        key = k;
+		position = p;
+		value = kActor_Item_APItem;
+        displayString = d;
         wasReplaced = false;
     }
 }
@@ -47,7 +65,7 @@ void InitActorReplacements()
 	#include "rando/randoReplacements.txt"
 }
 
-// Add to the array.
+// Add to the array for a local item.
 // - name: The friendly name of the actor
 // - key: The key to replace (the AP id of the actor)
 // - position: The position of the actor, to identify it on the map
@@ -60,6 +78,21 @@ void AddReplacement(
 {
 	g_actorReplacements.insertLast(
 		ReplacementEntry(name, key, position, value));
+}
+
+// Add to the array for an off-world AP item.
+// - name: The friendly name of the actor
+// - key: The key to replace (the AP id of the actor)
+// - position: The position of the actor, to identify it on the map
+// - displayString: The string to display when picked up (the enum id of the actor)
+void AddReplacement(
+	const kStr &in name, 
+	const int &in key, 
+	const kStr &in position,
+	const kStr &in displayString)
+{
+	g_actorReplacements.insertLast(
+		ReplacementEntry(name, key, position, displayString));
 }
 
 // Tries to get the replacement for the given actor id.

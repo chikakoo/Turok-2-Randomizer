@@ -52,7 +52,7 @@ def gen_turok2_seed(self: "Turok2World", output_directory: str):
         mod_dir, 
         output_directory, 
         self.player,
-        self.multiworld.get_file_safe_player_name(self.player))
+        header + self.multiworld.get_file_safe_player_name(self.player))
     mod.write()
     
 def get_angelscript_from_filled_locations(self: "Turok2World") -> str:
@@ -65,8 +65,17 @@ def get_angelscript_from_filled_locations(self: "Turok2World") -> str:
         location_name = location.name
         location_id = LOCATION_TABLE[location_name]["ap_id"]
         location_position = LOCATION_TABLE[location.name]["position"]
-        actor_id = ITEM_TABLE[location.item.name]["actor_id"]
         
-        angelscript_snippets.append(f"AddReplacement(\"{location_name}\", {location_id}, \"{location_position}\", {actor_id});")
+        snippet = f"AddReplacement(\"{location_name}\", {location_id}, \"{location_position}\""
+        
+        # If the item is for this world, the actor id should be the last parameter
+        if location.item and location.item.player == self.player:
+            snippet += f", {ITEM_TABLE[location.item.name]["actor_id"]});"
+        # Else, it should be the location name and player name (so we can display it on pickup)
+        else:
+            player_name = self.multiworld.get_player_name(location.item.player)
+            snippet += f", \"{player_name}'s {location.item.name}\");"
+        
+        angelscript_snippets.append(snippet)
         
     return "\n".join(angelscript_snippets)

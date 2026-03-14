@@ -6,6 +6,7 @@ class RandoPickupObject : ScriptObject
 	kStr m_name;
 	int m_id;
 	kStr m_actorName;
+	kStr m_displayString;
 	
 	// Constructor
 	// @actor: The actor that was loaded
@@ -13,14 +14,21 @@ class RandoPickupObject : ScriptObject
     {
 	    @self = actor;
 		m_position = GetPositionString();
-		
-		// Must have the replacement entry for this to work
-		SetNameAndId();
+		SetReplacementEntryProperties();
 		
 		// Turn on the flag so that collision can be detected
 		// We need to be able to detect touching health/ammo
 		// pickups even when we don't have full so we can send the AP check
 		self.WorldComponent().Flags() |= WCF_INVOKE_COLLIDE_CALLBACK;
+		
+		// AP actors need to set these properties manually
+		if (self.Type() == kActor_Item_APItem)
+		{
+			Sys.Print("CONVERTING AP ITEM");
+			self.WorldComponent().Radius() = 40.96;
+			self.WorldComponent().Radius() = 61.44;
+			self.WorldComponent().Flags() |= WCF_NONSOLID;
+		}
     }
 	
 	// Gets a unique id for the pickup.
@@ -40,9 +48,9 @@ class RandoPickupObject : ScriptObject
 			int(position.z);
 	}
 	
-	// Tries to get the name/id out of the dictionary.
+	// Tries to get the name/id/display string out of the dictionary.
 	// If not there, returns a placeholder for the name.
-	void SetNameAndId(void)
+	void SetReplacementEntryProperties(void)
 	{
 		ReplacementEntry replacementEntry;
 		TryGetReplacement(m_position, replacementEntry);
@@ -50,11 +58,13 @@ class RandoPickupObject : ScriptObject
 		if (replacementEntry is null)
 		{
 			m_name = "<NO NAME SET>";
+			m_displayString = "";
 		}
-		else 
+		else
 		{
 			m_name = replacementEntry.name;
 			m_id = replacementEntry.key;
+			m_displayString = replacementEntry.displayString;
 		}
 	}
 	
@@ -74,6 +84,12 @@ class RandoPickupObject : ScriptObject
 			// It will turn back on when the map reloads, but at least
 			// we don't be spamming AP with useless messages every tick!
 			self.WorldComponent().Flags() &= ~WCF_INVOKE_COLLIDE_CALLBACK;
+			
+			// If it's an AP item, display the check
+			if (m_displayString != "")
+			{
+				Hud.AddMessage(m_displayString);
+			}
 		}
 	}
 	
