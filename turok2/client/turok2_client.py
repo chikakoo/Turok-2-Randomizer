@@ -178,7 +178,11 @@ class Turok2Context(CommonContext):
         Here, we use the highest processed index to get all the new items we need to get, and
         process them one at a time, incrementing the index for each one.
         """
-        self.highest_processed_index = self.read_int(APMemoryOffset.OUT_LAST_PROCESSED_ITEM_IDX)
+        # Clamp it so we can't accidently go out of range
+        self.highest_processed_index = min(
+            self.read_int(APMemoryOffset.OUT_LAST_PROCESSED_ITEM_IDX),
+            len(self.items_received)
+)
         new_items = self.items_received[self.highest_processed_index:]
         for item in new_items:
             # If we're suddenly not connected, exit out
