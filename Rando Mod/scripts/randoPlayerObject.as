@@ -320,6 +320,13 @@ bool TryGivePlayerHealth(int& in actorId)
 			newHealthValue = Math::Min(newHealthValue, recoveryCap);
 		}
 	}
+	
+	// Play the voice line if there is one (e.g. "Ultra Health", or "Full Health")
+	int callout;
+	if (healthDict.GetInt("pickup.callout", callout))
+	{
+		Game.PlayVoice(callout);
+	}
 
 	LocalPlayer.Actor().CastToActor().Health() = newHealthValue;
 	LocalPlayer.Actor().PlaySound(pickupSound);
