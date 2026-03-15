@@ -190,7 +190,7 @@ class RandoPlayerObject : ScriptObject
 		
 		if (className == "kexLifeForcePickup")
 		{
-		
+			SpawnActorOnPlayer(data);
 		}
 	}
 	
