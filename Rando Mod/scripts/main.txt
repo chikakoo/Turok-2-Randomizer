@@ -65,6 +65,7 @@ bool DeserializeBool(kDict& in dict, const kStr& in key)
 #include "scripts/primagenBoss.txt"
 #include "scripts/netcallbacks.txt"
 
+#include "scripts/playerUtils.as"
 #include "scripts/randoPickupObject.as"
 #include "scripts/randoPlayerObject.as"
 #include "scripts/replacementEntry.as"
@@ -90,53 +91,4 @@ void main(void)
     InitQueenBossModeTable();
     InitMotherBossModeTable();
     InitPrimagenBossModeTable();
-}
-
-
-// --------------------------
-// Mod test block
-// TODO: remove this when done
-void TestIncrement(void)
-{
-	g_AP.Version++;
-	Sys.Print("VALUE: " + g_AP.Version);
-}
-
-void GetAPItem(void)
-{
-	Sys.Print("" + g_AP.Version);
-}
-
-void APTest(void)
-{
-	LocalPlayer.Actor().CastToActor().Health() = 69;
-}
-
-void APTest2(void)
-{
-}
-
-void APTest3(void)
-{
-
-}
-
-void Health2()
-{
-	TryGivePlayerHealth(kActor_Item_Health2);
-}
-
-void Health10()
-{
-	TryGivePlayerHealth(kActor_Item_Health10);
-}
-
-void FullHealth()
-{
-	TryGivePlayerHealth(kActor_Item_HealthFull);
-}
-
-void UltraHealth()
-{
-	TryGivePlayerHealth(kActor_Item_HealthUltra);
 }

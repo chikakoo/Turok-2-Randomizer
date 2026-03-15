@@ -66,6 +66,8 @@ void InitDefManager()
 	g_defManager = kIndexDefManager();
 	g_defManager.LoadFile("defs/actors/health.txt");
 	g_defManager.LoadFile("defs/actors/pickups.txt");
+	g_defManager.LoadFile("defs/actors/weaponPickups.txt");
+	g_defManager.LoadFile("defs/actors/powerCells.txt");
 }
 
 // Initialize the replacement array
@@ -314,8 +316,8 @@ kStr GetFriendlyActorName(const int &in actorType)
 			return "Nuke Ammo";
 			
 		// Mission items
-		case kActor_MissionItem_PoAPowerCell:
-			return "PoA Power Cell";
+		case kActor_MissionItem_BeaconPowerCell:
+			return "Beacon Power Cell";
 	}
 	
 	// Unmapped - return the type as a string

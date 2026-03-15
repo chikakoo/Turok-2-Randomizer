@@ -11,6 +11,7 @@ class RandoPlayerObject : ScriptObject
 		'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '{', '|', '}', '~', ""
 	};
 	
+	//---------------------------
 	// Constructor
 	// @actor: The actor that was loaded
     RandoPlayerObject(kActor @actor)
@@ -18,6 +19,7 @@ class RandoPlayerObject : ScriptObject
 		@self = actor;
     }
 	
+	//---------------------------
 	// Resets the state of the globals on a save load
 	void OnSpawn(void)
 	{
@@ -31,9 +33,10 @@ class RandoPlayerObject : ScriptObject
 		}
 	}
 	
+	//---------------------------
 	// Serializes the collectedLocations by converting it to a trailing-pipe string
 	// e.g. "51001|51002" for two locations
-	void OnSerialize(kDict& out dict)
+	void OnSerialize(kDict &out dict)
     {
 		kStr collectedLocations;
 		for (uint i = 0; i < g_collectedLocations.length(); i++)
@@ -49,7 +52,8 @@ class RandoPlayerObject : ScriptObject
 		SERIALIZE(g_AP.OutgoingLastProcessedItemIdx);
 		Sys.Print("Saved last processed index: " + g_AP.OutgoingLastProcessedItemIdx);
 	}
-	
+
+	//---------------------------
 	// Deserializes the saved data on the player object:
 	// - Writes the highest processed item index into the outgoing one so the client can read it
 	// - Writes the collected locations by converting the trailing pipe string (see above) 
@@ -57,7 +61,7 @@ class RandoPlayerObject : ScriptObject
 	// - Resets the repalcement flags so they don't persist from a previous session
 	//
 	// Also, clear out any incoming/outgoing data because it's invalid at this point
-	void OnDeserialize(kDict& in dict)
+	void OnDeserialize(kDict &in dict)
     {
 		kStr data;
 		dict.GetString("collectedLocations", data);
@@ -93,6 +97,7 @@ class RandoPlayerObject : ScriptObject
 		Sys.Print("Loaded last processed index: " + g_AP.OutgoingLastProcessedItemIdx);
 	}
 	
+	//---------------------------
 	// Checks for incoming and outgoing messages
 	void OnTick(void)
 	{
@@ -116,18 +121,23 @@ class RandoPlayerObject : ScriptObject
 		switch(g_AP.IncomingMessageType)
 		{
 			case AP_IN_MSGTYPE_GET_PICKUP:
+				Sys.Print("Pickup get: " + data);
 				HandleGetPickup(data);
 				break;
 			case AP_IN_MSGTYPE_GET_WEAPON:
-				HandleGetWeapon(data);
+				Sys.Print("Weapon get: " + data);
+				TryGivePlayerWeapon(data);
 				break;
 			case AP_IN_MSGTYPE_GET_AMMO:
+				Sys.Print("Ammo get: " + data);
 				HandleGetAmmo(data);
 				break;
 			case AP_IN_MSGTYPE_GET_MISSION_ITEM:
+				Sys.Print("Mission item get: " + data);
 				HandleGetMissionItem(data);
 				break;
 			case AP_IN_MSGTYPE_GET_TRAP:
+				Sys.Print("It's a trap! " + data);
 				HandleTrap(data);
 				break;
 			default:
@@ -145,32 +155,10 @@ class RandoPlayerObject : ScriptObject
 		Sys.Print("Updated last processed index: " + g_AP.OutgoingLastProcessedItemIdx);
 	}
 	
-	void SpawnActorNearPlayer(int& in actorId)
-	{
-		kVec3 origin1 = kVec3(self.Origin());
-		kVec3 origin2 = kVec3(self.Origin());
-		kVec3 origin3 = kVec3(self.Origin());
-		int16 regionIdx = self.WorldComponent()
-			.GetNearPositionAndRegionIndex(origin1, origin2);
-		
-		ActorFactory.Spawn(actorId, origin3, 0, 0, 0, true, regionIdx);
-	}
-	
-	void SpawnActorOnPlayer(int& in actorId)
-	{
-		kActor @actor = LocalPlayer.Actor().CastToActor();
-		int regionIdx = actor.WorldComponent().RegionIndex();
-		kVec3 origin = kVec3(self.Origin());
-		
-		ActorFactory.Spawn(actorId, origin, 0, 0, 0, true, regionIdx);
-	}
-	
 	// Pickups aren't that important, so let's just spawn it on the player.
 	// They SHOULD just pick it up most of the time!
-	void HandleGetPickup(int& in data)
+	void HandleGetPickup(int &in data)
 	{
-		Sys.Print("Pickup get: " + data);
-	
 		kDictMem@ entry = g_defManager.GetEntry(data);
 		
 		// ALL actors will have an entry here
@@ -194,13 +182,6 @@ class RandoPlayerObject : ScriptObject
 		}
 	}
 	
-	// Gives the player the given weapon and completely fills the ammo
-	void HandleGetWeapon(int& in data)
-	{
-		Sys.Print("Weapon get: " + data);
-		LocalPlayer.GiveWeapon(data, 1000);
-	}
-	
 	// Handles getting ammo
 	// Currently just maxes out the current weapon's ammo
 	// TODO: Figure out what we want this to actually do
@@ -208,14 +189,13 @@ class RandoPlayerObject : ScriptObject
 	// - else we can give ammo to all owned weapons, or something of that nature
 	// - else else we just spawn the given actor id under the player and
 	//   if they don't have the matching weapon, oh well
-	void HandleGetAmmo(int& in data)
+	void HandleGetAmmo(int &in data)
 	{
-		Sys.Print("Ammo get: " + data);
 		int currentWeaponId = LocalPlayer.CurrentWeaponID();
 		LocalPlayer.GiveWeapon(currentWeaponId, 1000);
 	}
 	
-	void HandleGetMissionItem(int& in data)
+	void HandleGetMissionItem(int &in data)
 	{
 		Sys.Print("Mission item get: " + data);
 		
@@ -233,10 +213,9 @@ class RandoPlayerObject : ScriptObject
 	// - more enemy spawns (or just have it be a random one)
 	// - ammo traps (self.ConsumeAmmo/ConsumeAltAmmo)
 	// - player damage traps (self.InflictDamage(kDamageInfo))
-	void HandleTrap(int& in data)
+	void HandleTrap(int &in data)
 	{
 		Hud.AddMessage("It's a trap! " + data);
-		Sys.Print("It's a trap! " + data);
 		SpawnActorNearPlayer(data);
 		
 		
@@ -268,69 +247,4 @@ class RandoPlayerObject : ScriptObject
 		// Now the python script knows it can read the data we set
 		g_AP.OutgoingStatus = AP_PROCESSING;
 	}
-}
-
-bool TryGivePlayerHealth(int& in actorId)
-{
-	kDictMem@ healthDict = g_defManager.GetEntry(actorId);
-	if (healthDict is null)
-	{
-		Sys.Print("Tried to use non-existant health def: " + actorId);
-		return false;
-	}
-	
-	kStr className;
-	healthDict.GetString("className", className);
-	if (className != "kexHealthPickup" )
-	{	
-		Sys.Print("Tried to give player health for non-health def: " + actorId);
-		return false;
-	}
-
-	float healthAmount;
-	kStr pickupSound;
-	kStr pickupMessage;
-
-	healthDict.GetFloat("pickup.health.amount", healthAmount);
-	healthDict.GetString("pickup.pickupSound", pickupSound);
-	healthDict.GetString("pickup.pickupMessage", pickupMessage);
-	
-	float playerHealth = LocalPlayer.Actor().CastToActor().Health();
-	float newHealthValue = playerHealth + healthAmount;
-	
-	float recoveryCap;
-	if (healthDict.GetFloat("rando.recoveryCap", recoveryCap))
-	{
-		// Full health sets the health to the cap
-		if (actorId == kActor_Item_HealthFull)
-		{
-			newHealthValue = recoveryCap;
-		}
-		
-		// No HP recovery if you're already at the cap
-		if (playerHealth >= recoveryCap)
-		{
-			newHealthValue = playerHealth;
-		}
-		
-		// Else, we want the lower of the cap or the new health value
-		// so we can't go above the cap
-		else 
-		{
-			newHealthValue = Math::Min(newHealthValue, recoveryCap);
-		}
-	}
-	
-	// Play the voice line if there is one (e.g. "Ultra Health", or "Full Health")
-	int callout;
-	if (healthDict.GetInt("pickup.callout", callout))
-	{
-		Game.PlayVoice(callout);
-	}
-
-	LocalPlayer.Actor().CastToActor().Health() = newHealthValue;
-	LocalPlayer.Actor().PlaySound(pickupSound);
-	Hud.AddMessage(pickupMessage);
-	
-	return true;
 }

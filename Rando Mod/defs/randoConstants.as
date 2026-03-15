@@ -1,2 +1,2 @@
-#define kActor_MissionItem_PoAPowerCell 4200
+#define kActor_MissionItem_BeaconPowerCell 4200
 #define kActor_Item_APItem 100000
