@@ -22,6 +22,13 @@ class RandoPlayerObject : ScriptObject
 	void OnSpawn(void)
 	{
 		ResetOnSaveLoad();
+		
+		// If the map is the intro map, it's a new game, so reset everything
+		if (Game.ActiveMapID() == kLevel_Level1Intro_1)
+		{
+			// Set outgoing index to 0 to receive all items from AP
+			ResetAPForLoadData(0);
+		}
 	}
 	
 	// Serializes the collectedLocations by converting it to a trailing-pipe string
@@ -34,20 +41,22 @@ class RandoPlayerObject : ScriptObject
 			collectedLocations += "" + g_collectedLocations[i] + "|";
 		}
 		
-		if (collectedLocations.Length() == 0)
+		if (collectedLocations.Length() > 0)
 		{
-			return;
+			SERIALIZE(collectedLocations);
 		}
 	
-		//Sys.Print("SERIALIZING: " + collectedLocations);
-		SERIALIZE(collectedLocations);
+		SERIALIZE(g_AP.OutgoingLastProcessedItemIdx);
+		Sys.Print("Saved last processed index: " + g_AP.OutgoingLastProcessedItemIdx);
 	}
 	
-	// Deserializes the collected locations by converting the trailing pipe string (see above)
-	// into its parts, then putting it back into the collectedLocations global.
-	// This will reset the global.
+	// Deserializes the saved data on the player object:
+	// - Writes the highest processed item index into the outgoing one so the client can read it
+	// - Writes the collected locations by converting the trailing pipe string (see above) 
+	// into its parts, then putting it back into the collectedLocations global (which is reset)
+	// - Resets the repalcement flags so they don't persist from a previous session
 	//
-	// This also resets the repalcement flags in case there's data from the previous save.
+	// Also, clear out any incoming/outgoing data because it's invalid at this point
 	void OnDeserialize(kDict& in dict)
     {
 		kStr data;
@@ -77,10 +86,11 @@ class RandoPlayerObject : ScriptObject
 		// Reset the replacement flags in case there's stale data
 		ResetReplacementFlags();
 		
-		//for (uint i = 0; i < g_collectedLocations.length(); i++)
-		//{
-		//	Sys.Print("DESERIZLIZED: " + g_collectedLocations[i]);
-		//}
+		// We are now ready to receive data, so reset everything
+		DESERIALIZE_INT(g_AP.OutgoingLastProcessedItemIdx);
+		ResetAPForLoadData(g_AP.OutgoingLastProcessedItemIdx);
+		
+		Sys.Print("Loaded last processed index: " + g_AP.OutgoingLastProcessedItemIdx);
 	}
 	
 	// Checks for incoming and outgoing messages
@@ -92,7 +102,7 @@ class RandoPlayerObject : ScriptObject
 			ProcessOutgoingMessages();
 		}
 	}
-	
+
 	void ProcessIncomingMessages(void)
 	{
 		// Do not process if we are still processing the last message
@@ -127,7 +137,12 @@ class RandoPlayerObject : ScriptObject
 		// Set this back to ready so AP knows it can send more
 		g_AP.IncomingMessageType = AP_MSGTYPE_NONE;
 		g_AP.IncomingMessageData = 0;
+		
+		// Set the index so we know what was processed last
+		g_AP.OutgoingLastProcessedItemIdx = g_AP.IncomingLastProcessedItemIdx;
 		g_AP.IncomingStatus = AP_READY;
+		
+		Sys.Print("Updated last processed index: " + g_AP.OutgoingLastProcessedItemIdx);
 	}
 	
 	void SpawnActorNearPlayer(int& in actorId)

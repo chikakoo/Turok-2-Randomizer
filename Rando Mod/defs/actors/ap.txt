@@ -1,4 +1,4 @@
-#include "defs/randoConstants.txt"
+#include "defs/randoConstants.as"
 
 // Off-world AP item - using life force so it will be collected no matter what
 // For now, you'll get a life force, but whatever

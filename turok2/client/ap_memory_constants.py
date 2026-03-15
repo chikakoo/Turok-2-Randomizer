@@ -28,15 +28,20 @@ class APMessageType(Enum):
     """The game will see this and log that it didn't process anything."""
 
     AP_IN_LAST_PROCESSED_ITEM_IDX = 1
+    """
+    The last processed index of the item to sent to the game.
+    VERY IMPORTANT to set this before sending any check!
+    The game will use this for its save data to stay in sync.
+    """
+    
     AP_IN_MSGTYPE_GET_PICKUP = 2
     AP_IN_MSGTYPE_GET_WEAPON = 3
     AP_IN_MSGTYPE_GET_MISSION_ITEM = 4
     AP_IN_MSGTYPE_GET_AMMO = 5
     AP_IN_MSGTYPE_GET_TRAP = 6
-
-    AP_OUT_LAST_PROCESSED_ITEM_IDX = 7
-    AP_OUT_MSGTYPE_SEND_CHECK = 8
-    AP_OUT_MSGTYE_GAME_FINISHED = 9
+    
+    AP_OUT_MSGTYPE_SEND_CHECK = 7
+    AP_OUT_MSGTYE_GAME_FINISHED = 8
 
 class APMemoryOffset(Enum):
     """
@@ -53,7 +58,9 @@ class APMemoryOffset(Enum):
     IN_STATUS = 16
     IN_TYPE = 20
     IN_DATA = 24
+    IN_LAST_PROCESSED_ITEM_IDX = 28
 
-    OUT_STATUS = 28
-    OUT_TYPE = 32
-    OUT_DATA = 36
+    OUT_STATUS = 32
+    OUT_TYPE = 36
+    OUT_DATA = 40
+    OUT_LAST_PROCESSED_ITEM_IDX = 44

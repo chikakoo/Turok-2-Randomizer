@@ -108,5 +108,11 @@ void GetAPItem(void)
 
 void APTest(void)
 {
-	Sys.Print("" + AP_IN_MSGTYPE_GET_PICKUP);
+	g_AP.OutgoingLastProcessedItemIdx++;
+	Sys.Print("idx: " + g_AP.OutgoingLastProcessedItemIdx);
+}
+
+void APTest2(void)
+{
+	Sys.Print("" + g_AP.OutgoingLastProcessedItemIdx);
 }

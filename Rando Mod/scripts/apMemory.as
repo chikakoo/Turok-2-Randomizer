@@ -11,12 +11,14 @@ class APMemory
 	int IncomingStatus;
 	int IncomingMessageType;
 	int IncomingMessageData;
+	int IncomingLastProcessedItemIdx; // Serialize the current value in the save data on save
 	
 	// Whether we're waiting for AP to read data
 	// After they process it, they will change this status to ready
 	int OutgoingStatus;
 	int OutgoingMessageType;
 	int OutgoingMessageData;
+	int OutgoingLastProcessedItemIdx;
 }
 
 APMemory g_AP;
@@ -31,10 +33,12 @@ void PrintAPMemory()
 	Sys.Print("IncomingStatus: " + g_AP.IncomingStatus);
 	Sys.Print("IncomingMessageType: " + g_AP.IncomingMessageType);
 	Sys.Print("IncomingMessageData: " + g_AP.IncomingMessageData);
+	Sys.Print("IncomingLastProcessedItemIdx: " + g_AP.IncomingLastProcessedItemIdx);
 	
 	Sys.Print("OutgoingStatus: " + g_AP.OutgoingStatus);
 	Sys.Print("OutgoingMessageType: " + g_AP.OutgoingMessageType);
 	Sys.Print("OutgoingMessageData: " + g_AP.OutgoingMessageData);
+	Sys.Print("OutgoingLastProcessedItemIdx: " + g_AP.OutgoingLastProcessedItemIdx);
 }
 
 class APOutgoingMessage
@@ -80,7 +84,6 @@ enum APMessageType
     AP_IN_MSGTYPE_GET_TRAP,
 	
 	// Outgoing message types
-	AP_OUT_LAST_PROCESSED_ITEM_IDX,
 	AP_OUT_MSGTYPE_SEND_CHECK,
 	AP_OUT_MSGTYE_GAME_FINISHED // TODO: use this
 }
@@ -92,11 +95,33 @@ void InitAP()
 	g_AP.Signature1 = 0x43110DAD;
 	g_AP.Signature2 = 0x1337BEEF;
 
-    g_AP.IncomingStatus = AP_READY;
+    g_AP.IncomingStatus = AP_PROCESSING; // We don't want to process on the title screen
     g_AP.IncomingMessageType = AP_MSGTYPE_NONE;
     g_AP.IncomingMessageData = 0;
+	g_AP.IncomingLastProcessedItemIdx = 0;
 
     g_AP.OutgoingStatus = AP_READY;
     g_AP.OutgoingMessageType = AP_MSGTYPE_NONE;
     g_AP.OutgoingMessageData = 0;
+	g_AP.OutgoingLastProcessedItemIdx = 0;
+}
+
+void ResetAPForLoadData(int& in outgoingLastProcessedItemIdx)
+{
+	Sys.Print("Resetting last index to: " + outgoingLastProcessedItemIdx);
+
+	// Set this first so AP doesn't try to send us items while we set these
+	g_AP.IncomingStatus = AP_PROCESSING;
+	g_AP.OutgoingStatus = AP_READY;
+	
+    g_AP.IncomingMessageType = AP_MSGTYPE_NONE;
+    g_AP.IncomingMessageData = 0;
+	g_AP.IncomingLastProcessedItemIdx = 0;
+
+    g_AP.OutgoingMessageType = AP_MSGTYPE_NONE;
+    g_AP.OutgoingMessageData = 0;
+	g_AP.OutgoingLastProcessedItemIdx = outgoingLastProcessedItemIdx;
+	
+	// Now we're ready to receive
+	g_AP.IncomingStatus = AP_READY;
 }

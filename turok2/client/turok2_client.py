@@ -1,9 +1,12 @@
 import asyncio
 import pymem
+import logging
 from .ap_memory_constants import APStatus, APMessageType, APMemoryOffset
 from argparse import Namespace
 from CommonClient import CommonContext, server_loop, gui_enabled
 from ..items import map_ap_item_to_game
+
+logger = logging.getLogger("Client")
 
 class Turok2Context(CommonContext):
     game = "Turok 2"
@@ -12,6 +15,8 @@ class Turok2Context(CommonContext):
     # 0: We do NOT get sent items from our own world (as we'd get dups)
     # 1: We get items sent to us from other worlds
     items_handling = 0b101
+    
+    highest_processed_index = 0
 
     def __init__(self, server_address, password):
         super().__init__(server_address, password)
@@ -44,11 +49,11 @@ class Turok2Context(CommonContext):
         # When this is called, it means the game isn't connected
         self.game_connected = False
 
-        print(f"Attempting to connect to {self.exe_name}...")
+        logger.info(f"Connecting to Turok 2...")
         while True:
             try:
                 self.pm = pymem.Pymem(self.exe_name)
-                print(f"Connected to {self.exe_name}")
+                logger.info(f"Connection succesful!")
                 return
             except Exception:
                 await asyncio.sleep(5)
@@ -89,11 +94,10 @@ class Turok2Context(CommonContext):
             except Exception:
                 attempt += 1
                 if attempt > 5:
-                    print("Couldn't find AP memory block after 5 tries, trying to reconnect to game.")
+                    logger.warn("Connected to the exe, but didn't find the AP memory block. This can happen if the intro cutscene plays uninterrupted. Retrying...")
                     await self.connect_to_game_async()
                     attempt = 0
                 
-                print("Did not find AP memory block... trying again shortly.")
                 await asyncio.sleep(5)
                 
     def is_ap_block_valid(self):
@@ -149,60 +153,62 @@ class Turok2Context(CommonContext):
                     self.game_connected = False
                     raise Exception("AP block disappeared")
                     
-                await self.process_outgoing() # Send checks to AP
-                #process_console()  #TODO
+                await self.process_incoming() # Send the game pending items
+                await self.process_outgoing() # Game sending us checks
+
                 await asyncio.sleep(0.1)
 
             except Exception:
-                print("Lost connection to game. Reconnecting...")
+                logger.warn("Lost connection to game. Reconnecting...")
                 await asyncio.sleep(5) # If the game was closed, let it close completely
 
                 while True:
                     try:
                         await self.connect_to_game_async()
                         self.ap_base = await self.scan_for_ap_base_async()
-                        print("Reconnected successfully.")
+                        logger.info("Reconnected successfully.")
                         break
                     except Exception:
                         print("Reconnect failed, retrying...")
                         await asyncio.sleep(3)
         
-    async def process_new_items_loop(self):
+    async def process_incoming(self):
         """
-        TODO: doc
+        The client will have every item received in the order it's received in self.items_received.
+        Here, we use the highest processed index to get all the new items we need to get, and
+        process them one at a time, incrementing the index for each one.
         """
-        
-        highest_index = 0
-        while True:
+        self.highest_processed_index = self.read_int(APMemoryOffset.OUT_LAST_PROCESSED_ITEM_IDX)
+        new_items = self.items_received[self.highest_processed_index:]
+        for item in new_items:
+            # If we're suddenly not connected, exit out
             if not self.game_connected:
-                await asyncio.sleep(3)
-                continue
-                
-            new_items = self.items_received[highest_index:]
-            for item in new_items:
-                # If we're suddenly not connected, exit out
-                if not self.game_connected:
-                    break
-                
-                highest_index += 1
-                msg_type, msg_data = map_ap_item_to_game(item.item)
-                await self.send_next_item_async(msg_type, msg_data)
-                
-            await asyncio.sleep(0.1)
+                raise Exception("Game not connected")
+
+            msg_type, msg_data = map_ap_item_to_game(item.item)
+            if not await self.send_next_item_async(msg_type, msg_data):
+                break
             
-    async def send_next_item_async(self, msg_type: int, data: int):
+            print(f"Processed index: {self.highest_processed_index}")
+            
+    async def send_next_item_async(self, msg_type: int, data: int) -> bool:
         """
         Sends a message to the game by:
         - Checking the IN_STATUS - if not AP_READY, do nothing, as the game is currently processing one
         - Writing the IN_TYPE and IN_DATA, so the game knows the type and what value to use
+        - Writing the highest processed index to IN_LAST_PROCESSED_ITEM_IDX so the game can update its index
         - Writing the IN_STATUS to AP_PROCESSING so the game knows to process what we just gave it
         """
-        while self.read_int(APMemoryOffset.IN_STATUS) != APStatus.AP_READY.value:
-            await asyncio.sleep(0.05)
+        if self.read_int(APMemoryOffset.IN_STATUS) != APStatus.AP_READY.value:
+            return False
 
+        self.highest_processed_index += 1
         self.write_int(APMemoryOffset.IN_TYPE, msg_type)
         self.write_int(APMemoryOffset.IN_DATA, data)
+        self.write_int(APMemoryOffset.IN_LAST_PROCESSED_ITEM_IDX, self.highest_processed_index)
         self.write_int(APMemoryOffset.IN_STATUS, APStatus.AP_PROCESSING)
+        
+        return True
         
     async def process_outgoing(self):
         """
@@ -240,10 +246,7 @@ async def main(args: Namespace, exe_name) -> None:
     ctx.run_cli()
 
     ctx.server_task = asyncio.create_task(server_loop(ctx), name="server loop")
-    
-    # Start the bridge as a background task
     asyncio.create_task(ctx.bridge_loop_async(), name="bridge loop")
-    asyncio.create_task(ctx.process_new_items_loop(), name="new items loop")
     
     await ctx.exit_event.wait()
     await ctx.shutdown()
