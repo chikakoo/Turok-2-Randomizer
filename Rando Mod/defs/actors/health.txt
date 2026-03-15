@@ -15,6 +15,7 @@ Health2 kActor_Item_Health2
     pickup.health.mortalwound   0
     pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
     pickup.pickupMessage        "$str_090"
+	rando.recoveryCap			250
     
     initialScale              "0.5 0.5 0.5"
     Begin_Component "kexWorldComponent"
@@ -39,6 +40,7 @@ Health10 kActor_Item_Health10
     pickup.health.mortalwound   1
     pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
     pickup.pickupMessage        "$str_091"
+	rando.recoveryCap			100
     
     initialScale              "0.5 0.5 0.5"
     Begin_Component "kexWorldComponent"
@@ -64,6 +66,7 @@ HealthFull kActor_Item_HealthFull
     pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
     pickup.pickupMessage        "$str_094"
     pickup.callout              kVoice_FullHealth
+	rando.recoveryCap			100
     
     initialScale              "0.5 0.5 0.5"
     Begin_Component "kexWorldComponent"
@@ -89,6 +92,7 @@ HealthUltra kActor_Item_HealthUltra
     pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
     pickup.pickupMessage        "$str_095"
     pickup.callout              kVoice_UltraHealth
+	rando.recoveryCap			250
     
     initialScale              "0.5 0.5 0.5"
     Begin_Component "kexWorldComponent"

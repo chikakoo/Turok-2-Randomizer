@@ -59,6 +59,15 @@ int16 g_previousMapId = 0;
 // Set on the first OnDeserialize and unset on the first OnSpawn call.
 bool g_perSaveInitialized = false;
 
+// Cache the def manager, since it lags when we load defs
+kIndexDefManager g_defManager;
+void InitDefManager()
+{
+	g_defManager = kIndexDefManager();
+	g_defManager.LoadFile("defs/actors/health.txt");
+	g_defManager.LoadFile("defs/actors/pickups.txt");
+}
+
 // Initialize the replacement array
 void InitActorReplacements()
 {

@@ -170,7 +170,28 @@ class RandoPlayerObject : ScriptObject
 	void HandleGetPickup(int& in data)
 	{
 		Sys.Print("Pickup get: " + data);
-		SpawnActorOnPlayer(data);
+	
+		kDictMem@ entry = g_defManager.GetEntry(data);
+		
+		// ALL actors will have an entry here
+		if (entry is null)
+		{
+			Sys.Print("Tried to use non-existant actor: " + data);
+			return;
+		}
+		
+		kStr className;
+		entry.GetString("className", className);
+		
+		if (TryGivePlayerHealth(data))
+		{
+			return;
+		}
+		
+		if (className == "kexLifeForcePickup")
+		{
+		
+		}
 	}
 	
 	// Gives the player the given weapon and completely fills the ammo
@@ -217,6 +238,13 @@ class RandoPlayerObject : ScriptObject
 		Hud.AddMessage("It's a trap! " + data);
 		Sys.Print("It's a trap! " + data);
 		SpawnActorNearPlayer(data);
+		
+		
+		// Damage trap idea
+		//kDamageInfo damageInfo;
+		//damageInfo.hits = 10;
+		//damageInfo.flags = DF_NORMAL;
+		//LocalPlayer.Actor().CastToActor().InflictDamage(damageInfo);
 	}
 	
 	void ProcessOutgoingMessages(void)
@@ -240,4 +268,62 @@ class RandoPlayerObject : ScriptObject
 		// Now the python script knows it can read the data we set
 		g_AP.OutgoingStatus = AP_PROCESSING;
 	}
+}
+
+bool TryGivePlayerHealth(int& in actorId)
+{
+	kDictMem@ healthDict = g_defManager.GetEntry(actorId);
+	if (healthDict is null)
+	{
+		Sys.Print("Tried to use non-existant health def: " + actorId);
+		return false;
+	}
+	
+	kStr className;
+	healthDict.GetString("className", className);
+	if (className != "kexHealthPickup" )
+	{	
+		Sys.Print("Tried to give player health for non-health def: " + actorId);
+		return false;
+	}
+
+	float healthAmount;
+	kStr pickupSound;
+	kStr pickupMessage;
+
+	healthDict.GetFloat("pickup.health.amount", healthAmount);
+	healthDict.GetString("pickup.pickupSound", pickupSound);
+	healthDict.GetString("pickup.pickupMessage", pickupMessage);
+	
+	float playerHealth = LocalPlayer.Actor().CastToActor().Health();
+	float newHealthValue = playerHealth + healthAmount;
+	
+	float recoveryCap;
+	if (healthDict.GetFloat("rando.recoveryCap", recoveryCap))
+	{
+		// Full health sets the health to the cap
+		if (actorId == kActor_Item_HealthFull)
+		{
+			newHealthValue = recoveryCap;
+		}
+		
+		// No HP recovery if you're already at the cap
+		if (playerHealth >= recoveryCap)
+		{
+			newHealthValue = playerHealth;
+		}
+		
+		// Else, we want the lower of the cap or the new health value
+		// so we can't go above the cap
+		else 
+		{
+			newHealthValue = Math::Min(newHealthValue, recoveryCap);
+		}
+	}
+
+	LocalPlayer.Actor().CastToActor().Health() = newHealthValue;
+	LocalPlayer.Actor().PlaySound(pickupSound);
+	Hud.AddMessage(pickupMessage);
+	
+	return true;
 }

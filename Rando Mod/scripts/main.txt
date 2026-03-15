@@ -78,6 +78,7 @@ main
 void main(void)
 {
 	InitAP();
+	InitDefManager();
 	InitActorReplacements();
 	
     InitDestructibleModeTable();
@@ -108,11 +109,34 @@ void GetAPItem(void)
 
 void APTest(void)
 {
-	g_AP.OutgoingLastProcessedItemIdx++;
-	Sys.Print("idx: " + g_AP.OutgoingLastProcessedItemIdx);
+	LocalPlayer.Actor().CastToActor().Health() = 69;
 }
 
 void APTest2(void)
 {
-	Sys.Print("" + g_AP.OutgoingLastProcessedItemIdx);
+}
+
+void APTest3(void)
+{
+
+}
+
+void Health2()
+{
+	TryGivePlayerHealth(kActor_Item_Health2);
+}
+
+void Health10()
+{
+	TryGivePlayerHealth(kActor_Item_Health10);
+}
+
+void FullHealth()
+{
+	TryGivePlayerHealth(kActor_Item_HealthFull);
+}
+
+void UltraHealth()
+{
+	TryGivePlayerHealth(kActor_Item_HealthUltra);
 }
