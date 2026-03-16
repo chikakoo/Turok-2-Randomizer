@@ -51,12 +51,6 @@ class RandoPickupObject : ScriptObject
 			m_name = replacementEntry.name;
 			m_id = replacementEntry.key;
 			m_displayString = replacementEntry.displayString;
-			
-			// Anything spawned from ActorFactory.Spawn needs to set these to avoid having collision
-			// These are the values for life tiles, which should be fine for everything
-			//self.WorldComponent().Radius() = 40.96;
-			//self.WorldComponent().Height() = 61.44;
-			//self.WorldComponent().Flags() |= WCF_NONSOLID;
 		}
 	}
 	
@@ -82,6 +76,11 @@ class RandoPickupObject : ScriptObject
 			{
 				Hud.AddMessage(m_displayString);
 			}
+			
+			if (IsHealthOrAmmo(self))
+			{
+				PlayPickupNotification(self.Definition());
+			}
 		}
 	}
 	
@@ -89,12 +88,11 @@ class RandoPickupObject : ScriptObject
 	// Marks it as collected so it won't respawn.
 	void OnTouch(kActor@ pInstigator)
 	{
-		Sys.Print("COLLECTED: " + ToString());
+		Sys.Print(m_position);
+		//Sys.Print("COLLECTED: " + ToString());
 		if (m_id != 0)
 		{
 			CollectLocation(m_id);
-			
-			// TODO: check if it's a level key - if it is, give it to the player
 		}
 	}
 	
@@ -121,6 +119,9 @@ class RandoPickupObject : ScriptObject
 			if (!replacement.wasReplaced) 
 			{ 
 				Sys.Print("NOT MAPPED: " + ToString() + " (" + GetFriendlyActorName(self.Type()) + ")"); 
+				
+				// TODO: remove this later, this is only to help find them to map them
+				self.Flags() |= AF_IMPORTANT;
 			}
 			
 			return; 
@@ -141,14 +142,19 @@ class RandoPickupObject : ScriptObject
 		newWorldComponent.Height() = worldComponent.Height();
 		newWorldComponent.Flags() = worldComponent.Flags();
 		
+		// Fixes console warnings
+		if (self.ModeStateComponent() !is null)
+		{
+			replacedActor.ModeStateComponent().SetMode(
+				self.ModeStateComponent().Mode());
+		}
+		
 		// Turn on the flag so that collision can be detected
 		// We need to be able to detect touching health/ammo
 		// pickups even when we don't have full so we can send the AP check
-		kStr className;
-		replacedActor.Definition().GetString("className", className);
-		if (className == "kexHealthPickup" || className == "kexAmmoPickup")
+		if (IsHealthOrAmmo(replacedActor))
 		{
-			self.WorldComponent().Flags() |= WCF_INVOKE_COLLIDE_CALLBACK;
+			newWorldComponent.Flags() |= WCF_INVOKE_COLLIDE_CALLBACK;
 		}
 		
 	    self.Remove();
@@ -157,6 +163,13 @@ class RandoPickupObject : ScriptObject
 	kStr ToString()
 	{
 		return m_name + " (" + m_position + ")" + " (" + m_id + ")";
+	}
+	
+	bool IsHealthOrAmmo(kActor@ actor) 
+	{
+		kStr className;
+		actor.Definition().GetString("className", className);
+		return className == "kexHealthPickup" || className == "kexAmmoPickup";
 	}
 	
 	// Debug helper to print the flags of an actor
