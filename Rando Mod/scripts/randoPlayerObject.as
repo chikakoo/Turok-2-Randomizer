@@ -32,6 +32,9 @@ class RandoPlayerObject : ScriptObject
 			// Set outgoing index to 0 to receive all items from AP
 			ResetAPForLoadData(0);
 		}
+		
+		// TODO: remove this when done with generator stuff
+		RemoveAllGenerators();
 	}
 	
 	//---------------------------
@@ -116,9 +119,10 @@ class RandoPlayerObject : ScriptObject
 		
 		// Buttons 8 and 9 are scope in and out, unlikely to ever be pressed at the same time
 		// TODO: add all invisible pickups here as they are added to the rando
-		if (LocalPlayer.ButtonHeldTime(8) > 60 && 
-			LocalPlayer.ButtonHeldTime(9) > 60)
+		if (LocalPlayer.ButtonHeldTime(8) > 5 && 
+			LocalPlayer.ButtonHeldTime(9) > 5)
 		{
+
 			kPlayerInventory@ inventory = LocalPlayer.Inventory();
 			Hud.AddMessage(
 				"Level 2 Keys: " + inventory.GetCount(kActor_InventoryItem_Level2Key) +

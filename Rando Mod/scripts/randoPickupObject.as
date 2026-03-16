@@ -90,6 +90,8 @@ class RandoPickupObject : ScriptObject
 	{
 		Sys.Print(m_position);
 		//Sys.Print("COLLECTED: " + ToString());
+		Hud.AddMessage("AP GET");
+		
 		if (m_id != 0)
 		{
 			CollectLocation(m_id);
@@ -100,10 +102,7 @@ class RandoPickupObject : ScriptObject
 	// Replaces the actor with a different one, in the same position.
 	// If it was already replaced or collected, don't do anything.
 	void OnSpawn(void)
-	{		
-		// These are after Deserialize, so unset them here
-		g_perSaveInitialized = false;
-		
+	{
 		if (IsLocationCollected(m_id))
 		{
 			Sys.Print("COLLECTED ON SPAWN: " + ToString());
@@ -121,6 +120,7 @@ class RandoPickupObject : ScriptObject
 				Sys.Print("NOT MAPPED: " + ToString() + " (" + GetFriendlyActorName(self.Type()) + ")"); 
 				
 				// TODO: remove this later, this is only to help find them to map them
+				// we MAY include this as an option, but only if m_id is set
 				self.Flags() |= AF_IMPORTANT;
 			}
 			
@@ -134,7 +134,7 @@ class RandoPickupObject : ScriptObject
 			self.Yaw(),
 			self.Pitch(),
 			self.Roll(),
-			true, // Hidden? (unsure if that's what this is)
+			true, // Unknown - always set to true
 			worldComponent.RegionIndex());
 			
 		kWorldComponent@ newWorldComponent = replacedActor.WorldComponent();

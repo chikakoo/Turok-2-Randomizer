@@ -55,10 +55,6 @@ array<int> g_collectedLocations;
 // The previous map that OnSpawn tried to replace an actor on
 int16 g_previousMapId = 0;
 
-// Whether we've initialized the state on a save load yet.
-// Set on the first OnDeserialize and unset on the first OnSpawn call.
-bool g_perSaveInitialized = false;
-
 // Cache the def manager, since it lags when we load defs
 kIndexDefManager g_defManager;
 void InitDefManager()

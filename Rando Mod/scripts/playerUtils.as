@@ -208,3 +208,53 @@ void LifeForce10(void)
 {
 	SpawnActorOnPlayer(kActor_Item_LifeForce10);
 }
+
+
+//TODO: primagen keys and talismans
+
+
+//---------------------------
+// Temporary stupid thing to remove all generators and generated items from the map
+void RemoveAllGenerators(void)
+{
+	kActorIterator cIterator;
+	kActor@ pActor;
+	array<kActor@> actorsToRemove;
+	array<kStr> generatorPositions;
+	while(!((@pActor = cIterator.GetNext()) is null))
+	{
+		if (pActor.HasComponent("kexGeneratorComponent"))
+		{
+			kVec3 position = pActor.Origin();
+			kStr posStr = "" + int(position.x) + "_" +
+				int(position.y) + "_" +
+				int(position.z);
+				
+			actorsToRemove.insertLast(pActor);
+			generatorPositions.insertLast(posStr);
+		}
+	}
+	
+	Hud.AddMessage("Removing " + generatorPositions.length() + " generator(s).");
+	
+	kActorIterator cIterator2;
+	while(!((@pActor = cIterator2.GetNext()) is null))
+	{
+		for (uint i = 0; i < generatorPositions.length(); i++)
+		{
+			kVec3 position2 = pActor.Origin();
+			kStr posStr2 = "" + int(position2.x) + "_" +
+				int(position2.y) + "_" +
+				int(position2.z);
+			if (posStr2 == generatorPositions[i])
+			{
+				actorsToRemove.insertLast(pActor);
+			}
+		}
+	}
+	
+	for (uint i = 0; i < actorsToRemove.length(); i++)
+	{
+		actorsToRemove[i].Remove();
+	}
+}
