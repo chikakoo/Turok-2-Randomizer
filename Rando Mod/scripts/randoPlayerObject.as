@@ -35,6 +35,120 @@ class RandoPlayerObject : ScriptObject
 		
 		// TODO: remove this when done with generator stuff
 		RemoveAllGenerators();
+		
+		// Replace all the actors that should be replaced
+		ReplaceAllActors();
+	}
+	
+	//----------------------------------
+	// Replaces all actors with the intended replacemnt.
+	// STOP iterating on the player, as that would be the LAST actor spawned.
+	// We prevent infinite spawn loops this way.
+	void ReplaceAllActors()
+	{
+		kActorIterator actorIterator;
+		kActor@ actor;
+		ReplacementEntry replacement;
+		kVec3 position;
+		kStr posStr;
+		array<kActor@> actorsToRemove; // Remove outside of the iterator, to be safe
+		while(!((@actor = actorIterator.GetNext()) is null) &&
+			!actor.InstanceOf("kexPuppet")) // STOP on the player so we don't iterate forever
+		{
+			position = actor.Origin();
+			posStr = "" + Game.ActiveMapID() + "_" +
+				int(position.x) + "_" +
+				int(position.y) + "_" +
+				int(position.z);
+			if (TryGetReplacement(posStr, replacement))
+			{
+				if (IsLocationCollected(replacement.key))
+				{
+					Sys.Print("COLLECTED ON SPAWN: " + replacement.name + " (" + posStr + ")" + " (" + replacement.key + ")");
+					actorsToRemove.insertLast(actor);
+					continue;
+				}
+				ReplaceActor(actor, replacement);
+			}
+			else 
+			{	
+				HandleWhetherActorShouldHaveBeenReplaced(actor, posStr);
+			}				
+		}
+		
+		for (uint i = 0; i < actorsToRemove.length(); i++)
+		{
+			actorsToRemove[i].Remove();
+		}
+	}
+	
+	//----------------------------------
+	// Called when an actor was NOT replaced.
+	// Checks if it should have been. If so, prints to the console and
+	// marks it as important so it's easier to find.
+	//
+	// We may want to NOT execute this in release versions, since
+	// it does nothing for the player.
+	void HandleWhetherActorShouldHaveBeenReplaced(kActor@ actor, kStr posStr)
+	{
+		kDictMem@ actorDef = actor.Definition();
+		if (actorDef is null)
+		{
+			return;
+		}
+		
+		kStr actorClassName;
+		if (actorDef.GetString("className", actorClassName))
+		{
+			// These are all the current randomized actor types
+			if (actorClassName == "kexAmmoPickup" ||
+				actorClassName == "kexHealthPickup" ||
+				actorClassName == "kexInventoryPickup" ||
+				actorClassName == "kexLifeForcePickup" ||
+				actorClassName == "kexWeaponPickup")
+			{
+				Sys.Print("NOT MAPPED: " + posStr + " (" + GetFriendlyActorName(actor.Type()) + ")"); 
+				actor.Flags() |= AF_IMPORTANT; 
+			}
+		}
+	}
+	
+	//----------------------------------
+	// Replace the given actor with the given replacement
+	void ReplaceActor(kActor@ initialActor, ReplacementEntry &in replacement)
+	{
+		kWorldComponent@ worldComponent = initialActor.WorldComponent();
+		kActor@ replacedActor = ActorFactory.Spawn(
+			replacement.value,
+			initialActor.Origin(),
+			initialActor.Yaw(),
+			initialActor.Pitch(),
+			initialActor.Roll(),
+			true, // Unknown - always set to true
+			worldComponent.RegionIndex());
+			
+		kWorldComponent@ newWorldComponent = replacedActor.WorldComponent();
+		newWorldComponent.Radius() = worldComponent.Radius();
+		newWorldComponent.Height() = worldComponent.Height();
+		newWorldComponent.Flags() = worldComponent.Flags();
+		
+		// Fixes console warnings
+		if (initialActor.ModeStateComponent() !is null)
+		{
+			Sys.Print("MODE STATE ACTUALLY WAS SET??");
+			replacedActor.ModeStateComponent().SetMode(
+				initialActor.ModeStateComponent().Mode());
+		}
+		
+		// Turn on the flag so that collision can be detected
+		// We need to be able to detect touching health/ammo
+		// pickups even when we don't have full so we can send the AP check
+		if (IsHealthOrAmmo(replacedActor))
+		{
+			newWorldComponent.Flags() |= WCF_INVOKE_COLLIDE_CALLBACK;
+		}
+		
+	    initialActor.Remove();
 	}
 	
 	//---------------------------
@@ -62,7 +176,6 @@ class RandoPlayerObject : ScriptObject
 	// - Writes the highest processed item index into the outgoing one so the client can read it
 	// - Writes the collected locations by converting the trailing pipe string (see above) 
 	// into its parts, then putting it back into the collectedLocations global (which is reset)
-	// - Resets the repalcement flags so they don't persist from a previous session
 	//
 	// Also, clear out any incoming/outgoing data because it's invalid at this point
 	void OnDeserialize(kDict &in dict)
@@ -91,9 +204,6 @@ class RandoPlayerObject : ScriptObject
 			}
 		}
 		
-		// Reset the replacement flags in case there's stale data
-		ResetReplacementFlags();
-		
 		// We are now ready to receive data, so reset everything
 		DESERIALIZE_INT(g_AP.OutgoingLastProcessedItemIdx);
 		ResetAPForLoadData(g_AP.OutgoingLastProcessedItemIdx);
@@ -104,7 +214,7 @@ class RandoPlayerObject : ScriptObject
 	//---------------------------
 	// Checks for incoming and outgoing messages
 	void OnTick(void)
-	{	
+	{
 		if (!CinemaPlayer.Playing())
 		{
 			ProcessIncomingMessages();
@@ -133,11 +243,11 @@ class RandoPlayerObject : ScriptObject
 		}
 	}
 
+	//----------------------------------
+	// Process incoming messages if we aren't processing a message already.
 	void ProcessIncomingMessages(void)
 	{
-		// Do not process if we are still processing the last message
-		if (g_AP.IncomingStatus != AP_PROCESSING ||
-			g_AP.IncomingMessageType == AP_MSGTYPE_NONE)
+		if (g_AP.IncomingStatus != AP_PROCESSING)
 		{
 			return;
 		}
@@ -145,6 +255,9 @@ class RandoPlayerObject : ScriptObject
 		int data = g_AP.IncomingMessageData;
 		switch(g_AP.IncomingMessageType)
 		{
+			case AP_MSGTYPE_NONE:
+				// Do nothing if there's no message type!
+				break;
 			case AP_IN_MSGTYPE_GET_PICKUP:
 				Sys.Print("Pickup get: " + data);
 				HandleGetPickup(data);

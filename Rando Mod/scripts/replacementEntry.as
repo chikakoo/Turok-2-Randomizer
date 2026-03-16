@@ -5,7 +5,6 @@
 //  - MapId_X_Y_Z
 // - value: The actor id (see common.txt for the macros)
 // - displayString: The display string to display when collected (only filled for AP items)
-// - wasReplaced: Whether this actor was already replaced (used to prevent replacement loops)
 class ReplacementEntry
 {
 	kStr name;
@@ -13,7 +12,6 @@ class ReplacementEntry
 	kStr position;
     int value;
 	kStr displayString;
-	bool wasReplaced;
 	
 	ReplacementEntry() {}
 	
@@ -28,7 +26,6 @@ class ReplacementEntry
 		position = p;
         value = v;
 		displayString = "";
-        wasReplaced = false;
     }
 	
 	ReplacementEntry(
@@ -42,7 +39,6 @@ class ReplacementEntry
 		position = p;
 		value = kActor_Item_APItem;
         displayString = d;
-        wasReplaced = false;
     }
 }
 
@@ -51,9 +47,6 @@ array<ReplacementEntry> g_actorReplacements;
 
 // The global for location ids already collected
 array<int> g_collectedLocations;
-
-// The previous map that OnSpawn tried to replace an actor on
-int16 g_previousMapId = 0;
 
 // Cache the def manager, since it lags when we load defs
 kIndexDefManager g_defManager;
@@ -107,7 +100,7 @@ void AddReplacement(
 // Will return false if not found.
 // - position: The position of the actor to replace
 //  - we CANNOT use the key because it can't be calculated from the Turok data
-// - replacementEntry: The retrieved entry (set even if the entry was replaced)
+// - replacementEntry: The retrieved entry
 // Returns true if the replacement was found; false otherwise.
 bool TryGetReplacement(const kStr &in position, ReplacementEntry &out replacementEntry)
 {
@@ -117,13 +110,6 @@ bool TryGetReplacement(const kStr &in position, ReplacementEntry &out replacemen
         if (entry.position == position)
         {
 			replacementEntry = entry;
-					
-            if (entry.wasReplaced)
-			{
-				return false;
-			}
-                
-            entry.wasReplaced = true;  // Prevent loops in this map instance
             return true;
         }
     }
@@ -163,37 +149,14 @@ void SendCheckToAP(const int &in id)
 		APOutgoingMessage(AP_OUT_MSGTYPE_SEND_CHECK, id));
 }
 
-// Reset the collected locations/replacement flags on a save load
+// Reset the collected locations on a save load
 // This flag is unset in OnSpawn
 void ResetOnSaveLoad()
 {
 	if (Game.ActiveMapID() == kLevel_Level1Intro_1)
 	{
-		g_previousMapId = kLevel_Level1Intro_1;
 		g_collectedLocations.removeRange(0, g_collectedLocations.length());
-		ResetReplacementFlags();
 	}
-}
-
-// Called on every replacement attempt.
-// If the map is now different, reset the replacement flags.
-void EnsureMapInit()
-{
-    int16 mapId = Game.ActiveMapID();
-    if (mapId != g_previousMapId)
-    {
-        g_previousMapId = mapId;
-        ResetReplacementFlags();
-    }
-}
-
-// Resets all of the wasReplaced flags.
-void ResetReplacementFlags()
-{
-    for (uint i = 0; i < g_actorReplacements.length(); i++)
-    {
-        g_actorReplacements[i].wasReplaced = false;
-    }
 }
 
 // Gets a friendly name given the actor type, for debugging

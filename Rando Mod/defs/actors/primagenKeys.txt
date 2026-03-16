@@ -1,0 +1,128 @@
+#include "defs/common.txt"
+#include "defs/randoConstants.as"
+
+//-----------------------------------------------------------------------------
+//
+// inventory primagen keys
+//
+//-----------------------------------------------------------------------------
+
+PrimKey1 kActor_PrimagenKey_1 
+{ 
+    className               "kexInventoryPickup" 
+    placeable               TRUE 
+    flags.noDamage          TRUE 
+    flags.important         TRUE 
+    pickup.pickupSound      "sounds/shaders/Ammo Pickup.ksnd" 
+    pickup.pickupMessage    "$str_119"
+    pickup.callout          384
+	
+	initialScale              "0.3 0.3 0.3"
+	Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Primagen_Key_1.staticmesh"
+    End_Component
+	Begin_Component "kexScriptComponent"
+        scriptClass           "RandoPickupObject"
+        triggerRadius         81.92
+    End_Component
+}
+
+PrimKey2 kActor_PrimagenKey_2 
+{ 
+    className               "kexInventoryPickup"
+    placeable               TRUE
+    flags.noDamage          TRUE
+    flags.important         TRUE
+    pickup.pickupSound      "sounds/shaders/Ammo Pickup.ksnd"
+    pickup.pickupMessage    "$str_120" 
+    pickup.callout          384
+	
+	initialScale              "0.3 0.3 0.3"
+	Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Primagen_Key_2.staticmesh"
+    End_Component
+	Begin_Component "kexScriptComponent"
+        scriptClass           "RandoPickupObject"
+        triggerRadius         81.92
+    End_Component
+}
+
+PrimKey3 kActor_PrimagenKey_3 
+{ 
+    className               "kexInventoryPickup"
+    placeable               TRUE
+    flags.noDamage          TRUE
+    flags.important         TRUE
+    pickup.pickupSound      "sounds/shaders/Ammo Pickup.ksnd"
+    pickup.pickupMessage    "$str_121" 
+    pickup.callout          384
+	
+	initialScale              "0.3 0.3 0.3"
+	Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Primagen_Key_3.staticmesh"
+    End_Component
+	Begin_Component "kexScriptComponent"
+        scriptClass           "RandoPickupObject"
+        triggerRadius         81.92
+    End_Component
+}
+
+PrimKey4 kActor_PrimagenKey_4 
+{ 
+    className               "kexInventoryPickup"
+    placeable               TRUE
+    flags.noDamage          TRUE
+    flags.important         TRUE
+    pickup.pickupSound      "sounds/shaders/Ammo Pickup.ksnd"
+    pickup.pickupMessage    "$str_122" 
+    pickup.callout          384
+	
+	initialScale              "0.3 0.3 0.3"
+	Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Primagen_Key_4.staticmesh"
+    End_Component
+	Begin_Component "kexScriptComponent"
+        scriptClass           "RandoPickupObject"
+        triggerRadius         81.92
+    End_Component
+}
+
+PrimKey5 kActor_PrimagenKey_5 
+{ 
+    className               "kexInventoryPickup"
+    placeable               TRUE
+    flags.noDamage          TRUE
+    flags.important         TRUE
+    pickup.pickupSound      "sounds/shaders/Ammo Pickup.ksnd"
+    pickup.pickupMessage    "$str_123"
+    pickup.callout          384
+	
+	initialScale              "0.3 0.3 0.3"
+	Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Primagen_Key_5.staticmesh"
+    End_Component
+	Begin_Component "kexScriptComponent"
+        scriptClass           "RandoPickupObject"
+        triggerRadius         81.92
+    End_Component
+}
+
+PrimKey6 kActor_PrimagenKey_6 
+{
+    className               "kexInventoryPickup"
+    placeable               TRUE
+    flags.noDamage          TRUE
+    flags.important         TRUE
+    pickup.pickupSound      "sounds/shaders/Ammo Pickup.ksnd"
+    pickup.pickupMessage    "$str_124"
+    pickup.callout          384
+	
+	initialScale              "0.3 0.3 0.3"
+	Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Primagen_Key_6.staticmesh"
+    End_Component
+	Begin_Component "kexScriptComponent"
+        scriptClass           "RandoPickupObject"
+        triggerRadius         81.92
+    End_Component
+}

@@ -63,7 +63,7 @@ class RandoPickupObject : ScriptObject
 			!(pCollider is null) &&
 			pCollider.InstanceOf("kexPuppet"))
 		{
-			Sys.Print("SENT TO AP: " + ToString());
+			Sys.Print("SENT TO AP: " + m_name);
 			SendCheckToAP(m_id);
 			
 			// Turn the flag off now, since we already sent the check
@@ -96,80 +96,6 @@ class RandoPickupObject : ScriptObject
 		{
 			CollectLocation(m_id);
 		}
-	}
-	
-	// Called when the actor is spawned in the map.
-	// Replaces the actor with a different one, in the same position.
-	// If it was already replaced or collected, don't do anything.
-	void OnSpawn(void)
-	{
-		if (IsLocationCollected(m_id))
-		{
-			Sys.Print("COLLECTED ON SPAWN: " + ToString());
-			self.Remove();
-			return;
-		}
-
-		ReplacementEntry replacement;
-		EnsureMapInit(); // Resets replacement flags if map is now different
-		
-		if (!TryGetReplacement(m_position, replacement)) 
-		{ 
-			if (!replacement.wasReplaced) 
-			{ 
-				Sys.Print("NOT MAPPED: " + ToString() + " (" + GetFriendlyActorName(self.Type()) + ")"); 
-				
-				// TODO: remove this later, this is only to help find them to map them
-				// we MAY include this as an option, but only if m_id is set
-				self.Flags() |= AF_IMPORTANT;
-			}
-			
-			return; 
-		}
-		
-		kWorldComponent@ worldComponent = self.WorldComponent();
-		kActor@ replacedActor = ActorFactory.Spawn(
-			replacement.value,
-			self.Origin(),
-			self.Yaw(),
-			self.Pitch(),
-			self.Roll(),
-			true, // Unknown - always set to true
-			worldComponent.RegionIndex());
-			
-		kWorldComponent@ newWorldComponent = replacedActor.WorldComponent();
-		newWorldComponent.Radius() = worldComponent.Radius();
-		newWorldComponent.Height() = worldComponent.Height();
-		newWorldComponent.Flags() = worldComponent.Flags();
-		
-		// Fixes console warnings
-		if (self.ModeStateComponent() !is null)
-		{
-			replacedActor.ModeStateComponent().SetMode(
-				self.ModeStateComponent().Mode());
-		}
-		
-		// Turn on the flag so that collision can be detected
-		// We need to be able to detect touching health/ammo
-		// pickups even when we don't have full so we can send the AP check
-		if (IsHealthOrAmmo(replacedActor))
-		{
-			newWorldComponent.Flags() |= WCF_INVOKE_COLLIDE_CALLBACK;
-		}
-		
-	    self.Remove();
-	}
-	
-	kStr ToString()
-	{
-		return m_name + " (" + m_position + ")" + " (" + m_id + ")";
-	}
-	
-	bool IsHealthOrAmmo(kActor@ actor) 
-	{
-		kStr className;
-		actor.Definition().GetString("className", className);
-		return className == "kexHealthPickup" || className == "kexAmmoPickup";
 	}
 	
 	// Debug helper to print the flags of an actor

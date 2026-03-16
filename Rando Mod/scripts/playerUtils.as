@@ -258,3 +258,10 @@ void RemoveAllGenerators(void)
 		actorsToRemove[i].Remove();
 	}
 }
+
+bool IsHealthOrAmmo(kActor@ actor) 
+{
+	kStr className;
+	actor.Definition().GetString("className", className);
+	return className == "kexHealthPickup" || className == "kexAmmoPickup";
+}
