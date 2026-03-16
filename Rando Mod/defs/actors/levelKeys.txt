@@ -1,0 +1,102 @@
+#include "defs/common.txt"
+#include "defs/randoConstants.as"
+
+//-----------------------------------------------------------------------------
+//
+// inventory level hub keys
+//
+//-----------------------------------------------------------------------------
+
+HubKey1 kActor_InventoryItem_Level1Key 
+{ 
+	className "kexInventoryPickup" 
+	placeable TRUE 
+	flags.noDamage TRUE 
+	flags.important TRUE 
+	pickup.pickupSound "sounds/shaders/Ammo Pickup.ksnd" 
+	pickup.pickupMessage "$str_113"
+	
+	Begin_Component "kexScriptComponent"
+        scriptClass           "RandoPickupObject"
+        triggerRadius         81.92
+    End_Component
+}
+
+HubKey2 kActor_InventoryItem_Level2Key 
+{
+	className "kexInventoryPickup" 
+	placeable TRUE 
+	flags.noDamage TRUE 
+	flags.important TRUE 
+	pickup.pickupSound "sounds/shaders/Ammo Pickup.ksnd" 
+	pickup.pickupMessage "$str_114"
+	
+	initialScale              "0.5 0.5 0.5"
+	Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Level_2_Key.staticmesh"
+    End_Component
+	Begin_Component "kexScriptComponent"
+        scriptClass           "RandoPickupObject"
+        triggerRadius         81.92
+    End_Component
+}
+
+HubKey3 kActor_InventoryItem_Level3Key 
+{ 
+	className "kexInventoryPickup" 
+	placeable TRUE 
+	flags.noDamage TRUE 
+	flags.important TRUE 
+	pickup.pickupSound "sounds/shaders/Ammo Pickup.ksnd" 
+	pickup.pickupMessage "$str_115"
+	
+	Begin_Component "kexScriptComponent"
+        scriptClass           "RandoPickupObject"
+        triggerRadius         81.92
+    End_Component
+}
+
+HubKey4 kActor_InventoryItem_Level4Key 
+{ 
+	className "kexInventoryPickup" 
+	placeable TRUE 
+	flags.noDamage TRUE 
+	flags.important TRUE 
+	pickup.pickupSound "sounds/shaders/Ammo Pickup.ksnd" 
+	pickup.pickupMessage "$str_116"
+	
+	Begin_Component "kexScriptComponent"
+        scriptClass           "RandoPickupObject"
+        triggerRadius         81.92
+    End_Component
+}
+
+HubKey5 kActor_InventoryItem_Level5Key 
+{ 
+	className "kexInventoryPickup" 
+	placeable TRUE 
+	flags.noDamage TRUE 
+	flags.important TRUE 
+	pickup.pickupSound "sounds/shaders/Ammo Pickup.ksnd" 
+	pickup.pickupMessage "$str_117"
+	
+	Begin_Component "kexScriptComponent"
+        scriptClass           "RandoPickupObject"
+        triggerRadius         81.92
+    End_Component
+}
+
+HubKey6 kActor_InventoryItem_Level6Key 
+{ 
+	className "kexInventoryPickup" 
+	placeable TRUE 
+	flags.noDamage TRUE 
+	flags.important TRUE 
+	pickup.pickupSound "sounds/shaders/Ammo Pickup.ksnd" 
+	pickup.pickupMessage "$str_118"
+	
+	Begin_Component "kexScriptComponent"
+        scriptClass           "RandoPickupObject"
+        triggerRadius         81.92
+    End_Component
+}

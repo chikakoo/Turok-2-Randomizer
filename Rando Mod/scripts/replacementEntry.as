@@ -68,6 +68,7 @@ void InitDefManager()
 	g_defManager.LoadFile("defs/actors/pickups.txt");
 	g_defManager.LoadFile("defs/actors/weaponPickups.txt");
 	g_defManager.LoadFile("defs/actors/powerCells.txt");
+	g_defManager.LoadFile("defs/actors/levelKeys.txt");
 }
 
 // Initialize the replacement array

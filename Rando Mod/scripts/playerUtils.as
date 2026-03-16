@@ -115,6 +115,11 @@ void UltraHealth()
 	TryGivePlayerHealth(kActor_Item_HealthUltra);
 }
 
+void SetHealthTo10()
+{
+	LocalPlayer.Actor().CastToActor().Health() = 10;
+}
+
 //---------------------------
 // Given the actor id, simulates the player picking up a weapon.
 bool TryGivePlayerWeapon(int &in actorId)
@@ -159,6 +164,12 @@ bool TryGetMissionItem(int &in actorId)
 void BeaconPowerCell(void)
 {
 	TryGetMissionItem(kActor_MissionItem_BeaconPowerCell);
+}
+
+void Level2Key(void)
+{
+	TryGetMissionItem(kActor_InventoryItem_Level2Key);
+	Sys.Print("" + LocalPlayer.Inventory().GetCount(kActor_InventoryItem_Level2Key));
 }
 
 //---------------------------

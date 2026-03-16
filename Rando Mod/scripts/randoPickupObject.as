@@ -15,11 +15,6 @@ class RandoPickupObject : ScriptObject
 	    @self = actor;
 		m_position = GetPositionString();
 		SetReplacementEntryProperties();
-		
-		// Turn on the flag so that collision can be detected
-		// We need to be able to detect touching health/ammo
-		// pickups even when we don't have full so we can send the AP check
-		self.WorldComponent().Flags() |= WCF_INVOKE_COLLIDE_CALLBACK;
     }
 	
 	// Gets a unique id for the pickup.
@@ -59,9 +54,9 @@ class RandoPickupObject : ScriptObject
 			
 			// Anything spawned from ActorFactory.Spawn needs to set these to avoid having collision
 			// These are the values for life tiles, which should be fine for everything
-			self.WorldComponent().Radius() = 40.96;
-			self.WorldComponent().Height() = 61.44;
-			self.WorldComponent().Flags() |= WCF_NONSOLID;
+			//self.WorldComponent().Radius() = 40.96;
+			//self.WorldComponent().Height() = 61.44;
+			//self.WorldComponent().Flags() |= WCF_NONSOLID;
 		}
 	}
 	
@@ -94,10 +89,12 @@ class RandoPickupObject : ScriptObject
 	// Marks it as collected so it won't respawn.
 	void OnTouch(kActor@ pInstigator)
 	{
+		Sys.Print("COLLECTED: " + ToString());
 		if (m_id != 0)
 		{
-			Sys.Print("COLLECTED: " + ToString());
 			CollectLocation(m_id);
+			
+			// TODO: check if it's a level key - if it is, give it to the player
 		}
 	}
 	
@@ -129,6 +126,7 @@ class RandoPickupObject : ScriptObject
 			return; 
 		}
 		
+		kWorldComponent@ worldComponent = self.WorldComponent();
 		kActor@ replacedActor = ActorFactory.Spawn(
 			replacement.value,
 			self.Origin(),
@@ -136,7 +134,22 @@ class RandoPickupObject : ScriptObject
 			self.Pitch(),
 			self.Roll(),
 			true, // Hidden? (unsure if that's what this is)
-			self.WorldComponent().RegionIndex());
+			worldComponent.RegionIndex());
+			
+		kWorldComponent@ newWorldComponent = replacedActor.WorldComponent();
+		newWorldComponent.Radius() = worldComponent.Radius();
+		newWorldComponent.Height() = worldComponent.Height();
+		newWorldComponent.Flags() = worldComponent.Flags();
+		
+		// Turn on the flag so that collision can be detected
+		// We need to be able to detect touching health/ammo
+		// pickups even when we don't have full so we can send the AP check
+		kStr className;
+		replacedActor.Definition().GetString("className", className);
+		if (className == "kexHealthPickup" || className == "kexAmmoPickup")
+		{
+			self.WorldComponent().Flags() |= WCF_INVOKE_COLLIDE_CALLBACK;
+		}
 		
 	    self.Remove();
 	}

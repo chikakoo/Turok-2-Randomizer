@@ -1,6 +1,7 @@
 class RandoPlayerObject : ScriptObject
 {
     kActor@ self;
+	int m_messageCooldown = 0;
 	
 	// An array of ascii characters so we can get the index easily
 	array<kStr> m_asciiChars = {
@@ -100,11 +101,31 @@ class RandoPlayerObject : ScriptObject
 	//---------------------------
 	// Checks for incoming and outgoing messages
 	void OnTick(void)
-	{
+	{	
 		if (!CinemaPlayer.Playing())
 		{
 			ProcessIncomingMessages();
 			ProcessOutgoingMessages();
+		}
+		
+		if (m_messageCooldown > 0) 
+		{
+			m_messageCooldown--;
+			return;
+		}
+		
+		// Buttons 8 and 9 are scope in and out, unlikely to ever be pressed at the same time
+		// TODO: add all invisible pickups here as they are added to the game
+		if (LocalPlayer.ButtonHeldTime(8) > 60 && 
+			LocalPlayer.ButtonHeldTime(9) > 60)
+		{
+			kPlayerInventory@ inventory = LocalPlayer.Inventory();
+			Hud.AddMessage(
+				"Level 2 Keys: " + inventory.GetCount(kActor_InventoryItem_Level2Key) +
+				" | Power Cells: " + inventory.GetCount(kActor_MissionItem_BeaconPowerCell),
+				300);
+				
+			m_messageCooldown = 330;
 		}
 	}
 

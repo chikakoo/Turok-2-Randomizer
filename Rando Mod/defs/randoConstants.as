@@ -1,2 +1,10 @@
-#define kActor_MissionItem_BeaconPowerCell 4200
 #define kActor_Item_APItem 100000
+
+#define kActor_InventoryItem_Level1Key 4300
+#define kActor_InventoryItem_Level2Key 4310
+#define kActor_InventoryItem_Level3Key 4320
+#define kActor_InventoryItem_Level4Key 4330
+#define kActor_InventoryItem_Level5Key 4340
+#define kActor_InventoryItem_Level6Key 4350
+
+#define kActor_MissionItem_BeaconPowerCell 4200
