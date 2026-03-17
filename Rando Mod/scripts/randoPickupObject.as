@@ -67,23 +67,20 @@ class RandoPickupObject : ScriptObject
 			!(pCollider is null) &&
 			pCollider.InstanceOf("kexPuppet"))
 		{
-			Sys.Print("SENT TO AP: " + m_name);
 			SendCheckToAP(m_id);
+			if (IsHealthOrAmmo(self))
+			{
+				PlayPickupNotification(self.Definition(), true);
+				DisplayCollectedLocationString();
+			}
 			
-			// Turn the flag off now, since we already sent the check
-			// It will turn back on when the map reloads, but at least
-			// we don't be spamming AP with useless messages every tick!
+			// Turn the flag off now, since we already sent the check.
 			self.WorldComponent().Flags() &= ~WCF_INVOKE_COLLIDE_CALLBACK;
 			
 			// If it's an AP item, display the check
 			if (m_displayString != "")
 			{
 				Hud.AddMessage(m_displayString);
-			}
-			
-			if (IsHealthOrAmmo(self))
-			{
-				PlayPickupNotification(self.Definition());
 			}
 		}
 	}
@@ -93,9 +90,6 @@ class RandoPickupObject : ScriptObject
 	void OnTouch(kActor@ pInstigator)
 	{
 		Sys.Print(m_position);
-		//Sys.Print("COLLECTED: " + ToString());
-		Hud.AddMessage("AP GET");
-		
 		if (m_id != 0)
 		{
 			CollectLocation(m_id);

@@ -282,6 +282,10 @@ class RandoPlayerObject : ScriptObject
 				"  -  Power Cells: " + inventory.GetCount(kActor_MissionItem_BeaconPowerCell),
 				300);
 				
+			// TODO: consider putting this in a different key sequence
+			// - that way we can display location stuff separate from item stuff
+			DisplayCollectedLocationString(300);
+				
 			m_messageCooldown = 330;
 		}
 	}

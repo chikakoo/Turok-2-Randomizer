@@ -138,6 +138,27 @@ void ResetCollectedStatuses()
 }
 
 //------------------------------
+// Displays a string indicating collection progress for the curren tmap:
+// locations checked / total locations.
+void DisplayCollectedLocationString(const int &in visibleTime = 120)
+{
+	array<ReplacementEntry@>@ locations = 
+		g_mapReplacements[Game.ActiveMapID()];
+	int totalCollected = 0;
+	for (uint i = 0; i < locations.length(); i++)
+	{
+		if (locations[i].isCollected || locations[i].isSentToAP)
+		{
+			totalCollected++;
+		}
+	}
+	
+	Hud.AddMessage(
+		"Map progress: " + totalCollected + " / " + locations.length(),
+		visibleTime);
+}
+
+//------------------------------
 // Puts the location in the outgoing message queue for AP.
 // This is different from collecting it, as you could touch health/ammo that
 // you cannot pick up. We still want to send that to AP.

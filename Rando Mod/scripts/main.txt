@@ -65,7 +65,7 @@ bool DeserializeBool(kDict& in dict, const kStr& in key)
 #include "scripts/primagenBoss.txt"
 #include "scripts/netcallbacks.txt"
 
-#include "scripts/playerUtils.as"
+#include "scripts/actorUtils.as"
 #include "scripts/locations.as"
 #include "scripts/randoPickupObject.as"
 #include "scripts/randoPlayerObject.as"
