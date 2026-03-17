@@ -94,6 +94,7 @@ class RandoPickupObject : ScriptObject
 		if (m_id != 0)
 		{
 			CollectLocation(m_id);
+			SendCheckToAP(m_id);
 		}
 	}
 	

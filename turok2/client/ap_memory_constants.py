@@ -41,7 +41,6 @@ class APMessageType(Enum):
     AP_IN_MSGTYPE_GET_TRAP = 6
     
     AP_OUT_MSGTYPE_SEND_CHECK = 7
-    AP_OUT_MSGTYE_GAME_FINISHED = 8
 
 class APMemoryOffset(Enum):
     """
@@ -64,3 +63,4 @@ class APMemoryOffset(Enum):
     OUT_TYPE = 36
     OUT_DATA = 40
     OUT_LAST_PROCESSED_ITEM_IDX = 44
+    OUT_GOAL_REACHED = 48

@@ -19,6 +19,9 @@ class APMemory
 	int OutgoingMessageType;
 	int OutgoingMessageData;
 	int OutgoingLastProcessedItemIdx;
+	
+	// Goal reached - AP will think it is done if this is set to anything above 0
+	int IsGoalReached;
 }
 
 APMemory g_AP;
@@ -39,6 +42,8 @@ void PrintAPMemory()
 	Sys.Print("OutgoingMessageType: " + g_AP.OutgoingMessageType);
 	Sys.Print("OutgoingMessageData: " + g_AP.OutgoingMessageData);
 	Sys.Print("OutgoingLastProcessedItemIdx: " + g_AP.OutgoingLastProcessedItemIdx);
+	
+	Sys.Print("IsGoalReached: " + g_AP.IsGoalReached);
 }
 
 class APOutgoingMessage
@@ -84,8 +89,7 @@ enum APMessageType
     AP_IN_MSGTYPE_GET_TRAP,
 	
 	// Outgoing message types
-	AP_OUT_MSGTYPE_SEND_CHECK,
-	AP_OUT_MSGTYE_GAME_FINISHED // TODO: use this
+	AP_OUT_MSGTYPE_SEND_CHECK
 }
 
 void InitAP()
@@ -104,6 +108,8 @@ void InitAP()
     g_AP.OutgoingMessageType = AP_MSGTYPE_NONE;
     g_AP.OutgoingMessageData = 0;
 	g_AP.OutgoingLastProcessedItemIdx = 0;
+	
+	g_AP.IsGoalReached = 0;
 }
 
 void ResetAPForLoadData(int& in outgoingLastProcessedItemIdx)

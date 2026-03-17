@@ -5,6 +5,7 @@ from .ap_memory_constants import APStatus, APMessageType, APMemoryOffset
 from argparse import Namespace
 from CommonClient import CommonContext, server_loop, gui_enabled
 from ..items import map_ap_item_to_game
+from NetUtils import ClientStatus
 
 logger = logging.getLogger("Client")
 
@@ -153,6 +154,7 @@ class Turok2Context(CommonContext):
                     self.game_connected = False
                     raise Exception("AP block disappeared")
                     
+                await self.check_goal()
                 await self.process_incoming() # Send the game pending items
                 await self.process_outgoing() # Game sending us checks
 
@@ -171,6 +173,14 @@ class Turok2Context(CommonContext):
                     except Exception:
                         print("Reconnect failed, retrying...")
                         await asyncio.sleep(3)
+                        
+    async def check_goal(self):
+        """
+        The game will keep track of the goal and set it when reached.
+        """
+        if not self.finished_game and self.read_int(APMemoryOffset.OUT_GOAL_REACHED) > 0:
+            await self.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
+            self.finished_game = True
         
     async def process_incoming(self):
         """

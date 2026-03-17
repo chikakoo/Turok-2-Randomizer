@@ -27,14 +27,22 @@ class RandoPlayerObject : ScriptObject
 	// Also handles actor replacements.
 	void OnSpawn(void)
 	{
+		int16 mapId = Game.ActiveMapID();
+	
 		// If the map is the intro map, it's a new game, so reset everything
-		if (Game.ActiveMapID() == kLevel_Level1Intro_1)
+		if (mapId == kLevel_Level1Intro_1)
 		{
 			// IsCollected and IsSentToAP should be false for every location
 			ResetCollectedStatuses();
 			
 			// Set outgoing index to 0 to receive all items from AP
 			ResetAPForLoadData(0);
+		}
+		
+		// The goal is either one of the enings
+		if (mapId == kLevel_Ending || mapId == kLevel_EndingB)
+		{
+			g_AP.IsGoalReached = 1;
 		}
 		
 		// TODO: remove this when done with generator stuff
