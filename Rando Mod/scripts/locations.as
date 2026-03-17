@@ -8,18 +8,52 @@
 // So, this is an array<array<ReplacementEntry@>>.
 //------------------------------
 array<array<ReplacementEntry@>> g_mapReplacements;
+array<array<int>> g_mapLevelNumberToMapIds; // To get all maps for a level
+
+enum LevelNumber
+{
+	LEVEL_HUB = 0,
+	LEVEL_PORT_OF_ADIA = 1,
+	LEVEL_RIVER_OF_SOULS = 2,
+	LEVEL_DEATH_MARSHES = 3,
+	LEVEL_LAIR_OF_THE_BLIND_ONES = 4,
+	LEVEL_HIVE_OF_THE_MANTIDS = 5,
+	LEVEL_PRIMAGENS_LIGHTSHIP = 6,
+	LEVEL_UNMAPPED = 7
+}
 
 //------------------------------
-// Initialize to handle up to an index of 135 (136 includes index 0).
+// Initialize to handle maps up to an index of 135 (136 includes index 0).
 // 135 is the largest map id we need this for.
+//
+// Also sets up our level id to map numbers array, used to display all
+// checks for a given map.
 void InitMapReplacements(void)
 {
     g_mapReplacements.resize(136); // 0–135 inclusive
-
     for (uint i = 0; i < g_mapReplacements.length(); i++)
     {
         g_mapReplacements[i] = array<ReplacementEntry@>();
     }
+	
+	g_mapLevelNumberToMapIds.resize(LEVEL_UNMAPPED + 1);
+	for (uint i = 0; i < g_mapLevelNumberToMapIds.length(); i++)
+    {
+        g_mapLevelNumberToMapIds[i] = array<int>();
+    }
+	
+	// Port of Adia
+	array<int>@ portOfAdiaMaps = g_mapLevelNumberToMapIds[LEVEL_PORT_OF_ADIA];
+	portOfAdiaMaps.insertLast(kLevel_PortOfAdia_1);
+	portOfAdiaMaps.insertLast(kLevel_PortOfAdia_2);
+	portOfAdiaMaps.insertLast(kLevel_PortOfAdia_3);
+	portOfAdiaMaps.insertLast(kLevel_PortOfAdia_4);
+	portOfAdiaMaps.insertLast(kLevel_PortOfAdia_5);
+	portOfAdiaMaps.insertLast(kLevel_PortOfAdia_6);
+	portOfAdiaMaps.insertLast(kLevel_PortOfAdia_7);
+	portOfAdiaMaps.insertLast(kLevel_PortOfAdia_8);
+	portOfAdiaMaps.insertLast(kLevel_PortOfAdia_9);
+	portOfAdiaMaps.insertLast(kLevel_PortOfAdia_OBL);
 }
 
 //------------------------------
@@ -28,6 +62,28 @@ void InitMapReplacements(void)
 void InitActorReplacements()
 {
 	#include "rando/randoReplacements.txt"
+}
+
+//------------------------------
+// Gets an internal level number for the given map id.
+int GetLevelNumberFromMapId(const int &in mapId)
+{
+	switch(mapId)
+	{
+		case kLevel_PortOfAdia_1:
+		case kLevel_PortOfAdia_2:
+		case kLevel_PortOfAdia_3:
+		case kLevel_PortOfAdia_4:
+		case kLevel_PortOfAdia_5:
+		case kLevel_PortOfAdia_6:
+		case kLevel_PortOfAdia_7:
+		case kLevel_PortOfAdia_8:
+		case kLevel_PortOfAdia_9:
+		case kLevel_PortOfAdia_OBL:
+			return LEVEL_PORT_OF_ADIA;
+	}
+	
+	return LEVEL_UNMAPPED;
 }
 
 //------------------------------
@@ -66,6 +122,24 @@ void AddReplacement(
 }
 
 //------------------------------
+// Tries to get the replacement array for the given map id.
+// If not found, locations is null and returns false.
+// If found, locations is the found location and returns true.
+bool TryGetReplacementArray(
+	const int16 &in mapId, 
+	array<ReplacementEntry@>@ &out locations)
+{
+	if (mapId < 0 || mapId >= int16(g_mapReplacements.length()))
+	{
+		@locations = null;
+		return false;
+	}
+	
+	@locations = g_mapReplacements[mapId];
+	return locations !is null;
+}
+
+//------------------------------
 // Tries to get the replacement for the given actor id.
 // Will return false if not found.
 // - mapId: The map id (passed directly for performance reasons)
@@ -77,7 +151,12 @@ bool TryGetReplacement(
 	const kStr &in position,
 	ReplacementEntry@ &out replacementEntry)
 {
-	array<ReplacementEntry@>@ locations = g_mapReplacements[mapId];
+	array<ReplacementEntry@>@ locations;
+	if (!TryGetReplacementArray(mapId, locations))
+	{
+		return false;
+	}
+
     for (uint i = 0; i < locations.length(); i++)
     {
         ReplacementEntry @entry = locations[i];
@@ -95,12 +174,17 @@ bool TryGetReplacement(
 // Returns null if not found.
 ReplacementEntry@ GetCurrentMapReplacementWithApId(const int &in apId)
 {
-	array<ReplacementEntry@>@ locations = g_mapReplacements[Game.ActiveMapID()];
+	array<ReplacementEntry@>@ locations;
+	if (!TryGetReplacementArray(Game.ActiveMapID(), locations))
+	{
+		return null;
+	}
+	
     for (uint i = 0; i < locations.length(); i++)
     {
         if (locations[i].apId == apId)
 		{
-			return locations[i];
+			return @locations[i];
 		}
     }
 	
@@ -138,9 +222,9 @@ void ResetCollectedStatuses()
 }
 
 //------------------------------
-// Displays a string indicating collection progress for the curren tmap:
+// Displays a string indicating collection progress for the current map:
 // locations checked / total locations.
-void DisplayCollectedLocationString(const int &in visibleTime = 120)
+void DisplayCollectedLocationsForCurrentMap(const int &in visibleTime = 120)
 {
 	array<ReplacementEntry@>@ locations = 
 		g_mapReplacements[Game.ActiveMapID()];
@@ -154,7 +238,112 @@ void DisplayCollectedLocationString(const int &in visibleTime = 120)
 	}
 	
 	Hud.AddMessage(
-		"Map progress: " + totalCollected + " / " + locations.length(),
+		"Map progress: " + totalCollected + "/" + locations.length(),
+		visibleTime);
+}
+
+//------------------------------
+// Displays a string indicating collection progress for the current level:
+// locations checked / total locations.
+void DisplayCollectedLocationsForLevel(
+	const int &in mapId,
+	const kStr &in prefix,
+	const int &in visibleTime = 120)
+{
+	int totalCollected;
+	int totalLocations;
+	CalculateTotalLocationsCheckedForLevelFromMap(
+		mapId,
+		totalCollected, 
+		totalLocations);
+
+	Hud.AddMessage(
+		prefix + ": " + totalCollected + "/" + totalLocations,
+		visibleTime);
+}
+
+//------------------------------
+// Calculates the total locations on the level, given the level number.
+// Outputs the total collected locations and total locations.
+void CalculateTotalLocationsCheckedForLevel(
+	const int &in levelNumber,
+	int &out totalCollected, 
+	int &out totalLocations)
+{
+	totalCollected = 0;
+	totalLocations = 0;
+
+	array<int>@ mapIds = g_mapLevelNumberToMapIds[levelNumber];
+	
+	Sys.Print("level: " + levelNumber + " - count: " + mapIds.length());
+	for (uint i = 0; i < mapIds.length(); i++)
+	{
+		array<ReplacementEntry@>@ locations = 
+			g_mapReplacements[mapIds[i]];
+		
+		totalLocations += locations.length();
+		
+		for (uint j = 0; j < locations.length(); j++)
+		{
+			if (locations[j].isCollected || locations[j].isSentToAP)
+			{
+				totalCollected++;
+			}
+		}
+	}
+}
+
+//------------------------------
+// Calculates the total locations on the level, given a map id in that level.
+// Outputs the total collected locations and total locations.
+void CalculateTotalLocationsCheckedForLevelFromMap(
+	const int &in mapId,
+	int &out totalCollected, 
+	int &out totalLocations)
+{
+	int levelNumber = GetLevelNumberFromMapId(mapId);
+	CalculateTotalLocationsCheckedForLevel(levelNumber, totalCollected, totalLocations);
+}
+
+//------------------------------
+// Displays a string indicating collection progress for the current level:
+// locations checked / total locations.
+void DisplayCollectedLocationsForGame(const int &in visibleTime = 120)
+{
+	int totalCollected = 0;
+	int totalChecks = 0;
+	
+	int levelCollected;
+	int levelTotal;
+	
+	array<int> levels = {
+		LEVEL_PORT_OF_ADIA,
+		LEVEL_RIVER_OF_SOULS,
+		LEVEL_DEATH_MARSHES,
+		LEVEL_LAIR_OF_THE_BLIND_ONES,
+		LEVEL_HIVE_OF_THE_MANTIDS,
+		LEVEL_PRIMAGENS_LIGHTSHIP
+	};
+	
+	kStr output = "Levels: ";
+	
+	for (uint i = 0; i < levels.length(); i++)
+	{
+		CalculateTotalLocationsCheckedForLevel(levels[i], levelCollected, levelTotal);
+		totalCollected += levelCollected;
+        totalChecks += levelTotal;
+		
+        if (i > 0)
+        {
+            output += " - ";
+        }
+
+        output += "" + levelCollected + "/" + levelTotal;
+	}
+	
+	Hud.AddMessage(output, visibleTime);
+	Hud.AddMessage(
+		"Total Checks: " + totalCollected + "/" + totalChecks,
 		visibleTime);
 }
 

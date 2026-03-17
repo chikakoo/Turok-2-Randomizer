@@ -2,6 +2,8 @@ class RandoPlayerObject : ScriptObject
 {
     kActor@ self;
 	int m_messageCooldown = 0;
+	uint16 m_menuButtonHeldTime = 5;
+	int m_progressMenuDisplayTime = 300;
 	
 	// An array of ascii characters so we can get the index easily
 	array<kStr> m_asciiChars = {
@@ -278,23 +280,78 @@ class RandoPlayerObject : ScriptObject
 			return;
 		}
 		
-		// Buttons 8 and 9 are scope in and out, unlikely to ever be pressed at the same time
-		// TODO: add all invisible pickups here as they are added to the rando
-		if (LocalPlayer.ButtonHeldTime(8) > 5 && 
-			LocalPlayer.ButtonHeldTime(9) > 5)
+		TryDisplayProgressMenu();
+	}
+	
+	//---------------------------
+	// Displays a progress menu for the player depending on what buttons are held for the
+	// set number of frames.
+	//
+	// Current level progress: Zoom in and out
+	// Current game progress: Zoom in, out, and jump
+	void TryDisplayProgressMenu()
+	{
+		if (LocalPlayer.ButtonHeldTime(8) > m_menuButtonHeldTime && 
+			LocalPlayer.ButtonHeldTime(9) > m_menuButtonHeldTime)
 		{
-			kPlayerInventory@ inventory = LocalPlayer.Inventory();
-			Hud.AddMessage(
-				"Level 2 Keys: " + inventory.GetCount(kActor_InventoryItem_Level2Key) +
-				"  -  Power Cells: " + inventory.GetCount(kActor_MissionItem_BeaconPowerCell),
-				300);
-				
-			// TODO: consider putting this in a different key sequence
-			// - that way we can display location stuff separate from item stuff
-			DisplayCollectedLocationString(300);
-				
-			m_messageCooldown = 330;
+			if (LocalPlayer.ButtonHeldTime(1) > m_menuButtonHeldTime)
+			{
+				DisplayGameProgress();
+			}
+			else
+			{
+				DisplayLevelProgress();
+			}
+			
+			m_messageCooldown = m_progressMenuDisplayTime + 30;
 		}
+	}
+	
+	//---------------------------
+	// Displays level-specific progress, including:
+	// - Location collection progress for the current map
+	// - Location collection progress for the entire Level
+	// - Special items that don't show up correctly in the pause menu
+	void DisplayLevelProgress()
+	{
+		kPlayerInventory@ inventory = LocalPlayer.Inventory();
+		int16 mapId = Game.ActiveMapID();
+		switch(GetLevelNumberFromMapId(mapId))
+		{
+			case LEVEL_PORT_OF_ADIA:
+				Hud.AddMessage(
+					"Power Cells: " + inventory.GetCount(kActor_MissionItem_BeaconPowerCell),
+					m_progressMenuDisplayTime);
+				DisplayCollectedLocationsForLevel(mapId, "Level Checks", m_progressMenuDisplayTime);
+				DisplayCollectedLocationsForCurrentMap(m_progressMenuDisplayTime);
+				break;
+			default:
+				Hud.AddMessage("Unmapped map id!");
+				break;
+		}
+	}
+	
+	//---------------------------
+	// Displays progress for the entire game, including:
+	// - Location collection progress
+	// - Special items that don't show up correctly in the pause menu
+	void DisplayGameProgress()
+	{
+		kPlayerInventory@ inventory = LocalPlayer.Inventory();
+		Hud.AddMessage(
+			"Nuke Parts: " + inventory.GetCount(kActor_InventoryItem_NukePart) + "/6",
+			m_progressMenuDisplayTime);
+		Hud.AddMessage(
+			"Keys 2-6: " +
+			inventory.GetCount(kActor_InventoryItem_Level2Key) + "/3 - " +
+			inventory.GetCount(kActor_InventoryItem_Level3Key) + "/3 - " +
+			inventory.GetCount(kActor_InventoryItem_Level4Key) + "/3 - " +
+			inventory.GetCount(kActor_InventoryItem_Level5Key) + "/3 - " +
+			inventory.GetCount(kActor_InventoryItem_Level6Key) + "/6",
+			m_progressMenuDisplayTime);
+		DisplayCollectedLocationsForGame(m_progressMenuDisplayTime);
+			
+		// TODO: talismans and feathers
 	}
 
 	//----------------------------------

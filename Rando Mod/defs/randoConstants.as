@@ -8,6 +8,7 @@
 #define kActor_InventoryItem_Level6Key 4350
 
 #define kActor_MissionItem_BeaconPowerCell 4200
+#define kActor_InventoryItem_NukePart 4500
 
 #define kActor_PrimagenKey_1 4360
 #define kActor_PrimagenKey_2 4361

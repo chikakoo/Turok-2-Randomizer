@@ -1,4 +1,5 @@
 #include "defs/common.txt"
+#include "defs/randoConstants.as"
 
 //-----------------------------------------------------------------------------
 //
@@ -87,7 +88,7 @@ FlashLight 1802
 //
 //-----------------------------------------------------------------------------
 
-NukePart 4500
+NukePart kActor_InventoryItem_NukePart
 {
     className                               "kexInventoryPickup"
     placeable                               TRUE

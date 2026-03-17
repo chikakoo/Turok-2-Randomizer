@@ -71,7 +71,7 @@ class RandoPickupObject : ScriptObject
 			if (IsHealthOrAmmo(self))
 			{
 				PlayPickupNotification(self.Definition(), true);
-				DisplayCollectedLocationString();
+				DisplayCollectedLocationsForCurrentMap();
 			}
 			
 			// Turn the flags off now, since we already sent the check.
