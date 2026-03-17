@@ -74,8 +74,9 @@ class RandoPickupObject : ScriptObject
 				DisplayCollectedLocationString();
 			}
 			
-			// Turn the flag off now, since we already sent the check.
+			// Turn the flags off now, since we already sent the check.
 			self.WorldComponent().Flags() &= ~WCF_INVOKE_COLLIDE_CALLBACK;
+			self.Flags() &= ~AF_IMPORTANT;
 			
 			// If it's an AP item, display the check
 			if (m_displayString != "")

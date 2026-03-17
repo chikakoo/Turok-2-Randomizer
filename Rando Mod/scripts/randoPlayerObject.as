@@ -71,9 +71,9 @@ class RandoPlayerObject : ScriptObject
 					actorsToRemove.insertLast(actor);
 					continue;
 				}
+				
 				ReplaceActor(actor, replacement);
 				
-				//TODO: mark as important if not sent to AP
 			}
 			else
 			{	
@@ -113,7 +113,7 @@ class RandoPlayerObject : ScriptObject
 				actorClassName == "kexWeaponPickup")
 			{
 				Sys.Print("NOT MAPPED: " + posStr + " (" + GetFriendlyActorName(actor.Type()) + ")"); 
-				actor.Flags() |= AF_IMPORTANT; 
+				//actor.Flags() |= AF_IMPORTANT;  // TODO: remove this after mapping stuff
 			}
 		}
 	}
@@ -151,6 +151,13 @@ class RandoPlayerObject : ScriptObject
 		if (IsHealthOrAmmo(replacedActor))
 		{
 			newWorldComponent.Flags() |= WCF_INVOKE_COLLIDE_CALLBACK;
+		}
+		
+		// Flag the actor as important so it can be found easier
+		// If it was already sent to AP, do not do this since it was "collected" already
+		if (!replacement.isSentToAP)
+		{
+			replacedActor.Flags() |= AF_IMPORTANT; // TODO: enable this when done adding items
 		}
 		
 	    initialActor.Remove();
