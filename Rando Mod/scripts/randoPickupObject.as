@@ -7,6 +7,7 @@ class RandoPickupObject : ScriptObject
 	int m_id;
 	kStr m_actorName;
 	kStr m_displayString;
+	bool m_wasSentToAP;
 	
 	// Constructor
 	// @actor: The actor that was loaded
@@ -38,19 +39,21 @@ class RandoPickupObject : ScriptObject
 	// If not there, returns a placeholder for the name.
 	void SetReplacementEntryProperties(void)
 	{
-		ReplacementEntry replacementEntry;
-		TryGetReplacement(m_position, replacementEntry);
+		ReplacementEntry@ replacementEntry;
+		TryGetReplacement(Game.ActiveMapID(), m_position, replacementEntry);
 		
 		if (replacementEntry is null)
 		{
 			m_name = "<NO NAME SET>";
 			m_displayString = "";
+			m_wasSentToAP = false;
 		}
 		else
 		{
 			m_name = replacementEntry.name;
-			m_id = replacementEntry.key;
+			m_id = replacementEntry.apId;
 			m_displayString = replacementEntry.displayString;
+			m_wasSentToAP = replacementEntry.isSentToAP;
 		}
 	}
 	
@@ -60,6 +63,7 @@ class RandoPickupObject : ScriptObject
 	void OnCollide(kActor@ pCollider)
 	{
 		if (m_id != 0 && 
+			!m_wasSentToAP &&
 			!(pCollider is null) &&
 			pCollider.InstanceOf("kexPuppet"))
 		{

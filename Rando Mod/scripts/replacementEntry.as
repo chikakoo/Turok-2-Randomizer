@@ -1,52 +1,63 @@
+//------------------------------
 // Represents an actor to be replaced
 // - name: The friendly name of the actor
-// - key: The key of the actor its AP id = MapID### (e.g. 51001 is item 2 on map 51)
+// - apId: The location's AP id = MapID### (e.g. 51001 is item 2 on map 51)
 // - position: The quantized position of the actor on the map
 //  - MapId_X_Y_Z
-// - value: The actor id (see common.txt for the macros)
+// - mapId: Computed from the position
+// - replacementActorId: The actor id to replace this with (see common.txt for the macros)
 // - displayString: The display string to display when collected (only filled for AP items)
+// - isSentToAP: Whether the player has sent the check to AP (may not be collected!)
+// - isCollected: Whether the player has this check
+//------------------------------
 class ReplacementEntry
 {
 	kStr name;
-    int key;
+    int apId;
 	kStr position;
-    int value;
+	int mapId;
+    int replacementActorId;
 	kStr displayString;
+	bool isSentToAP;
+	bool isCollected;
 	
 	ReplacementEntry() {}
 	
     ReplacementEntry(
-		const kStr &in n, 
-		const int &in k, 
-		const kStr &in p, 
-		const int &in v)
+		const kStr &in initName,
+		const int &in initApId,
+		const kStr &in initPosition,
+		const int &in initReplacementActorId)
     {
-        name = n;
-        key = k;
-		position = p;
-        value = v;
+        name = initName;
+        apId = initApId;
+		position = initPosition;
+		mapId = position.Atoi();
+        replacementActorId = initReplacementActorId;
 		displayString = "";
+		isSentToAP = false;
+		isCollected = false;
     }
 	
 	ReplacementEntry(
-		const kStr &in n, 
-		const int &in k, 
-		const kStr &in p, 
-		const kStr &in d)
+		const kStr &in initName,
+		const int &in initApId,
+		const kStr &in initPosition,
+		const kStr &in initDisplayString)
     {
-        name = n;
-        key = k;
-		position = p;
-		value = kActor_Item_APItem;
-        displayString = d;
+        name = initName;
+        apId = initApId;
+		position = initPosition;
+		mapId = position.Atoi();
+		replacementActorId = kActor_Item_APItem;
+        displayString = initDisplayString;
+		isSentToAP = false;
+		isCollected = false;
     }
 }
 
-// The global for the actor replacements
-array<ReplacementEntry> g_actorReplacements;
 
-// The global for location ids already collected
-array<int> g_collectedLocations;
+//TODO: the below functions don't really belong here
 
 // Cache the def manager, since it lags when we load defs
 kIndexDefManager g_defManager;
@@ -58,105 +69,6 @@ void InitDefManager()
 	g_defManager.LoadFile("defs/actors/weaponPickups.txt");
 	g_defManager.LoadFile("defs/actors/powerCells.txt");
 	g_defManager.LoadFile("defs/actors/levelKeys.txt");
-}
-
-// Initialize the replacement array
-void InitActorReplacements()
-{
-	#include "rando/randoReplacements.txt"
-}
-
-// Add to the array for a local item.
-// - name: The friendly name of the actor
-// - key: The key to replace (the AP id of the actor)
-// - position: The position of the actor, to identify it on the map
-// - value: The value to replace it with (the enum id of the actor)
-void AddReplacement(
-	const kStr &in name, 
-	const int &in key, 
-	const kStr &in position,
-	const int &in value)
-{
-	g_actorReplacements.insertLast(
-		ReplacementEntry(name, key, position, value));
-}
-
-// Add to the array for an off-world AP item.
-// - name: The friendly name of the actor
-// - key: The key to replace (the AP id of the actor)
-// - position: The position of the actor, to identify it on the map
-// - displayString: The string to display when picked up (the enum id of the actor)
-void AddReplacement(
-	const kStr &in name, 
-	const int &in key, 
-	const kStr &in position,
-	const kStr &in displayString)
-{
-	g_actorReplacements.insertLast(
-		ReplacementEntry(name, key, position, displayString));
-}
-
-// Tries to get the replacement for the given actor id.
-// Will return false if not found.
-// - position: The position of the actor to replace
-//  - we CANNOT use the key because it can't be calculated from the Turok data
-// - replacementEntry: The retrieved entry
-// Returns true if the replacement was found; false otherwise.
-bool TryGetReplacement(const kStr &in position, ReplacementEntry &out replacementEntry)
-{
-    for (uint i = 0; i < g_actorReplacements.length(); i++)
-    {
-        ReplacementEntry @entry = g_actorReplacements[i];
-        if (entry.position == position)
-        {
-			replacementEntry = entry;
-            return true;
-        }
-    }
-    return false;
-}
-
-// Checks if the location is in the collected array.
-// id: The id to check
-bool IsLocationCollected(const int &in id)
-{
-    for (uint i = 0; i < g_collectedLocations.length(); i++)
-    {
-        if (g_collectedLocations[i] == id)
-		{
-			return true;
-		}
-    }
-
-    return false;
-}
-
-// Marks the given location as collected by putting it in the array.
-// We handle sending to AP in SendCheckToAP - see that documentation.
-// id: The id to mark as collected
-void CollectLocation(const int &in id)
-{
-    g_collectedLocations.insertLast(id);
-}
-
-// Puts the location in the outgoing message queue for AP.
-// This is different from collecting it, as you could touch health/ammo that
-// you cannot pick up. We still want to send that to AP.
-// id: The id to send to AP
-void SendCheckToAP(const int &in id)
-{
-	g_outgoingMessageQueue.insertLast(
-		APOutgoingMessage(AP_OUT_MSGTYPE_SEND_CHECK, id));
-}
-
-// Reset the collected locations on a save load
-// This flag is unset in OnSpawn
-void ResetOnSaveLoad()
-{
-	if (Game.ActiveMapID() == kLevel_Level1Intro_1)
-	{
-		g_collectedLocations.removeRange(0, g_collectedLocations.length());
-	}
 }
 
 // Gets a friendly name given the actor type, for debugging

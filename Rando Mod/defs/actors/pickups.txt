@@ -107,4 +107,8 @@ NukePart 4500
     Begin_Component "kexStaticMeshComponent"
         mesh                  "models/Nuke_Part.staticmesh"
     End_Component
+	Begin_Component "kexScriptComponent"
+        scriptClass           "RandoPickupObject"
+        triggerRadius         81.92
+    End_Component
 }

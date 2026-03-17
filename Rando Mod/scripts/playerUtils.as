@@ -210,7 +210,7 @@ void LifeForce10(void)
 }
 
 
-//TODO: primagen keys and talismans
+//TODO: primagen keys, talismans, nuke parts
 
 
 //---------------------------
@@ -264,4 +264,9 @@ bool IsHealthOrAmmo(kActor@ actor)
 	kStr className;
 	actor.Definition().GetString("className", className);
 	return className == "kexHealthPickup" || className == "kexAmmoPickup";
+}
+
+// TESTING
+void Test()
+{
 }

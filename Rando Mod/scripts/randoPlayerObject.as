@@ -21,14 +21,16 @@ class RandoPlayerObject : ScriptObject
     }
 	
 	//---------------------------
-	// Resets the state of the globals on a save load
+	// Resets the state of the globals on a save load.
+	// Also handles actor replacements.
 	void OnSpawn(void)
 	{
-		ResetOnSaveLoad();
-		
 		// If the map is the intro map, it's a new game, so reset everything
 		if (Game.ActiveMapID() == kLevel_Level1Intro_1)
 		{
+			// IsCollected and IsSentToAP should be false for every location
+			ResetCollectedStatuses();
+			
 			// Set outgoing index to 0 to receive all items from AP
 			ResetAPForLoadData(0);
 		}
@@ -48,7 +50,7 @@ class RandoPlayerObject : ScriptObject
 	{
 		kActorIterator actorIterator;
 		kActor@ actor;
-		ReplacementEntry replacement;
+		ReplacementEntry@ replacement;
 		kVec3 position;
 		kStr posStr;
 		array<kActor@> actorsToRemove; // Remove outside of the iterator, to be safe
@@ -56,21 +58,24 @@ class RandoPlayerObject : ScriptObject
 			!actor.InstanceOf("kexPuppet")) // STOP on the player so we don't iterate forever
 		{
 			position = actor.Origin();
-			posStr = "" + Game.ActiveMapID() + "_" +
+			int16 mapId = Game.ActiveMapID();
+			posStr = "" + mapId + "_" +
 				int(position.x) + "_" +
 				int(position.y) + "_" +
 				int(position.z);
-			if (TryGetReplacement(posStr, replacement))
+			if (TryGetReplacement(mapId, posStr, replacement))
 			{
-				if (IsLocationCollected(replacement.key))
+				if (replacement.isCollected)
 				{
-					Sys.Print("COLLECTED ON SPAWN: " + replacement.name + " (" + posStr + ")" + " (" + replacement.key + ")");
+					Sys.Print("COLLECTED ON SPAWN: " + replacement.name + " (" + posStr + ")" + " (" + replacement.apId + ")");
 					actorsToRemove.insertLast(actor);
 					continue;
 				}
 				ReplaceActor(actor, replacement);
+				
+				//TODO: mark as important if not sent to AP
 			}
-			else 
+			else
 			{	
 				HandleWhetherActorShouldHaveBeenReplaced(actor, posStr);
 			}				
@@ -115,11 +120,11 @@ class RandoPlayerObject : ScriptObject
 	
 	//----------------------------------
 	// Replace the given actor with the given replacement
-	void ReplaceActor(kActor@ initialActor, ReplacementEntry &in replacement)
+	void ReplaceActor(kActor@ initialActor, ReplacementEntry@ replacement)
 	{
 		kWorldComponent@ worldComponent = initialActor.WorldComponent();
 		kActor@ replacedActor = ActorFactory.Spawn(
-			replacement.value,
+			replacement.replacementActorId,
 			initialActor.Origin(),
 			initialActor.Yaw(),
 			initialActor.Pitch(),
@@ -157,14 +162,32 @@ class RandoPlayerObject : ScriptObject
 	void OnSerialize(kDict &out dict)
     {
 		kStr collectedLocations;
-		for (uint i = 0; i < g_collectedLocations.length(); i++)
+		kStr sentToAPLocations;
+		for (uint i = 0; i < g_mapReplacements.length(); i++)
 		{
-			collectedLocations += "" + g_collectedLocations[i] + "|";
+			array<ReplacementEntry@>@ locations = g_mapReplacements[i];
+			for (uint j = 0; j < locations.length(); j++)
+			{
+				if (locations[j].isCollected)
+				{
+					collectedLocations += "" + locations[j].apId + "|";
+				}
+				
+				if (locations[j].isSentToAP)
+				{
+					sentToAPLocations += "" + locations[j].apId + "|";
+				}
+			}
 		}
 		
 		if (collectedLocations.Length() > 0)
 		{
 			SERIALIZE(collectedLocations);
+		}
+		
+		if (sentToAPLocations.Length() > 0)
+		{
+			SERIALIZE(sentToAPLocations);
 		}
 	
 		SERIALIZE(g_AP.OutgoingLastProcessedItemIdx);
@@ -173,19 +196,38 @@ class RandoPlayerObject : ScriptObject
 
 	//---------------------------
 	// Deserializes the saved data on the player object:
+	// - Writes the collected locations (see below)
 	// - Writes the highest processed item index into the outgoing one so the client can read it
-	// - Writes the collected locations by converting the trailing pipe string (see above) 
-	// into its parts, then putting it back into the collectedLocations global (which is reset)
-	//
-	// Also, clear out any incoming/outgoing data because it's invalid at this point
+	// - Clears out any incoming/outgoing data because it's invalid at this point
 	void OnDeserialize(kDict &in dict)
     {
-		kStr data;
-		dict.GetString("collectedLocations", data);
-	
-		g_collectedLocations.resize(0);
-		kStr current = "";
+		ResetCollectedStatuses();
 		
+		DeserializeLocationFlags(dict, "collectedLocations");
+		DeserializeLocationFlags(dict, "sentToAPLocations");
+
+		// We are now ready to receive data, so reset everything
+		DESERIALIZE_INT(g_AP.OutgoingLastProcessedItemIdx);
+		ResetAPForLoadData(g_AP.OutgoingLastProcessedItemIdx);
+		
+		Sys.Print("Loaded last processed index: " + g_AP.OutgoingLastProcessedItemIdx);
+	}
+	
+	//---------------------------
+	// Deserializes the saved data on the player object:
+	// - Writes the collected locations by converting the trailing pipe string
+	//   into its parts, then updating the map replacements global.
+	void DeserializeLocationFlags(
+		kDict &in dict,
+		const kStr &in key)
+	{
+		kStr data;
+		if (!dict.GetString(key, data))
+		{
+			return;
+		}
+	
+		kStr current = "";
 		for (uint i = 0; i < data.Length(); i++)
 		{
 			int8 c = data[i];
@@ -194,21 +236,23 @@ class RandoPlayerObject : ScriptObject
 				// Send out all collected locations as well as adding to the list
 				g_outgoingMessageQueue.insertLast(
 					APOutgoingMessage(AP_OUT_MSGTYPE_SEND_CHECK, current.Atoi()));
-				g_collectedLocations.insertLast(current.Atoi());
+					
+				if (key == "collectedLocations")
+				{
+					CollectLocation(current.Atoi());
+				}
+				else
+				{
+					MarkSentToAP(current.Atoi());
+				}
+				
 				current = "";
 			}
 			else
 			{
-				// TODO: Handle if the index doesn't exist
 				current += m_asciiChars[c];
 			}
 		}
-		
-		// We are now ready to receive data, so reset everything
-		DESERIALIZE_INT(g_AP.OutgoingLastProcessedItemIdx);
-		ResetAPForLoadData(g_AP.OutgoingLastProcessedItemIdx);
-		
-		Sys.Print("Loaded last processed index: " + g_AP.OutgoingLastProcessedItemIdx);
 	}
 	
 	//---------------------------
@@ -232,7 +276,6 @@ class RandoPlayerObject : ScriptObject
 		if (LocalPlayer.ButtonHeldTime(8) > 5 && 
 			LocalPlayer.ButtonHeldTime(9) > 5)
 		{
-
 			kPlayerInventory@ inventory = LocalPlayer.Inventory();
 			Hud.AddMessage(
 				"Level 2 Keys: " + inventory.GetCount(kActor_InventoryItem_Level2Key) +

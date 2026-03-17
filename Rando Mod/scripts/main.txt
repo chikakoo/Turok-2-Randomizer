@@ -66,6 +66,7 @@ bool DeserializeBool(kDict& in dict, const kStr& in key)
 #include "scripts/netcallbacks.txt"
 
 #include "scripts/playerUtils.as"
+#include "scripts/locations.as"
 #include "scripts/randoPickupObject.as"
 #include "scripts/randoPlayerObject.as"
 #include "scripts/replacementEntry.as"
@@ -79,6 +80,7 @@ main
 void main(void)
 {
 	InitAP();
+	InitMapReplacements();
 	InitDefManager();
 	InitActorReplacements();
 	
