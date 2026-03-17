@@ -13,9 +13,11 @@ if TYPE_CHECKING:
 class Turok2Container(APPlayerContainer):
     game: str = 'Turok 2'
 
-    def __init__(self, patch_data: str, base_path: str, output_directory: str,
+    def __init__(self, rando_replacements: str, ap_settings: str, 
+                base_path: str, output_directory: str,
                  player=None, player_name: str = "", server: str = ""):
-        self.patch_data = patch_data
+        self.rando_replacements = rando_replacements
+        self.ap_settings = ap_settings
         self.file_path = base_path
         container_path = os.path.join(output_directory, base_path)
         self.patch_file_ending = ".kpf"
@@ -28,7 +30,8 @@ class Turok2Container(APPlayerContainer):
         """
         kpf_buffer = io.BytesIO()
         with zipfile.ZipFile(kpf_buffer, "w", zipfile.ZIP_DEFLATED) as kpf_zip:
-            kpf_zip.writestr("rando/randoReplacements.txt", self.patch_data)
+            kpf_zip.writestr("rando/randoReplacements.as", self.rando_replacements)
+            kpf_zip.writestr("rando/apSettings.as", self.ap_settings)
             
         opened_zipfile.writestr("rando.kpf", kpf_buffer.getvalue())
         super().write_contents(opened_zipfile)
@@ -49,6 +52,7 @@ def gen_turok2_seed(self: "Turok2World", output_directory: str):
     mod_dir = os.path.join(output_directory, mod_name + "_" + ap_version + ".zip")
     mod = Turok2Container(
         get_angelscript_from_filled_locations(self),
+        get_settings_string(self),
         mod_dir, 
         output_directory, 
         self.player,
@@ -78,4 +82,10 @@ def get_angelscript_from_filled_locations(self: "Turok2World") -> str:
         
         angelscript_snippets.append(snippet)
         
-    return "\n".join(angelscript_snippets)
+    return "\n".join(angelscript_snippets)    
+    
+def get_settings_string(self: "Turok2World") -> str:
+    """
+    Gets the macro file with any settings the game needs to know.
+    """
+    return "// No settings here yet!";

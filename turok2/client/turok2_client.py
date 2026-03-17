@@ -54,7 +54,7 @@ class Turok2Context(CommonContext):
         while True:
             try:
                 self.pm = pymem.Pymem(self.exe_name)
-                logger.info(f"Connection succesful!")
+                logger.info(f"Found Turok 2 process...")
                 return
             except Exception:
                 await asyncio.sleep(5)
@@ -90,6 +90,8 @@ class Turok2Context(CommonContext):
                 
                 self.game_connected = True
                 print(f"Found AP block at {hex(self.ap_base)}")
+                logger.info("Connected!")
+                
                 return self.ap_base
                     
             except Exception:

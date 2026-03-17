@@ -61,7 +61,7 @@ void InitMapReplacements(void)
 // This is just a bunch of calls to the below AddReplacement functions.
 void InitActorReplacements()
 {
-	#include "rando/randoReplacements.txt"
+	#include "rando/randoReplacements.as"
 }
 
 //------------------------------
