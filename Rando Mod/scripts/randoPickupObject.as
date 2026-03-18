@@ -101,20 +101,4 @@ class RandoPickupObject : ScriptObject
 			TryTriggerTrap(self.Type());
 		}
 	}
-	
-	// Debug helper to print the flags of an actor
-	void PrintFlags(int flags)
-	{
-		kStr flagStr = "Flags:";
-
-		for (int i = 0; i < 24; i++)
-		{
-			if ((flags & (1 << i)) != 0)
-			{
-				flagStr += " " + i;
-			}
-		}
-		
-		Sys.Print(flagStr);
-	}
 }

@@ -1,0 +1,707 @@
+#include "defs/common.txt"
+
+Weapon kWpn_Talon
+{
+    offset                  "6 5.5 10.5"
+    actor                   kActor_Wpn_Talons
+    defaultWeapon           FALSE
+    owned                   TRUE
+    allowUnderwater         TRUE
+    allowLand               TRUE
+    allowMultiplayer        FALSE
+    noCheatGiveWeapons      TRUE
+    icon                    "gfx/hud/weapons/h_w_talon.png"
+    charMeshIndex           NONE
+    priority                10200
+    slot                    1
+    quickslot               0
+    tactileFire             "tactile/PRTSQSH1.bnvib"
+}
+
+Weapon kWpn_Blade
+{
+    offset                  "6 3.5 10"
+    actor                   kActor_Wpn_Blade
+    defaultWeapon           FALSE
+    owned                   FALSE
+    ownedMP                 TRUE
+    allowUnderwater         TRUE
+    allowLand               TRUE
+    allowMultiplayer        TRUE
+    canSever                TRUE
+    icon                    "gfx/hud/weapons/h_w_blade.png"
+    charMeshIndex           kWpnChar_Blade
+    priority                10100
+    slot                    1
+    quickslot               0
+    tactileFire             "tactile/PRTSQSH1.bnvib"
+}
+
+Weapon kWpn_Bow
+{
+    offset                  "6 4.5 10"
+    actor                   kActor_Wpn_Bow
+    defaultWeapon           TRUE
+    owned                   TRUE
+    allowUnderwater         FALSE
+    allowLand               TRUE
+    allowMultiplayer        FALSE
+    noCheatGiveWeapons      TRUE
+    maxRoll                 0.1
+    icon                    "gfx/hud/weapons/h_w_bow.png"
+    ammo                    "Ammo_Arrow"
+    initialAmmoAmount       10
+    ammoConsumption         1
+    projectileParticle      kParticle_Arrow
+    charMeshIndex           kWpnChar_Crossbow
+    priority                9100
+    slot                    2
+    quickslot               1
+}
+
+Weapon kWpn_TekBow
+{
+    offset                  "6 4.5 10"
+    actor                   kActor_Wpn_TekBow
+    defaultWeapon           FALSE
+    owned                   FALSE
+    allowUnderwater         FALSE
+    allowLand               TRUE
+    allowMultiplayer        TRUE
+    maxRoll                 0.1
+    icon                    "gfx/hud/weapons/h_w_tekbow.png"
+    ammo                    "Ammo_TekArrow"
+    altAmmo                 "Ammo_Arrow"
+    initialAltAmmoAmount    10
+    hasScope                1
+    overlayModel            "models/Turok_Eye_Piece.staticmesh"
+    scopeOffset             "0.0 448.0 288.0"
+    scopeScale              "0.19 0.25 0.12"
+    scopeRotateAxis         0
+    scopeCrosshair          "gfx/hud/crosshair_tekbow_scope.png"
+    projectileParticle      kParticle_TekArrow
+    altProjectileParticle   kParticle_Arrow
+    projectileSnipe         kParticle_TekArrowSnipe
+    altProjectileSnipe      kParticle_ArrowSnipe
+    ammoConsumption         1
+    charMeshIndex           kWpnChar_Crossbow
+    priority                9000
+    slot                    2
+    pickupTypeID            kActor_Item_WpnTekBow
+    quickslot               1
+}
+
+Weapon kWpn_Pistol
+{
+    offset                  "6 7 10"
+    actor                   kActor_Wpn_Pistol
+    defaultWeapon           FALSE
+    owned                   FALSE
+    allowUnderwater         FALSE
+    allowLand               TRUE
+    allowMultiplayer        TRUE
+    icon                    "gfx/hud/weapons/h_w_pistol.png"
+    ammo                    "Ammo_Bullet"
+    ammoConsumption         1
+    projectileParticle      kParticle_Bullet
+    charMeshIndex           kWpnChar_Pistol
+    priority                8100
+    slot                    3
+    pickupTypeID            kActor_Item_WpnPistol
+    quickslot               2
+}
+
+Weapon kWpn_Magnum
+{
+    offset                  "6 7 10"
+    actor                   kActor_Wpn_Mag60
+    defaultWeapon           FALSE
+    owned                   FALSE
+    allowUnderwater         FALSE
+    allowLand               TRUE
+    allowMultiplayer        TRUE
+    icon                    "gfx/hud/weapons/h_w_mag60.png"
+    ammo                    "Ammo_Bullet"
+    ammoConsumption         1
+    projectileParticle      kParticle_MagnumBullet
+    charMeshIndex           kWpnChar_Mag60
+    priority                8000
+    slot                    3
+    pickupTypeID            kActor_Item_WpnMag60
+    quickslot               2
+}
+
+Weapon kWpn_Tranq
+{
+    offset                  "6 7 11"
+    actor                   kActor_Wpn_Tranq
+    defaultWeapon           FALSE
+    owned                   FALSE
+    allowUnderwater         FALSE
+    allowLand               TRUE
+    allowMultiplayer        TRUE
+    icon                    "gfx/hud/weapons/h_w_tranq.png"
+    ammo                    "Ammo_Dart"
+    ammoConsumption         1
+    projectileParticle      kParticle_TranqDart
+    charMeshIndex           NONE
+    priority                8300
+    slot                    4
+    quickslot               3
+    tactileFire             "tactile/TRANQ1.bnvib"
+}
+
+Weapon kWpn_ChargeDart
+{
+    offset                  "6 7 11"
+    actor                   kActor_Wpn_ChargeDart
+    defaultWeapon           FALSE
+    owned                   FALSE
+    allowUnderwater         FALSE
+    allowLand               TRUE
+    allowMultiplayer        TRUE
+    icon                    "gfx/hud/weapons/h_w_shockdart.png"
+    ammo                    "Ammo_ChargeDart"
+    ammoConsumption         0   // special case - see script
+    projectileParticle      kParticle_ChargeDart
+    charMeshIndex           kWpnChar_ChargeDart
+    priority                8200
+    slot                    4
+    pickupTypeID            kActor_Item_WpnChargeDart
+    quickslot               3
+}
+
+Weapon kWpn_Shotgun
+{
+    offset                  "5 7 11"
+    actor                   kActor_Wpn_Shotgun
+    defaultWeapon           FALSE
+    owned                   FALSE
+    allowUnderwater         FALSE
+    allowLand               TRUE
+    allowMultiplayer        TRUE
+    icon                    "gfx/hud/weapons/h_w_shotgun.png"
+    ammo                    "Ammo_Shell"
+    altAmmo                 "Ammo_ExpShells"
+    projectileParticle      kParticle_ShotgunBullet
+    altProjectileParticle   kParticle_ExpShotgunBullet
+    projectileOffset        "-1.5 4 2"
+    ammoConsumption         1
+    charMeshIndex           kWpnChar_Shotgun
+    priority                7100
+    slot                    5
+    pickupTypeID            kActor_Item_WpnShotgun
+    quickslot               4
+}
+
+Weapon kWpn_Shredder
+{
+    offset                  "5 7 11"
+    actor                   kActor_Wpn_Shredder
+    defaultWeapon           FALSE
+    owned                   FALSE
+    allowUnderwater         FALSE
+    allowLand               TRUE
+    allowMultiplayer        TRUE
+    icon                    "gfx/hud/weapons/h_w_shredder.png"
+    ammo                    "Ammo_Shell"
+    altAmmo                 "Ammo_ExpShells"
+    projectileParticle      kParticle_ScatterRound
+    altProjectileParticle   kParticle_ExpScatterRound
+    ammoConsumption         1
+    charMeshIndex           kWpnChar_Shredder
+    priority                7000
+    slot                    5
+    pickupTypeID            kActor_Item_WpnScatter
+    quickslot               5
+    tactileFire             "tactile/SHREDDERIMPACTMIX01.bnvib"
+}
+
+Weapon kWpn_PlasmaRifle
+{
+    offset                  "6 7 11"
+    actor                   kActor_Wpn_PlasmaRifle
+    defaultWeapon           FALSE
+    owned                   FALSE
+    allowUnderwater         FALSE
+    allowLand               TRUE
+    allowMultiplayer        TRUE
+    icon                    "gfx/hud/weapons/h_w_plasmarifle.png"
+    ammo                    "Ammo_Plasma"
+    hasScope                1
+    overlayModel            "models/Plasma_Eye_Piece.staticmesh"
+    scopeOffset             "290 404.0 184.0"
+    scopeScale              "0.15 0.1 0.12"
+    scopeRotateAxis         2
+    scopeCrosshair          "gfx/hud/crosshair_plasma_scope.png"
+    projectileParticle      kParticle_PlasmaShot
+    projectileSnipe         kParticle_PlasmaSnipe
+    ammoConsumption         5
+    charMeshIndex           kWpnChar_AssaultRifle
+    priority                6000
+    slot                    6
+    pickupTypeID            kActor_Item_WpnPlasmaRifle
+    quickslot               6
+}
+
+Weapon kWpn_Firestorm
+{
+    offset                  "3 10 3"
+    actor                   kActor_Wpn_FireStorm
+    defaultWeapon           FALSE
+    owned                   FALSE
+    allowUnderwater         FALSE
+    allowLand               TRUE
+    allowMultiplayer        TRUE
+    icon                    "gfx/hud/weapons/h_w_firestorm.png"
+    ammo                    "Ammo_Plasma"
+    ammoConsumption         1
+    charMeshIndex           kWpnChar_Firestorm
+    priority                6100
+    slot                    6
+    pickupTypeID            kActor_Item_WpnFireStorm
+    quickslot               7
+}
+
+Weapon kWpn_SunfirePod
+{
+    offset                  "6 7 12"
+    actor                   kActor_Wpn_SunfirePod
+    defaultWeapon           FALSE
+    owned                   FALSE
+    allowUnderwater         FALSE
+    allowLand               TRUE
+    allowMultiplayer        FALSE
+    icon                    "gfx/hud/weapons/h_w_sunfirepod.png"
+    ammo                    "Ammo_SunfirePod"
+    ammoConsumption         1
+    charMeshIndex           NONE
+    priority                20300
+    slot                    10
+    quickslot               8
+}
+
+Weapon kWpn_Bore
+{
+    offset                  "7 7 10"
+    actor                   kActor_Wpn_Bore
+    defaultWeapon           FALSE
+    owned                   FALSE
+    allowUnderwater         FALSE
+    allowLand               TRUE
+    allowMultiplayer        TRUE
+    icon                    "gfx/hud/weapons/h_w_bore.png"
+    trackingCrosshair       "gfx/hud/crosshair_bore_track.png"
+    lockonCrosshair         "gfx/hud/crosshair_bore_lock.png"
+    ammo                    "Ammo_Bore"
+    allowTracking           TRUE
+    allowTrackingMulti      TRUE
+    fireOnlyIfTracking      TRUE
+    maxTrackingDegrees      35.0
+    ammoConsumption         1
+    projectileParticle      kParticle_Bore
+    charMeshIndex           kWpnChar_Bore
+    priority                20100
+    slot                    9
+    pickupTypeID            kActor_Item_WpnCerebralBore
+    quickslot               9
+}
+
+Weapon kWpn_PFM
+{
+    offset                  "-3 8 3"
+    actor                   kActor_Wpn_PFMLayer
+    defaultWeapon           FALSE
+    owned                   FALSE
+    allowUnderwater         FALSE
+    allowLand               TRUE
+    allowMultiplayer        TRUE
+    icon                    "gfx/hud/weapons/h_w_pfm.png"
+    ammo                    "Ammo_Mine"
+    ammoConsumption         1
+    projectileParticle      kParticle_PFM
+    charMeshIndex           kWpnChar_PFM
+    priority                20000
+    slot                    7
+    pickupTypeID            kActor_Item_WpnPFMLayer
+    quickslot               10
+    tactileFire             "tactile/PFMLNCH10.bnvib"
+}
+
+Weapon kWpn_GrenadeLauncher
+{
+    offset                  "6 7 10"
+    actor                   kActor_Wpn_GrenadeLauncher
+    defaultWeapon           FALSE
+    owned                   FALSE
+    allowUnderwater         FALSE
+    allowLand               TRUE
+    allowMultiplayer        TRUE
+    icon                    "gfx/hud/weapons/h_w_grenadelauncher.png"
+    ammo                    "Ammo_Grenades"
+    ammoConsumption         1
+    projectileParticle      kParticle_Grenade
+    charMeshIndex           kWpnChar_Grenade
+    priority                5000
+    slot                    8
+    pickupTypeID            kActor_Item_WpnGrenadeLauncher
+    quickslot               11
+    tactileFire             "tactile/GRNLNCH2.bnvib"
+}
+
+Weapon kWpn_MissileLauncher
+{
+    offset                  "6 7 10"
+    actor                   kActor_Wpn_ScorpionLauncher
+    defaultWeapon           FALSE
+    owned                   FALSE
+    allowUnderwater         FALSE
+    allowLand               TRUE
+    allowMultiplayer        TRUE
+    icon                    "gfx/hud/weapons/h_w_missilelauncher_quad.png"
+    trackingCrosshair       "gfx/hud/crosshair_missile_track.png"
+    lockonCrosshair         "gfx/hud/crosshair_missile_lock.png"
+    ammo                    "Ammo_Rockets"
+    allowTracking           1
+    maxTrackingDegrees      25.0
+    ammoConsumption         0   // special case - see script
+    projectileParticle      kParticle_Missile
+    charMeshIndex           kWpnChar_Missile
+    priority                5100
+    slot                    8
+    pickupTypeID            kActor_Item_WpnMissileLauncher
+    quickslot               12
+}
+
+Weapon kWpn_HarpoonGun
+{
+    offset                  "6 7 10"
+    actor                   kActor_Wpn_Harpoon
+    defaultWeapon           FALSE
+    owned                   FALSE
+    allowUnderwater         TRUE
+    allowLand               FALSE
+    allowMultiplayer        TRUE
+    icon                    "gfx/hud/weapons/h_w_harpoon.png"
+    ammo                    "Ammo_Spears"
+    ammoConsumption         1
+    projectileParticle      kParticle_Spear
+    charMeshIndex           kWpnChar_Harpoon
+    priority                10050
+    slot                    11
+    quickslot               1
+    tactileFire             "tactile/HARPOONMIX01.bnvib"
+}
+
+Weapon kWpn_TorpedoLauncher
+{
+    offset                  "8 7 10"
+    actor                   kActor_Wpn_TorpedoLauncher
+    defaultWeapon           FALSE
+    owned                   FALSE
+    allowUnderwater         TRUE
+    allowLand               FALSE
+    allowMultiplayer        TRUE
+    icon                    "gfx/hud/weapons/h_w_torpedo.png"
+    ammo                    "Ammo_Torpedos"
+    ammoConsumption         1
+    posture.swimmingDef     "Player_Swimming_Torpedo"
+    charMeshIndex           kWpnChar_Torpedo
+    priority                9199
+    slot                    11
+    pickupTypeID            kActor_Item_WpnTorpedoLauncher
+    quickslot               2
+}
+
+Weapon kWpn_FlameThrower
+{
+    offset                  "-6 -2 2"
+    actor                   kActor_Wpn_FlameThrower
+    defaultWeapon           FALSE
+    owned                   FALSE
+    allowUnderwater         FALSE
+    allowLand               TRUE
+    allowMultiplayer        TRUE
+    icon                    "gfx/hud/weapons/h_w_flamethrower.png"
+    ammo                    "Ammo_Fuel"
+    maxRoll                 0.1
+    ammoConsumption         0   // special case - see script
+    projectileParticle      kParticle_FlameThrower
+    charMeshIndex           kWpnChar_FlameThrower
+    priority                5200
+    slot                    7
+    pickupTypeID            kActor_Item_WpnFlameThrower
+    quickslot               13
+}
+
+Weapon kWpn_RazorWind
+{
+    offset                  "6 7 12"
+    actor                   kActor_Wpn_RazorWind
+    defaultWeapon           FALSE
+    owned                   FALSE
+    allowUnderwater         FALSE
+    allowLand               TRUE
+    allowMultiplayer        FALSE
+    canSever                TRUE
+    icon                    "gfx/hud/weapons/h_w_razorwind.png"
+    charMeshIndex           kWpnChar_RazorWind
+    priority                20200
+    slot                    9
+    quickslot               14
+}
+
+Weapon kWpn_Nuke
+{
+    offset                  "6 7 10"
+    actor                   kActor_Wpn_Nuke
+    defaultWeapon           FALSE
+    owned                   FALSE
+    allowUnderwater         FALSE
+    allowLand               TRUE
+    allowMultiplayer        TRUE
+    icon                    "gfx/hud/weapons/h_w_nuke.png"
+    ammo                    "Ammo_Nuke"
+    ammoConsumption         1
+    projectileParticle      kParticle_Nuke
+    charMeshIndex           kWpnChar_Nuke
+    priority                66666
+    slot                    0
+    pickupTypeID            kActor_Item_WpnNuke
+    quickslot               15
+}
+
+Weapon kWpn_Flare
+{
+    offset                  "6 7 10"
+    actor                   kActor_Wpn_Flare
+    defaultWeapon           FALSE
+    owned                   TRUE
+    allowUnderwater         TRUE
+    allowLand               TRUE
+    allowMultiplayer        FALSE
+    icon                    "gfx/hud/weapons/h_w_flare.png"
+	ammo                    "Ammo_ExpShells"
+    projectileParticle      kParticle_Flare
+    charMeshIndex           NONE
+    priority                100000
+    slot                    11
+    quickslot               0
+    tactileFire             "tactile/pistl3ap.bnvib"
+}
+
+Weapon kWpn_RaptorClaws
+{
+    offset                  "12 8 12"
+    actor                   kActor_Wpn_RaptorClaws
+    defaultWeapon           FALSE
+    owned                   FALSE
+    allowUnderwater         TRUE
+    allowLand               TRUE
+    allowMultiplayer        TRUE
+    noCheatGiveWeapons      TRUE
+    icon                    "gfx/hud/weapons/h_w_raptorclaws.png"
+    maxRoll                 0.1
+    charMeshIndex           NONE
+    priority                -1
+}
+
+Weapon kWpn_Crossbow_MP
+{
+    offset                  "6 4.5 10"
+    actor                   kActor_Wpn_Crossbow_MP
+    defaultWeapon           TRUE
+    owned                   TRUE
+    allowUnderwater         TRUE
+    allowLand               TRUE
+    allowMultiplayer        TRUE
+    onlyMultiplayer         TRUE
+    noCheatGiveWeapons      TRUE
+    maxRoll                 0.1
+    icon                    "gfx/hud/weapons/h_w_tekbow_mp.png"
+    charMeshIndex           kWpnChar_Crossbow
+    priority                9200
+    slot                    2
+    quickslot               1
+    tactileFire             "tactile/CROSSBOWMIX02.bnvib"
+}
+
+Weapon kWpn_Plasma_MP
+{
+    offset                  "6 6 10"
+    actor                   kActor_Wpn_PlasmaRifle_MP
+    defaultWeapon           FALSE
+    owned                   FALSE
+    allowUnderwater         FALSE
+    allowLand               TRUE
+    allowMultiplayer        TRUE
+    onlyMultiplayer         TRUE
+    noCheatGiveWeapons      TRUE
+    icon                    "gfx/hud/weapons/h_w_plasmarifle.png"
+    ammo                    "Ammo_Plasma"
+    ammoConsumption         5
+    projectileParticle      kParticle_Multiplayer9
+    charMeshIndex           kWpnChar_AssaultRifle
+    priority                6000
+    slot                    6
+    pickupTypeID            kActor_Item_PlasmaMP
+    quickslot               6
+    tactileFire             "tactile/PLASMAMIX01SILENCED.bnvib"
+}
+
+Weapon kWpn_Rocket_MP
+{
+    offset                  "6 5 10"
+    actor                   kActor_Wpn_RocketLauncher_MP
+    defaultWeapon           FALSE
+    owned                   FALSE
+    allowUnderwater         FALSE
+    allowLand               TRUE
+    allowMultiplayer        TRUE
+    onlyMultiplayer         TRUE
+    noCheatGiveWeapons      TRUE
+    icon                    "gfx/hud/weapons/h_w_missilelauncher_single.png"
+    ammo                    "Ammo_Rockets"
+    ammoConsumption         1
+    projectileParticle      kParticle_Multiplayer1
+    charMeshIndex           kWpnChar_Missile
+    priority                5100
+    slot                    8
+    pickupTypeID            kActor_Item_MissileMP
+    quickslot               12
+    tactileFire             "tactile/roklch3p.bnvib"
+}
+
+Weapon kWpn_ChargeDart_MP
+{
+    offset                  "6 5 10"
+    actor                   kActor_Wpn_ChargeDart_MP
+    defaultWeapon           FALSE
+    owned                   FALSE
+    allowUnderwater         FALSE
+    allowLand               TRUE
+    allowMultiplayer        TRUE
+    onlyMultiplayer         TRUE
+    noCheatGiveWeapons      TRUE
+    icon                    "gfx/hud/weapons/h_w_shockdart.png"
+    ammo                    "Ammo_ChargeDart"
+    ammoConsumption         1
+    projectileParticle      kParticle_Multiplayer2
+    charMeshIndex           kWpnChar_ChargeDart
+    priority                8200
+    slot                    4
+    pickupTypeID            kActor_Item_ChargeDartMP
+    quickslot               3
+    tactileFire             "tactile/CHGDART1.bnvib"
+}
+
+Weapon kWpn_AssaultRifle_MP
+{
+    offset                  "6 4.5 10"
+    actor                   kActor_Wpn_AssaultRifle_MP
+    defaultWeapon           FALSE
+    owned                   FALSE
+    allowUnderwater         FALSE
+    allowLand               TRUE
+    allowMultiplayer        TRUE
+    onlyMultiplayer         TRUE
+    noCheatGiveWeapons      TRUE
+    icon                    "gfx/hud/weapons/h_w_smg.png"
+    ammo                    "Ammo_Bullet"
+    ammoConsumption         1
+    projectileParticle      kParticle_Multiplayer11
+    charMeshIndex           kWpnChar_AssaultRifle
+    priority                8300
+    slot                    3
+    pickupTypeID            kActor_Item_AssaultMP
+    quickslot               2
+    tactileFire             "tactile/pistl3ap.bnvib"
+}
+
+Weapon kWpn_Grenade_MP
+{
+    offset                  "6 7 10"
+    actor                   kActor_Wpn_GrenadeLauncher_MP
+    defaultWeapon           FALSE
+    owned                   FALSE
+    allowUnderwater         FALSE
+    allowLand               TRUE
+    allowMultiplayer        TRUE
+    onlyMultiplayer         TRUE
+    noCheatGiveWeapons      TRUE
+    icon                    "gfx/hud/weapons/h_w_grenadelauncher.png"
+    ammo                    "Ammo_Grenades"
+    ammoConsumption         1
+    projectileParticle      kParticle_Multiplayer8
+    charMeshIndex           kWpnChar_Grenade
+    priority                5200
+    slot                    8
+    pickupTypeID            kActor_Item_GrenadeMP
+    quickslot               11
+    tactileFire             "tactile/GRNLNCH2.bnvib"
+}
+
+Weapon kWpn_RidingGun
+{
+    offset                  "0 -0.05 0.1"
+    actor                   kActor_Wpn_RidingGun
+    defaultWeapon           FALSE
+    owned                   FALSE
+    allowUnderwater         FALSE
+    allowLand               TRUE
+    allowMultiplayer        FALSE
+    noCheatGiveWeapons      TRUE
+    icon                    "gfx/hud/weapons/h_w_talon.png"
+    posture.standingDef     "Player_Riding"
+    charMeshIndex           NONE
+    priority                -1
+}
+
+Weapon kWpn_Firestorm_MP
+{
+    offset                  "7 10 10"
+    actor                   kActor_Wpn_FireStorm_MP
+    defaultWeapon           FALSE
+    owned                   FALSE
+    allowUnderwater         FALSE
+    allowLand               TRUE
+    allowMultiplayer        TRUE
+    onlyMultiplayer         TRUE
+    noCheatGiveWeapons      TRUE
+    icon                    "gfx/hud/weapons/h_w_firestorm.png"
+    ammo                    "Ammo_Plasma"
+    ammoConsumption         1
+    charMeshIndex           kWpnChar_Firestorm
+    priority                6100
+    slot                    6
+    pickupTypeID            kActor_Item_FireStormMP
+    quickslot               7
+}
+
+Weapon kWpn_Bore_MP
+{
+    offset                  "7.5 6.6 10"
+    actor                   kActor_Wpn_Bore_MP
+    defaultWeapon           FALSE
+    owned                   FALSE
+    allowUnderwater         FALSE
+    allowLand               TRUE
+    allowMultiplayer        TRUE
+    onlyMultiplayer         TRUE
+    noCheatGiveWeapons      TRUE
+    fireOnlyIfTracking      TRUE
+    icon                    "gfx/hud/weapons/h_w_bore.png"
+    trackingCrosshair       "gfx/hud/crosshair_bore_track.png"
+    lockonCrosshair         "gfx/hud/crosshair_bore_lock.png"
+    ammo                    "Ammo_Bore"
+    allowTracking           1
+    allowTrackingMulti      1
+    maxTrackingDegrees      35.0
+    ammoConsumption         1
+    projectileParticle      kParticle_Multiplayer3
+    charMeshIndex           kWpnChar_Bore
+    priority                20100
+    pickupTypeID            kActor_Item_BoreMP
+    slot                    9
+    quickslot               9
+}

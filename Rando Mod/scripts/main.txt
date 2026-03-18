@@ -69,6 +69,7 @@ bool DeserializeBool(kDict& in dict, const kStr& in key)
 #include "scripts/utils.as"
 #include "scripts/actorUtils.as"
 #include "scripts/locations.as"
+#include "scripts/weaponsAndAmmo.as"
 #include "scripts/traps.as"
 #include "scripts/randoPickupObject.as"
 #include "scripts/randoPlayerObject.as"

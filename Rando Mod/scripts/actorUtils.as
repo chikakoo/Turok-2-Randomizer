@@ -182,80 +182,6 @@ void LowHealth()
 }
 
 //---------------------------
-// Given the actor id, simulates the player picking up a weapon.
-// They are given the ammo amount even if they own the weapon.
-bool TryGivePlayerWeapon(int &in actorId, int &in ammoAmount = 1000)
-{
-	WeaponInfo@ weaponInfo = GetWeaponInfo(actorId);
-	Sys.Print("DEF: " + weaponInfo.weaponDef);
-	Sys.Print("MSG: " + weaponInfo.pickupMessage);
-	Sys.Print("SOUND: " + weaponInfo.pickupSound);
-	Sys.Print("CALL: " + weaponInfo.callout);
-	
-	bool ownsWeapon = LocalPlayer.HasWeapon(weaponInfo.weaponDef);
-	LocalPlayer.GiveWeapon(weaponInfo.weaponDef, ammoAmount);
-	if (ownsWeapon)
-	{
-		PlayPickupNotificationSoundAndMessage(weaponInfo);
-	}
-	else
-	{
-		PlayPickupNotification(weaponInfo);
-	}
-
-	return true;
-}
-
-void Pistol()
-{
-	TryGivePlayerWeapon(kActor_Item_WpnPistol);
-}
-
-//---------------------------
-// Gives the player 20-75% of the max ammo of a random weapon they have.
-// 75% chance of choosing from weapons with missing ammo.
-void GetAmmoInRandomWeapon() {}
-/*void T()
-{
-	array<int> ownedWeapons;
-	array<int> ownedWeaponsMissingAmmo;
-	array<int> ownedWeaponsWithNoAmmo;
-	for (int i = 0; i < ownedWeaponsWithAmmo.length(); i++)
-	{
-		int weaponPickupId = ownedWeaponsWithAmmo[i];
-		kDictMem@ weaponPickupDict = TryGetActorDefWithClass(weaponPickupId, "kexWeaponPickup");
-		if (weaponPickupDict is null)
-		{
-			return false;
-		}
-
-		int weaponDef; 
-		weaponPickupDict.GetInt("pickup.weapon.definition", weaponDef);
-		
-		if (LocalPlayer.HasWeapon(weaponDef))
-		{
-			ownedWeaponsWithAmmo.insertLast(weaponPickupId);
-			
-			int totalAmmo = LocalPlayer.GetAmmo(weaponPickupId) + 
-				LocalPlayer.GetAltAmmo(weaponPickupId);
-			
-			if (totalAmmo > 0)
-			{
-				ownedWeaponsMissingAmmo.insertLast();
-			}
-		}
-	}
-	
-	if (ownedWeaponsMissingAmmo.length() > 0)
-	{
-		
-	}
-	else
-	{
-	}
-}*/
-
-//---------------------------
 // Gets the given mission item and adds it to your inventory.
 // TODO: there are multiple things called power cells, deal with the display...
 bool TryGetMissionItem(int &in actorId)
@@ -379,13 +305,6 @@ bool IsHealthOrAmmo(kActor@ actor)
 	kStr className;
 	actor.Definition().GetString("className", className);
 	return className == "kexHealthPickup" || className == "kexAmmoPickup";
-}
-
-//---------------------------
-// Trap functions
-void EnemyTrap()
-{
-	HandleEnemyTrap();
 }
 
 //---------------------------
