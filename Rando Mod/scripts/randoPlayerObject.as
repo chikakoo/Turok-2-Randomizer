@@ -349,6 +349,7 @@ class RandoPlayerObject : ScriptObject
 		Hud.AddMessage(
 			"Nuke Parts: " + inventory.GetCount(kActor_InventoryItem_NukePart) + "/6",
 			m_progressMenuDisplayTime);
+			
 		Hud.AddMessage(
 			"Keys 2-6: " +
 			int(Math::Min(inventory.GetCount(kActor_InventoryItem_Level2Key), 3)) +
@@ -372,9 +373,16 @@ class RandoPlayerObject : ScriptObject
 			(inventory.GetCount(kActor_PrimagenKey_5) > 0 ? "5" : "X") + 
 			(inventory.GetCount(kActor_PrimagenKey_6) > 0 ? "6" : "X"),
 			m_progressMenuDisplayTime);
-		DisplayCollectedLocationsForGame(m_progressMenuDisplayTime);
 			
-		// TODO: primagen key, talismans, and feathers
+		Hud.AddMessage(
+			(inventory.GetCount(kActor_Talisman_LeapOfFaith) > 0 ? "[Leap] " : "") +
+			(inventory.GetCount(kActor_Talisman_BreathOfLife) > 0 ? "[Breath] " : "") +
+			(inventory.GetCount(kActor_Talisman_HeartOfFire) > 0 ? "[Fire] " : "") +
+			(inventory.GetCount(kActor_Talisman_Whispers) > 0 ? "[Whispers] " : "") +
+			(inventory.GetCount(kActor_Talisman_EyeOfTruth) > 0 ? "[Eye] " : ""),
+			m_progressMenuDisplayTime);
+			
+		DisplayCollectedLocationsForGame(m_progressMenuDisplayTime);
 	}
 
 	//----------------------------------
