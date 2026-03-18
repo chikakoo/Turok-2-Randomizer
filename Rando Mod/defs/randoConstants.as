@@ -1,5 +1,7 @@
 #define kActor_Item_APItem 100000
 
+#define kActor_Trap_Enemy 900000
+
 #define kActor_InventoryItem_Level1Key 4300
 #define kActor_InventoryItem_Level2Key 4310
 #define kActor_InventoryItem_Level3Key 4320

@@ -387,15 +387,14 @@ class RandoPlayerObject : ScriptObject
 				break;
 			case AP_IN_MSGTYPE_GET_AMMO:
 				Sys.Print("Ammo get: " + data);
-				HandleGetAmmo(data);
+				GetAmmoInRandomWeapon();
 				break;
 			case AP_IN_MSGTYPE_GET_MISSION_ITEM:
 				Sys.Print("Mission item get: " + data);
 				HandleGetMissionItem(data);
 				break;
 			case AP_IN_MSGTYPE_GET_TRAP:
-				Sys.Print("It's a trap! " + data);
-				HandleTrap(data);
+				TryTriggerTrap(data);
 				break;
 			default:
 				Sys.Print("Did not handle incoming message: " + g_AP.IncomingMessageType + ". Data: " + data);
@@ -416,7 +415,7 @@ class RandoPlayerObject : ScriptObject
 	// They SHOULD just pick it up most of the time!
 	void HandleGetPickup(int &in data)
 	{
-		kDictMem@ entry = g_defManager.GetEntry(data);
+		kDictMem@ entry = g_indexDefManager.GetEntry(data);
 		
 		// ALL actors will have an entry here
 		if (entry is null)
@@ -439,19 +438,6 @@ class RandoPlayerObject : ScriptObject
 		}
 	}
 	
-	// Handles getting ammo
-	// Currently just maxes out the current weapon's ammo
-	// TODO: Figure out what we want this to actually do
-	// - if we want it to give it only if you own the weapon, we need to look up the weapon
-	// - else we can give ammo to all owned weapons, or something of that nature
-	// - else else we just spawn the given actor id under the player and
-	//   if they don't have the matching weapon, oh well
-	void HandleGetAmmo(int &in data)
-	{
-		int currentWeaponId = LocalPlayer.CurrentWeaponID();
-		LocalPlayer.GiveWeapon(currentWeaponId, 1000);
-	}
-	
 	void HandleGetMissionItem(int &in data)
 	{
 		Sys.Print("Mission item get: " + data);
@@ -462,25 +448,6 @@ class RandoPlayerObject : ScriptObject
 		// TODO: look these up based on the actor id instead
 		LocalPlayer.Actor().PlaySound("sounds/shaders/Ammo Pickup.ksnd");
 		Hud.AddMessage("Got Power Cell (" + total + ")!");
-	}
-	
-	// Handles traps - for now, this will just spawn the actor given in data.
-	// We will want different types for the different ids here, though eventually.
-	// Trap ideas: 
-	// - more enemy spawns (or just have it be a random one)
-	// - ammo traps (self.ConsumeAmmo/ConsumeAltAmmo)
-	// - player damage traps (self.InflictDamage(kDamageInfo))
-	void HandleTrap(int &in data)
-	{
-		Hud.AddMessage("It's a trap! " + data);
-		SpawnActorNearPlayer(data);
-		
-		
-		// Damage trap idea
-		//kDamageInfo damageInfo;
-		//damageInfo.hits = 10;
-		//damageInfo.flags = DF_NORMAL;
-		//LocalPlayer.Actor().CastToActor().InflictDamage(damageInfo);
 	}
 	
 	void ProcessOutgoingMessages(void)

@@ -5,16 +5,21 @@
 //---------------------------
 
 //---------------------------
-// Cache the def manager, since it lags when we load defs.
-kIndexDefManager g_defManager;
+// Cache the def managers, since they lag when we load defs.
+kIndexDefManager g_indexDefManager;
+kDefManager g_defManager;
 void InitDefManager()
 {
-	g_defManager = kIndexDefManager();
-	g_defManager.LoadFile("defs/actors/health.txt");
-	g_defManager.LoadFile("defs/actors/pickups.txt");
-	g_defManager.LoadFile("defs/actors/weaponPickups.txt");
-	g_defManager.LoadFile("defs/actors/powerCells.txt");
-	g_defManager.LoadFile("defs/actors/levelKeys.txt");
+	g_indexDefManager = kIndexDefManager();
+	g_indexDefManager.LoadFile("defs/weaponInfo.txt");
+	g_indexDefManager.LoadFile("defs/actors/health.txt");
+	g_indexDefManager.LoadFile("defs/actors/pickups.txt");
+	g_indexDefManager.LoadFile("defs/actors/weaponPickups.txt");
+	g_indexDefManager.LoadFile("defs/actors/powerCells.txt");
+	g_indexDefManager.LoadFile("defs/actors/levelKeys.txt");
+	
+	g_defManager = kDefManager();
+	g_defManager.LoadFile("defs/ammoInfo.txt");
 }
 
 //---------------------------
@@ -23,7 +28,7 @@ void InitDefManager()
 // Writes the actor to actorDef, which is null if not found.
 kDictMem@ TryGetActorDefWithClass(int &in actorId, kStr &in className)
 {
-	kDictMem@ actorDef = g_defManager.GetEntry(actorId);
+	kDictMem@ actorDef = g_indexDefManager.GetEntry(actorId);
 	if (actorDef is null)
 	{
 		Sys.Print("Tried to use non-existant actor def: " + actorId + ", " + className);
@@ -45,33 +50,63 @@ kDictMem@ TryGetActorDefWithClass(int &in actorId, kStr &in className)
 //--------------------------
 // Play the sound, show the message, and say the callout, if any.
 // Does NOT handle actually getting the pickup.
-// Has the option to play the pickup sound only, used when collecting a
-// health or ammo (since you may not actually "collect" it).
+//
+// Has the option to include/exclude the message and callout.
 void PlayPickupNotification(
-	kDictMem@ actorDef,
-	const bool &in pickupSoundOnly = false)
+	kStr pickupSound,
+	kStr pickupMessage = "",
+	int callout = 0)
 {
-	// Pickup sound
-	kStr pickupSound;
-	actorDef.GetString("pickup.pickupSound", pickupSound);
 	LocalPlayer.Actor().PlaySound(pickupSound);
 	
-	if (pickupSoundOnly)
+	if (pickupMessage != "")
 	{
-		return;
+		Hud.AddMessage(pickupMessage);
 	}
 	
-	// Pickup message
-	kStr pickupMessage;
-	actorDef.GetString("pickup.pickupMessage", pickupMessage);
-	Hud.AddMessage(pickupMessage);
-
-	// Voice callout
-	int callout;
-	if (actorDef.GetInt("pickup.callout", callout))
+	if (callout != 0)
 	{
 		Game.PlayVoice(callout);
 	}
+}
+
+void PlayPickupNotification(kDictMem@ actorDef)
+{
+	kStr pickupSound;
+	actorDef.GetString("pickup.pickupSound", pickupSound);
+	
+	kStr pickupMessage = "";
+	actorDef.GetString("pickup.pickupMessage", pickupMessage);
+	
+	int callout = 0;
+	actorDef.GetInt("pickup.callout", callout);
+	
+	PlayPickupNotification(pickupSound, pickupMessage, callout);
+}
+
+void PlayPickupNotification(WeaponInfo@ weaponInfo)
+{
+	PlayPickupNotification(
+		weaponInfo.pickupSound, 
+		weaponInfo.pickupMessage, 
+		weaponInfo.callout);
+}
+
+void PlayPickupNotificationSound(kDictMem@ actorDef)
+{
+	kStr pickupSound;
+	actorDef.GetString("pickup.pickupSound", pickupSound);
+	PlayPickupNotification(pickupSound);
+}
+
+void PlayPickupNotificationSound(WeaponInfo@ weaponInfo)
+{
+	PlayPickupNotification(weaponInfo.pickupSound);
+}
+
+void PlayPickupNotificationSoundAndMessage(WeaponInfo@ weaponInfo)
+{
+	PlayPickupNotification(weaponInfo.pickupSound, weaponInfo.pickupMessage);
 }
 
 //---------------------------
@@ -141,27 +176,33 @@ void UltraHealth()
 	TryGivePlayerHealth(kActor_Item_HealthUltra);
 }
 
-void SetHealthTo10()
+void LowHealth()
 {
-	LocalPlayer.Actor().CastToActor().Health() = 10;
+	LocalPlayer.Actor().CastToActor().Health() = 1;
 }
 
 //---------------------------
 // Given the actor id, simulates the player picking up a weapon.
-bool TryGivePlayerWeapon(int &in actorId)
+// They are given the ammo amount even if they own the weapon.
+bool TryGivePlayerWeapon(int &in actorId, int &in ammoAmount = 1000)
 {
-	kDictMem@ weaponPickupDict = TryGetActorDefWithClass(actorId, "kexWeaponPickup");
-	if (weaponPickupDict is null)
+	WeaponInfo@ weaponInfo = GetWeaponInfo(actorId);
+	Sys.Print("DEF: " + weaponInfo.weaponDef);
+	Sys.Print("MSG: " + weaponInfo.pickupMessage);
+	Sys.Print("SOUND: " + weaponInfo.pickupSound);
+	Sys.Print("CALL: " + weaponInfo.callout);
+	
+	bool ownsWeapon = LocalPlayer.HasWeapon(weaponInfo.weaponDef);
+	LocalPlayer.GiveWeapon(weaponInfo.weaponDef, ammoAmount);
+	if (ownsWeapon)
 	{
-		return false;
+		PlayPickupNotificationSoundAndMessage(weaponInfo);
 	}
-	
-	int weaponDef; 
-	weaponPickupDict.GetInt("pickup.weapon.definition", weaponDef);
-	LocalPlayer.GiveWeapon(weaponDef, 1000);
-	
-	PlayPickupNotification(weaponPickupDict);
-	
+	else
+	{
+		PlayPickupNotification(weaponInfo);
+	}
+
 	return true;
 }
 
@@ -169,6 +210,50 @@ void Pistol()
 {
 	TryGivePlayerWeapon(kActor_Item_WpnPistol);
 }
+
+//---------------------------
+// Gives the player 20-75% of the max ammo of a random weapon they have.
+// 75% chance of choosing from weapons with missing ammo.
+void GetAmmoInRandomWeapon() {}
+/*void T()
+{
+	array<int> ownedWeapons;
+	array<int> ownedWeaponsMissingAmmo;
+	array<int> ownedWeaponsWithNoAmmo;
+	for (int i = 0; i < ownedWeaponsWithAmmo.length(); i++)
+	{
+		int weaponPickupId = ownedWeaponsWithAmmo[i];
+		kDictMem@ weaponPickupDict = TryGetActorDefWithClass(weaponPickupId, "kexWeaponPickup");
+		if (weaponPickupDict is null)
+		{
+			return false;
+		}
+
+		int weaponDef; 
+		weaponPickupDict.GetInt("pickup.weapon.definition", weaponDef);
+		
+		if (LocalPlayer.HasWeapon(weaponDef))
+		{
+			ownedWeaponsWithAmmo.insertLast(weaponPickupId);
+			
+			int totalAmmo = LocalPlayer.GetAmmo(weaponPickupId) + 
+				LocalPlayer.GetAltAmmo(weaponPickupId);
+			
+			if (totalAmmo > 0)
+			{
+				ownedWeaponsMissingAmmo.insertLast();
+			}
+		}
+	}
+	
+	if (ownedWeaponsMissingAmmo.length() > 0)
+	{
+		
+	}
+	else
+	{
+	}
+}*/
 
 //---------------------------
 // Gets the given mission item and adds it to your inventory.
@@ -297,6 +382,13 @@ bool IsHealthOrAmmo(kActor@ actor)
 }
 
 //---------------------------
+// Trap functions
+void EnemyTrap()
+{
+	HandleEnemyTrap();
+}
+
+//---------------------------
 // Gets a friendly name given the actor type, for debugging
 // actorType: The type of actor to get a name for
 kStr GetFriendlyActorName(const int &in actorType)
@@ -420,9 +512,4 @@ kStr GetFriendlyActorName(const int &in actorType)
 	
 	// Unmapped - return the type as a string
 	return "" + actorType; 
-}
-
-// TESTING
-void Test()
-{
 }

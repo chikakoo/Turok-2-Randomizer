@@ -65,8 +65,11 @@ bool DeserializeBool(kDict& in dict, const kStr& in key)
 #include "scripts/primagenBoss.txt"
 #include "scripts/netcallbacks.txt"
 
+#include "scripts/weaponInfoCache.as"
+#include "scripts/utils.as"
 #include "scripts/actorUtils.as"
 #include "scripts/locations.as"
+#include "scripts/traps.as"
 #include "scripts/randoPickupObject.as"
 #include "scripts/randoPlayerObject.as"
 #include "scripts/replacementEntry.as"
@@ -82,6 +85,7 @@ void main(void)
 	InitAP();
 	InitMapReplacements();
 	InitDefManager();
+	InitWeaponInfoCache();
 	InitActorReplacements();
 	
     InitDestructibleModeTable();

@@ -84,7 +84,7 @@ ITEM_TABLE = {
     # Traps
     "Endtrail Trap": {
         "id": 900000,
-        "actor_id": 201,
+        "actor_id": 900000,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_TRAP.value,
         "class": ItemClassification.trap
     }

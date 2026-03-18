@@ -70,7 +70,7 @@ class RandoPickupObject : ScriptObject
 			SendCheckToAP(m_id);
 			if (IsHealthOrAmmo(self))
 			{
-				PlayPickupNotification(self.Definition(), true);
+				PlayPickupNotificationSound(self.Definition());
 				DisplayCollectedLocationsForCurrentMap();
 			}
 			
@@ -95,6 +95,10 @@ class RandoPickupObject : ScriptObject
 		{
 			CollectLocation(m_id);
 			SendCheckToAP(m_id);
+			
+			// Try to trigger it if it is a trap.
+			// If it isn't, this doesn't do anything.
+			TryTriggerTrap(self.Type());
 		}
 	}
 	
