@@ -96,6 +96,10 @@ class RandoPickupObject : ScriptObject
 			CollectLocation(m_id);
 			SendCheckToAP(m_id);
 			
+			// If this item is marked with rando.give2, do this to give the second one
+			// This is true for primagen keys currently
+			HandleGiveSecondItem(self.Type());
+			
 			// Try to trigger it if it is a trap.
 			// If it isn't, this doesn't do anything.
 			TryTriggerTrap(self.Type());

@@ -351,15 +351,30 @@ class RandoPlayerObject : ScriptObject
 			m_progressMenuDisplayTime);
 		Hud.AddMessage(
 			"Keys 2-6: " +
-			inventory.GetCount(kActor_InventoryItem_Level2Key) + "/3 - " +
-			inventory.GetCount(kActor_InventoryItem_Level3Key) + "/3 - " +
-			inventory.GetCount(kActor_InventoryItem_Level4Key) + "/3 - " +
-			inventory.GetCount(kActor_InventoryItem_Level5Key) + "/3 - " +
-			inventory.GetCount(kActor_InventoryItem_Level6Key) + "/6",
+			int(Math::Min(inventory.GetCount(kActor_InventoryItem_Level2Key), 3)) +
+			int(Math::Min(inventory.GetCount(kActor_InventoryItem_Level3Key), 3)) +
+			int(Math::Min(inventory.GetCount(kActor_InventoryItem_Level4Key), 3)) +
+			int(Math::Min(inventory.GetCount(kActor_InventoryItem_Level5Key), 3)) +
+			int(Math::Min(inventory.GetCount(kActor_InventoryItem_Level6Key), 6)) +
+			
+			" - Feathers 2-6: " +
+			(inventory.GetCount(kActor_Feather_2) > 0 ? "2" : "X") +
+			(inventory.GetCount(kActor_Feather_3) > 0 ? "3" : "X") +
+			(inventory.GetCount(kActor_Feather_4) > 0 ? "4" : "X") +
+			(inventory.GetCount(kActor_Feather_5) > 0 ? "5" : "X") +
+			(inventory.GetCount(kActor_Feather_6) > 0 ? "6" : "X") +
+			
+			" - Prim Keys 1-6: " +
+			(inventory.GetCount(kActor_PrimagenKey_1) > 0 ? "1" : "X") + 
+			(inventory.GetCount(kActor_PrimagenKey_2) > 0 ? "2" : "X") + 
+			(inventory.GetCount(kActor_PrimagenKey_3) > 0 ? "3" : "X") + 
+			(inventory.GetCount(kActor_PrimagenKey_4) > 0 ? "4" : "X") + 
+			(inventory.GetCount(kActor_PrimagenKey_5) > 0 ? "5" : "X") + 
+			(inventory.GetCount(kActor_PrimagenKey_6) > 0 ? "6" : "X"),
 			m_progressMenuDisplayTime);
 		DisplayCollectedLocationsForGame(m_progressMenuDisplayTime);
 			
-		// TODO: talismans and feathers
+		// TODO: primagen key, talismans, and feathers
 	}
 
 	//----------------------------------

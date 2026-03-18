@@ -53,6 +53,7 @@ void InitMapReplacements(void)
 	portOfAdiaMaps.insertLast(kLevel_PortOfAdia_7);
 	portOfAdiaMaps.insertLast(kLevel_PortOfAdia_8);
 	portOfAdiaMaps.insertLast(kLevel_PortOfAdia_9);
+	portOfAdiaMaps.insertLast(kLevel_PortOfAdia_T);
 	portOfAdiaMaps.insertLast(kLevel_PortOfAdia_OBL);
 }
 
@@ -274,8 +275,6 @@ void CalculateTotalLocationsCheckedForLevel(
 	totalLocations = 0;
 
 	array<int>@ mapIds = g_mapLevelNumberToMapIds[levelNumber];
-	
-	Sys.Print("level: " + levelNumber + " - count: " + mapIds.length());
 	for (uint i = 0; i < mapIds.length(); i++)
 	{
 		array<ReplacementEntry@>@ locations = 

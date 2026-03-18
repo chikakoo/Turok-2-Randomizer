@@ -115,21 +115,3 @@ void GetAmmoInRandomWeapon()
 		}
 	}
 }
-
-
-//---------------------------
-// Weapon givers, to test in the console.
-void Pistol()
-{
-	TryGivePlayerWeapon(kActor_Item_WpnPistol);
-}
-
-void Shotgun()
-{
-	TryGivePlayerWeapon(kActor_Item_WpnShotgun);
-}
-
-void Shredder()
-{
-	TryGivePlayerWeapon(kActor_Item_WpnScatter);
-}

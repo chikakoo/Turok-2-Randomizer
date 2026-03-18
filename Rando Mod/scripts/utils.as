@@ -1,5 +1,6 @@
 //------------------------------
 // Utility functions that don't fit elsewhere.
+// Currently just functions for randomization (rename the file?)
 //------------------------------
 
 //------------------------------

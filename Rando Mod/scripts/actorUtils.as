@@ -1,7 +1,5 @@
 // --------------------------
 // Contains functions to help with actors.
-// Includes functions to spawn things for the palayer.
-// You can call the ones without args from the console with "call <func name>".
 //---------------------------
 
 //---------------------------
@@ -17,34 +15,11 @@ void InitDefManager()
 	g_indexDefManager.LoadFile("defs/actors/weaponPickups.txt");
 	g_indexDefManager.LoadFile("defs/actors/powerCells.txt");
 	g_indexDefManager.LoadFile("defs/actors/levelKeys.txt");
+	g_indexDefManager.LoadFile("defs/actors/primagenKeys.txt");
+	g_indexDefManager.LoadFile("defs/actors/eagleFeathers.txt");
 	
 	g_defManager = kDefManager();
 	g_defManager.LoadFile("defs/ammoInfo.txt");
-}
-
-//---------------------------
-// Tries to get the actor def of the given class.
-// Returns false if not found or if the class name is not correct.
-// Writes the actor to actorDef, which is null if not found.
-kDictMem@ TryGetActorDefWithClass(int &in actorId, kStr &in className)
-{
-	kDictMem@ actorDef = g_indexDefManager.GetEntry(actorId);
-	if (actorDef is null)
-	{
-		Sys.Print("Tried to use non-existant actor def: " + actorId + ", " + className);
-		return null;
-	}
-	
-	kStr actorClassName;
-	actorDef.GetString("className", actorClassName);
-	if (actorClassName != className)
-	{	
-		Sys.Print("Actor: " + actorId + " was class " + actorClassName + ", which is not the expected " + actorClassName);
-		@actorDef = null;
-		return null;
-	}
-	
-	return actorDef;
 }
 
 //--------------------------
@@ -110,6 +85,31 @@ void PlayPickupNotificationSoundAndMessage(WeaponInfo@ weaponInfo)
 }
 
 //---------------------------
+// Tries to get the actor def of the given class.
+// Returns false if not found or if the class name is not correct.
+// Writes the actor to actorDef, which is null if not found.
+kDictMem@ TryGetActorDefWithClass(int &in actorId, kStr &in className)
+{
+	kDictMem@ actorDef = g_indexDefManager.GetEntry(actorId);
+	if (actorDef is null)
+	{
+		Sys.Print("Tried to use non-existant actor def: " + actorId + ", " + className);
+		return null;
+	}
+	
+	kStr actorClassName;
+	actorDef.GetString("className", actorClassName);
+	if (actorClassName != className)
+	{	
+		Sys.Print("Actor: " + actorId + " was class " + actorClassName + ", which is not the expected " + actorClassName);
+		@actorDef = null;
+		return null;
+	}
+	
+	return actorDef;
+}
+
+//---------------------------
 // Given the actor id, simulates the player picking up health.
 // Respects the game's normal health pickup rules, except it
 // displays the message for the health even if you didn't gain any.
@@ -156,35 +156,10 @@ bool TryGivePlayerHealth(int &in actorId)
 	return true;
 }
 
-void Health2()
-{
-	TryGivePlayerHealth(kActor_Item_Health2);
-}
-
-void Health10()
-{
-	TryGivePlayerHealth(kActor_Item_Health10);
-}
-
-void FullHealth()
-{
-	TryGivePlayerHealth(kActor_Item_HealthFull);
-}
-
-void UltraHealth()
-{
-	TryGivePlayerHealth(kActor_Item_HealthUltra);
-}
-
-void LowHealth()
-{
-	LocalPlayer.Actor().CastToActor().Health() = 1;
-}
-
 //---------------------------
-// Gets the given mission item and adds it to your inventory.
+// Gets the given item and adds it to your inventory.
 // TODO: there are multiple things called power cells, deal with the display...
-bool TryGetMissionItem(int &in actorId)
+bool TryGetInventoryItem(int &in actorId)
 {
 	kDictMem@ missionItemDef = TryGetActorDefWithClass(actorId, "kexInventoryPickup");
 	if (missionItemDef is null)
@@ -194,20 +169,47 @@ bool TryGetMissionItem(int &in actorId)
 	
 	LocalPlayer.Inventory().Give(actorId);
 	PlayPickupNotification(missionItemDef);
+	HandleGiveSecondItem(actorId, missionItemDef);
 	
 	return true;
 }
 
-void BeaconPowerCell(void)
+//---------------------------
+// Some items (primagen keys) will disappear when you use them.
+// We want to track these still, so give a second one of them.
+void HandleGiveSecondItem(int &in actorId, kDictMem@ missionItemDef = null)
 {
-	TryGetMissionItem(kActor_MissionItem_BeaconPowerCell);
+	if (missionItemDef is null)
+	{
+		@missionItemDef = TryGetActorDefWithClass(actorId, "kexInventoryPickup");
+		if (missionItemDef is null)
+		{
+			return;
+		}
+	}
+	
+	bool give2;
+	missionItemDef.GetBool("rando.give2", give2, false);
+	if (give2)
+	{
+		LocalPlayer.Inventory().Give(actorId);
+	}
 }
 
-void Level2Key(void)
+//---------------------------
+// Void get nuke part - also handles giving the nuke if you have 6
+// since it doesn't do this unless all specific level ones exist.
+void GetNukePart(void)
 {
-	TryGetMissionItem(kActor_InventoryItem_Level2Key);
-	Sys.Print("" + LocalPlayer.Inventory().GetCount(kActor_InventoryItem_Level2Key));
+	TryGetInventoryItem(kActor_InventoryItem_NukePart);
+	
+	if (!LocalPlayer.HasWeapon(kActor_Wpn_Nuke) &&
+		LocalPlayer.Inventory().GetCount(kActor_InventoryItem_NukePart) >= 6)
+	{
+		LocalPlayer.GiveWeapon(kWpn_Nuke, 1000);
+	}
 }
+
 
 //---------------------------
 // Spawns the given actor id near the player.
@@ -235,20 +237,6 @@ void SpawnActorOnPlayer(int &in actorId)
 	
 	ActorFactory.Spawn(actorId, origin, 0, 0, 0, true, regionIdx);
 }
-
-void LifeForce1(void)
-{
-	SpawnActorOnPlayer(kActor_Item_LifeForce1);
-}
-
-void LifeForce10(void)
-{
-	SpawnActorOnPlayer(kActor_Item_LifeForce10);
-}
-
-
-//TODO: primagen keys, talismans, nuke parts
-
 
 //---------------------------
 // Temporary stupid thing to remove all generators and generated items from the map

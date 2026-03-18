@@ -1,0 +1,67 @@
+#include "defs/common.txt"
+#include "defs/randoConstants.as"
+
+//-----------------------------------------------------------------------------
+//
+// inventory eagle feathers
+//
+// Rando note: 
+// These feathers are all out of order. We will use our macro to 
+// indicate which level each feather is for.
+//
+//-----------------------------------------------------------------------------
+
+Feather1 kActor_Feather_3 
+{ 
+	className 				"kexInventoryPickup" 
+	placeable 				TRUE 
+	pickup.callout 			kVoice_EagleFeather 
+	flags.important 		TRUE 
+	pickup.pickupSound 		"sounds/shaders/Health Pickup Sound.ksnd" 
+	pickup.pickupMessage 	"$str_130"
+	rando.give2				TRUE
+}
+
+Feather2 kActor_Feather_6 
+{ 
+	className 				"kexInventoryPickup" 
+	placeable 				TRUE 
+	pickup.callout 			kVoice_EagleFeather 
+	flags.important 		TRUE 
+	pickup.pickupSound 		"sounds/shaders/Health Pickup Sound.ksnd" 
+	pickup.pickupMessage 	"$str_131" 
+	rando.give2				TRUE
+}
+
+Feather3 kActor_Feather_2 
+{ 
+	className 				"kexInventoryPickup" 
+	placeable 				TRUE 
+	pickup.callout 			kVoice_EagleFeather 
+	flags.important 		TRUE 
+	pickup.pickupSound 		"sounds/shaders/Health Pickup Sound.ksnd" 
+	pickup.pickupMessage 	"$str_132"
+	rando.give2				TRUE
+}
+
+Feather4 kActor_Feather_5 
+{ 
+	className 				"kexInventoryPickup" 
+	placeable 				TRUE 
+	pickup.callout 			kVoice_EagleFeather 
+	flags.important 		TRUE 
+	pickup.pickupSound 		"sounds/shaders/Health Pickup Sound.ksnd" 
+	pickup.pickupMessage 	"$str_133"
+	rando.give2				TRUE
+}
+
+Feather5 kActor_Feather_4
+{ 
+	className 				"kexInventoryPickup" 
+	placeable 				TRUE 
+	pickup.callout 			kVoice_EagleFeather 
+	flags.important 		TRUE 
+	pickup.pickupSound 		"sounds/shaders/Health Pickup Sound.ksnd" 
+	pickup.pickupMessage 	"$str_134"
+	rando.give2				TRUE
+}
