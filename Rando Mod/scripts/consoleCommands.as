@@ -142,8 +142,32 @@ void Feather6(void)
 	TryGetInventoryItem(kActor_Feather_6);
 }
 
-//TODO: talismans
+//---------------------------
+// Talismans
+void LeapOfFaith(void)
+{
+	TryGetInventoryItem(kActor_Talisman_LeapOfFaith);
+}
 
+void BreathOfLife(void)
+{
+	TryGetInventoryItem(kActor_Talisman_BreathOfLife);
+}
+
+void HeartOfFire(void)
+{
+	TryGetInventoryItem(kActor_Talisman_HeartOfFire);
+}
+
+void Whispers(void)
+{
+	TryGetInventoryItem(kActor_Talisman_Whispers);
+}
+
+void EyeOfTruth(void)
+{
+	TryGetInventoryItem(kActor_Talisman_EyeOfTruth);
+}
 
 //---------------------------
 // Weapons

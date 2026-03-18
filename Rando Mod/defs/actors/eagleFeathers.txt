@@ -20,6 +20,15 @@ Feather1 kActor_Feather_3
 	pickup.pickupSound 		"sounds/shaders/Health Pickup Sound.ksnd" 
 	pickup.pickupMessage 	"$str_130"
 	rando.give2				TRUE
+	
+	initialScale              "0.3 0.3 0.3"
+	Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Blue_Feather___Breath_Of_Life.staticmesh"
+    End_Component
+	Begin_Component "kexScriptComponent"
+        scriptClass           "RandoPickupObject"
+        triggerRadius         81.92
+    End_Component
 }
 
 Feather2 kActor_Feather_6 
@@ -31,6 +40,15 @@ Feather2 kActor_Feather_6
 	pickup.pickupSound 		"sounds/shaders/Health Pickup Sound.ksnd" 
 	pickup.pickupMessage 	"$str_131" 
 	rando.give2				TRUE
+	
+	initialScale              "0.3 0.3 0.3"
+	Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Grey_Feather___Eye_Of_Truth.staticmesh"
+    End_Component
+	Begin_Component "kexScriptComponent"
+        scriptClass           "RandoPickupObject"
+        triggerRadius         81.92
+    End_Component
 }
 
 Feather3 kActor_Feather_2 
@@ -42,6 +60,15 @@ Feather3 kActor_Feather_2
 	pickup.pickupSound 		"sounds/shaders/Health Pickup Sound.ksnd" 
 	pickup.pickupMessage 	"$str_132"
 	rando.give2				TRUE
+	
+	initialScale              "0.3 0.3 0.3"
+	Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Brown_Feather__Leap_Of_Faith.staticmesh"
+    End_Component
+	Begin_Component "kexScriptComponent"
+        scriptClass           "RandoPickupObject"
+        triggerRadius         81.92
+    End_Component
 }
 
 Feather4 kActor_Feather_5 
@@ -53,6 +80,15 @@ Feather4 kActor_Feather_5
 	pickup.pickupSound 		"sounds/shaders/Health Pickup Sound.ksnd" 
 	pickup.pickupMessage 	"$str_133"
 	rando.give2				TRUE
+	
+	initialScale              "0.3 0.3 0.3"
+	Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Purple_Feather_Whispers.staticmesh"
+    End_Component
+	Begin_Component "kexScriptComponent"
+        scriptClass           "RandoPickupObject"
+        triggerRadius         81.92
+    End_Component
 }
 
 Feather5 kActor_Feather_4
@@ -64,4 +100,13 @@ Feather5 kActor_Feather_4
 	pickup.pickupSound 		"sounds/shaders/Health Pickup Sound.ksnd" 
 	pickup.pickupMessage 	"$str_134"
 	rando.give2				TRUE
+	
+	initialScale              "0.3 0.3 0.3"
+	Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Red_Feather____Fire_Walker.staticmesh"
+    End_Component
+	Begin_Component "kexScriptComponent"
+        scriptClass           "RandoPickupObject"
+        triggerRadius         81.92
+    End_Component
 }

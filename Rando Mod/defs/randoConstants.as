@@ -18,6 +18,12 @@
 #define kActor_Feather_5 4403
 #define kActor_Feather_4 4404
 
+#define kActor_Talisman_BreathOfLife 4380
+#define kActor_Talisman_EyeOfTruth 4381
+#define kActor_Talisman_LeapOfFaith 4382
+#define kActor_Talisman_Whispers 4383
+#define kActor_Talisman_HeartOfFire 4384
+
 #define kActor_PrimagenKey_1 4360
 #define kActor_PrimagenKey_2 4361
 #define kActor_PrimagenKey_3 4362

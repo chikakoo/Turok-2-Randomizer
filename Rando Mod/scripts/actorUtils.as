@@ -17,6 +17,7 @@ void InitDefManager()
 	g_indexDefManager.LoadFile("defs/actors/levelKeys.txt");
 	g_indexDefManager.LoadFile("defs/actors/primagenKeys.txt");
 	g_indexDefManager.LoadFile("defs/actors/eagleFeathers.txt");
+	g_indexDefManager.LoadFile("defs/actors/talismans.txt");
 	
 	g_defManager = kDefManager();
 	g_defManager.LoadFile("defs/ammoInfo.txt");
