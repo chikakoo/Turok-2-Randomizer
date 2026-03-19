@@ -1,6 +1,12 @@
 #define kActor_Item_APItem 100000
+#define kActor_Item_RandomAmmo 400000
 
-#define kActor_Trap_Enemy 900000
+#define RANDO_TRAP_TYPE_ENEMY 1
+
+#define kActor_Trap_Enemy_Silver_Health 900000
+#define kActor_Trap_Enemy_Blue_Health 900001
+#define kActor_Trap_Enemy_Full_Health 900002
+#define kActor_Trap_Enemy_Ultra_Health 900003
 
 #define kActor_InventoryItem_Level1Key 4300
 #define kActor_InventoryItem_Level2Key 4310

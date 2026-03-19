@@ -18,6 +18,7 @@ void InitDefManager()
 	g_indexDefManager.LoadFile("defs/actors/primagenKeys.txt");
 	g_indexDefManager.LoadFile("defs/actors/eagleFeathers.txt");
 	g_indexDefManager.LoadFile("defs/actors/talismans.txt");
+	g_indexDefManager.LoadFile("defs/actors/ap.txt");
 	
 	g_defManager = kDefManager();
 	g_defManager.LoadFile("defs/ammoInfo.txt");
@@ -101,8 +102,7 @@ kDictMem@ TryGetActorDefWithClass(int &in actorId, kStr &in className)
 	kStr actorClassName;
 	actorDef.GetString("className", actorClassName);
 	if (actorClassName != className)
-	{	
-		Sys.Print("Actor: " + actorId + " was class " + actorClassName + ", which is not the expected " + actorClassName);
+	{
 		@actorDef = null;
 		return null;
 	}

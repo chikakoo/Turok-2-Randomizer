@@ -15,7 +15,7 @@ ITEM_TABLE = {
         "class": ItemClassification.filler,
         "weight": 8
     },
-    "Life Tile 2": {
+    "Life Tile 10": {
         "id": 100001, 
         "actor_id": 1706, 
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_PICKUP.value,
@@ -26,14 +26,14 @@ ITEM_TABLE = {
         "id": 100002,
         "actor_id": 1701,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_PICKUP.value,
-        "class": ItemClassification.useful,
+        "class": ItemClassification.filler,
         "weight": 3
     },
     "Blue Health": {
         "id": 100003,
         "actor_id": 1702,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_PICKUP.value,
-        "class": ItemClassification.useful,
+        "class": ItemClassification.filler,
         "weight": 5
     },
     "Full Health": {
@@ -51,14 +51,13 @@ ITEM_TABLE = {
         "weight": 1
     },
 
-    # Mission items
-    # TODO: hopefully we don't need the actor_id for these and can just modify the inventory instead
+    # Inventory items
     "Beacon Power Cell": {
         "id": 200000,
         "actor_id": 4200,
-        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_MISSION_ITEM.value,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value,
         "class": ItemClassification.progression,
-        "count": 1 # TODO: this is actually like 4, or something
+        "count": 3
     },
 
     # Weapons

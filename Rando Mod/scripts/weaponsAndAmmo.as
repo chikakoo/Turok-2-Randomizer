@@ -8,6 +8,12 @@
 bool TryGivePlayerWeapon(int &in actorId, int &in ammoAmount = 1000)
 {
 	WeaponInfo@ weaponInfo = GetWeaponInfo(actorId);
+	if (weaponInfo is null)
+	{	
+		Sys.Print("Tried to give player undefined weapon: " + actorId);
+		return false;
+	}
+	
 	bool ownsWeapon = LocalPlayer.HasWeapon(weaponInfo.weaponDef);
 	LocalPlayer.GiveWeapon(weaponInfo.weaponDef, ammoAmount);
 	if (ownsWeapon)

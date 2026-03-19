@@ -3,7 +3,7 @@ class RandoPlayerObject : ScriptObject
     kActor@ self;
 	int m_messageCooldown = 0;
 	uint16 m_menuButtonHeldTime = 5;
-	int m_progressMenuDisplayTime = 300;
+	int m_progressMenuDisplayTime = 330;
 	
 	// An array of ascii characters so we can get the index easily
 	array<kStr> m_asciiChars = {
@@ -401,20 +401,16 @@ class RandoPlayerObject : ScriptObject
 				// Do nothing if there's no message type!
 				break;
 			case AP_IN_MSGTYPE_GET_PICKUP:
-				Sys.Print("Pickup get: " + data);
 				HandleGetPickup(data);
 				break;
 			case AP_IN_MSGTYPE_GET_WEAPON:
-				Sys.Print("Weapon get: " + data);
 				TryGivePlayerWeapon(data);
 				break;
 			case AP_IN_MSGTYPE_GET_AMMO:
-				Sys.Print("Ammo get: " + data);
 				GetAmmoInRandomWeapon();
 				break;
-			case AP_IN_MSGTYPE_GET_MISSION_ITEM:
-				Sys.Print("Mission item get: " + data);
-				HandleGetMissionItem(data);
+			case AP_IN_MSGTYPE_GET_INVENTORY_ITEM:
+				TryGetInventoryItem(data);
 				break;
 			case AP_IN_MSGTYPE_GET_TRAP:
 				TryTriggerTrap(data);
@@ -434,8 +430,10 @@ class RandoPlayerObject : ScriptObject
 		Sys.Print("Updated last processed index: " + g_AP.OutgoingLastProcessedItemIdx);
 	}
 	
-	// Pickups aren't that important, so let's just spawn it on the player.
-	// They SHOULD just pick it up most of the time!
+	//----------------------------------
+	// This includes health and life forces.
+	// Health will be given directly.
+	// Life forces have no way of being given, so they will be spawned in.
 	void HandleGetPickup(int &in data)
 	{
 		kDictMem@ entry = g_indexDefManager.GetEntry(data);
@@ -461,18 +459,11 @@ class RandoPlayerObject : ScriptObject
 		}
 	}
 	
-	void HandleGetMissionItem(int &in data)
-	{
-		Sys.Print("Mission item get: " + data);
-		
-		LocalPlayer.Inventory().Give(data);
-		int total = LocalPlayer.Inventory().GetCount(data);
-		
-		// TODO: look these up based on the actor id instead
-		LocalPlayer.Actor().PlaySound("sounds/shaders/Ammo Pickup.ksnd");
-		Hud.AddMessage("Got Power Cell (" + total + ")!");
-	}
-	
+	//----------------------------------
+	// Process messages to send to AP.
+	// First, waits until the client is ready to receive. 
+	// Then, sets our message data and type and lets sets the
+	// flag so the client knows there's data for it to process.
 	void ProcessOutgoingMessages(void)
 	{
 		// Do not process if AP is still processing the last message

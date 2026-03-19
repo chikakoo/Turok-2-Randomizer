@@ -66,7 +66,7 @@ class RandoPickupObject : ScriptObject
 			!m_wasSentToAP &&
 			!(pCollider is null) &&
 			pCollider.InstanceOf("kexPuppet"))
-		{
+		{			
 			SendCheckToAP(m_id);
 			if (IsHealthOrAmmo(self))
 			{
@@ -77,12 +77,6 @@ class RandoPickupObject : ScriptObject
 			// Turn the flags off now, since we already sent the check.
 			self.WorldComponent().Flags() &= ~WCF_INVOKE_COLLIDE_CALLBACK;
 			self.Flags() &= ~AF_IMPORTANT;
-			
-			// If it's an AP item, display the check
-			if (m_displayString != "")
-			{
-				Hud.AddMessage(m_displayString);
-			}
 		}
 	}
 	
@@ -102,7 +96,21 @@ class RandoPickupObject : ScriptObject
 			
 			// Try to trigger it if it is a trap.
 			// If it isn't, this doesn't do anything.
-			TryTriggerTrap(self.Type());
+			if (TryTriggerTrap(self.Type()))
+			{
+			}
+			
+			// If it's an AP item, display the check
+			else if (self.Type() == kActor_Item_APItem)
+			{
+				Hud.AddMessage(m_displayString);
+			}
+			
+			// If it's ammo, give ammo
+			else if(self.Type() == kActor_Item_RandomAmmo)
+			{
+				GetAmmoInRandomWeapon();
+			}
 		}
 	}
 }

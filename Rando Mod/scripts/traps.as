@@ -17,15 +17,28 @@
 // Triggers the trap for the given actor id.
 // If this isn't a trap actor, doesn't do anything.
 // This will be the data that AP sends us.
-void TryTriggerTrap(const int &in trapId)
+bool TryTriggerTrap(const int &in trapId)
 {
-	switch(trapId)
+	kDictMem@ actorDef = g_indexDefManager.GetEntry(trapId);
+	if (actorDef is null)
 	{
-		case kActor_Trap_Enemy:
+		return false ;
+	}
+	
+	int trapType;
+	if (!actorDef.GetInt("rando.trapType", trapType))
+	{
+		return false;
+	}
+	
+	switch(trapType)
+	{
+		case RANDO_TRAP_TYPE_ENEMY:
 			Hud.AddMessage("It's a trap!");
 			HandleEnemyTrap();
-			
 	}
+	
+	return true;
 }
 
 void HandleEnemyTrap()
