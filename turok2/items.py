@@ -52,8 +52,167 @@ ITEM_TABLE = {
     },
 
     # Inventory items
+    "Level 2 Key": {
+        "id": 200001,
+        "actor_id": 4310,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value,
+        "class": ItemClassification.progression,
+        "count": 3
+    },
+    "Level 3 Key": {
+        "id": 200002,
+        "actor_id": 4320,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value,
+        "class": ItemClassification.progression,
+        "count": 3
+    },
+    "Level 4 Key": {
+        "id": 200003,
+        "actor_id": 4330,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value,
+        "class": ItemClassification.progression,
+        "count": 3
+    },
+    "Level 5 Key": {
+        "id": 200004,
+        "actor_id": 4340,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value,
+        "class": ItemClassification.progression,
+        "count": 3
+    },
+    "Level 6 Key": {
+        "id": 200005,
+        "actor_id": 4350,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value,
+        "class": ItemClassification.progression,
+        "count": 6
+    },
+    
+    "Primagen Key 1": {
+        "id": 200006,
+        "actor_id": 4360,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value,
+        "class": ItemClassification.progression_skip_balancing,
+        "count": 1
+    },
+    "Primagen Key 2": {
+        "id": 200007,
+        "actor_id": 4361,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value,
+        "class": ItemClassification.progression_skip_balancing,
+        "count": 1
+    },
+    "Primagen Key 3": {
+        "id": 200008,
+        "actor_id": 4362,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value,
+        "class": ItemClassification.progression_skip_balancing,
+        "count": 1
+    },
+    "Primagen Key 4": {
+        "id": 200009,
+        "actor_id": 4363,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value,
+        "class": ItemClassification.progression_skip_balancing,
+        "count": 1
+    },
+    "Primagen Key 5": {
+        "id": 200010,
+        "actor_id": 4364,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value,
+        "class": ItemClassification.progression_skip_balancing,
+        "count": 1
+    },
+    "Primagen Key 6": {
+        "id": 200011,
+        "actor_id": 4365,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value,
+        "class": ItemClassification.progression_skip_balancing,
+        "count": 1
+    },
+    
+    "Level 2 Eagle Feather": {
+        "id": 200012,
+        "actor_id": 4402,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value,
+        "class": ItemClassification.progression,
+        "count": 1
+    },
+    "Level 3 Eagle Feather": {
+        "id": 200013,
+        "actor_id": 4400,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value,
+        "class": ItemClassification.progression,
+        "count": 1
+    },
+    "Level 4 Eagle Feather": {
+        "id": 200014,
+        "actor_id": 4404,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value,
+        "class": ItemClassification.progression,
+        "count": 1
+    },
+    "Level 5 Eagle Feather": {
+        "id": 200015,
+        "actor_id": 4403,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value,
+        "class": ItemClassification.progression,
+        "count": 1
+    },
+    "Level 6 Eagle Feather": {
+        "id": 200016,
+        "actor_id": 4401,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value,
+        "class": ItemClassification.progression,
+        "count": 1
+    },
+    
+    "Leap of Faith": {
+        "id": 200017,
+        "actor_id": 4382,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value,
+        "class": ItemClassification.progression,
+        "count": 1
+    },
+    "Breath of Life": {
+        "id": 200018,
+        "actor_id": 4380,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value,
+        "class": ItemClassification.progression,
+        "count": 1
+    },
+    "Heart of Fire": {
+        "id": 200019,
+        "actor_id": 4384,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value,
+        "class": ItemClassification.progression,
+        "count": 1
+    },
+    "Whispers": {
+        "id": 200020,
+        "actor_id": 4383,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value,
+        "class": ItemClassification.progression,
+        "count": 1
+    },
+    "Eye of Truth": {
+        "id": 200021,
+        "actor_id": 4381,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value,
+        "class": ItemClassification.progression,
+        "count": 1
+    },
+    
+    "Nuke Part": {
+        "id": 200022,
+        "actor_id": 4500,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value,
+        "class": ItemClassification.useful,
+        "count": 6
+    },
+    
     "Beacon Power Cell": {
-        "id": 200000,
+        "id": 200100,
         "actor_id": 4200,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value,
         "class": ItemClassification.progression,
@@ -61,31 +220,184 @@ ITEM_TABLE = {
     },
 
     # Weapons
-    "Pistol": {
+    "War Blade": {
         "id": 300000,
+        "actor_id": 2001,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
+        "class": ItemClassification.useful,
+        "count": 1
+    },
+    "Tek Bow": {
+        "id": 300001,
+        "actor_id": 2002,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
+        "class": ItemClassification.progression,
+        "count": 1
+    },
+    "Pistol": {
+        "id": 300002,
         "actor_id": 2004,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
         "class": ItemClassification.progression,
-        "count": 1 # This will unlock the pistol, we may want options for how many of these
+        "count": 1
     },
-
-    # Ammo
+    "Mag 60": {
+        "id": 300003,
+        "actor_id": 2005,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
+        "class": ItemClassification.progression,
+        "count": 1
+    },
+    "Tranquilizer Gun": {
+        "id": 300004,
+        "actor_id": 2006,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
+        "class": ItemClassification.useful,
+        "count": 1
+    },
+    "Charge Dart Rifle": {
+        "id": 300005,
+        "actor_id": 2007,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
+        "class": ItemClassification.progression,
+        "count": 1
+    },
+    "Shotgun": {
+        "id": 300006,
+        "actor_id": 2008,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
+        "class": ItemClassification.progression,
+        "count": 1
+    },
+    "Shredder": {
+        "id": 300007,
+        "actor_id": 2009,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
+        "class": ItemClassification.progression,
+        "count": 1
+    },
+    "Plasma Rifle": {
+        "id": 300008,
+        "actor_id": 2010,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
+        "class": ItemClassification.progression,
+        "count": 1
+    },
+    "Firestorm Cannon": {
+        "id": 300009,
+        "actor_id": 2011,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
+        "class": ItemClassification.progression,
+        "count": 1
+    },
+    "Sunfire Pod": {
+        "id": 300010,
+        "actor_id": 2012,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
+        "class": ItemClassification.useful,
+        "count": 1
+    },
+    "Cerebral Bore": {
+        "id": 300011,
+        "actor_id": 2014,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
+        "class": ItemClassification.progression,
+        "count": 1
+    },
+    "P.F.M. Layer": {
+        "id": 300012,
+        "actor_id": 2015,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
+        "class": ItemClassification.useful,
+        "count": 1
+    },
+    "Grenade Launcher": {
+        "id": 300013,
+        "actor_id": 2016,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
+        "class": ItemClassification.progression,
+        "count": 1
+    },
+    "Scorpion Launcher": {
+        "id": 300014,
+        "actor_id": 2017,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
+        "class": ItemClassification.progression,
+        "count": 1
+    },
+    "Flame Thrower": {
+        "id": 300015,
+        "actor_id": 2110,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
+        "class": ItemClassification.progression,
+        "count": 1
+    },
+    "Razor Wind": {
+        "id": 300016,
+        "actor_id": 2111,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
+        "class": ItemClassification.progression,
+        "count": 1
+    },
+    "Harpoon Gun": {
+        "id": 300017,
+        "actor_id": 2100,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
+        "class": ItemClassification.useful,
+        "count": 1
+    },
+    "Torpedo Launcher": {
+        "id": 300018,
+        "actor_id": 2101,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
+        "class": ItemClassification.progression,
+        "count": 1
+    },
+    "Nuke": {
+        "id": 300019,
+        "actor_id": 2112,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
+        "class": ItemClassification.progression,
+        "count": 1 # Setting in yaml to not have nuke parts
+    },
     
-    # TODO: make a universal ammo type
-    "Clip (Pistol)": {
+    # Ammo
+    "Random Ammo Pack": {
         "id": 400000,
-        "actor_id": 2500,
+        "actor_id": 400000,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_AMMO.value,
         "class": ItemClassification.filler,
         "weight": 4
     },
 
     # Traps
-    "Endtrail Trap": {
+    "Enemy Trap (Silver Health)": {
         "id": 900000,
         "actor_id": 900000,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_TRAP.value,
-        "class": ItemClassification.trap
+        "class": ItemClassification.trap,
+        "weight": 25
+    },
+    "Enemy Trap (Blue Health)": {
+        "id": 900001,
+        "actor_id": 900001,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_TRAP.value,
+        "class": ItemClassification.trap,
+        "weight": 65
+    },
+    "Enemy Trap (Full Health)": {
+        "id": 900002,
+        "actor_id": 900002,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_TRAP.value,
+        "class": ItemClassification.trap,
+        "weight": 7
+    },
+    "Enemy Trap (Ultra Health)": {
+        "id": 900003,
+        "actor_id": 900003,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_TRAP.value,
+        "class": ItemClassification.trap,
+        "weight": 3
     }
 }
 

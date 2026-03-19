@@ -25,6 +25,9 @@ class Turok2World(World):
     game = "Turok 2"
     web = web_world.Turok2WebWorld()
     
+    options_dataclass = turok2_options.Turok2Options
+    options: turok2_options.Turok2Options
+    
     settings: typing.ClassVar[Turok2Settings]
 
     location_name_to_id = {name: data["ap_id"] for name, data in locations.LOCATION_TABLE.items()}
