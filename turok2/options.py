@@ -1,6 +1,10 @@
 from dataclasses import dataclass
 from Options import Choice, OptionGroup, PerGameCommonOptions, Range, Toggle
-#todo: randomize options for health/ammo/life force tiles; death link
+#todo: randomize options for health/ammo/life force tiles
+#      whether to shuffle nuke parts, include it as a possible weapon, or just exclude them
+#      whether to include the nuke in the random ammo packs
+#      death link
+#      also a goal setting: primagen, or just beat level 1
 
 class GameLogicDifficulty(Choice):
     """
@@ -51,7 +55,7 @@ class LifeForceFillPercentage(Range):
     
     range_start = 0
     range_end = 100
-    default = 70
+    default = 50
     
 class LocalLifeForcePercentage(Range):
     """
@@ -107,7 +111,7 @@ class AmmoFillPercentage(Range):
 
     range_start = 0
     range_end = 100
-    default = 30
+    default = 40
     
 class LocalAmmoPercentage(Range):
     """
@@ -190,11 +194,11 @@ option_presets = {
         "game_logic_difficulty": GameLogicDifficulty.option_casual,
         "weapon_logic_difficulty": WeaponLogicDifficulty.option_casual,
         "force_early_weapon": True,
-        "life_force_fill_percentage": 70,
+        "life_force_fill_percentage": 50,
         "local_life_force_percentage": 0,
-        "health_fill_percentage": 30,
+        "health_fill_percentage": 40,
         "local_health_percentage": 50,
-        "ammo_fill_percentage": 30,
+        "ammo_fill_percentage": 40,
         "local_ammo_percentage": 50,
         "trap_fill_percentage": 0,
         "enemy_trap_weight": 2
@@ -203,11 +207,11 @@ option_presets = {
         "game_logic_difficulty": GameLogicDifficulty.option_advanced,
         "weapon_logic_difficulty": GameLogicDifficulty.option_advanced,
         "force_early_weapon": False,
-        "life_force_fill_percentage": 70,
+        "life_force_fill_percentage": 50,
         "local_life_force_percentage": 0,
-        "health_fill_percentage": 30,
+        "health_fill_percentage": 40,
         "local_health_percentage": 50,
-        "ammo_fill_percentage": 30,
+        "ammo_fill_percentage": 40,
         "local_ammo_percentage": 50,
         "trap_fill_percentage": 0,
         "enemy_trap_weight": 2

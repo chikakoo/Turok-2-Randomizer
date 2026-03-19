@@ -1,4 +1,6 @@
 from __future__ import annotations
+from collections import Counter
+from enum import Enum
 from typing import TYPE_CHECKING
 from BaseClasses import Item, ItemClassification
 from .client.ap_memory_constants import APMessageType
@@ -6,55 +8,95 @@ from .client.ap_memory_constants import APMessageType
 if TYPE_CHECKING:
     from .world import Turok2World
     
+class ItemType(Enum):
+    """
+    Types used to filter the item table.
+    """
+    LIFE_FORCE = 0
+    HEALTH = 1
+    AMMO = 2
+    LEVEL_KEY = 3
+    PRIMAGEN_KEY = 4
+    EAGLE_FEATHER = 5
+    TALISMAN = 6
+    NUKE_PART = 7
+    MISSION_ITEM = 8
+    WEAPON = 9
+    TRAP = 10
+    
+class TrapType(Enum):
+    """
+    Trap types, so we can choose traps based on their weights.
+    """
+    ENEMY = 0
+    
 ITEM_TABLE = {
     # Pickups
-    "Life Tile 1": {
+    "Life Force 1": {
         "id": 100000, 
         "actor_id": 1705,
+        "type": ItemType.LIFE_FORCE.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_PICKUP.value,
         "class": ItemClassification.filler,
-        "weight": 8
+        "weight": 95
     },
-    "Life Tile 10": {
+    "Life Force 10": {
         "id": 100001, 
         "actor_id": 1706, 
-        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_PICKUP.value,
-        "class": ItemClassification.filler,
-        "weight": 3
-    },
-    "Silver Health": {
-        "id": 100002,
-        "actor_id": 1701,
-        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_PICKUP.value,
-        "class": ItemClassification.filler,
-        "weight": 3
-    },
-    "Blue Health": {
-        "id": 100003,
-        "actor_id": 1702,
+        "type": ItemType.LIFE_FORCE.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_PICKUP.value,
         "class": ItemClassification.filler,
         "weight": 5
     },
+    
+    "Silver Health": {
+        "id": 100002,
+        "actor_id": 1701,
+        "type": ItemType.HEALTH.value,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_PICKUP.value,
+        "class": ItemClassification.filler,
+        "weight": 25
+    },
+    "Blue Health": {
+        "id": 100003,
+        "actor_id": 1702,
+        "type": ItemType.HEALTH.value,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_PICKUP.value,
+        "class": ItemClassification.filler,
+        "weight": 65
+    },
     "Full Health": {
         "id": 100004,
         "actor_id": 1703,
+        "type": ItemType.HEALTH.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_PICKUP.value,
         "class": ItemClassification.useful,
-        "weight": 2
+        "weight": 7
     },
     "Ultra Health": {
         "id": 100005,
         "actor_id": 1704,
+        "type": ItemType.HEALTH.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_PICKUP.value,
         "class": ItemClassification.useful,
-        "weight": 1
+        "weight": 3
+    },
+    
+    # Ammo
+    "Random Ammo Pack": {
+        "id": 400000,
+        "actor_id": 400000,
+        "type": ItemType.AMMO.value,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_AMMO.value,
+        "class": ItemClassification.filler,
+        "weight": 4
     },
 
     # Inventory items
     "Level 2 Key": {
         "id": 200001,
         "actor_id": 4310,
+        "type": ItemType.LEVEL_KEY.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value,
         "class": ItemClassification.progression,
         "count": 3
@@ -62,6 +104,7 @@ ITEM_TABLE = {
     "Level 3 Key": {
         "id": 200002,
         "actor_id": 4320,
+        "type": ItemType.LEVEL_KEY.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value,
         "class": ItemClassification.progression,
         "count": 3
@@ -69,6 +112,7 @@ ITEM_TABLE = {
     "Level 4 Key": {
         "id": 200003,
         "actor_id": 4330,
+        "type": ItemType.LEVEL_KEY.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value,
         "class": ItemClassification.progression,
         "count": 3
@@ -76,6 +120,7 @@ ITEM_TABLE = {
     "Level 5 Key": {
         "id": 200004,
         "actor_id": 4340,
+        "type": ItemType.LEVEL_KEY.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value,
         "class": ItemClassification.progression,
         "count": 3
@@ -83,6 +128,7 @@ ITEM_TABLE = {
     "Level 6 Key": {
         "id": 200005,
         "actor_id": 4350,
+        "type": ItemType.LEVEL_KEY.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value,
         "class": ItemClassification.progression,
         "count": 6
@@ -91,6 +137,7 @@ ITEM_TABLE = {
     "Primagen Key 1": {
         "id": 200006,
         "actor_id": 4360,
+        "type": ItemType.PRIMAGEN_KEY.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value,
         "class": ItemClassification.progression_skip_balancing,
         "count": 1
@@ -98,6 +145,7 @@ ITEM_TABLE = {
     "Primagen Key 2": {
         "id": 200007,
         "actor_id": 4361,
+        "type": ItemType.PRIMAGEN_KEY.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value,
         "class": ItemClassification.progression_skip_balancing,
         "count": 1
@@ -105,6 +153,7 @@ ITEM_TABLE = {
     "Primagen Key 3": {
         "id": 200008,
         "actor_id": 4362,
+        "type": ItemType.PRIMAGEN_KEY.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value,
         "class": ItemClassification.progression_skip_balancing,
         "count": 1
@@ -112,6 +161,7 @@ ITEM_TABLE = {
     "Primagen Key 4": {
         "id": 200009,
         "actor_id": 4363,
+        "type": ItemType.PRIMAGEN_KEY.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value,
         "class": ItemClassification.progression_skip_balancing,
         "count": 1
@@ -119,6 +169,7 @@ ITEM_TABLE = {
     "Primagen Key 5": {
         "id": 200010,
         "actor_id": 4364,
+        "type": ItemType.PRIMAGEN_KEY.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value,
         "class": ItemClassification.progression_skip_balancing,
         "count": 1
@@ -126,6 +177,7 @@ ITEM_TABLE = {
     "Primagen Key 6": {
         "id": 200011,
         "actor_id": 4365,
+        "type": ItemType.PRIMAGEN_KEY.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value,
         "class": ItemClassification.progression_skip_balancing,
         "count": 1
@@ -134,6 +186,7 @@ ITEM_TABLE = {
     "Level 2 Eagle Feather": {
         "id": 200012,
         "actor_id": 4402,
+        "type": ItemType.EAGLE_FEATHER.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value,
         "class": ItemClassification.progression,
         "count": 1
@@ -141,6 +194,7 @@ ITEM_TABLE = {
     "Level 3 Eagle Feather": {
         "id": 200013,
         "actor_id": 4400,
+        "type": ItemType.EAGLE_FEATHER.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value,
         "class": ItemClassification.progression,
         "count": 1
@@ -148,6 +202,7 @@ ITEM_TABLE = {
     "Level 4 Eagle Feather": {
         "id": 200014,
         "actor_id": 4404,
+        "type": ItemType.EAGLE_FEATHER.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value,
         "class": ItemClassification.progression,
         "count": 1
@@ -155,6 +210,7 @@ ITEM_TABLE = {
     "Level 5 Eagle Feather": {
         "id": 200015,
         "actor_id": 4403,
+        "type": ItemType.EAGLE_FEATHER.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value,
         "class": ItemClassification.progression,
         "count": 1
@@ -162,6 +218,7 @@ ITEM_TABLE = {
     "Level 6 Eagle Feather": {
         "id": 200016,
         "actor_id": 4401,
+        "type": ItemType.EAGLE_FEATHER.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value,
         "class": ItemClassification.progression,
         "count": 1
@@ -170,6 +227,7 @@ ITEM_TABLE = {
     "Leap of Faith": {
         "id": 200017,
         "actor_id": 4382,
+        "type": ItemType.TALISMAN.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value,
         "class": ItemClassification.progression,
         "count": 1
@@ -177,6 +235,7 @@ ITEM_TABLE = {
     "Breath of Life": {
         "id": 200018,
         "actor_id": 4380,
+        "type": ItemType.TALISMAN.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value,
         "class": ItemClassification.progression,
         "count": 1
@@ -184,6 +243,7 @@ ITEM_TABLE = {
     "Heart of Fire": {
         "id": 200019,
         "actor_id": 4384,
+        "type": ItemType.TALISMAN.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value,
         "class": ItemClassification.progression,
         "count": 1
@@ -191,6 +251,7 @@ ITEM_TABLE = {
     "Whispers": {
         "id": 200020,
         "actor_id": 4383,
+        "type": ItemType.TALISMAN.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value,
         "class": ItemClassification.progression,
         "count": 1
@@ -198,6 +259,7 @@ ITEM_TABLE = {
     "Eye of Truth": {
         "id": 200021,
         "actor_id": 4381,
+        "type": ItemType.TALISMAN.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value,
         "class": ItemClassification.progression,
         "count": 1
@@ -206,6 +268,7 @@ ITEM_TABLE = {
     "Nuke Part": {
         "id": 200022,
         "actor_id": 4500,
+        "type": ItemType.NUKE_PART.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value,
         "class": ItemClassification.useful,
         "count": 6
@@ -214,6 +277,7 @@ ITEM_TABLE = {
     "Beacon Power Cell": {
         "id": 200100,
         "actor_id": 4200,
+        "type": ItemType.MISSION_ITEM.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value,
         "class": ItemClassification.progression,
         "count": 3
@@ -223,6 +287,7 @@ ITEM_TABLE = {
     "War Blade": {
         "id": 300000,
         "actor_id": 2001,
+        "type": ItemType.WEAPON.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
         "class": ItemClassification.useful,
         "count": 1
@@ -230,6 +295,7 @@ ITEM_TABLE = {
     "Tek Bow": {
         "id": 300001,
         "actor_id": 2002,
+        "type": ItemType.WEAPON.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
         "class": ItemClassification.progression,
         "count": 1
@@ -237,6 +303,7 @@ ITEM_TABLE = {
     "Pistol": {
         "id": 300002,
         "actor_id": 2004,
+        "type": ItemType.WEAPON.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
         "class": ItemClassification.progression,
         "count": 1
@@ -244,6 +311,7 @@ ITEM_TABLE = {
     "Mag 60": {
         "id": 300003,
         "actor_id": 2005,
+        "type": ItemType.WEAPON.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
         "class": ItemClassification.progression,
         "count": 1
@@ -251,6 +319,7 @@ ITEM_TABLE = {
     "Tranquilizer Gun": {
         "id": 300004,
         "actor_id": 2006,
+        "type": ItemType.WEAPON.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
         "class": ItemClassification.useful,
         "count": 1
@@ -258,6 +327,7 @@ ITEM_TABLE = {
     "Charge Dart Rifle": {
         "id": 300005,
         "actor_id": 2007,
+        "type": ItemType.WEAPON.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
         "class": ItemClassification.progression,
         "count": 1
@@ -265,6 +335,7 @@ ITEM_TABLE = {
     "Shotgun": {
         "id": 300006,
         "actor_id": 2008,
+        "type": ItemType.WEAPON.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
         "class": ItemClassification.progression,
         "count": 1
@@ -272,6 +343,7 @@ ITEM_TABLE = {
     "Shredder": {
         "id": 300007,
         "actor_id": 2009,
+        "type": ItemType.WEAPON.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
         "class": ItemClassification.progression,
         "count": 1
@@ -279,6 +351,7 @@ ITEM_TABLE = {
     "Plasma Rifle": {
         "id": 300008,
         "actor_id": 2010,
+        "type": ItemType.WEAPON.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
         "class": ItemClassification.progression,
         "count": 1
@@ -286,6 +359,7 @@ ITEM_TABLE = {
     "Firestorm Cannon": {
         "id": 300009,
         "actor_id": 2011,
+        "type": ItemType.WEAPON.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
         "class": ItemClassification.progression,
         "count": 1
@@ -293,6 +367,7 @@ ITEM_TABLE = {
     "Sunfire Pod": {
         "id": 300010,
         "actor_id": 2012,
+        "type": ItemType.WEAPON.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
         "class": ItemClassification.useful,
         "count": 1
@@ -300,6 +375,7 @@ ITEM_TABLE = {
     "Cerebral Bore": {
         "id": 300011,
         "actor_id": 2014,
+        "type": ItemType.WEAPON.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
         "class": ItemClassification.progression,
         "count": 1
@@ -307,6 +383,7 @@ ITEM_TABLE = {
     "P.F.M. Layer": {
         "id": 300012,
         "actor_id": 2015,
+        "type": ItemType.WEAPON.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
         "class": ItemClassification.useful,
         "count": 1
@@ -314,6 +391,7 @@ ITEM_TABLE = {
     "Grenade Launcher": {
         "id": 300013,
         "actor_id": 2016,
+        "type": ItemType.WEAPON.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
         "class": ItemClassification.progression,
         "count": 1
@@ -321,6 +399,7 @@ ITEM_TABLE = {
     "Scorpion Launcher": {
         "id": 300014,
         "actor_id": 2017,
+        "type": ItemType.WEAPON.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
         "class": ItemClassification.progression,
         "count": 1
@@ -328,6 +407,7 @@ ITEM_TABLE = {
     "Flame Thrower": {
         "id": 300015,
         "actor_id": 2110,
+        "type": ItemType.WEAPON.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
         "class": ItemClassification.progression,
         "count": 1
@@ -335,6 +415,7 @@ ITEM_TABLE = {
     "Razor Wind": {
         "id": 300016,
         "actor_id": 2111,
+        "type": ItemType.WEAPON.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
         "class": ItemClassification.progression,
         "count": 1
@@ -342,6 +423,7 @@ ITEM_TABLE = {
     "Harpoon Gun": {
         "id": 300017,
         "actor_id": 2100,
+        "type": ItemType.WEAPON.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
         "class": ItemClassification.useful,
         "count": 1
@@ -349,31 +431,26 @@ ITEM_TABLE = {
     "Torpedo Launcher": {
         "id": 300018,
         "actor_id": 2101,
+        "type": ItemType.WEAPON.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
-        "class": ItemClassification.progression,
+        "class": ItemClassification.progression, # Needed in Level 4
         "count": 1
     },
     "Nuke": {
         "id": 300019,
         "actor_id": 2112,
+        "type": ItemType.WEAPON.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
-        "class": ItemClassification.progression,
-        "count": 1 # Setting in yaml to not have nuke parts
-    },
-    
-    # Ammo
-    "Random Ammo Pack": {
-        "id": 400000,
-        "actor_id": 400000,
-        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_AMMO.value,
-        "class": ItemClassification.filler,
-        "weight": 4
+        "class": ItemClassification.useful,
+        "count": 1 # TODO: setting in yaml to not have nuke parts
     },
 
     # Traps
     "Enemy Trap (Silver Health)": {
         "id": 900000,
         "actor_id": 900000,
+        "type": ItemType.TRAP.value,
+        "trap_type": TrapType.ENEMY.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_TRAP.value,
         "class": ItemClassification.trap,
         "weight": 25
@@ -381,6 +458,8 @@ ITEM_TABLE = {
     "Enemy Trap (Blue Health)": {
         "id": 900001,
         "actor_id": 900001,
+        "type": ItemType.TRAP.value,
+        "trap_type": TrapType.ENEMY.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_TRAP.value,
         "class": ItemClassification.trap,
         "weight": 65
@@ -388,6 +467,8 @@ ITEM_TABLE = {
     "Enemy Trap (Full Health)": {
         "id": 900002,
         "actor_id": 900002,
+        "type": ItemType.TRAP.value,
+        "trap_type": TrapType.ENEMY.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_TRAP.value,
         "class": ItemClassification.trap,
         "weight": 7
@@ -395,6 +476,8 @@ ITEM_TABLE = {
     "Enemy Trap (Ultra Health)": {
         "id": 900003,
         "actor_id": 900003,
+        "type": ItemType.TRAP.value,
+        "trap_type": TrapType.ENEMY.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_TRAP.value,
         "class": ItemClassification.trap,
         "weight": 3
@@ -416,11 +499,36 @@ DEFAULT_ITEM_CLASSIFICATIONS = {
     for name, data in ITEM_TABLE.items()
 }
 
-def get_progression_items():
+TRAPS_BY_CATEGORY = {}
+
+TRAPS = {
+    name: data
+    for name, data in ITEM_TABLE.items()
+    if data["type"] == ItemType.TRAP.value
+}
+
+LIFE_FORCES = {
+    name: data
+    for name, data in ITEM_TABLE.items()
+    if data["type"] == ItemType.LIFE_FORCE.value
+}
+
+HEALTH_PICKUPS = {
+    name: data
+    for name, data in ITEM_TABLE.items()
+    if data["type"] == ItemType.HEALTH.value
+}
+
+def get_required_seed_items():
+    """
+    All items required to be in the seed.
+    These are all weapons, and all inventory items.
+    """
     return [
         (name, data)
         for name, data in ITEM_TABLE.items()
-        if data["class"] == ItemClassification.progression
+        if (data["msg_type"] == APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value or
+            data["msg_type"] == APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value)
     ]
 
 
@@ -439,33 +547,40 @@ def get_useful_items():
         if data["class"] == ItemClassification.useful
     ]
 
-
-def get_traps():
-    return [
-        (name, data)
-        for name, data in ITEM_TABLE.items()
-        if data["class"] == ItemClassification.trap
-    ]
-
 class Turok2Item(Item):
     game = "Turok 2"
     
 def get_random_filler_item_name(world: Turok2World) -> str:
-    '''
+    """
     world.py will use this to generate filler items.
     This will generate a random filler by weight based on filler/useful items.
-    '''
-    items = get_filler_items() + get_useful_items()
-    names = [name for name, _ in items]
-    weights = [data.get("weight", 3) for _, data in items]
+    """
+    categories = [
+        (ItemType.LIFE_FORCE.value, 50),
+        (ItemType.HEALTH.value, 25),
+        (ItemType.AMMO.value, 25)
+    ]
     
-    return world.random.choices(names, weights=weights, k=1)[0]
+    category_names = [name for name, _ in categories]
+    category_weights = [weight for _, weight in categories]
+    
+    # Pick a category
+    chosen_category = world.random.choices(category_names, weights=category_weights, k=1)[0]
+
+    # Pick an item from that category
+    if chosen_category == ItemType.HEALTH.value:
+        return get_random_health_pickup_item_name(world)
+    elif chosen_category == ItemType.AMMO.value:
+        return get_random_ammo_pickup_item_name(world)
+    else:
+        # Acts as the fallback
+        return get_random_life_force_item_name(world)
     
 def create_item_with_correct_classification(world: Turok2World, name: str) -> Turok2Item:
-    '''
+    """
     Creates an item by name. This is here in case we ever need to change the
     classification of any item based on the options the player chooses.
-    '''
+    """
     classification = DEFAULT_ITEM_CLASSIFICATIONS[name]
 
     return Turok2Item(
@@ -474,36 +589,183 @@ def create_item_with_correct_classification(world: Turok2World, name: str) -> Tu
         ITEM_NAME_TO_ID[name],
         world.player
     )
+
+def get_random_trap_item_name(world: Turok2World) -> str | None:
+    """
+    Gets a random trap name to add to the item pool.
+    First, chooses the category based on the options.
+    Next, chooses the specific item by weighing the different game models.
+    """
+    # Choose the trap category
+    categories = [
+        (TrapType.ENEMY.value, world.options.enemy_trap_weight)
+    ]
+    categories = [(name, weight) for name, weight in categories if weight > 0]
+    
+    if not categories:
+        return None
+    
+    category_names = [name for name, _ in categories]
+    category_weights = [weight for _, weight in categories]
+    category = world.random.choices(category_names, weights=category_weights, k=1)[0]
+    
+    # Choose the trap item (the model that will appear in the game)
+    items = TRAPS_BY_CATEGORY[category]
+    if not items:
+        return None
+    
+    names = [name for name, _ in items]
+    weights = [data.get("weight", 1) for _, data in items]
+    
+    return world.random.choices(names, weights=weights, k=1)[0]
+    
+def get_random_life_force_item_name(world: Turok2World) -> str:
+    """
+    Gets a random life force.
+    """
+    names = list(LIFE_FORCES.keys())
+    weights = [data.get("weight", 1) for data in LIFE_FORCES.values()]
+    return world.random.choices(names, weights=weights, k=1)[0]
+    
+def get_random_health_pickup_item_name(world: Turok2World) -> str:
+    """
+    Gets a random health pickup.
+    """
+    names = list(HEALTH_PICKUPS.keys())
+    weights = [data.get("weight", 1) for data in HEALTH_PICKUPS.values()]
+    return world.random.choices(names, weights=weights, k=1)[0]
+    
+def get_random_ammo_pickup_item_name(world: Turok2World) -> str:
+    """
+    Gets a random ammo pickup. There's currently only one, so just return it.
+    """
+    return "Random Ammo Pack"
+    
+def add_weighted_items(
+    world: Turok2World,
+    itempool: list[Item],
+    needed_number_of_items: int,
+    percentage: int,
+    get_random_item_name_func) -> int:
+    """
+    Adds items to the itempool based on a percentage of remaining slots.
+    Returns the updated needed_number_of_items.
+    """
+    if percentage <= 0 or needed_number_of_items <= 0:
+        return needed_number_of_items
+
+    ratio = percentage / 100.0
+    number_to_add = round(needed_number_of_items * ratio)
+
+    for _ in range(number_to_add):
+        item_name = get_random_item_name_func(world)
+        if item_name is not None:
+            itempool.append(world.create_item(item_name))
+            needed_number_of_items -= 1
+
+            if needed_number_of_items <= 0:
+                break
+
+    return needed_number_of_items
+
     
 def create_all_items(world: Turok2World) -> None:
-    '''
+    """
     Creates all of the items that will go into the item pool.
     There must be exactly as many items as locations.
-    '''
+    """
+    itempool: list[Item] = []
     
-    # All items that must be in the pool
-    # Currently, all useful and progression items
-    # TODO: this can be tweaked with settings, with % of useful and filler being options
-    itempool = []
+    # Populate the traps dictionary
+    for name, data in TRAPS.items():
+        trap_type = data["trap_type"]
+        if trap_type is None:
+            continue
+        TRAPS_BY_CATEGORY.setdefault(trap_type, []).append((name, data))
 
-    # All progression items are included
-    for name, data in get_progression_items():
+    # Add all the required items to the pool (weapons and inventory items)
+    for name, data in get_required_seed_items():
         for _ in range(data.get("count", 1)):
             itempool.append(world.create_item(name))
-
-    number_of_items = len(itempool)
-    
-    # TODO: add guaranteed number of "fillers" to the pool
-    
-    # Add filler items to the pool - includes items marked as filler and useful
+         
+    # Fill the world with fillers
     number_of_unfilled_locations = len(world.multiworld.get_unfilled_locations(world.player))
+    number_of_items = len(itempool)
     needed_number_of_filler_items = max(0, number_of_unfilled_locations - number_of_items)
+    
+    # Traps
+    needed_number_of_filler_items = add_weighted_items(
+        world,
+        itempool,
+        needed_number_of_filler_items,
+        world.options.trap_fill_percentage,
+        get_random_trap_item_name
+    )
+
+    # Life Forces
+    needed_number_of_filler_items = add_weighted_items(
+        world,
+        itempool,
+        needed_number_of_filler_items,
+        world.options.life_force_fill_percentage,
+        get_random_life_force_item_name
+    )
+                
+    # Health and Ammo
+    # If their percentages are > 100, they should instead be a ratio to fill out
+    # the remaining item locations
+    #
+    # Otherwise, use them as percentages and let create_filler make the rest of the items
+    health_fill_percentage = world.options.health_fill_percentage
+    ammo_fill_percentage = world.options.ammo_fill_percentage
+    percentage_sum = health_fill_percentage + ammo_fill_percentage
+    
+    if percentage_sum > 100:
+        health_ratio = health_fill_percentage / percentage_sum
+        ammo_ratio = ammo_fill_percentage / percentage_sum
+    else:
+        health_ratio = health_fill_percentage / 100.0
+        ammo_ratio = ammo_fill_percentage / 100.0
+
+    health_count = round(needed_number_of_filler_items * health_ratio)
+    ammo_count = round(needed_number_of_filler_items * ammo_ratio)
+
+    # Health pickups
+    for _ in range(health_count):
+        name = get_random_health_pickup_item_name(world)
+        if name:
+            itempool.append(world.create_item(name))
+
+    # Ammo pickups
+    for _ in range(ammo_count):
+        name = get_random_ammo_pickup_item_name(world)
+        if name:
+            itempool.append(world.create_item(name))
+            
+    needed_number_of_filler_items -= (health_count + ammo_count)
+    
+    # Fill out the rest of the pool - ends up using get_random_filler_item_name
     itempool += [world.create_filler() for _ in range(needed_number_of_filler_items)]
 
     world.multiworld.itempool += itempool
     
-    # If we make options for this...
-    # To start with items, do world.push_precollected(created_item)
+    """
+    Print out the item pool by type for debugging
+    Leave this commented out in released versions
+    """
+    
+    type_counts: dict[ItemType, int] = Counter()
+    total_items = len(itempool)
+
+    for item in itempool:
+        item_type = ItemType(ITEM_TABLE[item.name]["type"])
+        type_counts[item_type] += 1
+
+    print(f"Item pool summary for player {world.player}:")
+    for item_type, count in type_counts.items():
+        percentage = (count / total_items) * 100
+        print(f"{item_type.name}: {count} ({percentage:.1f}%)")
+    
     
 def map_ap_item_to_game(ap_item_id) -> tuple[int, int]:
     """
