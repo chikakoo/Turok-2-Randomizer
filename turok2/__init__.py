@@ -3,7 +3,7 @@ import typing
 from . import components as components
 from collections.abc import Mapping
 from worlds.AutoWorld import World
-from . import items, locations, regions, rules, web_world
+from . import items, locations, web_world
 from . import options as turok2_options
 from .turok2_seed import gen_turok2_seed
 
@@ -33,11 +33,15 @@ class Turok2World(World):
     location_name_to_id = locations.LOCATIONS_BY_ID
     item_name_to_id = items.ITEM_NAME_TO_ID
     item_name_groups = items.get_item_name_groups()
-    origin_region_name = "Entire Game"
+    origin_region_name = "PoA Start"
 
     def create_regions(self) -> None:
-        regions.create_and_connect_regions(self)
-        locations.create_all_locations(self)
+        locations.create_regions_and_entrances(self)
+        locations.create_locations(self)
+
+    def set_rules(self) -> None:
+        locations.apply_entrance_rules(self)
+        locations.apply_location_rules(self)
 
     def create_items(self) -> None:
         items.create_all_items(self)

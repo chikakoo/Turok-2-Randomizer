@@ -2,7 +2,7 @@ from __future__ import annotations
 import json
 import pkgutil
 from typing import TYPE_CHECKING
-from BaseClasses import ItemClassification, Location, CollectionState
+from BaseClasses import ItemClassification, Location, CollectionState, Entrance, Region
 from worlds.generic.Rules import set_rule
 from .options import GameLogicDifficulty, WeaponLogicDifficulty
 from . import items
@@ -16,13 +16,24 @@ class Turok2Location(Location):
 LOCATION_TABLE = {}
 LOCATIONS_BY_ID = {}
 
-def create_all_locations(world: Turok2World) -> None:
-    
+def create_locations(world: Turok2World) -> None:
     data = json.loads(pkgutil.get_data(__name__, "data.json").decode())
 
-    for region in data.get("regions", []):
-        region_locations = region.get("locations", {})
+    for region_data in data.get("regions", []):
+        region_name = region_data["name"]
+        region_obj = world.get_region(region_name)
+        
+        region_locations = region_data.get("locations", {})
+        region_location_objs = {}
+        
         for loc_name, loc_info in region_locations.items():
+            region_location_objs[loc_name] = Turok2Location(
+                world.player,
+                loc_name,
+                loc_info["ap_id"],
+                region_obj
+            )
+            
             LOCATION_TABLE[loc_name] = {
                 "ap_id": loc_info["ap_id"],
                 "position": loc_info["position"],
@@ -30,13 +41,33 @@ def create_all_locations(world: Turok2World) -> None:
             }
             LOCATIONS_BY_ID[loc_info["ap_id"]] = loc_name
             
-    # TODO: set up regions from the json so things link correctly
-    entireGame = world.get_region("Entire Game")
-    entireGame.add_locations(
-        LOCATION_TABLE,
-        Turok2Location)
+        region_obj.add_locations(region_location_objs)
         
-    apply_location_rules(world)
+def create_regions_and_entrances(world: Turok2World) -> None:
+    data = json.loads(pkgutil.get_data(__name__, "data.json").decode())
+
+    region_map = {}
+
+    # Create all regions
+    for region_data in data.get("regions", []):
+        region_name = region_data["name"]
+        region = Region(region_name, world.player, world.multiworld)
+        region_map[region_name] = region
+        world.multiworld.regions.append(region)
+
+    # Connect the regions with entrances
+    for region_data in data.get("regions", []):
+        from_region = region_map[region_data["name"]]
+
+        for exit_data in region_data.get("exits", []):
+            to_region = region_map[exit_data["to"]]
+
+            entrance_name = f"{from_region.name} -> {to_region.name}"
+            entrance = from_region.connect(
+                to_region,
+                entrance_name
+            )
+            entrance.rule_json = exit_data.get("rule")
     
 def apply_location_rules(world: Turok2World):
     for loc_name, data in LOCATION_TABLE.items():
@@ -44,6 +75,15 @@ def apply_location_rules(world: Turok2World):
             location = world.get_location(loc_name)
             rule_func = build_rule(data["rule"], world)
             set_rule(location, rule_func)
+
+def apply_entrance_rules(world: Turok2World) -> None:
+    for region in world.multiworld.regions:
+        for entrance in region.exits:
+            rule_json = getattr(entrance, "rule_json", None)
+
+            if rule_json is not None:
+                rule = build_rule(rule_json, world)
+                set_rule(entrance, rule)
         
 def build_rule(rule_json, world: Turok2World):
     player = world.player
@@ -108,7 +148,7 @@ def build_has_rule(has_data, world: Turok2World):
                 raise Exception(f"Unknown exclusion: {ex}")
         
         valid_items = tuple(base_items)
-        return lambda state: state.has_from_list(valid_items, player, count)
+        return lambda state: state.has_from_list_unique(valid_items, player, count)
         
     raise Exception(f"Invalid 'has' rule: {has_data}")
     

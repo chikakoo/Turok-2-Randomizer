@@ -26,10 +26,14 @@
 			"exits": [
 				{ 
 					"to": "PoA Water Hub",
-					"has": { 
-						"category": "Land Weapon",
-						"exclude": ["Bad Weapon"]
+					"rule": {
+						"has": { 
+							"category": "Land Weapon",
+							"exclude": ["Bad Weapon"],
+							"count": 6
+						}
 					}
+					
 				}
 			]
 		},
@@ -198,9 +202,11 @@
 			"exits": [
 				{ 
 					"to": "PoA Water Hub Upper",
-					"has": { 
-						"category": "Land Weapon",
-						"count": 2
+					"rule": {
+						"has": { 
+							"category": "Land Weapon",
+							"count": 2
+						}
 					}
 				}
 			]
@@ -624,8 +630,10 @@
 			"exits": [
 				{ 
 					"to": "PoA Oblivion",
-					"has": {
-						"category": "Good Weapon"
+					"rule": {
+						"has": {
+							"category": "Good Weapon"
+						}
 					}
 				},
 				{
@@ -671,6 +679,11 @@
 					]
 				}
 			}]
+		},
+		{
+			"name": "Primagen Boss",
+			"locations": {},
+			"exits": []
 		}
 	]
 }
