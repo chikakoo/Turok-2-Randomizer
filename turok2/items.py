@@ -696,8 +696,89 @@ def add_weighted_items(
                 break
 
     return needed_number_of_items
-
     
+def force_local_items(world: Turok2World, item_type: int, percentage: int):
+    """
+    Forces the percentage of items in the item pool of the given type to
+    be placed in this world.
+    """
+    items = [
+        item for item in world.multiworld.itempool 
+        if ITEM_TABLE[item.name].get("type", -1) == item_type 
+        and item.player == world.player
+    ]
+    world.multiworld.random.shuffle(items) # Avoids bias for earlier items
+    
+    locations = [
+        loc for loc in world.multiworld.get_unfilled_locations(world.player)
+        if loc.address is not None
+        and not loc.locked
+        and loc.item is None
+        and loc.parent_region.name != world.origin_region_name
+    ]
+
+    # Don't try to force more items than there are locations
+    count = int(len(items) * percentage / 100)
+    count = min(count, len(locations))
+    selected_items = items[:count]
+    
+    for item in selected_items:
+        world.multiworld.itempool.remove(item)
+
+    world.multiworld.random.shuffle(locations) # Avoids bias for earlier locations
+    for item, loc in zip(selected_items, locations):
+        loc.place_locked_item(item)
+        
+    print(f"Forced {count} {ItemType(item_type)} items locally for Player {world.player}")
+
+def try_force_early_weapon(world: Turok2World):
+    """
+    If the setting is on, forces a land weapon that is not bad into
+    the starting area.
+    """
+    if not world.options.force_early_weapon:
+        return
+        
+    def is_valid_early_weapon(item_name: str) -> bool:
+        data = ITEM_TABLE[item_name]
+
+        groups = data.get("groups", [])
+        return ("Land Weapon" in groups 
+            and "Bad Weapon" not in groups
+            and "Melee Weapon" not in groups)
+
+    weapon_items = [
+        item for item in world.multiworld.itempool
+        if item.player == world.player
+        and is_valid_early_weapon(item.name)
+    ]
+    
+    # If we don't have a valid weapon, use any
+    if not weapon_items:
+        weapon_items = [
+            item for item in world.multiworld.itempool
+            if ITEM_TABLE[item.name].get("type") == ItemType.WEAPON.value
+            and item.player == world.player
+        ]
+
+    starting_locations = [
+        loc for loc in world.multiworld.get_unfilled_locations(world.player)
+        if loc.parent_region.name == world.origin_region_name
+        and loc.address is not None
+        and not loc.locked
+        and loc.item is None
+    ]
+    
+    if weapon_items and starting_locations:
+        weapon = world.multiworld.random.choice(weapon_items)
+        location = world.multiworld.random.choice(starting_locations)
+
+        world.multiworld.itempool.remove(weapon)
+        location.place_locked_item(weapon)
+        
+        print(f"Placed early weapon {weapon.name} at {location.name} for Player {world.player}")
+
+
 def create_all_items(world: Turok2World) -> None:
     """
     Creates all of the items that will go into the item pool.
@@ -777,6 +858,12 @@ def create_all_items(world: Turok2World) -> None:
     itempool += [world.create_filler() for _ in range(needed_number_of_filler_items)]
 
     world.multiworld.itempool += itempool
+    
+    # Force local items depending on options
+    try_force_early_weapon(world)
+    force_local_items(world, ItemType.HEALTH.value, world.options.local_health_percentage)
+    force_local_items(world, ItemType.AMMO.value, world.options.local_ammo_percentage)
+    force_local_items(world, ItemType.WEAPON.value, world.options.local_weapon_percentage)
     
     """
     Print out the item pool by type for debugging

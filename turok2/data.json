@@ -29,7 +29,7 @@
 					"rule": {
 						"has": { 
 							"category": "Land Weapon",
-							"exclude": ["Bad Weapon"]
+							"exclude": ["Bad Weapon", "Melee Weapon"]
 						}
 					}
 				}

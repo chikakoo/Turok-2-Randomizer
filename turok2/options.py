@@ -5,6 +5,7 @@ from Options import Choice, OptionGroup, PerGameCommonOptions, Range, Toggle
 #      whether to include the nuke in the random ammo packs
 #      death link
 #      also a goal setting: primagen, or just beat level 1
+#      whether to mark the pickups as important in the game
 
 class GameLogicDifficulty(Choice):
     """
@@ -45,6 +46,16 @@ class ForceEarlyWeapon(Toggle):
     display_name = "Force Early Weapon"
     default = True
     
+class TrapFillPercentage(Range):
+    """
+    Replaces a percentage of non-progression items with traps.
+    """
+    display_name = "Trap Fill Percentage"
+    
+    range_start = 0
+    range_end = 100
+    default = 0
+    
 class LifeForceFillPercentage(Range):
     """
     Replaces a percentage of non-progression, non-trap items with Life Forces.
@@ -56,19 +67,6 @@ class LifeForceFillPercentage(Range):
     range_start = 0
     range_end = 100
     default = 50
-    
-class LocalLifeForcePercentage(Range):
-    """
-    The percentage of Life Forces forced to your local world.
-    This includes the Life Force fill percentages and those as generated filler items.
-    
-    These are purely junk items if you are playing with infinite lives.
-    """
-    display_name = "Local Force Fill Percentage"
-    
-    range_start = 0
-    range_end = 100
-    default = 0
     
 class HealthFillPercentage(Range):
     """
@@ -82,20 +80,6 @@ class HealthFillPercentage(Range):
     range_start = 0
     range_end = 100
     default = 40
-    
-class LocalHealthPercentage(Range):
-    """
-    The percentage of health forced to your local world.
-    This includes the health fill percentages and those as generated filler items.
-    
-    Make sure to set this higher if you are playing in a big multiworld
-    so you can actually get health when you need it.
-    """
-    display_name = "Local Health Percentage"
-    
-    range_start = 0
-    range_end = 100
-    default = 50
     
 class AmmoFillPercentage(Range):
     """
@@ -113,6 +97,22 @@ class AmmoFillPercentage(Range):
     range_end = 100
     default = 40
     
+class LocalHealthPercentage(Range):
+    """
+    The percentage of health forced to your local world.
+    This includes the health fill percentages and those as generated filler items.
+    
+    Make sure to set this higher if you are playing in a big multiworld
+    so you can actually get health when you need it.
+    
+    Setting this too high could result in generation failures.
+    """
+    display_name = "Local Health Percentage"
+    
+    range_start = 0
+    range_end = 100
+    default = 50
+    
 class LocalAmmoPercentage(Range):
     """
     The percentage of ammo forced to your local world.
@@ -120,22 +120,27 @@ class LocalAmmoPercentage(Range):
     
     Make sure to set this higher if you are playing in a big multiworld
     so you can actually get ammo when you need it.
+    
+    Setting this too high could result in generation failures.
     """
     display_name = "Local Ammo Percentage"
     
     range_start = 0
     range_end = 100
-    default = 50
+    default = 40
     
-class TrapFillPercentage(Range):
+class LocalWeaponPercentage(Range):
     """
-    Replaces a percentage of non-progression items with traps.
+    The percentage of weapons forced to your local world.
+    
+    Make sure to set this higher if you are playing in a big multiworld
+    so you can actually get new weapons.
     """
-    display_name = "Trap Fill Percentage"
+    display_name = "Local Weapon Percentage"
     
     range_start = 0
     range_end = 100
-    default = 0
+    default = 50
     
 class BaseTrapWeight(Choice):
     """
@@ -157,14 +162,18 @@ class EnemyTrapWeight(BaseTrapWeight):
 class Turok2Options(PerGameCommonOptions):
     game_logic_difficulty: GameLogicDifficulty
     weapon_logic_difficulty: WeaponLogicDifficulty
+    
     force_early_weapon: ForceEarlyWeapon
-    life_force_fill_percentage: LifeForceFillPercentage
-    local_life_force_percentage: LocalLifeForcePercentage
-    health_fill_percentage: HealthFillPercentage
-    local_health_percentage: LocalHealthPercentage
-    ammo_fill_percentage: AmmoFillPercentage
-    local_ammo_percentage: LocalAmmoPercentage
+    
     trap_fill_percentage: TrapFillPercentage
+    life_force_fill_percentage: LifeForceFillPercentage
+    health_fill_percentage: HealthFillPercentage
+    ammo_fill_percentage: AmmoFillPercentage
+    
+    local_weapon_percentage: LocalWeaponPercentage
+    local_health_percentage: LocalHealthPercentage
+    local_ammo_percentage: LocalAmmoPercentage
+    
     enemy_trap_weight: EnemyTrapWeight
     
 option_groups = [
@@ -176,13 +185,13 @@ option_groups = [
         ForceEarlyWeapon
     ]),
     OptionGroup("Filler Item Balancing", [
+        TrapFillPercentage,
         LifeForceFillPercentage,
-        LocalLifeForcePercentage,
         HealthFillPercentage,
-        LocalHealthPercentage,
         AmmoFillPercentage,
-        LocalAmmoPercentage,
-        TrapFillPercentage
+        LocalWeaponPercentage,
+        LocalHealthPercentage,
+        LocalAmmoPercentage
     ]),
     OptionGroup("Trap Weights", [
         EnemyTrapWeight
@@ -194,26 +203,26 @@ option_presets = {
         "game_logic_difficulty": GameLogicDifficulty.option_casual,
         "weapon_logic_difficulty": WeaponLogicDifficulty.option_casual,
         "force_early_weapon": True,
-        "life_force_fill_percentage": 50,
-        "local_life_force_percentage": 0,
-        "health_fill_percentage": 40,
-        "local_health_percentage": 50,
-        "ammo_fill_percentage": 40,
-        "local_ammo_percentage": 50,
         "trap_fill_percentage": 0,
+        "life_force_fill_percentage": 50,
+        "health_fill_percentage": 40,
+        "ammo_fill_percentage": 40,
+        "local_weapon_percentage": 50,
+        "local_health_percentage": 50,
+        "local_ammo_percentage": 50,
         "enemy_trap_weight": 2
     },
     "advanced": {
         "game_logic_difficulty": GameLogicDifficulty.option_advanced,
         "weapon_logic_difficulty": GameLogicDifficulty.option_advanced,
         "force_early_weapon": False,
-        "life_force_fill_percentage": 50,
-        "local_life_force_percentage": 0,
-        "health_fill_percentage": 40,
-        "local_health_percentage": 50,
-        "ammo_fill_percentage": 40,
-        "local_ammo_percentage": 50,
         "trap_fill_percentage": 0,
+        "life_force_fill_percentage": 50,
+        "health_fill_percentage": 40,
+        "ammo_fill_percentage": 40,
+        "local_weapon_percentage": 50,
+        "local_health_percentage": 50,
+        "local_ammo_percentage": 50,
         "enemy_trap_weight": 2
     }
 }
