@@ -170,6 +170,19 @@ class EnemyTrapWeight(BaseTrapWeight):
     """
     display_name = "Enemy Trap"
     
+class DamageTrapWeight(BaseTrapWeight):
+    """
+    Likelihood of receiving a trap that does a small amount of damage to you.
+    It will never bring your health to 0.
+    """
+    display_name = "Damage Trap"
+    
+class SpamTrapWeight(BaseTrapWeight):
+    """
+    Likelihood of receiving a trap that spams your screen with useless messages.
+    """
+    display_name = "Spam Trap"
+    
 @dataclass
 class Turok2Options(PerGameCommonOptions):
     goal: Goal
@@ -189,6 +202,8 @@ class Turok2Options(PerGameCommonOptions):
     local_ammo_percentage: LocalAmmoPercentage
     
     enemy_trap_weight: EnemyTrapWeight
+    damage_trap_weight: DamageTrapWeight
+    spam_trap_weight: SpamTrapWeight
     
 option_groups = [
     OptionGroup("Goal", [Goal]),
@@ -209,7 +224,9 @@ option_groups = [
         LocalAmmoPercentage
     ]),
     OptionGroup("Trap Weights", [
-        EnemyTrapWeight
+        EnemyTrapWeight,
+        DamageTrapWeight,
+        SpamTrapWeight
     ])
 ]
 

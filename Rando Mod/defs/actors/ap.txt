@@ -53,6 +53,8 @@ RandomAmmo kActor_Item_RandomAmmo
 //------------------------------
 // Traps - each type can have any of the health pickup models.
 //------------------------------
+
+// Enemy Trap
 TrapSilverHealth kActor_Trap_Enemy_Silver_Health
 {
     className                   "kexLifeForcePickup"
@@ -149,3 +151,196 @@ TrapUltraHealth kActor_Trap_Enemy_Ultra_Health
     End_Component
 }
 
+// Damage Trap
+TrapSilverHealth kActor_Trap_Damage_Silver_Health
+{
+    className                   "kexLifeForcePickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
+	pickup.lifeforce.amount     0
+	rando.trapType				RANDO_TRAP_TYPE_DAMAGE
+    
+    initialScale              "0.5 0.5 0.5"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+    Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Pickup_Health_2.staticmesh"
+    End_Component
+    Begin_Component "kexScriptComponent"
+        scriptClass           "RandoPickupObject"
+        triggerRadius         81.92
+    End_Component
+}
+
+TrapBlueHealth kActor_Trap_Damage_Blue_Health
+{
+    className                   "kexLifeForcePickup"
+	pickup.lifeforce.amount     0
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
+	rando.trapType				RANDO_TRAP_TYPE_DAMAGE
+    
+    initialScale              "0.5 0.5 0.5"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+    Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Pickup_Health_10.staticmesh"
+    End_Component
+    Begin_Component "kexScriptComponent"
+        scriptClass           "RandoPickupObject"
+        triggerRadius         81.92
+    End_Component
+}
+
+TrapFullHealth kActor_Trap_Damage_Full_Health
+{
+    className                   "kexLifeForcePickup"
+	pickup.lifeforce.amount     0
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
+	rando.trapType				RANDO_TRAP_TYPE_DAMAGE
+	
+    initialScale              "0.5 0.5 0.5"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+    Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Pickup_Full_health.staticmesh"
+    End_Component
+    Begin_Component "kexScriptComponent"
+        scriptClass           "RandoPickupObject"
+        triggerRadius         81.92
+    End_Component
+}
+
+TrapUltraHealth kActor_Trap_Damage_Ultra_Health
+{
+    className                   "kexLifeForcePickup"
+	pickup.lifeforce.amount     0
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
+ 	rando.trapType				RANDO_TRAP_TYPE_DAMAGE
+	
+    initialScale              "0.5 0.5 0.5"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+    Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Pickup_Ultra_Health.staticmesh"
+    End_Component
+    Begin_Component "kexScriptComponent"
+        scriptClass           "RandoPickupObject"
+        triggerRadius         81.92
+    End_Component
+}
+
+// Spam Trap
+TrapSilverHealth kActor_Trap_Spam_Silver_Health
+{
+    className                   "kexLifeForcePickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
+	pickup.lifeforce.amount     0
+	rando.trapType				RANDO_TRAP_TYPE_SPAM
+    
+    initialScale              "0.5 0.5 0.5"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+    Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Pickup_Health_2.staticmesh"
+    End_Component
+    Begin_Component "kexScriptComponent"
+        scriptClass           "RandoPickupObject"
+        triggerRadius         81.92
+    End_Component
+}
+
+TrapBlueHealth kActor_Trap_Spam_Silver_Health
+{
+    className                   "kexLifeForcePickup"
+	pickup.lifeforce.amount     0
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
+	rando.trapType				RANDO_TRAP_TYPE_SPAM
+    
+    initialScale              "0.5 0.5 0.5"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+    Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Pickup_Health_10.staticmesh"
+    End_Component
+    Begin_Component "kexScriptComponent"
+        scriptClass           "RandoPickupObject"
+        triggerRadius         81.92
+    End_Component
+}
+
+TrapFullHealth kActor_Trap_Spam_Silver_Health
+{
+    className                   "kexLifeForcePickup"
+	pickup.lifeforce.amount     0
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
+	rando.trapType				RANDO_TRAP_TYPE_SPAM
+	
+    initialScale              "0.5 0.5 0.5"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+    Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Pickup_Full_health.staticmesh"
+    End_Component
+    Begin_Component "kexScriptComponent"
+        scriptClass           "RandoPickupObject"
+        triggerRadius         81.92
+    End_Component
+}
+
+TrapUltraHealth kActor_Trap_Spam_Silver_Health
+{
+    className                   "kexLifeForcePickup"
+	pickup.lifeforce.amount     0
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
+ 	rando.trapType				RANDO_TRAP_TYPE_SPAM
+	
+    initialScale              "0.5 0.5 0.5"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+    Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Pickup_Ultra_Health.staticmesh"
+    End_Component
+    Begin_Component "kexScriptComponent"
+        scriptClass           "RandoPickupObject"
+        triggerRadius         81.92
+    End_Component
+}

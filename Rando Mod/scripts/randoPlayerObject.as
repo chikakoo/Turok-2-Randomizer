@@ -46,8 +46,8 @@ class RandoPlayerObject : ScriptObject
 			g_AP.IsGoalReached = 1;
 		}
 		
-		// TODO: remove this when done with generator stuff
-		RemoveAllGenerators();
+		// TODO: Remove this when done adding locations
+		//RemoveAllGenerators();
 		
 		// Replace all the actors that should be replaced
 		ReplaceAllActors();

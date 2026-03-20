@@ -1,12 +1,24 @@
 #define kActor_Item_APItem 100000
 #define kActor_Item_RandomAmmo 400000
 
-#define RANDO_TRAP_TYPE_ENEMY 1
+#define RANDO_TRAP_TYPE_ENEMY 0
+#define RANDO_TRAP_TYPE_DAMAGE 1
+#define RANDO_TRAP_TYPE_SPAM 2
 
 #define kActor_Trap_Enemy_Silver_Health 900000
 #define kActor_Trap_Enemy_Blue_Health 900001
 #define kActor_Trap_Enemy_Full_Health 900002
 #define kActor_Trap_Enemy_Ultra_Health 900003
+
+#define kActor_Trap_Damage_Silver_Health 900010
+#define kActor_Trap_Damage_Blue_Health 900011
+#define kActor_Trap_Damage_Full_Health 900012
+#define kActor_Trap_Damage_Ultra_Health 900013
+
+#define kActor_Trap_Spam_Silver_Health 900020
+#define kActor_Trap_Spam_Blue_Health 900021
+#define kActor_Trap_Spam_Full_Health 900022
+#define kActor_Trap_Spam_Ultra_Health 900023
 
 #define kActor_InventoryItem_Level1Key 4300
 #define kActor_InventoryItem_Level2Key 4310

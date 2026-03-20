@@ -29,6 +29,8 @@ class TrapType(Enum):
     Trap types, so we can choose traps based on their weights.
     """
     ENEMY = 0
+    DAMAGE = 1
+    SPAM = 2
     
 ITEM_TABLE = {
     # Pickups
@@ -501,6 +503,80 @@ ITEM_TABLE = {
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_TRAP.value,
         "class": ItemClassification.trap,
         "weight": 3
+    },
+    
+    "Damage Trap (Silver Health)": {
+        "id": 900010,
+        "actor_id": 900010,
+        "type": ItemType.TRAP.value,
+        "trap_type": TrapType.DAMAGE.value,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_TRAP.value,
+        "class": ItemClassification.trap,
+        "weight": 25
+    },
+    "Damage Trap (Blue Health)": {
+        "id": 900011,
+        "actor_id": 900011,
+        "type": ItemType.TRAP.value,
+        "trap_type": TrapType.DAMAGE.value,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_TRAP.value,
+        "class": ItemClassification.trap,
+        "weight": 65
+    },
+    "Damage Trap (Full Health)": {
+        "id": 900012,
+        "actor_id": 900012,
+        "type": ItemType.TRAP.value,
+        "trap_type": TrapType.DAMAGE.value,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_TRAP.value,
+        "class": ItemClassification.trap,
+        "weight": 7
+    },
+    "Damage Trap (Ultra Health)": {
+        "id": 900013,
+        "actor_id": 900013,
+        "type": ItemType.TRAP.value,
+        "trap_type": TrapType.DAMAGE.value,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_TRAP.value,
+        "class": ItemClassification.trap,
+        "weight": 3
+    },
+    
+    "Spam Trap (Silver Health)": {
+        "id": 900020,
+        "actor_id": 900020,
+        "type": ItemType.TRAP.value,
+        "trap_type": TrapType.SPAM.value,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_TRAP.value,
+        "class": ItemClassification.trap,
+        "weight": 25
+    },
+    "Spam Trap (Blue Health)": {
+        "id": 900021,
+        "actor_id": 900021,
+        "type": ItemType.TRAP.value,
+        "trap_type": TrapType.SPAM.value,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_TRAP.value,
+        "class": ItemClassification.trap,
+        "weight": 65
+    },
+    "Spam Trap (Full Health)": {
+        "id": 900022,
+        "actor_id": 900022,
+        "type": ItemType.TRAP.value,
+        "trap_type": TrapType.SPAM.value,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_TRAP.value,
+        "class": ItemClassification.trap,
+        "weight": 7
+    },
+    "Spam Trap (Ultra Health)": {
+        "id": 900023,
+        "actor_id": 900023,
+        "type": ItemType.TRAP.value,
+        "trap_type": TrapType.SPAM.value,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_TRAP.value,
+        "class": ItemClassification.trap,
+        "weight": 3
     }
 }
 
@@ -627,7 +703,9 @@ def get_random_trap_item_name(world: Turok2World) -> str | None:
     """
     # Choose the trap category
     categories = [
-        (TrapType.ENEMY.value, world.options.enemy_trap_weight)
+        (TrapType.ENEMY.value, world.options.enemy_trap_weight),
+        (TrapType.DAMAGE.value, world.options.damage_trap_weight),
+        (TrapType.SPAM.value, world.options.spam_trap_weight)
     ]
     categories = [(name, weight) for name, weight in categories if weight > 0]
     

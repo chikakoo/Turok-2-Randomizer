@@ -17,6 +17,10 @@ LOCATION_TABLE = {}
 LOCATION_NAME_TO_ID = {}
 
 def _build_location_name_to_id():
+    """
+    Build the location name to id dictionary for the world to use.
+    This has to be done at import time, or the world won't have it.
+    """
     data = json.loads(pkgutil.get_data(__name__, "data.json").decode())
 
     for region_data in data.get("regions", []):
@@ -37,8 +41,6 @@ def create_locations(world: Turok2World) -> None:
         region_obj = world.get_region(region_name)
         
         region_locations = region_data.get("locations", {})
-        region_location_objs = {}
-        
         for loc_name, loc_info in region_locations.items():
             location = Turok2Location(
                 world.player,

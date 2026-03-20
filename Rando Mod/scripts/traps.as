@@ -1,16 +1,8 @@
 //------------------------------
 // Contains trap-related functions.
-
-// Trap ideas: 
-// - more enemy spawns (or just have it be a random one)
-// - ammo traps (self.ConsumeAmmo/ConsumeAltAmmo)
-// - player damage traps (self.InflictDamage(kDamageInfo))
 //
-// Damage trap idea
-//kDamageInfo damageInfo;
-//damageInfo.hits = 10;
-//damageInfo.flags = DF_NORMAL;
-//LocalPlayer.Actor().CastToActor().InflictDamage(damageInfo);
+// More trap ideas: 
+// - ammo traps (self.ConsumeAmmo/ConsumeAltAmmo)
 //------------------------------
 
 //------------------------------
@@ -34,15 +26,25 @@ bool TryTriggerTrap(const int &in trapId)
 	switch(trapType)
 	{
 		case RANDO_TRAP_TYPE_ENEMY:
-			Hud.AddMessage("It's a trap!");
 			HandleEnemyTrap();
+			break;
+		case RANDO_TRAP_TYPE_DAMAGE:
+			HandleDamageTrap();
+			break;
+		case RANDO_TRAP_TYPE_SPAM:
+			HandleSpamTrap();
+			break;
 	}
 	
 	return true;
 }
 
+//------------------------------
+// Spawns a set of 1-3 random enemies near the player.
 void HandleEnemyTrap()
 {
+	Hud.AddMessage("It's a trap!");
+
 	array<int> possibleEnemies = {
 		kActor_AI_Raptoid,
 		kActor_AI_Endtrail,
@@ -60,4 +62,42 @@ void HandleEnemyTrap()
 	{
 		SpawnActorNearPlayer(selectedActor);
 	}
+}
+
+//------------------------------
+// Damages the player by 10% of their current health, rounded up.
+void HandleDamageTrap()
+{
+	Hud.AddMessage("It's a trap!");
+	
+	kActor@ player = LocalPlayer.Actor().CastToActor();
+	float currentHealth = player.Health();
+	
+	kDamageInfo damageInfo;
+	damageInfo.hits = Math::Max(currentHealth * 0.1, 1);
+	damageInfo.flags = DF_NORMAL;
+	
+	if (currentHealth - damageInfo.hits <= 0)
+	{
+		// Don't kill the player, but do call InflictDamage for the hurt sound effect
+		damageInfo.hits = 0;
+	}
+	
+	player.InflictDamage(damageInfo);
+}
+
+//------------------------------
+// Hello, would you like to order a description? Only $9.95!
+void HandleSpamTrap()
+{
+	Hud.AddMessage("ORDER NOW WHILE SUPPLIES LAST! DON'T WAIT!", 600);
+	Hud.AddMessage("hi turok i am a big fan pls frend me on fb plzzzz", 600);
+	Hud.AddMessage("!!!!! Click here for a bigger Shredder !!!!!", 600);
+	Hud.AddMessage("Hello? I'd like to order a pizza. Extra spicy.", 600);
+	Hud.AddMessage("hi send me money and i will definitely send you more", 600);
+	Hud.AddMessage("hi, asl?", 600);
+	Hud.AddMessage("The Primagen is just a figment of our society, maaaan", 600);
+	Hud.AddMessage("Received Nuke!                        jk", 600);
+	Hud.AddMessage("SPAMSPAMSPAMSPAMSPAMSPAMSPAMSPAMSPAMSPAMSPAMSPAM", 600);
+	Hud.AddMessage("1 2 3 4 5 6 7 8 9 whatcomesnextiforgot", 600);
 }
