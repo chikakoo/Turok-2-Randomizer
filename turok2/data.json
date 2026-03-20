@@ -29,11 +29,9 @@
 					"rule": {
 						"has": { 
 							"category": "Land Weapon",
-							"exclude": ["Bad Weapon"],
-							"count": 6
+							"exclude": ["Bad Weapon"]
 						}
 					}
-					
 				}
 			]
 		},
