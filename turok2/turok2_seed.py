@@ -66,9 +66,13 @@ def get_angelscript_from_filled_locations(self: "Turok2World") -> str:
     """
     angelscript_snippets = []
     for location in self.multiworld.get_filled_locations(self.player):
+        # This is an event, so we don't care about it
+        if location.address is None:
+            continue
+        
         location_name = location.name
         location_id = LOCATION_TABLE[location_name]["ap_id"]
-        location_position = LOCATION_TABLE[location.name]["position"]
+        location_position = LOCATION_TABLE[location_name]["position"]
         
         snippet = f"AddReplacement(\"{location_name}\", {location_id}, \"{location_position}\""
         

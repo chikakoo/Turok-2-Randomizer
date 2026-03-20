@@ -38,6 +38,7 @@ class Turok2World(World):
     def create_regions(self) -> None:
         locations.create_regions_and_entrances(self)
         locations.create_locations(self)
+        locations.create_completion_condition(self)
 
     def set_rules(self) -> None:
         locations.apply_entrance_rules(self)

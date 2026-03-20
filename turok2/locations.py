@@ -4,7 +4,7 @@ import pkgutil
 from typing import TYPE_CHECKING
 from BaseClasses import ItemClassification, Location, CollectionState, Entrance, Region
 from worlds.generic.Rules import set_rule
-from .options import GameLogicDifficulty, WeaponLogicDifficulty
+from .options import GameLogicDifficulty, WeaponLogicDifficulty, Goal
 from . import items
 
 if TYPE_CHECKING:
@@ -17,6 +17,10 @@ LOCATION_TABLE = {}
 LOCATIONS_BY_ID = {}
 
 def create_locations(world: Turok2World) -> None:
+    """
+    Creates the locations by looking at all of the regions defined in the json data.
+    Includes putting a "rule" property in the table to construct the rules later on.
+    """
     data = json.loads(pkgutil.get_data(__name__, "data.json").decode())
 
     for region_data in data.get("regions", []):
@@ -44,6 +48,10 @@ def create_locations(world: Turok2World) -> None:
         region_obj.add_locations(region_location_objs)
         
 def create_regions_and_entrances(world: Turok2World) -> None:
+    """
+    Creates regions and connects them together based on the json data.
+    Includes putting a "rule_json" property in the table to construct the rules later on.
+    """
     data = json.loads(pkgutil.get_data(__name__, "data.json").decode())
 
     region_map = {}
@@ -70,6 +78,9 @@ def create_regions_and_entrances(world: Turok2World) -> None:
             entrance.rule_json = exit_data.get("rule")
     
 def apply_location_rules(world: Turok2World):
+    """
+    Set the rules grabbed from the json earlier for for each location.
+    """
     for loc_name, data in LOCATION_TABLE.items():
         if data.get("rule") is not None:
             location = world.get_location(loc_name)
@@ -77,6 +88,9 @@ def apply_location_rules(world: Turok2World):
             set_rule(location, rule_func)
 
 def apply_entrance_rules(world: Turok2World) -> None:
+    """
+    Set the rules grabbed from the json earlier for for each entrance.
+    """
     for region in world.multiworld.regions:
         for entrance in region.exits:
             rule_json = getattr(entrance, "rule_json", None)
@@ -86,6 +100,11 @@ def apply_entrance_rules(world: Turok2World) -> None:
                 set_rule(entrance, rule)
         
 def build_rule(rule_json, world: Turok2World):
+    """
+    Builds the rule, given the json.
+    Supports specific functions, and/or, and has, which will check for items or categories.
+    - See NAMED_RULES for the specific functions supported.
+    """
     player = world.player
 
     if isinstance(rule_json, str):
@@ -107,12 +126,22 @@ def build_rule(rule_json, world: Turok2World):
     raise Exception(f"Unknown rule: {rule_json}")
     
 def make_and_rule(subrules):
+    """Makes the 'and' rule."""
     return lambda state: all(rule(state) for rule in subrules)
     
 def make_or_rule(subrules):
+    """Makes the 'or' rule."""
     return lambda state: any(rule(state) for rule in subrules)
     
 def build_has_rule(has_data, world: Turok2World):
+    """
+    Checks whether the player...
+    - Has the given item, if passed a string
+    - Has all the given items, if passed a list
+    - Has the given count of items, if given an "item" object
+    - Has the given count of unique items of the given category, if given a "category" object
+      - If it contains an "exclude" property, will not include items in that category
+    """
     player = world.player
     
     # Simple case: the string or string array is passed directly
@@ -153,14 +182,37 @@ def build_has_rule(has_data, world: Turok2World):
     raise Exception(f"Invalid 'has' rule: {has_data}")
     
 def advanced_game_logic(world: Turok2World):
+    """Checks advanced game logic is on."""
     enabled = world.options.game_logic_difficulty == GameLogicDifficulty.option_advanced
     return lambda state: enabled
     
 def advanced_weapon_logic(world: Turok2World):
+    """Checks advanced weapon logic is on."""
     enabled = world.options.weapon_logic_difficulty == WeaponLogicDifficulty.option_advanced
     return lambda state: enabled
-    
+
 NAMED_RULES = {
     "advanced_game_logic": advanced_game_logic,
     "advanced_weapon_logic": advanced_weapon_logic
 }
+    
+def create_completion_condition(world: Turok2World):
+    """
+    Creates the completion condition based on the goal setting.
+    - Primagen: Defeat the Primagen (vanilla) - this is the fallback
+    - Hub: Get to the hub by completing Level 1
+    """
+    if world.options.goal == Goal.option_hub:
+        victory_region = world.multiworld.get_region("Hub", world.player)
+    else:
+        victory_region = world.multiworld.get_region("Primagen Boss", world.player)
+        
+    victory_region.add_event(
+        "Final Boss Defeated", 
+        "Victory",
+        location_type=Turok2Location, 
+        item_type=items.Turok2Item
+    )
+
+    world.multiworld.completion_condition[world.player] = \
+        lambda state: state.has("Victory", world.player)

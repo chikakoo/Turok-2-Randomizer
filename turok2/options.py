@@ -4,8 +4,20 @@ from Options import Choice, OptionGroup, PerGameCommonOptions, Range, Toggle
 #      whether to shuffle nuke parts, include it as a possible weapon, or just exclude them
 #      whether to include the nuke in the random ammo packs
 #      death link
-#      also a goal setting: primagen, or just beat level 1
 #      whether to mark the pickups as important in the game
+
+class Goal(Choice):
+    """
+    Defines the goal of the seed.
+    - Primagen: Defeat the Primagen (vanilla)
+    - Hub: Get to the hub by completing Level 1 (that's that exists so far)
+    """
+    display_name = "Goal"
+    
+    option_primagen = 0
+    option_hub = 1
+    
+    default = option_primagen
 
 class GameLogicDifficulty(Choice):
     """
@@ -160,6 +172,8 @@ class EnemyTrapWeight(BaseTrapWeight):
     
 @dataclass
 class Turok2Options(PerGameCommonOptions):
+    goal: Goal
+    
     game_logic_difficulty: GameLogicDifficulty
     weapon_logic_difficulty: WeaponLogicDifficulty
     
@@ -177,6 +191,7 @@ class Turok2Options(PerGameCommonOptions):
     enemy_trap_weight: EnemyTrapWeight
     
 option_groups = [
+    OptionGroup("Goal", [Goal]),
     OptionGroup("Difficulty Options", [
         GameLogicDifficulty,
         WeaponLogicDifficulty
@@ -202,27 +217,11 @@ option_presets = {
     "casual": {
         "game_logic_difficulty": GameLogicDifficulty.option_casual,
         "weapon_logic_difficulty": WeaponLogicDifficulty.option_casual,
-        "force_early_weapon": True,
-        "trap_fill_percentage": 0,
-        "life_force_fill_percentage": 50,
-        "health_fill_percentage": 40,
-        "ammo_fill_percentage": 40,
-        "local_weapon_percentage": 50,
-        "local_health_percentage": 50,
-        "local_ammo_percentage": 50,
-        "enemy_trap_weight": 2
+        "force_early_weapon": True
     },
     "advanced": {
         "game_logic_difficulty": GameLogicDifficulty.option_advanced,
         "weapon_logic_difficulty": GameLogicDifficulty.option_advanced,
-        "force_early_weapon": False,
-        "trap_fill_percentage": 0,
-        "life_force_fill_percentage": 50,
-        "health_fill_percentage": 40,
-        "ammo_fill_percentage": 40,
-        "local_weapon_percentage": 50,
-        "local_health_percentage": 50,
-        "local_ammo_percentage": 50,
-        "enemy_trap_weight": 2
+        "force_early_weapon": False
     }
 }
