@@ -290,7 +290,8 @@ ITEM_TABLE = {
         "type": ItemType.WEAPON.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
         "class": ItemClassification.useful,
-        "count": 1
+        "count": 1,
+        "groups": ["Land Weapon", "Underwater Weapon", "Melee Weapon"]
     },
     "Tek Bow": {
         "id": 300001,
@@ -298,7 +299,8 @@ ITEM_TABLE = {
         "type": ItemType.WEAPON.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
         "class": ItemClassification.progression,
-        "count": 1
+        "count": 1,
+        "groups": ["Land Weapon", "Long Range"]
     },
     "Pistol": {
         "id": 300002,
@@ -306,7 +308,8 @@ ITEM_TABLE = {
         "type": ItemType.WEAPON.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
         "class": ItemClassification.progression,
-        "count": 1
+        "count": 1,
+        "groups": ["Land Weapon", "Bird Killer"]
     },
     "Mag 60": {
         "id": 300003,
@@ -314,7 +317,8 @@ ITEM_TABLE = {
         "type": ItemType.WEAPON.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
         "class": ItemClassification.progression,
-        "count": 1
+        "count": 1,
+        "groups": ["Land Weapon", "Bird Killer", "Good Weapon"]
     },
     "Tranquilizer Gun": {
         "id": 300004,
@@ -322,7 +326,8 @@ ITEM_TABLE = {
         "type": ItemType.WEAPON.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
         "class": ItemClassification.useful,
-        "count": 1
+        "count": 1,
+        "groups": ["Land Weapon", "Bad Weapon"]
     },
     "Charge Dart Rifle": {
         "id": 300005,
@@ -330,7 +335,8 @@ ITEM_TABLE = {
         "type": ItemType.WEAPON.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
         "class": ItemClassification.progression,
-        "count": 1
+        "count": 1,
+        "groups": ["Land Weapon", "Good Weapon"]
     },
     "Shotgun": {
         "id": 300006,
@@ -338,7 +344,8 @@ ITEM_TABLE = {
         "type": ItemType.WEAPON.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
         "class": ItemClassification.progression,
-        "count": 1
+        "count": 1,
+        "groups": ["Land Weapon", "Bird Killer", "Good Weapon"]
     },
     "Shredder": {
         "id": 300007,
@@ -346,7 +353,8 @@ ITEM_TABLE = {
         "type": ItemType.WEAPON.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
         "class": ItemClassification.progression,
-        "count": 1
+        "count": 1,
+        "groups": ["Land Weapon", "Bird Killer", "Good Weapon"]
     },
     "Plasma Rifle": {
         "id": 300008,
@@ -354,7 +362,8 @@ ITEM_TABLE = {
         "type": ItemType.WEAPON.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
         "class": ItemClassification.progression,
-        "count": 1
+        "count": 1,
+        "groups": ["Land Weapon", "Long Range", "Bird Killer", "Good Weapon"]
     },
     "Firestorm Cannon": {
         "id": 300009,
@@ -362,7 +371,8 @@ ITEM_TABLE = {
         "type": ItemType.WEAPON.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
         "class": ItemClassification.progression,
-        "count": 1
+        "count": 1,
+        "groups": ["Land Weapon", "Long Range", "Bird Killer", "Good Weapon"]
     },
     "Sunfire Pod": {
         "id": 300010,
@@ -370,7 +380,8 @@ ITEM_TABLE = {
         "type": ItemType.WEAPON.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
         "class": ItemClassification.useful,
-        "count": 1
+        "count": 1,
+        "groups": ["Land Weapon", "Bad Weapon"]
     },
     "Cerebral Bore": {
         "id": 300011,
@@ -378,7 +389,8 @@ ITEM_TABLE = {
         "type": ItemType.WEAPON.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
         "class": ItemClassification.progression,
-        "count": 1
+        "count": 1,
+        "groups": ["Land Weapon", "Good Weapon"]
     },
     "P.F.M. Layer": {
         "id": 300012,
@@ -386,7 +398,8 @@ ITEM_TABLE = {
         "type": ItemType.WEAPON.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
         "class": ItemClassification.useful,
-        "count": 1
+        "count": 1,
+        "groups": ["Land Weapon", "Bad Weapon"]
     },
     "Grenade Launcher": {
         "id": 300013,
@@ -394,7 +407,8 @@ ITEM_TABLE = {
         "type": ItemType.WEAPON.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
         "class": ItemClassification.progression,
-        "count": 1
+        "count": 1,
+        "groups": ["Land Weapon", "Good Weapon"]
     },
     "Scorpion Launcher": {
         "id": 300014,
@@ -402,7 +416,8 @@ ITEM_TABLE = {
         "type": ItemType.WEAPON.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
         "class": ItemClassification.progression,
-        "count": 1
+        "count": 1,
+        "groups": ["Land Weapon", "Long Range", "Good Weapon"]
     },
     "Flame Thrower": {
         "id": 300015,
@@ -410,7 +425,8 @@ ITEM_TABLE = {
         "type": ItemType.WEAPON.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
         "class": ItemClassification.progression,
-        "count": 1
+        "count": 1,
+        "groups": ["Land Weapon", "Good Weapon"]
     },
     "Razor Wind": {
         "id": 300016,
@@ -418,7 +434,8 @@ ITEM_TABLE = {
         "type": ItemType.WEAPON.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
         "class": ItemClassification.progression,
-        "count": 1
+        "count": 1,
+        "groups": ["Land Weapon", "Good Weapon"]
     },
     "Harpoon Gun": {
         "id": 300017,
@@ -426,7 +443,8 @@ ITEM_TABLE = {
         "type": ItemType.WEAPON.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
         "class": ItemClassification.useful,
-        "count": 1
+        "count": 1,
+        "groups": ["Underwater Weapon", "Bad Weapon"]
     },
     "Torpedo Launcher": {
         "id": 300018,
@@ -434,7 +452,8 @@ ITEM_TABLE = {
         "type": ItemType.WEAPON.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
         "class": ItemClassification.progression, # Needed in Level 4
-        "count": 1
+        "count": 1,
+        "groups": ["Underwater Weapon", "Bad Weapon"]
     },
     "Nuke": {
         "id": 300019,
@@ -442,7 +461,8 @@ ITEM_TABLE = {
         "type": ItemType.WEAPON.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
         "class": ItemClassification.useful,
-        "count": 1 # TODO: setting in yaml to not have nuke parts
+        "count": 1, # TODO: setting in yaml to not have nuke parts
+        "groups": ["Land Weapon"]
     },
 
     # Traps
@@ -518,6 +538,15 @@ HEALTH_PICKUPS = {
     for name, data in ITEM_TABLE.items()
     if data["type"] == ItemType.HEALTH.value
 }
+
+def get_item_name_groups() -> dict[str, set[str]]:
+    groups: dict[str, set[str]] = {}
+
+    for name, data in ITEM_TABLE.items():
+        for group in data.get("groups", []):
+            groups.setdefault(group, set()).add(name)
+
+    return groups
 
 def get_required_seed_items():
     """

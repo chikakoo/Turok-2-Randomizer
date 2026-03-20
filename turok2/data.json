@@ -24,11 +24,17 @@
 				"PoA Start - Pistol": { "ap_id": 51018,  "position": "51_2615_1227_359" }
 			},
 			"exits": [
-				{ "to": "PoA Water Hub" }
+				{ 
+					"to": "PoA Water Hub",
+					"has": { 
+						"category": "Land Weapon",
+						"exclude": ["Bad Weapon"]
+					}
+				}
 			]
 		},
 		{
-			"name":  "PoA Water Hub",
+			"name": "PoA Water Hub",
 			"locations": {
 				"PoA Hall After Warp 1 - LF1 on Close Catwalk 1": { "ap_id": 52000,  "position": "52_1505_-2676_317" },
 				"PoA Hall After Warp 1 - LF1 on Close Catwalk 2": { "ap_id": 52001,  "position": "52_1505_-2523_317" },
@@ -190,7 +196,13 @@
 				"Child 2 Rooms - Blue Health by Cage Switch 2": { "ap_id": 53086,  "position": "53_357_-101_0" }
 			},
 			"exits": [
-				{ "to": "PoA Water Hub Upper" }
+				{ 
+					"to": "PoA Water Hub Upper",
+					"has": { 
+						"category": "Land Weapon",
+						"count": 2
+					}
+				}
 			]
 		},
 		{
@@ -272,7 +284,7 @@
 					"to": "PoA Bird Door", 
 					"rule": {
 						"or": [
-							"can_kill_birds",
+							{ "has": { "category": "Bird Killer" } },
 							"advanced_weapon_logic"
 						]
 					}
@@ -281,7 +293,11 @@
 					"to": "PoA Upper Primagen Key", 
 					"rule": {
 						"or": [
-							"has_long_range_weapon",
+							{
+								"has": {
+									"category": "Long Range"
+								}
+							},
 							"advanced_weapon_logic"
 						]
 					}
@@ -606,15 +622,19 @@
 					"PoA Exit Room - Quiver of Tek Arrows": { "ap_id": 59127,  "position": "59_-10240_5427_-307" }
 			},
 			"exits": [
-				{ "to": "PoA Oblivion" },
 				{ 
+					"to": "PoA Oblivion",
+					"has": {
+						"category": "Good Weapon"
+					}
+				},
+				{
 					"to": "Hub",
 					"rule": {
 						"and": [
 							{
 								"has": {
-									"item_category": "Progressive Land Weapon",
-									"count": 3
+									"category": "Good Weapon"
 								}
 							},
 							{
@@ -633,12 +653,24 @@
 			"locations": {
 				"PoA Oblivion - Nuke Part": { "ap_id": 78000,  "position": "78_-1075_-358_0" }
 			},
-			"exits": { "to": "Primagen Boss", "rule": "enter_primagen_boss" }
+			"exits": []
 		},
 		{
 			"name": "Hub",
 			"locations": {},
-			"exits": { "to": "Primagen Boss", "rule": "enter_primagen_boss" }
+			"exits": [{
+				"to": "Primagen Boss", 
+				"rule": {
+					"has": [
+						"Primagen Key 1",
+						"Primagen Key 2",
+						"Primagen Key 3",
+						"Primagen Key 4",
+						"Primagen Key 5",
+						"Primagen Key 6"
+					]
+				}
+			}]
 		}
 	]
 }

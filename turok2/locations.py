@@ -1,537 +1,126 @@
 from __future__ import annotations
+import json
+import pkgutil
 from typing import TYPE_CHECKING
-from BaseClasses import ItemClassification, Location
+from BaseClasses import ItemClassification, Location, CollectionState
+from worlds.generic.Rules import set_rule
+from .options import GameLogicDifficulty, WeaponLogicDifficulty
 from . import items
 
 if TYPE_CHECKING:
-    from .world import APQuestWorld
-
-LOCATION_TABLE = {
-    "PoA Start - LF1 on Box": { "ap_id": 51000, "position": "51_702_-660_-153" },
-    "PoA Start - LF1 in Left Ship Half 1": { "ap_id": 51001, "position": "51_-1342_116_-1095" },
-    "PoA Start - LF1 in Left Ship Half 2": { "ap_id": 51002, "position": "51_-1405_86_-1095" },
-    "PoA Start - LF1 After First Ladder 1": { "ap_id": 51003, "position": "51_2203_1180_0" },
-    "PoA Start - LF1 After First Ladder 2": { "ap_id": 51004, "position": "51_2273_1115_0" },
-    "PoA Start - LF1 After First Ladder 3": { "ap_id": 51005, "position": "51_2306_985_0" },
-    "PoA Start - LF1 After First Ladder 4": { "ap_id": 51006, "position": "51_2304_892_52" },
-    "PoA Start - LF10 in Left Ship Half": { "ap_id": 51007, "position": "51_-1465_56_-1095" },
-    "PoA Start - LF10 in Right Ship Half 1": { "ap_id": 51008, "position": "51_-1122_412_-1075" },
-    "PoA Start - LF10 in Right Ship Half 2": { "ap_id": 51009, "position": "51_-1021_347_-1075" },
-    "PoA Start - LF10 in Right Ship Half 3": { "ap_id": 51010, "position": "51_-916_276_-1075" },
-    "PoA Start - LF10 Underwater Alcove 1": { "ap_id": 51011, "position": "51_708_-919_-1198" },
-    "PoA Start - LF10 Underwater Alcove 2": { "ap_id": 51012, "position": "51_739_-384_-1198" },
-    "PoA Start - LF10 Underwater Alcove 3": { "ap_id": 51013, "position": "51_746_100_-1198" },
-    "PoA Start - LF10 Underwater Alcove 4": { "ap_id": 51014, "position": "51_746_601_-1198" },
-    "PoA Start - LF10 Underwater Alcove 5": { "ap_id": 51015, "position": "51_739_1134_-1198" },
-    "PoA Start - Arrows on Boxes": { "ap_id": 51016, "position": "51_562_514_-102" },
-    "PoA Start - Power Cell": { "ap_id": 51017, "position": "51_2304_0_0" },
-    "PoA Start - Pistol": { "ap_id": 51018, "position": "51_2615_1227_359" },
-    "PoA Hall After Warp 1 - LF1 on Close Catwalk 1": { "ap_id": 52000, "position": "52_1505_-2676_317" },
-    "PoA Hall After Warp 1 - LF1 on Close Catwalk 2": { "ap_id": 52001, "position": "52_1505_-2523_317" },
-    "PoA Hall After Warp 1 - LF1 on Close Catwalk 3": { "ap_id": 52002, "position": "52_1505_-2369_317" },
-    "PoA Hall After Warp 1 - LF1 on Close Catwalk 4": { "ap_id": 52003, "position": "52_1505_-2216_317" },
-    "PoA Hall After Warp 1 - LF1 on Close Catwalk 5": { "ap_id": 52004, "position": "52_1505_-2062_317" },
-    "PoA Hall After Warp 1 - LF1 on Close Catwalk 6": { "ap_id": 52005, "position": "52_1505_-1908_317" },
-    "PoA Hall After Warp 1 - LF1 on Far Catwalk 1": { "ap_id": 52006, "position": "52_-1792_-1280_315" },
-    "PoA Hall After Warp 1 - LF1 on Far Catwalk 2": { "ap_id": 52007, "position": "52_-1792_-1126_315" },
-    "PoA Hall After Warp 1 - LF1 on Far Catwalk 3": { "ap_id": 52008, "position": "52_-1792_-972_315" },
-    "PoA Hall After Warp 1 - LF1 on Far Catwalk 4": { "ap_id": 52009, "position": "52_-1792_-819_316" },
-    "PoA Hall After Warp 1 - LF1 on Far Catwalk 5": { "ap_id": 52010, "position": "52_-1792_-665_317" },
-    "PoA Hall After Warp 1 - Level 2 Key": { "ap_id": 52011, "position": "52_-153_-1996_30" },
-    "PoA Hall After Warp 1 - Quiver by Level 2 Key": { "ap_id": 52012, "position": "52_167_-2533_0" },
-    "PoA Hall After Warp 1 - Blue Health in Crawlspace 1": { "ap_id": 52013, "position": "52_-1177_-768_0" },
-    "PoA Hall After Warp 1 - Blue Health in Crawlspace 2": { "ap_id": 52014, "position": "52_-1075_-768_0" },
-    "PoA Hall After Warp 1 - Blue Health in Crawlspace 3": { "ap_id": 52015, "position": "52_-972_-768_0" },
-    "PoA Hall After Warp 1 - Blue Health in Crawlspace 4": { "ap_id": 52016, "position": "52_-870_-768_0" },
-    "PoA Hall After Warp 1 - Blue Health in Crawlspace 5": { "ap_id": 52017, "position": "52_-768_-768_0" },
-    "PoA Hall After Warp 1 - Blue Health in Crawlspace 6": { "ap_id": 52018, "position": "52_-665_-768_0" },
-    "PoA Hall After Warp 1 - Blue Health in Crawlspace 7": { "ap_id": 52019, "position": "52_-563_-768_0" },
-    "PoA Lower Water - Pistol": { "ap_id": 52020, "position": "52_-152_-369_0" },
-    "PoA Lower Water - Silver Health in Water 1": { "ap_id": 52021, "position": "52_-256_307_-307" },
-    "PoA Lower Water - Silver Health in Water 2": { "ap_id": 52022, "position": "52_-153_409_-307" },
-    "PoA Lower Water - Silver Health in Water 3": { "ap_id": 52023, "position": "52_-51_307_-307" },
-    "PoA Lower Water - Silver Health in Water 4": { "ap_id": 52024, "position": "52_-153_204_-307" },
-    "PoA Lower Water - Box of Bullets in Water": { "ap_id": 52025, "position": "52_-153_307_-307" },
-    "PoA Lower Water - LF10 in Water 1": { "ap_id": 52026, "position": "52_614_1024_-174" },
-    "PoA Lower Water - LF10 in Water 2": { "ap_id": 52027, "position": "52_614_1331_-174" },
-    "PoA Lower Water - LF10 in Water 3": { "ap_id": 52028, "position": "52_614_1638_-174" },
-    "PoA Lower Water - Blue Health Behind Switch Door 1": { "ap_id": 52029, "position": "52_870_2406_0" },
-    "PoA Lower Water - Blue Health Behind Switch Door 2": { "ap_id": 52030, "position": "52_972_2406_0" },
-    "PoA Lower Water - LF1 on Far Side": { "ap_id": 52031, "position": "52_0_819_0" },
-    "PoA Mid Water - LF1 on Catwalk 1": { "ap_id": 52032, "position": "52_614_819_615" },
-    "PoA Mid Water - LF1 on Catwalk 2": { "ap_id": 52033, "position": "52_307_819_615" },
-    "PoA Mid Water - LF1 on Catwalk 3": { "ap_id": 52034, "position": "52_-307_819_615" },
-    "PoA Mid Water - LF1 on Catwalk 4": { "ap_id": 52035, "position": "52_-614_819_615" },
-    "PoA Child 1 - Silver Health 1": { "ap_id": 52036, "position": "52_-409_-1382_1075" },
-    "PoA Child 1 - Silver Health 2": { "ap_id": 52037, "position": "52_-256_-1382_1075" },
-    "PoA Child 1 - Silver Health 3": { "ap_id": 52038, "position": "52_-102_-1382_1075" },
-    "PoA Child 1 - Silver Health 4": { "ap_id": 52039, "position": "52_51_-1382_1075" },
-    "PoA Child 1 - Silver Health 5": { "ap_id": 52040, "position": "52_204_-1382_1075" },
-    "PoA Child 1 - Silver Health 6": { "ap_id": 52041, "position": "52_358_-1382_1075" },
-    "PoA Child 1 - Silver Health 7": { "ap_id": 52042, "position": "52_512_-1382_1075" },
-    "PoA Child 1 - Silver Health 8": { "ap_id": 52043, "position": "52_665_-1382_1075" },
-    "PoA Child 1 - LF10 by First Switch": { "ap_id": 52044, "position": "52_973_-206_820" },
-    "PoA Child 1 - Clip by Cage 1": { "ap_id": 52045, "position": "52_3174_-870_768" },
-    "PoA Child 1 - Clip by Cage 2": { "ap_id": 52046, "position": "52_4198_-870_768" },
-    "PoA Child 1 - Clip by Cage 3": { "ap_id": 52047, "position": "52_4198_-1894_768" },
-    "PoA Child 1 - Clip by Cage 4": { "ap_id": 52048, "position": "52_3174_-1894_768" },
-    "PoA Child 1 - Blue Health on Ramp 1": { "ap_id": 52049, "position": "52_4915_-153_1075" },
-    "PoA Child 1 - Blue Health on Ramp 2": { "ap_id": 52050, "position": "52_4608_-153_1152" },
-    "PoA Child 1 - Blue Health on Ramp 3": { "ap_id": 52051, "position": "52_4300_-153_1305" },
-    "PoA Child 1 - Blue Health on Ramp 4": { "ap_id": 52052, "position": "52_3993_-153_1382" },
-    "PoA Child 1 - Blue Health on Ramp 5": { "ap_id": 52053, "position": "52_4915_-2611_1075" },
-    "PoA Child 1 - Blue Health on Ramp 6": { "ap_id": 52054, "position": "52_4608_-2611_1152" },
-    "PoA Child 1 - Blue Health on Ramp 7": { "ap_id": 52055, "position": "52_4300_-2611_1305" },
-    "PoA Child 1 - Blue Health on Ramp 8": { "ap_id": 52056, "position": "52_3993_-2611_1381" },
-    "PoA Child 1 - Box of Bullets": { "ap_id": 52057, "position": "52_4710_-1382_1382" },
-    "PoA Lower Water Warp - Clip Behind Door 1": { "ap_id": 52058, "position": "52_-1429_144_0" },
-    "PoA Lower Water Warp - Clip Behind Door 2": { "ap_id": 52059, "position": "52_-1429_475_0" },
-    "PoA Lower Water Warp - Box of Bullets": { "ap_id": 52060, "position": "52_-1740_307_0" },
-    "PoA Lower Water Warp - Clip Behind Second Door": { "ap_id": 52061, "position": "52_-2336_453_0" },
-    "PoA Lower Water Warp - Quiver by Portal": { "ap_id": 52062, "position": "52_-3028_-221_0" },
-    "PoA First Compy Area - Clip Left of Portal": { "ap_id": 53000, "position": "53_-8671_-3384_0" },
-    "PoA First Compy Area - Clip Right of Portal": { "ap_id": 53001, "position": "53_-7585_-3671_0" },
-    "PoA First Compy Area - LF10 by Switch": { "ap_id": 53002, "position": "53_-7644_-3417_0" },
-    "PoA First Compy Area - Blue Health in Switch Room 1": { "ap_id": 53003, "position": "53_-7270_-2662_0" },
-    "PoA First Compy Area - Blue Health in Switch Room 2": { "ap_id": 53004, "position": "53_-7270_-2764_0" },
-    "PoA First Compy Area - Blue Health in Switch Room 3": { "ap_id": 53005, "position": "53_-7270_-2867_0" },
-    "PoA First Compy Area - Quiver Behind Endtrail": { "ap_id": 53006, "position": "53_-8854_-1993_0" },
-    "PoA First Compy Area - LF1 in Hall 1": { "ap_id": 53007, "position": "53_-8601_-1331_0" },
-    "PoA First Compy Area - LF1 in Hall 2": { "ap_id": 53008, "position": "53_-8601_-1126_0" },
-    "PoA First Compy Area - LF1 in Hall 3": { "ap_id": 53009, "position": "53_-8601_-921_0" },
-    "PoA First Compy Area - LF1 in Hall 4": { "ap_id": 53010, "position": "53_-8396_-921_0" },
-    "PoA First Compy Area - LF1 in Hall 5": { "ap_id": 53011, "position": "53_-8192_-921_0" },
-    "PoA First Compy Area - LF1 in Hall 6": { "ap_id": 53012, "position": "53_-7987_-921_0" },
-    "PoA First Compy Area - LF1 in Hall 7": { "ap_id": 53013, "position": "53_-7987_-716_0" },
-    "PoA First Compy Area - LF1 in Hall 8": { "ap_id": 53014, "position": "53_-7987_-512_0" },
-    "PoA First Box Endtrail - Arrows up Ladder": { "ap_id": 53015, "position": "53_-7334_116_614" },
-    "PoA Ultra Health Hall - LF10 1": { "ap_id": 53016, "position": "53_-7947_-1228_307" },
-    "PoA Ultra Health Hall - LF10 2": { "ap_id": 53017, "position": "53_-8155_-1229_307" },
-    "PoA Ultra Health Hall - LF10 3": { "ap_id": 53018, "position": "53_-8282_-1313_307" },
-    "PoA Ultra Health Hall - LF10 4": { "ap_id": 53019, "position": "53_-8292_-1501_307" },
-    "PoA Ultra Health Hall - Ultra Health": { "ap_id": 53020, "position": "53_-8294_-1566_307" },
-    "PoA First Raptors - Clip 1": { "ap_id": 53021, "position": "53_-3532_1167_81" },
-    "PoA First Raptors - Clip 2": { "ap_id": 53022, "position": "53_-3705_1018_82" },
-    "PoA First Raptors - Pistol": { "ap_id": 53023, "position": "53_-3635_1105_81" },
-    "PoA Under Shotgun Bridge - Silver Health up Ladder 1": { "ap_id": 53024, "position": "53_-2662_1433_307" },
-    "PoA Under Shotgun Bridge - Silver Health up Ladder 2": { "ap_id": 53025, "position": "53_-2867_1433_307" },
-    "PoA Single Ship - Arrows in Box Alcove": { "ap_id": 53026, "position": "53_-2487_4283_0" },
-    "PoA Single Ship - Blue Health on Box": { "ap_id": 53027, "position": "53_-3048_4096_115" },
-    "PoA Single Ship - Clip on Ship": { "ap_id": 53028, "position": "53_-3996_3613_317" },
-    "PoA Single Ship - LF10 in Water": { "ap_id": 53029, "position": "53_-5031_3261_-307" },
-    "PoA Single Ship - Power Cell": { "ap_id": 53030, "position": "53_-3989_4666_0" },
-    "PoA Between Ship Rooms - LF10 After Single Ship 1": { "ap_id": 53031, "position": "53_-4761_4518_30" },
-    "PoA Between Ship Rooms - LF10 After Single Ship 2": { "ap_id": 53032, "position": "53_-5006_4514_30" },
-    "PoA Between Ship Rooms - LF10 After Single Ship 3": { "ap_id": 53033, "position": "53_-4506_4518_30" },
-    "PoA Between Ship Rooms - Shotgun After Single Ship": { "ap_id": 53034, "position": "53_-4751_4864_0" },
-    "PoA Two Ships - LF10 in Water": { "ap_id": 53035, "position": "53_-5036_6020_-307" },
-    "PoA Two Ships - Clip by Boxes 1": { "ap_id": 53036, "position": "53_-2662_5867_0" },
-    "PoA Two Ships - Clip by Boxes 2": { "ap_id": 53037, "position": "53_-2662_5959_0" },
-    "PoA Two Ships - Pistol Behind Boxes": { "ap_id": 53038, "position": "53_-3800_7483_0" },
-    "PoA Two Ships - Arrows in Corner": { "ap_id": 53039, "position": "53_-3276_5427_0" },
-    "PoA Two Ships - LF10 in Water": { "ap_id": 53040, "position": "53_-5036_6020_-307" },
-    "PoA Two Ships - Clip by Boxes 1": { "ap_id": 53041, "position": "53_-2662_5867_0" },
-    "PoA Two Ships - Clip by Boxes 2": { "ap_id": 53042, "position": "53_-2662_5959_0" },
-    "PoA Two Ships - Pistol Behind Boxes": { "ap_id": 53043, "position": "53_-3800_7483_0" },
-    "PoA Two Ships - Silver Health on Right Ship 4": { "ap_id": 53044, "position": "53_-3008_6069_393" },
-    "PoA Two Ships - Silver Health on Right Ship 5": { "ap_id": 53045, "position": "53_-2818_6098_426" },
-    "PoA Two Ships - Blue Health on Upper Boxes": { "ap_id": 53046, "position": "53_-2467_5867_204" },
-    "PoA Two Ships - Silver Health on Left Ship 1": { "ap_id": 53047, "position": "53_-2975_6757_416" },
-    "PoA Two Ships - Silver Health on Left Ship 2": { "ap_id": 53048, "position": "53_-2818_6727_389" },
-    "PoA Two Ships - Silver Health on Left Ship 3": { "ap_id": 53049, "position": "53_-2658_6719_363" },
-    "PoA Two Ships - Silver Health on Left Ship 4": { "ap_id": 53050, "position": "53_-2511_6724_341" },
-    "PoA Two Ships - Silver Health on Left Ship 5": { "ap_id": 53051, "position": "53_-2339_6758_310" },
-    "PoA Two Ships - LF10 on Upper Boxes 1": { "ap_id": 53052, "position": "53_-2917_7453_204" },
-    "PoA Two Ships - LF10 on Upper Boxes 2": { "ap_id": 53053, "position": "53_-3072_7453_204" },
-    "PoA Two Ships - LF10 on Upper Boxes 3": { "ap_id": 53054, "position": "53_-3233_7455_204" },
-    "PoA Two Ships - Power Cell": { "ap_id": 53055, "position": "53_-1443_7065_0" },
-    "PoA Box Room - Shells on Ground": { "ap_id": 53056, "position": "53_-266_6584_0" },
-    "PoA Box Room - LF10 on Ground": { "ap_id": 53057, "position": "53_1075_5376_0" },
-    "PoA Box Room - Arrows up Ramp": { "ap_id": 53058, "position": "53_-266_5642_317" },
-    "PoA Box Room - Blue Health up Ramp 1": { "ap_id": 53059, "position": "53_-256_6113_204" },
-    "PoA Box Room - Blue Health up Ramp 2": { "ap_id": 53060, "position": "53_-256_6328_204" },
-    "PoA Box Room - Clip up Ramp 1": { "ap_id": 53061, "position": "53_552_6062_307" },
-    "PoA Box Room - Clip up Ramp 2": { "ap_id": 53062, "position": "53_665_6062_307" },
-    "PoA Box Room - LF1 up Ramp 1": { "ap_id": 53063, "position": "53_1126_4986_307" },
-    "PoA Box Room - LF1 up Ramp 2": { "ap_id": 53064, "position": "53_1126_4904_307" },
-    "PoA Box Room - LF1 up Ramp 3": { "ap_id": 53065, "position": "53_1126_4823_307" },
-    "PoA Box Room - LF1 up Ramp 4": { "ap_id": 53066, "position": "53_1228_4823_307" },
-    "PoA Box Room - LF1 up Ramp 5": { "ap_id": 53067, "position": "53_1331_4823_307" },
-    "PoA Box Room - LF1 up Ramp 6": { "ap_id": 53068, "position": "53_1331_4904_307" },
-    "PoA Box Room - LF1 up Ramp 7": { "ap_id": 53069, "position": "53_1331_4986_307" },
-    "PoA Box Room - Silver Health on Boxes 1": { "ap_id": 53070, "position": "53_1146_6174_204" },
-    "PoA Box Room - Silver Health on Boxes 2": { "ap_id": 53071, "position": "53_1146_6287_204" },
-    "PoA Box Room - Silver Health on Boxes 3": { "ap_id": 53072, "position": "53_1146_6400_204" },
-    "PoA Box Room - Silver Health on Boxes 4": { "ap_id": 53073, "position": "53_1280_6400_204" },
-    "PoA Box Room - Silver Health on Boxes 5": { "ap_id": 53074, "position": "53_1280_6287_204" },
-    "PoA Box Room - Silver Health on Boxes 6": { "ap_id": 53075, "position": "53_1280_6174_204" },
-    "PoA Shotgun Bridge - Blue Health in Exploded Wall": { "ap_id": 53076, "position": "53_-612_3887_307" },
-    "PoA Shotgun Bridge - LF10 on Upper Boxes 1": { "ap_id": 53077, "position": "53_-803_3485_217" },
-    "PoA Shotgun Bridge - LF10 on Upper Boxes 2": { "ap_id": 53078, "position": "53_-668_3483_217" },
-    "PoA Shotgun Bridge - LF10 on Upper Boxes 3": { "ap_id": 53079, "position": "53_-532_3480_217" },
-    "Child 2 Rooms - LF1 at Entrance 1": { "ap_id": 53080, "position": "53_-230_2918_0" },
-    "Child 2 Rooms - LF1 at Entrance 2": { "ap_id": 53081, "position": "53_-128_3020_0" },
-    "Child 2 Rooms - LF1 at Entrance 3": { "ap_id": 53082, "position": "53_-25_2918_0" },
-    "Child 2 Rooms - LF1 at Entrance 4": { "ap_id": 53083, "position": "53_-128_2816_0" },
-    "Child 2 Rooms - Clip in Water": { "ap_id": 53084, "position": "53_-107_1964_0" },
-    "Child 2 Rooms - Blue Health by Cage Switch 1": { "ap_id": 53085, "position": "53_562_-102_0" },
-    "Child 2 Rooms - Blue Health by Cage Switch 2": { "ap_id": 53086, "position": "53_357_-101_0" },
-    "PoA Upper Water - Pistol Clip 1": { "ap_id": 53087, "position": "52_0_2713_922" },
-    "PoA Upper Water - Pistol Clip 2": { "ap_id": 53088, "position": "52_102_2713_922" },
-    "PoA Upper Water - Pistol Clip 3": { "ap_id": 53089, "position": "52_102_2611_922" },
-    "PoA Upper Water - Level 2 Key": { "ap_id": 53090, "position": "52_-153_2152_952" },
-    "PoA Upper Water - Explosive Shells": { "ap_id": 53091, "position": "52_-153_934_976" },
-    "PoA Mid Water Warp - Clip by Door": { "ap_id": 53092, "position": "52_2263_453_614" },
-    "PoA Mid Water Warp - Arrows Left of Portal": { "ap_id": 53093, "position": "52_3261_825_614" },
-    "PoA Mid Water Warp - Quiver Right of Portal": { "ap_id": 53094, "position": "52_3273_-172_614" },
-    "PoA City 1 Ground - Arrows 1": { "ap_id": 55000, "position": "55_-1150_-585_0" },
-    "PoA City 1 Ground - Arrows 2": { "ap_id": 55001, "position": "55_-458_564_0" },
-    "PoA City 1 Ground - LF1 in Left House 1": { "ap_id": 55002, "position": "55_-51_102_0" },
-    "PoA City 1 Ground - LF1 in Left House 2": { "ap_id": 55003, "position": "55_-153_204_0" },
-    "PoA City 1 Ground - LF1 in Left House 3": { "ap_id": 55004, "position": "55_-51_307_0" },
-    "PoA City 1 Ground - LF1 in Left House 4": { "ap_id": 55005, "position": "55_51_204_0" },
-    "PoA City 1 Ground - Clip in Right House": { "ap_id": 55006, "position": "55_174_-1484_5" },
-    "PoA City 1 Ground - Clip by Right House": { "ap_id": 55007, "position": "55_334_-2110_0" },
-    "PoA City 1 Ground - Explosive Shells by Waterfall 1": { "ap_id": 55008, "position": "55_1075_-614_0" },
-    "PoA City 1 Ground - Explosive Shells by Waterfall 2": { "ap_id": 55009, "position": "55_1075_-921_0" },
-    "PoA City 1 Ground - Level 3 Key": { "ap_id": 55010, "position": "55_1568_-765_30" },
-    "PoA City 1 Ground - LF1 Trail 1": { "ap_id": 55011, "position": "55_1126_-1280_0" },
-    "PoA City 1 Ground - LF1 Trail 2": { "ap_id": 55012, "position": "55_1126_-1433_0" },
-    "PoA City 1 Ground - LF1 Trail 3": { "ap_id": 55013, "position": "55_1126_-1638_0" },
-    "PoA City 1 Ground - LF1 Trail 4": { "ap_id": 55014, "position": "55_1126_-1843_0" },
-    "PoA City 1 Ground - LF1 Trail 5": { "ap_id": 55015, "position": "55_1126_-2048_0" },
-    "PoA City 1 Ground - LF1 Trail 6": { "ap_id": 55016, "position": "55_1126_-2252_0" },
-    "PoA City 1 Ground - LF1 Trail 7": { "ap_id": 55017, "position": "55_1126_-2457_0" },
-    "PoA City 1 Ground - LF1 Trail 8": { "ap_id": 55018, "position": "55_1126_-2662_0" },
-    "PoA Bird Door - Ultra Health": { "ap_id": 55019, "position": "55_-102_-1740_548" },
-    "PoA Bird Door - LF10 1": { "ap_id": 55020, "position": "55_-256_-1740_517" },
-    "PoA Bird Door - LF10 2": { "ap_id": 55021, "position": "55_-256_-1664_517" },
-    "PoA Bird Door - LF10 3": { "ap_id": 55022, "position": "55_-256_-1587_514" },
-    "PoA Bird Door - LF10 4": { "ap_id": 55023, "position": "55_-102_-1664_517" },
-    "PoA Bird Door - LF10 5": { "ap_id": 55024, "position": "55_-102_-1587_514" },
-    "PoA Bird Door - LF10 6": { "ap_id": 55025, "position": "55_51_-1740_517" },
-    "PoA Bird Door - LF10 7": { "ap_id": 55026, "position": "55_51_-1664_517" },
-    "PoA Bird Door - LF10 8": { "ap_id": 55027, "position": "55_51_-1587_514" },
-    "PoA Talisman Portal Hallways - Arrows in First Hall": { "ap_id": 55028, "position": "55_1544_-4032_0" },
-    "PoA Talisman Portal Hallways - Clip by Portal 1": { "ap_id": 55029, "position": "55_2554_-3726_307" },
-    "PoA Talisman Portal Hallways - Clip by Portal 2": { "ap_id": 55030, "position": "55_3397_-4564_307" },
-    "PoA Talisman Portal Hallways - Blue Health by Portal 1": { "ap_id": 55031, "position": "55_3692_-3728_307" },
-    "PoA Talisman Portal Hallways - Blue Health by Portal 2": { "ap_id": 55032, "position": "55_3690_-3957_307" },
-    "PoA Talisman Portal Hallways - Shells in Second Hall": { "ap_id": 55033, "position": "55_3084_-3599_307" },
-    "PoA City 1 Upper - Clip Behind Building 1": { "ap_id": 55034, "position": "55_2406_-1664_614" },
-    "PoA City 1 Upper - Clip Behind Building 2": { "ap_id": 55035, "position": "55_2406_-1587_614" },
-    "PoA City 1 Upper - Clip Behind Building 3": { "ap_id": 55036, "position": "55_2406_-1510_614" },
-    "PoA City 1 Upper - Shells by Boxes": { "ap_id": 55037, "position": "55_2158_-734_614" },
-    "PoA City 1 Upper - LF10 up Ladder 1": { "ap_id": 55038, "position": "55_2048_-1484_942" },
-    "PoA City 1 Upper - LF10 up Ladder 2": { "ap_id": 55039, "position": "55_2201_-1587_942" },
-    "PoA City 1 Upper - LF10 up Ladder 3": { "ap_id": 55040, "position": "55_2048_-1689_942" },
-    "PoA City 1 Upper - LF10 up Ladder 4": { "ap_id": 55041, "position": "55_1894_-1587_942" },
-    "PoA City 1 Upper - Blue Health up Ladder": { "ap_id": 55042, "position": "55_2048_-1587_942" },
-    "PoA Primagen Key - Tek Bow": { "ap_id": 55043, "position": "55_2355_358_614" },
-    "PoA Primagen Key - Tek Arrows on Ground 1": { "ap_id": 55044, "position": "55_1945_1792_614" },
-    "PoA Primagen Key - Tek Arrows on Ground 2": { "ap_id": 55045, "position": "55_2768_2730_614" },
-    "PoA Primagen Key Upper - Close Tek Arrows": { "ap_id": 55046, "position": "55_2764_3027_921" },
-    "PoA Primagen Key Upper - Far Tek Arrows": { "ap_id": 55047, "position": "55_1130_2199_921" },
-    "PoA Primagen Key Leap - LF10 Trail 1": { "ap_id": 55048, "position": "55_2662_2662_1095" },
-    "PoA Primagen Key Leap - LF10 Trail 2": { "ap_id": 55049, "position": "55_2662_2508_1208" },
-    "PoA Primagen Key Leap - LF10 Trail 3": { "ap_id": 55050, "position": "55_2662_2355_1269" },
-    "PoA Primagen Key Leap - LF10 Trail 4": { "ap_id": 55051, "position": "55_2662_2201_1269" },
-    "PoA Primagen Key Leap - LF10 Trail 5": { "ap_id": 55052, "position": "55_2662_2048_1218" },
-    "PoA Primagen Key Leap - LF10 Trail 6": { "ap_id": 55053, "position": "55_2662_1894_1116" },
-    "PoA Primagen Key Leap - Primagen Key": { "ap_id": 55054, "position": "55_2713_1638_921" },
-    "PoA City 1 Upper After Hall - LF1 Trail 1": { "ap_id": 55055, "position": "55_1440_773_614" },
-    "PoA City 1 Upper After Hall - LF1 Trail 2": { "ap_id": 55056, "position": "55_1303_772_614" },
-    "PoA City 1 Upper After Hall - LF1 Trail 3": { "ap_id": 55057, "position": "55_1173_770_614" },
-    "PoA City 1 Upper After Hall - Clip in Building": { "ap_id": 55058, "position": "55_-174_1170_619" },
-    "PoA City 1 Upper After Hall - LF1 Behind Building 1": { "ap_id": 55059, "position": "55_515_1782_614" },
-    "PoA City 1 Upper After Hall - LF1 Behind Building 2": { "ap_id": 55060, "position": "55_362_1782_614" },
-    "PoA City 1 Upper After Hall - LF1 Behind Building 3": { "ap_id": 55061, "position": "55_208_1782_614" },
-    "PoA City 1 Upper After Hall - LF1 Behind Building 4": { "ap_id": 55062, "position": "55_54_1782_614" },
-    "PoA City 1 Upper After Hall - LF1 Behind Building 5": { "ap_id": 55063, "position": "55_-98_1782_614" },
-    "PoA City 1 Upper After Hall - Blue Health on Edge 1": { "ap_id": 55064, "position": "55_-921_-285_614" },
-    "PoA City 1 Upper After Hall - Blue Health on Edge 2": { "ap_id": 55065, "position": "55_-1023_-285_614" },
-    "PoA City 1 Upper After Hall - Blue Health on Edge 3": { "ap_id": 55066, "position": "55_-1125_-285_614" },
-    "PoA City 1 Upper After Hall - Silver Health Building Jump 1": { "ap_id": 55067, "position": "55_-102_174_327" },
-    "PoA City 1 Upper After Hall - Silver Health Building Jump 2": { "ap_id": 55068, "position": "55_-40_235_327" },
-    "PoA City 1 Upper After Hall - Silver Health Building Jump 3": { "ap_id": 55069, "position": "55_20_174_327" },
-    "PoA City 1 Upper After Hall - Silver Health Building Jump 4": { "ap_id": 55070, "position": "55_-40_112_327" },
-    "PoA City 1 Upper After Hall - Explosives Shells Building Jump": { "ap_id": 55071, "position": "55_-40_163_327" },
-    "PoA Child 3 Above Ground - Tek Bow": { "ap_id": 55072, "position": "54_-153_-3225_614" },
-    "PoA Child 3 Above Ground - Arrows Right of Rubble": { "ap_id": 55073, "position": "54_-234_-850_614" },
-    "PoA Child 3 Above Ground - Clip Behind Rubble": { "ap_id": 55074, "position": "54_-1087_-937_614" },
-    "PoA Child 3 Above Ground - LF1 in Water 1": { "ap_id": 55075, "position": "54_-563_1382_440" },
-    "PoA Child 3 Above Ground - LF1 in Water 2": { "ap_id": 55076, "position": "54_-665_1536_440" },
-    "PoA Child 3 Above Ground - LF1 in Water 3": { "ap_id": 55077, "position": "54_-563_1689_440" },
-    "PoA Child 3 Above Ground - LF1 in Water 4": { "ap_id": 55078, "position": "54_-460_1536_440" },
-    "PoA Child 3 Above Ground - LF10 in Water": { "ap_id": 55079, "position": "54_-563_1536_440" },
-    "PoA Child 3 Above Ground - LF1 Trail to Warp 1": { "ap_id": 55080, "position": "54_1168_3114_632" },
-    "PoA Child 3 Above Ground - LF1 Trail to Warp 2": { "ap_id": 55081, "position": "54_1320_3274_632" },
-    "PoA Child 3 Above Ground - LF1 Trail to Warp 3": { "ap_id": 55082, "position": "54_1554_3307_632" },
-    "PoA Child 3 Above Ground - LF1 Trail to Warp 4": { "ap_id": 55083, "position": "54_1741_3421_632" },
-    "PoA Child 3 Above Ground - LF1 Trail to Warp 5": { "ap_id": 55084, "position": "54_1838_3596_632" },
-    "PoA Child 3 Above Ground - LF1 Trail to Warp 6": { "ap_id": 55085, "position": "54_1840_3806_632" },
-    "PoA Child 3 Above Ground - LF1 Trail to Warp 7": { "ap_id": 55086, "position": "54_1832_4034_632" },
-    "PoA Child 3 Above Ground - Blue Health on Rubble": { "ap_id": 55087, "position": "54_-471_-593_971" },
-    "PoA Child 3 - Silver Health Trail 1": { "ap_id": 55088, "position": "54_-1484_-1843_614" },
-    "PoA Child 3 - Silver Health Trail 2": { "ap_id": 55089, "position": "54_-1740_-1843_614" },
-    "PoA Child 3 - Silver Health Trail 3": { "ap_id": 55090, "position": "54_-2048_-1843_614" },
-    "PoA Child 3 - Shotgun": { "ap_id": 55091, "position": "54_-2867_-1843_0" },
-    "PoA Child 3 - Shells": { "ap_id": 55092, "position": "54_-3368_-1843_0" },
-    "PoA Child 3 - Blue Health in Wall 1": { "ap_id": 55093, "position": "54_-2457_-2457_0" },
-    "PoA Child 3 - Blue Health in Wall 2": { "ap_id": 55094, "position": "54_-3481_-839_0" },
-    "PoA Child 3 - Blue Health by Cage Switch 1": { "ap_id": 55095, "position": "54_-3993_-1740_0" },
-    "PoA Child 3 - Blue Health by Cage Switch 2": { "ap_id": 55096, "position": "54_-3993_-1945_0" },
-    "PoA Archery Targets - Clip in House 1": { "ap_id": 55097, "position": "56_560_-2808_5" },
-    "PoA Archery Targets - Clip in House 2": { "ap_id": 55098, "position": "56_563_-2611_5" },
-    "PoA Archery Targets - Arrows Behind House": { "ap_id": 55099, "position": "56_285_-2150_0" },
-    "PoA Archery Targets - LF1 Trail 1": { "ap_id": 55100, "position": "56_-570_-2464_0" },
-    "PoA Archery Targets - LF1 Trail 2": { "ap_id": 55101, "position": "56_-570_-2365_0" },
-    "PoA Archery Targets - LF1 Trail 3": { "ap_id": 55102, "position": "56_-584_-2251_0" },
-    "PoA Archery Targets - LF1 Trail 4": { "ap_id": 55103, "position": "56_-613_-2149_0" },
-    "PoA Archery Targets - Clip by Hallway": { "ap_id": 55104, "position": "56_-829_-2175_5" },
-    "PoA Building and Bridge - Silver Health in House 1": { "ap_id": 55105, "position": "56_-1382_1484_5" },
-    "PoA Building and Bridge - Silver Health in House 2": { "ap_id": 55106, "position": "56_-1382_1382_5" },
-    "PoA Building and Bridge - Silver Health in House 3": { "ap_id": 55107, "position": "56_-1382_1280_5" },
-    "PoA Building and Bridge - Silver Health in House 4": { "ap_id": 55108, "position": "56_-1382_1177_5" },
-    "PoA Building and Bridge - Silver Health in House 5": { "ap_id": 55109, "position": "56_-1382_1075_5" },
-    "PoA Building and Bridge - Silver Health in House 6": { "ap_id": 55110, "position": "56_-1382_972_5" },
-    "PoA Building and Bridge - Blue Health in Exploded Wall 1": { "ap_id": 55111, "position": "56_-2355_2048_0" },
-    "PoA Building and Bridge - Blue Health in Exploded Wall 2": { "ap_id": 55112, "position": "56_-2355_2252_0" },
-    "PoA Building and Bridge - Clip in Exploded Corner 1": { "ap_id": 55113, "position": "56_-1083_2437_0" },
-    "PoA Building and Bridge - Clip in Exploded Corner 2": { "ap_id": 55114, "position": "56_-1064_2467_0" },
-    "PoA Building and Bridge - LF1 in Exploded Wall 1": { "ap_id": 55115, "position": "56_0_716_0" },
-    "PoA Building and Bridge - LF1 in Exploded Wall 2": { "ap_id": 55116, "position": "56_0_512_0" },
-    "PoA Building and Bridge - LF10 in Exploded Wall": { "ap_id": 55117, "position": "56_0_614_0" },
-    "PoA Building and Bridge - Box of Shells Upstairs": { "ap_id": 55118, "position": "56_-931_561_312" },
-    "PoA Building and Bridge - Box of Bullets on Rubble": { "ap_id": 55119, "position": "56_-681_1332_226" },
-    "PoA Building and Bridge - Explosive Shells on Rubble": { "ap_id": 55120, "position": "56_-584_2108_164" },
-    "PoA Building and Bridge - LF1 Trail to Bridge 1": { "ap_id": 55121, "position": "56_512_2150_307" },
-    "PoA Building and Bridge - LF1 Trail to Bridge 2": { "ap_id": 55122, "position": "56_665_2150_307" },
-    "PoA Building and Bridge - LF1 Trail to Bridge 3": { "ap_id": 55123, "position": "56_819_2150_307" },
-    "PoA Building and Bridge - LF1 Trail to Bridge 4": { "ap_id": 55124, "position": "56_819_2304_307" },
-    "PoA Building and Bridge - LF1 Trail to Bridge 5": { "ap_id": 55125, "position": "56_819_2457_307" },
-    "PoA Building and Bridge - LF1 Trail to Bridge 6": { "ap_id": 55126, "position": "56_819_2611_307" },
-    "PoA Building and Bridge - LF1 Trail to Bridge 7": { "ap_id": 55127, "position": "56_819_2764_307" },
-    "PoA Building and Bridge - LF1 Trail to Bridge 8": { "ap_id": 55128, "position": "56_665_2764_307" },
-    "PoA Building and Bridge - LF1 Trail to Bridge 9": { "ap_id": 55129, "position": "56_512_2764_307" },
-    "PoA Child 4 City - LF1 Trail at Entrance 1": { "ap_id": 55130, "position": "57_256_-2355_55" },
-    "PoA Child 4 City - LF1 Trail at Entrance 2": { "ap_id": 55131, "position": "57_153_-2352_1" },
-    "PoA Child 4 City - LF1 Trail at Entrance 3": { "ap_id": 55132, "position": "57_32_-2331_0" },
-    "PoA Child 4 City - LF1 Trail at Entrance 4": { "ap_id": 55133, "position": "57_-81_-2294_0" },
-    "PoA Child 4 City - Clip in Exploded Wall": { "ap_id": 55134, "position": "57_-1024_-2441_0" },
-    "PoA Child 4 City - Tek Arrows on Roof": { "ap_id": 55135, "position": "57_30_-1507_424" },
-    "PoA Child 4 City - Full Health on Roof": { "ap_id": 55136, "position": "57_986_-876_516" },
-    "PoA Child 4 City - Silver Health on Roof 1": { "ap_id": 55137, "position": "57_1305_-1133_349" },
-    "PoA Child 4 City - Silver Health on Roof 2": { "ap_id": 55138, "position": "57_1305_-1031_349" },
-    "PoA Child 4 City - Silver Health on Roof 3": { "ap_id": 55139, "position": "57_1305_-928_349" },
-    "PoA Child 4 City - Silver Health on Roof 4": { "ap_id": 55140, "position": "57_1305_-826_349" },
-    "PoA Child 4 City - Silver Health on Roof 5": { "ap_id": 55141, "position": "57_1305_-723_350" },
-    "PoA Child 4 City - Silver Health on Roof 6": { "ap_id": 55142, "position": "57_1305_-621_350" },
-    "PoA Child 4 City - Clip in House": { "ap_id": 55143, "position": "57_735_-1099_5" },
-    "PoA Child 4 City - LF10 Between Boxes": { "ap_id": 55144, "position": "57_287_538_0" },
-    "PoA Child 4 City - Shells on Crate": { "ap_id": 55145, "position": "57_727_534_153" },
-    "PoA Child 4 - Clip on Bottom": { "ap_id": 55146, "position": "57_-2456_-410_-1536" },
-    "PoA Child 4 - Shells on Bottom": { "ap_id": 55147, "position": "57_-2877_823_-1536" },
-    "PoA Child 4 - Blue Health on Upwards Path": { "ap_id": 55148, "position": "57_-3240_102_-1228" },
-    "PoA Child 4 - Blue Health on Ledge": { "ap_id": 55149, "position": "57_-2150_737_-1228" },
-    "PoA Child 4 - LF1 Trail on Upwards Path 1": { "ap_id": 55150, "position": "57_-2764_1331_-1228" },
-    "PoA Child 4 - LF1 Trail on Upwards Path 2": { "ap_id": 55151, "position": "57_-2764_1228_-1228" },
-    "PoA Child 4 - LF1 Trail on Upwards Path 3": { "ap_id": 55152, "position": "57_-2764_1126_-1228" },
-    "PoA Child 4 - LF1 Trail on Upwards Path 4": { "ap_id": 55153, "position": "57_-2764_1024_-1228" },
-    "PoA Child 4 - LF1 Trail on Upwards Path 5": { "ap_id": 55154, "position": "57_-2764_921_-1228" },
-    "PoA After Child 4 - Clip in Hallway": { "ap_id": 55155, "position": "57_1716_792_5" },
-    "PoA After Child 4 - Arrows Behind Right Rubble": { "ap_id": 55156, "position": "57_3364_-737_5" },
-    "PoA After Child 4 - Clip Behind Ramp": { "ap_id": 55157, "position": "57_3251_1275_0" },
-    "PoA After Child 4 - Blue Health by Central Rubble": { "ap_id": 55158, "position": "57_4162_467_0" },
-    "PoA After Child 4 - Clip by Central Rubble": { "ap_id": 55159, "position": "57_4417_706_5" },
-    "PoA Before Gated City - Box of Shells up Ladder": { "ap_id": 55160, "position": "58_-819_716_307" },
-    "PoA Before Gated City - Box of Bullets up Ladder": { "ap_id": 55161, "position": "58_-409_716_307" },
-    "PoA Gated City - Clip Right of House": { "ap_id": 55162, "position": "58_1177_-2252_0" },
-    "PoA Gated City - Clip by Back House Entrance": { "ap_id": 55163, "position": "58_2363_-1640_0" },
-    "PoA Gated City - Quiver by Back House Entrance": { "ap_id": 55164, "position": "58_2259_-1024_5" },
-    "PoA Gated City - Clip in Exploded Wall 1": { "ap_id": 55165, "position": "58_3174_-921_0" },
-    "PoA Gated City - Clip in Exploded Wall 2": { "ap_id": 55166, "position": "58_3174_-716_0" },
-    "PoA Gated City - Blue Health in Exploded Wall 1": { "ap_id": 55167, "position": "58_2830_-423_0" },
-    "PoA Gated City - Blue Health in Exploded Wall 2": { "ap_id": 55168, "position": "58_2711_-421_0" },
-    "PoA Gated City - Shells in Exploded Corner": { "ap_id": 55169, "position": "58_2424_-503_0" },
-    "PoA Gated City - Silver Health in House 1": { "ap_id": 55170, "position": "58_1540_-1031_5" },
-    "PoA Gated City - Silver Health in House 2": { "ap_id": 55171, "position": "58_1461_-1031_5" },
-    "PoA Gated City - Silver Health up Ladder": { "ap_id": 55172, "position": "58_1623_-1032_307" },
-    "PoA Gated City - Level Key up Ladder": { "ap_id": 55173, "position": "58_1262_-1395_337" },
-    "PoA Below Catwalk Room - Box of Bullets Behind Boxes": { "ap_id": 55174, "position": "59_2232_1202_0" },
-    "PoA Below Catwalk Room - Blue Health on Boxes": { "ap_id": 55175, "position": "59_2254_1091_153" },
-    "PoA Checkpoint with Raptors - Clip by Boxes 1": { "ap_id": 55176, "position": "59_3091_2210_0" },
-    "PoA Checkpoint with Raptors - Clip by Boxes 2": { "ap_id": 55177, "position": "59_3117_2236_0" },
-    "PoA Checkpoint with Raptors - Tek Arrows in Hallway": { "ap_id": 55178, "position": "59_5529_2252_4" },
-    "PoA Catwalks Start - Blue Health Left of Start": { "ap_id": 55179, "position": "59_6576_840_5" },
-    "PoA Catwalks Start - LF1 Trail 1": { "ap_id": 55180, "position": "59_5162_588_0" },
-    "PoA Catwalks Start - LF1 Trail 2": { "ap_id": 55181, "position": "59_5147_496_0" },
-    "PoA Catwalks Start - LF1 Trail 3": { "ap_id": 55182, "position": "59_5045_469_0" },
-    "PoA Catwalks Start - LF1 Trail 4": { "ap_id": 55183, "position": "59_4944_475_0" },
-    "PoA Catwalks Start - LF1 Trail 5": { "ap_id": 55184, "position": "59_4173_481_0" },
-    "PoA Catwalks Start - LF1 Trail 6": { "ap_id": 55185, "position": "59_3767_484_-614" },
-    "PoA Catwalks Start - LF1 Trail 7": { "ap_id": 55186, "position": "59_3665_485_-614" },
-    "PoA Catwalks Start - LF1 Trail 8": { "ap_id": 55187, "position": "59_3604_448_-614" },
-    "PoA Catwalks Start - LF1 Trail 9": { "ap_id": 55188, "position": "59_3598_360_-614" },
-    "PoA Catwalks Start - LF1 Trail 10": { "ap_id": 55189, "position": "59_4428_-273_-619" },
-    "PoA Catwalks Start - LF1 Trail 11": { "ap_id": 55190, "position": "59_4520_-294_-619" },
-    "PoA Catwalks Start - LF1 Trail 12": { "ap_id": 55191, "position": "59_4549_-381_-619" },
-    "PoA Catwalks Start - Clip by Hall": { "ap_id": 55192, "position": "59_4474_-948_-619" },
-    "PoA Catwalks Hall - LF1 Trail 1": { "ap_id": 55193, "position": "59_3362_-1316_-614" },
-    "PoA Catwalks Hall - LF1 Trail 2": { "ap_id": 55194, "position": "59_3428_-1426_-614" },
-    "PoA Catwalks Hall - LF1 Trail 3": { "ap_id": 55195, "position": "59_3567_-1444_-614" },
-    "PoA Catwalks Hall - Clip 1": { "ap_id": 55196, "position": "59_4489_-2157_-608" },
-    "PoA Catwalks Hall - Clip 2": { "ap_id": 55197, "position": "59_5726_-1627_-608" },
-    "PoA Catwalks Hall - Quiver of Tek Arrows": { "ap_id": 55198, "position": "59_7168_-1740_-615" },
-    "PoA Catwalks Endtrail Snipers - Pistol": { "ap_id": 55199, "position": "59_7915_-1362_-312" },
-    "PoA Catwalks Endtrail Snipers - Ultra Health for Killing Endtrail": { "ap_id": 55200, "position": "59_7372_-256_302" },
-    "PoA Catwalks Post Snipers - LF1 Hallway 1 Trail 1": { "ap_id": 55201, "position": "59_7116_409_302" },
-    "PoA Catwalks Post Snipers - LF1 Hallway 1 Trail 2": { "ap_id": 55202, "position": "59_7014_409_302" },
-    "PoA Catwalks Post Snipers - LF1 Hallway 1 Trail 3": { "ap_id": 55203, "position": "59_6912_409_302" },
-    "PoA Catwalks Post Snipers - LF1 Hallway 1 Trail 4": { "ap_id": 55204, "position": "59_6809_409_302" },
-    "PoA Catwalks Post Snipers - LF1 Hallway 1 Trail 5": { "ap_id": 55205, "position": "59_6707_409_302" },
-    "PoA Catwalks Post Snipers - Blue Health After Hallway 1": { "ap_id": 55206, "position": "59_5403_345_302" },
-    "PoA Catwalks Post Snipers - LF1 Hallway 2 Trail 1": { "ap_id": 55207, "position": "59_5836_102_302" },
-    "PoA Catwalks Post Snipers - LF1 Hallway 2 Trail 2": { "ap_id": 55208, "position": "59_5836_0_302" },
-    "PoA Catwalks Post Snipers - LF1 Hallway 2 Trail 3": { "ap_id": 55209, "position": "59_5836_-102_302" },
-    "PoA Catwalks Post Snipers - LF1 Hallway 2 Trail 4": { "ap_id": 55210, "position": "59_5836_-204_302" },
-    "PoA Catwalks Post Snipers - Clip by Ladder": { "ap_id": 55211, "position": "59_5389_-947_308" },
-    "PoA Catwalks Hall up Ladder - LF1 Trail 1": { "ap_id": 55212, "position": "59_5529_-1433_614" },
-    "PoA Catwalks Hall up Ladder - LF1 Trail 2": { "ap_id": 55213, "position": "59_5324_-1433_614" },
-    "PoA Catwalks Hall up Ladder - LF1 Trail 3": { "ap_id": 55214, "position": "59_5120_-1433_614" },
-    "PoA Catwalks Hall up Ladder - LF1 Trail 4": { "ap_id": 55215, "position": "59_4915_-1433_614" },
-    "PoA Catwalks Hall up Ladder - LF1 Trail 5": { "ap_id": 55216, "position": "59_4915_-1587_614" },
-    "PoA Catwalks Hall up Ladder - LF1 Trail 6": { "ap_id": 55217, "position": "59_4915_-1740_614" },
-    "PoA Catwalks Hall up Ladder - LF1 Trail 7": { "ap_id": 55218, "position": "59_4710_-1740_614" },
-    "PoA Catwalks Hall up Ladder - LF1 Trail 8": { "ap_id": 55219, "position": "59_4505_-1740_614" },
-    "PoA Catwalks Hall up Ladder - LF1 Trail 9": { "ap_id": 55220, "position": "59_4300_-1740_614" },
-    "PoA Catwalks Hall up Ladder - LF1 Trail 10": { "ap_id": 55221, "position": "59_4147_-1740_614" },
-    "PoA Catwalks Hall up Ladder - LF1 Trail 11": { "ap_id": 55222, "position": "59_3993_-1740_614" },
-    "PoA Catwalks Hall up Ladder - Quiver of Tek Arrows": { "ap_id": 55223, "position": "59_3993_-1126_614" },
-    "PoA Catwalks Two Entrail Snipers - Blue Health by Exit": { "ap_id": 55224, "position": "59_3609_537_609" },
-    "PoA Catwalks Above First Room - LF1 Trail": { "ap_id": 55225, "position": "59_1178_1246_614" },
-    "PoA Catwalks Above First Room - LF1 Trail": { "ap_id": 55226, "position": "59_1177_1155_614" },
-    "PoA Catwalks Above First Room - LF1 Trail": { "ap_id": 55227, "position": "59_1153_1052_614" },
-    "PoA Catwalks Above First Room - LF1 Trail": { "ap_id": 55228, "position": "59_1018_1025_614" },
-    "PoA Catwalks Above First Room - Pistol": { "ap_id": 55229, "position": "59_1167_624_614" },
-    "PoA Below Oblivion Portal - Quiver of Tek Arrows on Catwalk": { "ap_id": 55230, "position": "59_-102_1945_614" },
-    "PoA Below Oblivion Portal - Blue Health on Catwalk 1": { "ap_id": 55231, "position": "59_-235_1546_614" },
-    "PoA Below Oblivion Portal - Blue Health on Catwalk 2": { "ap_id": 55232, "position": "59_-235_2344_614" },
-    "PoA Below Oblivion Portal - LF10 Hall to Previous Map 1": { "ap_id": 55233, "position": "59_486_2252_0" },
-    "PoA Below Oblivion Portal - LF10 Hall to Previous Map 2": { "ap_id": 55234, "position": "59_768_2252_0" },
-    "PoA Below Oblivion Portal - LF10 Hall to Previous Map 3": { "ap_id": 55235, "position": "59_1075_2252_0" },
-    "PoA Below Oblivion Portal - LF10 Hall to Previous Map 4": { "ap_id": 55236, "position": "59_1382_2252_0" },
-    "PoA Below Oblivion Portal - LF10 Hall to Previous Map 5": { "ap_id": 55237, "position": "59_1664_2252_0" },
-    "PoA Below Oblivion Portal - Box of Bullets Behind Rubble": { "ap_id": 55238, "position": "59_-1758_2331_0" },
-    "PoA Below Oblivion Portal - Full Health": { "ap_id": 55239, "position": "59_-2271_1673_159" },
-    "PoA Below Oblivion Portal - Level Key Up Ladder": { "ap_id": 55240, "position": "59_-613_639_337" },
-    "PoA Hall to Bridge Compy Room - Clip": { "ap_id": 55241, "position": "59_-1051_3056_614" },
-    "PoA Bridge Compy Room - Blue Health in Hall": { "ap_id": 55242, "position": "59_921_4403_766" },
-    "PoA Bridge Compy Room - Shotgun": { "ap_id": 55243, "position": "59_-460_5324_942" },
-    "PoA Fountain Room Bottom - LF1 in Circle 1": { "ap_id": 55244, "position": "59_-3532_5068_-307" },
-    "PoA Fountain Room Bottom - LF1 in Circle 2": { "ap_id": 55245, "position": "59_-3635_5120_-307" },
-    "PoA Fountain Room Bottom - LF1 in Circle 3": { "ap_id": 55246, "position": "59_-3686_5222_-307" },
-    "PoA Fountain Room Bottom - LF1 in Circle 4": { "ap_id": 55247, "position": "59_-3635_5324_-307" },
-    "PoA Fountain Room Bottom - LF1 in Circle 5": { "ap_id": 55248, "position": "59_-3532_5376_-307" },
-    "PoA Fountain Room Bottom - LF1 in Circle 6": { "ap_id": 55249, "position": "59_-3430_5324_-307" },
-    "PoA Fountain Room Bottom - LF1 in Circle 7": { "ap_id": 55250, "position": "59_-3379_5222_-307" },
-    "PoA Fountain Room Bottom - LF1 in Circle 8": { "ap_id": 55251, "position": "59_-3430_5120_-307" },
-    "PoA Fountain Room Bottom - Tek Bow in LF1 Circle": { "ap_id": 55252, "position": "59_-3532_5222_-307" },
-    "PoA Fountain Room Bottom - LF10 Before Level End 1": { "ap_id": 55253, "position": "59_-8806_5017_-307" },
-    "PoA Fountain Room Bottom - LF10 Before Level End 2": { "ap_id": 55254, "position": "59_-8908_4915_-307" },
-    "PoA Fountain Room Bottom - LF10 Before Level End 3": { "ap_id": 55255, "position": "59_-9011_5017_-307" },
-    "PoA Fountain Room Bottom - LF10 Before Level End 4": { "ap_id": 55256, "position": "59_-8908_5120_-307" },
-    "PoA Fountain Room Bottom - Full Health Before Level End": { "ap_id": 55257, "position": "59_-8908_5017_-307" },
-    "PoA Fountain Room - Tek Bow up Ladder": { "ap_id": 55258, "position": "59_-7066_4059_0" },
-    "PoA Fountain Room - LF10 in Fountain 1": { "ap_id": 55259, "position": "59_-5836_5478_15" },
-    "PoA Fountain Room - LF10 in Fountain 2": { "ap_id": 55260, "position": "59_-5683_5632_15" },
-    "PoA Fountain Room - LF10 in Fountain 3": { "ap_id": 55261, "position": "59_-5529_5478_15" },
-    "PoA Fountain Room - LF10 in Fountain 4": { "ap_id": 55262, "position": "59_-5683_5324_15" },
-    "PoA Fountain Room - Blue Health by Building 1": { "ap_id": 55263, "position": "59_-5836_6553_0" },
-    "PoA Fountain Room - Blue Health by Building 2": { "ap_id": 55264, "position": "59_-5529_6553_0" },
-    "PoA Fountain Room - Shotgun by Building": { "ap_id": 55265, "position": "59_-5683_6553_0" },
-    "PoA Fountain in Building F1 - Shells in Left Room": { "ap_id": 55266, "position": "59_-6100_7259_307" },
-    "PoA Fountain in Building F1 - Shells in Right Room": { "ap_id": 55267, "position": "59_-4805_6936_348" },
-    "PoA Fountain in Building F1 - Clip in Right Room": { "ap_id": 55268, "position": "59_-4511_7170_307" },
-    "PoA Fountain in Building F2 - Clip in Left Room 1": { "ap_id": 55269, "position": "59_-6160_6709_614" },
-    "PoA Fountain in Building F2 - Clip in Left Room 2": { "ap_id": 55270, "position": "59_-6160_6811_614" },
-    "PoA Fountain in Building F2 - Clip Inside Left Room Pillar": { "ap_id": 55271, "position": "59_-6160_6606_614" },
-    "PoA Fountain in Building F2 - Shells in Right Room": { "ap_id": 55272, "position": "59_-4705_7266_614" },
-    "PoA Fountain in Building F2 - Level Key in Center": { "ap_id": 55273, "position": "59_-5682_6556_645" },
-    "PoA Hall to Oblivion Portal - LF1 Trail 1": { "ap_id": 55274, "position": "59_-5836_3840_0" },
-    "PoA Hall to Oblivion Portal - LF1 Trail 2": { "ap_id": 55275, "position": "59_-5836_3532_51" },
-    "PoA Hall to Oblivion Portal - LF1 Trail 3": { "ap_id": 55276, "position": "59_-5836_3174_153" },
-    "PoA Hall to Oblivion Portal - LF1 Trail 4": { "ap_id": 55277, "position": "59_-5836_2867_153" },
-    "PoA Hall to Oblivion Portal - LF1 Trail 5": { "ap_id": 55278, "position": "59_-5529_2867_232" },
-    "PoA Hall to Oblivion Portal - LF1 Trail 6": { "ap_id": 55279, "position": "59_-5222_2867_307" },
-    "PoA Hall to Oblivion Portal - LF1 Trail 7": { "ap_id": 55280, "position": "59_-5222_3174_307" },
-    "PoA Hall to Oblivion Portal - LF1 Trail 8": { "ap_id": 55281, "position": "59_-4915_3174_307" },
-    "PoA Hall to Oblivion Portal - LF1 Trail 9": { "ap_id": 55282, "position": "59_-4608_3174_307" },
-    "PoA Hall to Oblivion Portal - LF1 Trail 10": { "ap_id": 55283, "position": "59_-4300_3174_379" },
-    "PoA Hall to Oblivion Portal - LF1 Trail 11": { "ap_id": 55284, "position": "59_-3993_3174_543" },
-    "PoA Hall to Oblivion Portal - LF1 Trail 12": { "ap_id": 55285, "position": "59_-3686_3174_614" },
-    "PoA Hall to Oblivion Portal - LF1 Trail 13": { "ap_id": 55286, "position": "59_-3686_2867_614" },
-    "PoA Hall to Oblivion Portal - LF1 Trail 14": { "ap_id": 55287, "position": "59_-3686_2611_614" },
-    "PoA Oblivion Portal Switch - Blue Health 1": { "ap_id": 55288, "position": "59_-3404_1715_302" },
-    "PoA Oblivion Portal Switch - Blue Health 2": { "ap_id": 55289, "position": "59_-3404_1868_302" },
-    "PoA Oblivion Portal Switch - Blue Health 3": { "ap_id": 55290, "position": "59_-3404_2022_302" },
-    "PoA Oblivion Portal Switch - Blue Health 4": { "ap_id": 55291, "position": "59_-3404_2176_302" },
-    "PoA Oblivion - Nuke Part": { "ap_id": 55292, "position": "78_-1075_-358_0" },
-    "PoA Exit Room - Blue Health 1": { "ap_id": 55293, "position": "59_-9728_4608_-307" },
-    "PoA Exit Room - Blue Health 2": { "ap_id": 55294, "position": "59_-9851_4610_-307" },
-    "PoA Exit Room - Blue Health 3": { "ap_id": 55295, "position": "59_-9984_4608_-307" },
-    "PoA Exit Room - Blue Health 4": { "ap_id": 55296, "position": "59_-10115_4610_-307" },
-    "PoA Exit Room - Blue Health 5": { "ap_id": 55297, "position": "59_-10240_4608_-307" },
-    "PoA Exit Room - Quiver": { "ap_id": 55298, "position": "59_-9728_5427_-307" },
-    "PoA Exit Room - Box of Shells": { "ap_id": 55299, "position": "59_-9851_5427_-307" },
-    "PoA Exit Room - Box of Bullets": { "ap_id": 55300, "position": "59_-9984_5427_-307" },
-    "PoA Exit Room - Explosive Shells": { "ap_id": 55301, "position": "59_-10102_5421_-307" },
-    "PoA Exit Room - Quiver of Tek Arrows": { "ap_id": 55302, "position": "59_-10240_5427_-307" }
-}
+    from .world import Turok2World
 
 class Turok2Location(Location):
     game = "Turok 2"
-    
-def get_location_names_with_ids(location_names: list[str]) -> dict[str, int | None]:
-    '''
-    Helper function to assist with creating locations.
-    Gets all matching location ap_ids in the listed name.
-    '''
-    return {
-        location_name: LOCATION_TABLE[location_name]["ap_id"]
-        for location_name in location_names
-    }
-    
-def get_location_names_with_prefix(prefix: str) -> dict[str, int | None]:
-    '''
-    Helper fuunction to assist with creating locations.
-    Gets all locations matching the given prefix (DO NOT include the hyphen part)
-    '''
-    full_prefix = prefix + " - "
-    return {
-        name: data["ap_id"]
-        for name, data in LOCATION_TABLE.items()
-        if name.startswith(full_prefix)
-    }
 
-def create_all_locations(world: APQuestWorld) -> None:
-    create_regular_locations(world)
-    create_events(world)
+LOCATION_TABLE = {}
+LOCATIONS_BY_ID = {}
 
-def create_regular_locations(world: APQuestWorld) -> None:
-    '''
-    Creates all locations. Locations are added to the regions
-    created in region.py.
-    '''
+def create_all_locations(world: Turok2World) -> None:
+    
+    data = json.loads(pkgutil.get_data(__name__, "data.json").decode())
+
+    for region in data.get("regions", []):
+        region_locations = region.get("locations", {})
+        for loc_name, loc_info in region_locations.items():
+            LOCATION_TABLE[loc_name] = {
+                "ap_id": loc_info["ap_id"],
+                "position": loc_info["position"],
+                "rule": loc_info.get("rule")
+            }
+            LOCATIONS_BY_ID[loc_info["ap_id"]] = loc_name
+            
+    # TODO: set up regions from the json so things link correctly
     entireGame = world.get_region("Entire Game")
     entireGame.add_locations(
         LOCATION_TABLE,
-        #get_location_names_with_prefix("PoA Start"),
         Turok2Location)
+        
+    apply_location_rules(world)
     
-def create_events(world: APQuestWorld) -> None:
-    '''
-    Define any events here that aren't just having an item.
-    We will probably put mission objectives here.
-    '''
-    pass
+def apply_location_rules(world: Turok2World):
+    for loc_name, data in LOCATION_TABLE.items():
+        if data.get("rule") is not None:
+            location = world.get_location(loc_name)
+            rule_func = build_rule(data["rule"], world)
+            set_rule(location, rule_func)
+        
+def build_rule(rule_json, world: Turok2World):
+    player = world.player
+
+    if isinstance(rule_json, str):
+        if rule_json not in NAMED_RULES:
+            raise Exception(f"Unknown named rule: {rule_json}")
+        return NAMED_RULES[rule_json](world)
+
+    if "and" in rule_json:
+        subrules = [build_rule(r, world) for r in rule_json["and"]]
+        return make_and_rule(subrules)
+
+    if "or" in rule_json:
+        subrules = [build_rule(r, world) for r in rule_json["or"]]
+        return make_or_rule(subrules)
+
+    if "has" in rule_json:
+        return build_has_rule(rule_json["has"], world)
+        
+    raise Exception(f"Unknown rule: {rule_json}")
+    
+def make_and_rule(subrules):
+    return lambda state: all(rule(state) for rule in subrules)
+    
+def make_or_rule(subrules):
+    return lambda state: any(rule(state) for rule in subrules)
+    
+def build_has_rule(has_data, world: Turok2World):
+    player = world.player
+    
+    # Simple case: the string or string array is passed directly
+    if isinstance(has_data, str):
+        return lambda state: state.has(has_data, player)
+        
+    if isinstance(has_data, list):
+        if not all(isinstance(x, str) for x in has_data):
+            raise Exception(f"'has' list must contain only strings: {has_data}")
+        return lambda state: state.has_all(has_data, player)
+        
+    # Complex case: "has" is an object
+    item = has_data.get("item")
+    category = has_data.get("category")
+    count = has_data.get("count", 1)
+    exclude = has_data.get("exclude", [])
+    
+    if item:
+        return lambda state: state.has(item, player, count)
+    if category:
+        if category not in world.item_name_groups:
+            raise Exception(f"Unknown category: {category}")
+            
+        base_items = set(world.item_name_groups[category])
+        
+        # Apply exclusions - groups and items work here
+        for ex in exclude:
+            if ex in world.item_name_groups:
+                base_items -= set(world.item_name_groups[ex])
+            elif ex in items.ITEM_TABLE:
+                base_items.discard(ex)
+            else:
+                raise Exception(f"Unknown exclusion: {ex}")
+        
+        valid_items = tuple(base_items)
+        return lambda state: state.has_from_list(valid_items, player, count)
+        
+    raise Exception(f"Invalid 'has' rule: {has_data}")
+    
+def advanced_game_logic(world: Turok2World):
+    enabled = world.options.game_logic_difficulty == GameLogicDifficulty.option_advanced
+    return lambda state: enabled
+    
+def advanced_weapon_logic(world: Turok2World):
+    enabled = world.options.weapon_logic_difficulty == WeaponLogicDifficulty.option_advanced
+    return lambda state: enabled
+    
+NAMED_RULES = {
+    "advanced_game_logic": advanced_game_logic,
+    "advanced_weapon_logic": advanced_weapon_logic
+}

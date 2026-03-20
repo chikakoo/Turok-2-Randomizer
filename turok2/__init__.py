@@ -30,8 +30,9 @@ class Turok2World(World):
     
     settings: typing.ClassVar[Turok2Settings]
 
-    location_name_to_id = {name: data["ap_id"] for name, data in locations.LOCATION_TABLE.items()}
+    location_name_to_id = locations.LOCATIONS_BY_ID
     item_name_to_id = items.ITEM_NAME_TO_ID
+    item_name_groups = items.get_item_name_groups()
     origin_region_name = "Entire Game"
 
     def create_regions(self) -> None:
