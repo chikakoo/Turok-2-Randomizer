@@ -42,8 +42,6 @@ void GetAmmoInRandomWeapon()
 	for (uint i = 0; i < g_weaponPickups.length(); i++)
 	{
 		int weaponPickupId = g_weaponPickups[i];
-		Sys.Print("Weapon pickup id: " + weaponPickupId);
-		
 		WeaponInfo@ weaponInfo = GetWeaponInfo(weaponPickupId);
 		if (weaponInfo is null)
 		{

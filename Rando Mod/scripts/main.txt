@@ -45,6 +45,7 @@ bool DeserializeBool(kDict& in dict, const kStr& in key)
 #define DESERIALIZE_INT(x)      dict.GetInt(#x, x)
 #define DESERIALIZE_BOOL(x)     x = DeserializeBool(dict, #x)
 
+#include "rando/apSettings.as"
 #include "defs/common.txt"
 #include "defs/randoConstants.as"
 

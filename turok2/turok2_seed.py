@@ -6,6 +6,7 @@ from worlds.Files import APPlayerContainer
 from typing import TYPE_CHECKING
 from .locations import LOCATION_TABLE
 from .items import ITEM_TABLE
+from .options import Goal
 
 if TYPE_CHECKING:
     from . import Turok2World
@@ -91,5 +92,14 @@ def get_angelscript_from_filled_locations(self: "Turok2World") -> str:
 def get_settings_string(self: "Turok2World") -> str:
     """
     Gets the macro file with any settings the game needs to know.
+    
+    Goal:
+    - Primagen (default/fallback): The ending cutscenes are id 10 or 11, depending on which ending
+    - Goal: The hub's id is 60, so set both macros to that
     """
-    return "// No settings here yet!";
+    if self.options.goal == Goal.option_hub:
+        settings = "#define OPTION_GOAL_LEVEL_A 60\n#define OPTION_GOAL_LEVEL_B 60"
+    else:
+        settings = "#define OPTION_GOAL_LEVEL_A 10\n#define OPTION_GOAL_LEVEL_B 11"
+        
+    return settings;

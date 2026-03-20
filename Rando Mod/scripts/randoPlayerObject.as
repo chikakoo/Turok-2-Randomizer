@@ -39,8 +39,9 @@ class RandoPlayerObject : ScriptObject
 			ResetAPForLoadData(0);
 		}
 		
-		// The goal is either one of the enings
-		if (mapId == kLevel_Ending || mapId == kLevel_EndingB)
+		// Check the goal - there's two checks here in case it's the
+		// Primagen, which has two different maps for the two endings
+		if (mapId == OPTION_GOAL_LEVEL_A || mapId == OPTION_GOAL_LEVEL_B)
 		{
 			g_AP.IsGoalReached = 1;
 		}

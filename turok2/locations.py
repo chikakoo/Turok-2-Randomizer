@@ -14,7 +14,16 @@ class Turok2Location(Location):
     game = "Turok 2"
 
 LOCATION_TABLE = {}
-LOCATIONS_BY_ID = {}
+LOCATION_NAME_TO_ID = {}
+
+def _build_location_name_to_id():
+    data = json.loads(pkgutil.get_data(__name__, "data.json").decode())
+
+    for region_data in data.get("regions", []):
+        for loc_name, loc_info in region_data.get("locations", {}).items():
+            LOCATION_NAME_TO_ID[loc_name] = loc_info["ap_id"]
+
+_build_location_name_to_id()
 
 def create_locations(world: Turok2World) -> None:
     """
@@ -31,22 +40,20 @@ def create_locations(world: Turok2World) -> None:
         region_location_objs = {}
         
         for loc_name, loc_info in region_locations.items():
-            region_location_objs[loc_name] = Turok2Location(
+            location = Turok2Location(
                 world.player,
                 loc_name,
                 loc_info["ap_id"],
                 region_obj
             )
+            region_obj.locations.append(location)
             
             LOCATION_TABLE[loc_name] = {
                 "ap_id": loc_info["ap_id"],
                 "position": loc_info["position"],
                 "rule": loc_info.get("rule")
             }
-            LOCATIONS_BY_ID[loc_info["ap_id"]] = loc_name
-            
-        region_obj.add_locations(region_location_objs)
-        
+
 def create_regions_and_entrances(world: Turok2World) -> None:
     """
     Creates regions and connects them together based on the json data.

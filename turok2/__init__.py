@@ -15,7 +15,7 @@ class Turok2Settings(settings.Group):
         is_exe = True
         description = "Turok 2 Executable"
     turok2_path: Turok2Path = Turok2Path(
-        "C:/Program Files (x86)/Steam/steamapps/common/Turok 2 - Seeds of Evil/horus_Shipping_Playfab_Steam_x64.exe")
+        "C:/Program Files (x86)/Steam/steamapps/common/Turok 2 - Seeds of Evil/Turok2.exe")
 
 class Turok2World(World):
     """
@@ -30,7 +30,7 @@ class Turok2World(World):
     
     settings: typing.ClassVar[Turok2Settings]
 
-    location_name_to_id = locations.LOCATIONS_BY_ID
+    location_name_to_id = locations.LOCATION_NAME_TO_ID
     item_name_to_id = items.ITEM_NAME_TO_ID
     item_name_groups = items.get_item_name_groups()
     origin_region_name = "PoA Start"
