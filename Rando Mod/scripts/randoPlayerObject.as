@@ -156,14 +156,10 @@ class RandoPlayerObject : ScriptObject
 				initialActor.ModeStateComponent().Mode());
 		}
 		
-		// Turn on the flag so that collision can be detected
-		// We need to be able to detect touching health/ammo
-		// pickups even when we don't have full so we can send the AP check
-		if (IsHealthOrAmmo(replacedActor))
-		{
-			newWorldComponent.Flags() |= WCF_INVOKE_COLLIDE_CALLBACK;
-		}
-		
+		// Turn on collision for health/ammo detection and to
+		// have a common place to show the pickup status message
+		newWorldComponent.Flags() |= WCF_INVOKE_COLLIDE_CALLBACK;
+
 		// Flag the actor as important so it can be found easier
 		// If it was already sent to AP, do not do this since it was "collected" already
 		if (!replacement.isSentToAP)
@@ -255,13 +251,15 @@ class RandoPlayerObject : ScriptObject
 				g_outgoingMessageQueue.insertLast(
 					APOutgoingMessage(AP_OUT_MSGTYPE_SEND_CHECK, current.Atoi()));
 					
+				int apId = current.Atoi();
+				int mapId = ConvertMapIdFromApId(apId);
 				if (key == "collectedLocations")
 				{
-					CollectLocation(current.Atoi());
+					CollectLocation(apId, mapId);
 				}
 				else
 				{
-					MarkSentToAP(current.Atoi());
+					MarkSentToAP(apId, mapId);
 				}
 				
 				current = "";

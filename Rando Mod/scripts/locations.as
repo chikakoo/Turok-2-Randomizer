@@ -171,12 +171,13 @@ bool TryGetReplacement(
 }
 
 //------------------------------
-// Gets the replacement on the current map with the given AP id.
+// Gets the replacement on the given map with the given AP id.
 // Returns null if not found.
-ReplacementEntry@ GetCurrentMapReplacementWithApId(const int &in apId)
+ReplacementEntry@ GetReplacementWithApId(
+	const int &in apId, const int &in mapId)
 {
 	array<ReplacementEntry@>@ locations;
-	if (!TryGetReplacementArray(Game.ActiveMapID(), locations))
+	if (!TryGetReplacementArray(mapId, locations))
 	{
 		return null;
 	}
@@ -190,19 +191,6 @@ ReplacementEntry@ GetCurrentMapReplacementWithApId(const int &in apId)
     }
 	
 	return null;
-}
-
-//------------------------------
-// Marks the given location as collected by setting it in the map.
-// We handle sending to AP in SendCheckToAP - see that documentation.
-// apId: The AP id to mark as collected
-void CollectLocation(const int &in apId)
-{
-	ReplacementEntry@ location = GetCurrentMapReplacementWithApId(apId);
-	if (location !is null)
-	{
-		location.isCollected = true;
-	}
 }
 
 //------------------------------
@@ -353,7 +341,7 @@ void DisplayCollectedLocationsForGame(const int &in visibleTime = 120)
 // apId: The AP id to send to AP
 void SendCheckToAP(const int &in apId)
 {
-	ReplacementEntry@ location = GetCurrentMapReplacementWithApId(apId);
+	ReplacementEntry@ location = GetReplacementWithApId(apId, Game.ActiveMapID());
 	if (location !is null)
 	{
 		location.isSentToAP = true;
@@ -362,15 +350,37 @@ void SendCheckToAP(const int &in apId)
 	}
 }
 
+
+//------------------------------
+// Marks the given location as collected by setting it in the map.
+// We handle sending to AP in SendCheckToAP - see that documentation.
+// apId: The AP id to mark as collected
+void CollectLocation(const int &in apId, const int &in mapId)
+{
+	ReplacementEntry@ location = GetReplacementWithApId(apId, mapId);
+	if (location !is null)
+	{
+		location.isCollected = true;
+	}
+}
+
 //------------------------------
 // Marks the location as sent to AP.
 // Used when loading a save with locations already sent to AP.
 // apId: The AP id to mark as sent to AP
-void MarkSentToAP(const int &in apId)
+void MarkSentToAP(const int &in apId, const int &in mapId)
 {
-	ReplacementEntry@ location = GetCurrentMapReplacementWithApId(apId);
+	ReplacementEntry@ location = GetReplacementWithApId(apId, mapId);
 	if (location !is null)
 	{
 		location.isSentToAP = true;
 	}
+}
+
+//------------------------------
+// The AP id is in this format: MMXXX or MMMXXX.
+// We can get the map (M) part with some simple math.
+int ConvertMapIdFromApId(const int &in apId)
+{
+	return apId / 1000;
 }

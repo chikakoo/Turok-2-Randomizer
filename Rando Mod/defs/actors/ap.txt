@@ -273,7 +273,7 @@ TrapSilverHealth kActor_Trap_Spam_Silver_Health
     End_Component
 }
 
-TrapBlueHealth kActor_Trap_Spam_Silver_Health
+TrapBlueHealth kActor_Trap_Spam_Blue_Health
 {
     className                   "kexLifeForcePickup"
 	pickup.lifeforce.amount     0
@@ -297,7 +297,7 @@ TrapBlueHealth kActor_Trap_Spam_Silver_Health
     End_Component
 }
 
-TrapFullHealth kActor_Trap_Spam_Silver_Health
+TrapFullHealth kActor_Trap_Spam_Full_Health
 {
     className                   "kexLifeForcePickup"
 	pickup.lifeforce.amount     0
@@ -321,7 +321,7 @@ TrapFullHealth kActor_Trap_Spam_Silver_Health
     End_Component
 }
 
-TrapUltraHealth kActor_Trap_Spam_Silver_Health
+TrapUltraHealth kActor_Trap_Spam_Ultra_Health
 {
     className                   "kexLifeForcePickup"
 	pickup.lifeforce.amount     0

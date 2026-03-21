@@ -50,6 +50,10 @@ HubKey3 kActor_InventoryItem_Level3Key
 	pickup.pickupSound "sounds/shaders/Ammo Pickup.ksnd" 
 	pickup.pickupMessage "$str_115"
 	
+	initialScale              "0.5 0.5 0.5"
+	Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Level_3_Key.staticmesh"
+    End_Component
 	Begin_Component "kexScriptComponent"
         scriptClass           "RandoPickupObject"
         triggerRadius         81.92
@@ -65,6 +69,10 @@ HubKey4 kActor_InventoryItem_Level4Key
 	pickup.pickupSound "sounds/shaders/Ammo Pickup.ksnd" 
 	pickup.pickupMessage "$str_116"
 	
+	initialScale              "0.5 0.5 0.5"
+	Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Level_4_Key.staticmesh"
+    End_Component
 	Begin_Component "kexScriptComponent"
         scriptClass           "RandoPickupObject"
         triggerRadius         81.92
@@ -80,6 +88,10 @@ HubKey5 kActor_InventoryItem_Level5Key
 	pickup.pickupSound "sounds/shaders/Ammo Pickup.ksnd" 
 	pickup.pickupMessage "$str_117"
 	
+	initialScale              "0.5 0.5 0.5"
+	Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Level_5_Key.staticmesh"
+    End_Component
 	Begin_Component "kexScriptComponent"
         scriptClass           "RandoPickupObject"
         triggerRadius         81.92
@@ -95,6 +107,10 @@ HubKey6 kActor_InventoryItem_Level6Key
 	pickup.pickupSound "sounds/shaders/Ammo Pickup.ksnd" 
 	pickup.pickupMessage "$str_118"
 	
+	initialScale              "0.5 0.5 0.5"
+	Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Level_6_Key.staticmesh"
+    End_Component
 	Begin_Component "kexScriptComponent"
         scriptClass           "RandoPickupObject"
         triggerRadius         81.92

@@ -68,10 +68,10 @@ class RandoPickupObject : ScriptObject
 			pCollider.InstanceOf("kexPuppet"))
 		{			
 			SendCheckToAP(m_id);
+			DisplayCollectedLocationsForCurrentMap();
 			if (IsHealthOrAmmo(self))
 			{
 				PlayPickupNotificationSound(self.Definition());
-				DisplayCollectedLocationsForCurrentMap();
 			}
 			
 			// Turn the flags off now, since we already sent the check.
@@ -87,7 +87,7 @@ class RandoPickupObject : ScriptObject
 		Sys.Print(m_position);
 		if (m_id != 0)
 		{
-			CollectLocation(m_id);
+			CollectLocation(m_id, Game.ActiveMapID());
 			SendCheckToAP(m_id);
 			
 			// If this item is marked with rando.give2, do this to give the second one
