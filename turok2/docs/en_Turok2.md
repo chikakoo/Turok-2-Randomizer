@@ -2,9 +2,9 @@
 
 ## Where is the options page?
 
-You will need to edit the yaml yourself. To get it, either download from [The Turok 2 apworld and mod](https://github.com/chikakoo/Turok-2-Randomizer/releases), or generate it from the Archipelago Launcher.
+Archipelago uses yaml files for game options. You will need to get and edit the yaml with your desired options. Either download from [the release](https://github.com/chikakoo/Turok-2-Randomizer/releases), or generate it from the Archipelago Launcher.
 
-To do that, install the AP world by downloading it and double-clicking it (or by putting it in your Archipeago's "custom worlds" directory. In the launcher, run "Generate Templates" to generate the yaml.
+To generate it, install the AP world by downloading it and double-clicking it (or by putting it in your Archipelago's "custom worlds" directory). In the launcher, run "Generate Template Option" to generate the yaml.
 
 ## What items and locations get randomized?
 
