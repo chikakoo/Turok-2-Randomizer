@@ -24,7 +24,6 @@ class Turok2Context(CommonContext):
         
     async def server_auth(self, password_requested: bool = False) -> None:
         if password_requested and not self.password:
-            self.ui.allow_intro_song()
             await super().server_auth(password_requested)
         await self.get_username()
         await self.send_connect(game=self.game)

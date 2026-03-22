@@ -782,8 +782,8 @@ def force_local_items(world: Turok2World, item_type: int, percentage: int):
     """
     items = [
         item for item in world.multiworld.itempool 
-        if ITEM_TABLE[item.name].get("type", -1) == item_type 
-        and item.player == world.player
+        if item.player == world.player
+        and ITEM_TABLE[item.name].get("type", -1) == item_type
     ]
     world.multiworld.random.shuffle(items) # Avoids bias for earlier items
     

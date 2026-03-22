@@ -72,7 +72,7 @@ Talisman4 kActor_Talisman_Whispers
 	
 	initialScale              "0.2 0.2 0.2"
 	Begin_Component "kexStaticMeshComponent"
-        mesh                  "models/Leap_Of_Faith.staticmesh"
+        mesh                  "models/Whispers.staticmesh"
     End_Component
 	Begin_Component "kexScriptComponent"
         scriptClass           "RandoPickupObject"
