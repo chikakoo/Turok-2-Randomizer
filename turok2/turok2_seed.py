@@ -21,7 +21,7 @@ class Turok2Container(APPlayerContainer):
         self.ap_settings = ap_settings
         self.file_path = base_path
         container_path = os.path.join(output_directory, base_path)
-        self.patch_file_ending = ".kpf"
+        self.patch_file_ending = ".apturok2"
         super().__init__(container_path, player, player_name, server)
 
     def write_contents(self, opened_zipfile: zipfile.ZipFile) -> None:

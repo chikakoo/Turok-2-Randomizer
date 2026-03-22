@@ -16,7 +16,7 @@ You also need to have [Archipelago](https://github.com/ArchipelagoMW/Archipelago
 
 Installing the mod is very simple. First, locate your Turok 2 installation folder. The typical Steam location is _C:\Program Files (x86)\Steam\steamapps\common\Turok 2 - Seeds of Evil_.
 
-Once there, create a _mods_ folder. Move the files from the mod (the _.kpf_ files) you downloaded from the [Required Software](#Required Software) section in this folder.
+Once there, create a _mods_ folder. Move the files from the mod (the _.kpf_ files) you downloaded from the [Required Software](#required-software) section in this folder.
 
 **Test that it worked before playing. You will see a custom title screen if it worked.**
 
@@ -24,7 +24,7 @@ Once there, create a _mods_ folder. Move the files from the mod (the _.kpf_ file
 
 Turok 2 uses a patch file to do its randomization and apply the game-specific yaml settings to the game.
 
-When your seed is generated, acquire your patch file like you normally would _(downloaded from the room, or extracted from the generated seed zip)_. This is the one called _rando.kpf_. To install, place it with the other mod files.
+When your seed is generated, acquire your patch file like you normally would _(downloaded from the room, or extracted from the generated seed zip)_. Extract the files from the patch - you should see one called _rando.kpf_. Place _rando.kpf_ with the other mod files.
 
 **Failure to install this will result in local items not being randomized!** Or, if you played a previous seed, it will use that seed's randomization. If you see the client telling you that you picked up something that you didn't, make sure you installed the correct patch!
 
