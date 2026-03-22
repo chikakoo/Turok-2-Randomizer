@@ -16,7 +16,7 @@ You also need to have [Archipelago](https://github.com/ArchipelagoMW/Archipelago
 
 Installing the mod is very simple. First, locate your Turok 2 installation folder. The typical Steam location is _C:\Program Files (x86)\Steam\steamapps\common\Turok 2 - Seeds of Evil_.
 
-Once there, create a _mods_ folder. Move the files from the mod (the _.kpf_ files) you downloaded from the [Required Software](#required-software) section in this folder.
+Once there, create a _mods_ folder. Extract the files from the mod zip (the _.kpf_ files) you downloaded from the [Required Software](#required-software) section into this folder. You should have a few files like: **mods/FileNameHere.kpf**.
 
 **Test that it worked before playing. You will see a custom title screen if it worked.**
 
