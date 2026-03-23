@@ -802,7 +802,7 @@ def try_force_early_weapon(world: Turok2World):
     If the setting is on, forces a land weapon that is not bad into
     the starting area.
     """
-    if not world.options.force_early_weapon:
+    if not world.options.include_weapon_locations or not world.options.force_early_weapon:
         return
         
     def is_valid_early_weapon(item_name: str) -> bool:

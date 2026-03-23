@@ -53,9 +53,9 @@ def create_locations(world: Turok2World) -> None:
                 continue
             if not world.options.randomize_ammo and item_type == ItemType.AMMO.value:
                 continue
-            if not world.options.randomize_weapons and item_type == ItemType.WEAPON.value:
-                continue
             """
+            if not world.options.include_weapon_locations and item_type == ItemType.WEAPON.value:
+                continue
             
             location = Turok2Location(
                 world.player,
@@ -129,12 +129,19 @@ def build_rule(rule_json, world: Turok2World):
     Supports specific functions, and/or, and has, which will check for items or categories.
     - See NAMED_RULES for the specific functions supported.
     """
-    player = world.player
-
+    # Named rule (no parameters)
     if isinstance(rule_json, str):
         if rule_json not in NAMED_RULES:
             raise Exception(f"Unknown named rule: {rule_json}")
         return NAMED_RULES[rule_json](world)
+    
+    # Named rule (with parameters)
+    if isinstance(rule_json, dict):
+        # Named rule with parameters
+        if len(rule_json) == 1:
+            rule_name, rule_args = next(iter(rule_json.items()))
+            if rule_name in NAMED_RULES:
+                return NAMED_RULES[rule_name](world, rule_args)
 
     if "and" in rule_json:
         subrules = [build_rule(r, world) for r in rule_json["and"]]
@@ -179,31 +186,38 @@ def build_has_rule(has_data, world: Turok2World):
         
     # Complex case: "has" is an object
     item = has_data.get("item")
-    category = has_data.get("category")
     count = has_data.get("count", 1)
-    exclude = has_data.get("exclude", [])
+    category = has_data.get("category")
     
     if item:
         return lambda state: state.has(item, player, count)
     if category:
-        if category not in world.item_name_groups:
-            raise Exception(f"Unknown category: {category}")
-            
-        base_items = set(world.item_name_groups[category])
-        
-        # Apply exclusions - groups and items work here
-        for ex in exclude:
-            if ex in world.item_name_groups:
-                base_items -= set(world.item_name_groups[ex])
-            elif ex in items.ITEM_TABLE:
-                base_items.discard(ex)
-            else:
-                raise Exception(f"Unknown exclusion: {ex}")
-        
-        valid_items = tuple(base_items)
-        return lambda state: state.has_from_list_unique(valid_items, player, count)
+        exclude = has_data.get("exclude", [])
+        return compute_category_rule(world, category, exclude, count)
         
     raise Exception(f"Invalid 'has' rule: {has_data}")
+
+def compute_category_rule(world: Turok2World, category: str, exclude: list, count: int = 1):
+    """
+    Checks whether the player has the given count of unique items of the given category
+    - If it contains an "exclude" property, will not include items in that category
+    """
+    if category not in world.item_name_groups:
+        raise Exception(f"Unknown category: {category}")
+            
+    base_items = set(world.item_name_groups[category])
+    
+    # Apply exclusions - groups and items work here
+    for ex in exclude:
+        if ex in world.item_name_groups:
+            base_items -= set(world.item_name_groups[ex])
+        elif ex in items.ITEM_TABLE:
+            base_items.discard(ex)
+        else:
+            raise Exception(f"Unknown exclusion: {ex}")
+    
+    valid_items = tuple(base_items)
+    return lambda state: state.has_from_list_unique(valid_items, world.player, count)
     
 def advanced_game_logic(world: Turok2World):
     """Checks advanced game logic is on."""
@@ -215,9 +229,27 @@ def advanced_weapon_logic(world: Turok2World):
     enabled = world.options.weapon_logic_difficulty == WeaponLogicDifficulty.option_advanced
     return lambda state: enabled
 
+def weapon_requirement(world: Turok2World, args: dict):
+    """
+    Checks whether the weapon requirements are met (categories and count).
+    Returns true if weapons are not randomized, as it's assumed the game's given weapons are enough.
+    """
+    category = args.get("category")
+    if not category:
+        raise Exception("weapon_requirement missing 'category'")
+
+    exclude = args.get("exclude", [])
+    count = args.get("count", 1)
+
+    if not world.options.include_weapon_locations:
+        return lambda state: True
+
+    return compute_category_rule(world, category, exclude, count)
+
 NAMED_RULES = {
     "advanced_game_logic": advanced_game_logic,
-    "advanced_weapon_logic": advanced_weapon_logic
+    "advanced_weapon_logic": advanced_weapon_logic,
+    "weapon_requirement": weapon_requirement
 }
     
 def create_completion_condition(world: Turok2World):
