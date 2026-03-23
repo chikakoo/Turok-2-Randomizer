@@ -45,6 +45,8 @@ def create_locations(world: Turok2World) -> None:
         for loc_name, loc_info in region_locations.items():
             # Exclude life force locations if not shuffled
             item_type = loc_info.get("type", -1)
+            """
+            # TODO: fix how this is done
             if not world.options.randomize_life_forces and item_type == ItemType.LIFE_FORCE.value:
                 continue
             if not world.options.randomize_health and item_type == ItemType.HEALTH.value:
@@ -53,6 +55,7 @@ def create_locations(world: Turok2World) -> None:
                 continue
             if not world.options.randomize_weapons and item_type == ItemType.WEAPON.value:
                 continue
+            """
             
             location = Turok2Location(
                 world.player,

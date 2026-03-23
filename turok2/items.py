@@ -1,7 +1,7 @@
 from __future__ import annotations
 from collections import Counter
 from enum import Enum
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Callable
 from BaseClasses import Item, ItemClassification
 from .client.ap_memory_constants import APMessageType
 
@@ -624,7 +624,7 @@ def get_item_name_groups() -> dict[str, set[str]]:
 
     return groups
 
-def get_required_seed_items():
+def get_required_seed_items(world: Turok2World):
     """
     All items required to be in the seed.
     These are all weapons, and all inventory items.
@@ -632,24 +632,8 @@ def get_required_seed_items():
     return [
         (name, data)
         for name, data in ITEM_TABLE.items()
-        if ((options.randomize_weapons and data["msg_type"] == APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value) or
-            data["msg_type"] == APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value)
-    ]
-
-
-def get_filler_items():
-    return [
-        (name, data)
-        for name, data in ITEM_TABLE.items()
-        if data["class"] == ItemClassification.filler
-    ]
-
-
-def get_useful_items():
-    return [
-        (name, data)
-        for name, data in ITEM_TABLE.items()
-        if data["class"] == ItemClassification.useful
+        if ((world.options.include_weapon_locations and data["type"] == ItemType.WEAPON.value) or
+            data["msg_type"] == APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value) # TODO: use ItemType here
     ]
 
 class Turok2Item(Item):
@@ -660,18 +644,13 @@ def get_random_filler_item_name(world: Turok2World) -> str:
     world.py will use this to generate filler items.
     This will generate a random filler by weight based on filler/useful items.
     """
-    categories = []
     
-    if world.options.randomize_health:
-        categories.append(ItemType.HEALTH.value, 25)
-        
-    if world.options.randomize_ammo:
-        categories.append(ItemType.AMMO.value, 25)
-    
-    # Use life forces if nothing valid is filler
-    if not categories or world.options.randomize_life_forces:
-        categories.append(ItemType.LIFE_FORCE.value, 50)
-    
+    categories = [
+        (ItemType.HEALTH.value, world.options.junk_item_pool_health_weight),
+        (ItemType.AMMO.value, world.options.junk_item_pool_ammo_weight),
+        (ItemType.LIFE_FORCE.value, world.options.junk_item_pool_life_force_weight),
+        (ItemType.TRAP.value, world.options.junk_item_pool_trap_weight)
+    ]
     category_names = [name for name, _ in categories]
     category_weights = [weight for _, weight in categories]
     
@@ -683,6 +662,8 @@ def get_random_filler_item_name(world: Turok2World) -> str:
         return get_random_health_pickup_item_name(world)
     elif chosen_category == ItemType.AMMO.value:
         return get_random_ammo_pickup_item_name(world)
+    elif chosen_category == ItemType.TRAP.value:
+        return get_random_trap_item_name(world)
     else:
         # Acts as the fallback
         return get_random_life_force_item_name(world)
@@ -754,32 +735,33 @@ def get_random_ammo_pickup_item_name(world: Turok2World) -> str:
     """
     return "Random Ammo Pack"
     
-def add_weighted_items(
+def add_items_to_itempool(
     world: Turok2World,
     itempool: list[Item],
-    needed_number_of_items: int,
-    percentage: int,
-    get_random_item_name_func) -> int:
+    number_of_unfilled_locations: int,
+    percentage_sum: int,
+    item_fill_percent: int,
+    get_item_name_function: Callable[[Turok2World], str | None]):
     """
-    Adds items to the itempool based on a percentage of remaining slots.
-    Returns the updated needed_number_of_items.
+    Adds items to the item pool based on the percentage sum, and the percent given.
+    If the sum if > 100, treat the percent as a ratio of the given sum. 
+    Otherwise, use it as the percent.
     """
-    if percentage <= 0 or needed_number_of_items <= 0:
-        return needed_number_of_items
-
-    ratio = percentage / 100.0
-    number_to_add = round(needed_number_of_items * ratio)
-
-    for _ in range(number_to_add):
-        item_name = get_random_item_name_func(world)
-        if item_name is not None:
-            itempool.append(world.create_item(item_name))
-            needed_number_of_items -= 1
-
-            if needed_number_of_items <= 0:
-                break
-
-    return needed_number_of_items
+    if item_fill_percent <= 0:
+        return
+    
+    if percentage_sum > 100:
+        ratio = item_fill_percent / percentage_sum
+    else:
+        ratio = item_fill_percent / 100.0
+    
+    # Any rounding error will be lower than expected, which is okay
+    count = int(number_of_unfilled_locations * ratio)
+    
+    for _ in range(count):
+        name = get_item_name_function(world)
+        if name:
+            itempool.append(world.create_item(name))
     
 def force_local_items(world: Turok2World, item_type: int, percentage: int):
     """
@@ -841,8 +823,8 @@ def try_force_early_weapon(world: Turok2World):
     if not weapon_items:
         weapon_items = [
             item for item in world.multiworld.itempool
-            if ITEM_TABLE[item.name].get("type") == ItemType.WEAPON.value
-            and item.player == world.player
+            if item.player == world.player and 
+                ITEM_TABLE[item.name].get("type", "-1") == ItemType.WEAPON.value
         ]
 
     starting_locations = [
@@ -878,7 +860,7 @@ def create_all_items(world: Turok2World) -> None:
         TRAPS_BY_CATEGORY.setdefault(trap_type, []).append((name, data))
 
     # Add all the required items to the pool (weapons and inventory items)
-    for name, data in get_required_seed_items():
+    for name, data in get_required_seed_items(world):
         for _ in range(data.get("count", 1)):
             itempool.append(world.create_item(name))
          
@@ -887,61 +869,40 @@ def create_all_items(world: Turok2World) -> None:
     number_of_items = len(itempool)
     needed_number_of_filler_items = max(0, number_of_unfilled_locations - number_of_items)
     
-    # Traps
-    needed_number_of_filler_items = add_weighted_items(
+    percentage_sum_of_minimum_items = (
+        world.options.minimum_health_percent + 
+        world.options.minimum_ammo_percent + 
+        world.options.minimum_life_force_percent)
+        
+    add_items_to_itempool(
         world,
         itempool,
         needed_number_of_filler_items,
-        world.options.trap_fill_percentage,
-        get_random_trap_item_name
-    )
-
-    # Life Forces
-    if world.options.randomize_life_forces:
-        needed_number_of_filler_items = add_weighted_items(
-            world,
-            itempool,
-            needed_number_of_filler_items,
-            world.options.life_force_fill_percentage,
-            get_random_life_force_item_name
-        )
-                
-    # Health and Ammo
-    # If their percentages are > 100, they should instead be a ratio to fill out
-    # the remaining item locations
-    #
-    # Otherwise, use them as percentages and let create_filler make the rest of the items
-    health_fill_percentage = world.options.health_fill_percentage if options.randomize_health else 0
-    ammo_fill_percentage = world.options.ammo_fill_percentage if options.randomize_ammo else 0
-    percentage_sum = health_fill_percentage + ammo_fill_percentage
+        percentage_sum_of_minimum_items,
+        world.options.minimum_health_percent,
+        get_random_health_pickup_item_name)
+    add_items_to_itempool(
+        world,
+        itempool,
+        needed_number_of_filler_items,
+        percentage_sum_of_minimum_items,
+        world.options.minimum_ammo_percent,
+        get_random_ammo_pickup_item_name)
+    add_items_to_itempool(
+        world,
+        itempool,
+        needed_number_of_filler_items,
+        percentage_sum_of_minimum_items,
+        world.options.minimum_life_force_percent,
+        get_random_life_force_item_name)
     
-    if percentage_sum > 100:
-        health_ratio = health_fill_percentage / percentage_sum
-        ammo_ratio = ammo_fill_percentage / percentage_sum
-    else:
-        health_ratio = health_fill_percentage / 100.0
-        ammo_ratio = ammo_fill_percentage / 100.0
-
-    health_count = round(needed_number_of_filler_items * health_ratio)
-    ammo_count = round(needed_number_of_filler_items * ammo_ratio)
-
-    # Health pickups
-    for _ in range(health_count):
-        name = get_random_health_pickup_item_name(world)
-        if name:
-            itempool.append(world.create_item(name))
-
-    # Ammo pickups
-    for _ in range(ammo_count):
-        name = get_random_ammo_pickup_item_name(world)
-        if name:
-            itempool.append(world.create_item(name))
-            
-    needed_number_of_filler_items -= (health_count + ammo_count)
+    # Recompute the number of filler items needed
+    number_of_unfilled_locations = len(world.multiworld.get_unfilled_locations(world.player))
+    number_of_items = len(itempool)
+    needed_number_of_filler_items = max(0, number_of_unfilled_locations - number_of_items)
     
-    # Fill out the rest of the pool - ends up using get_random_filler_item_name
+    # Fill out the rest of the pool (calls get_random_filler_item_name)
     itempool += [world.create_filler() for _ in range(needed_number_of_filler_items)]
-
     world.multiworld.itempool += itempool
     
     # Force local items depending on options
