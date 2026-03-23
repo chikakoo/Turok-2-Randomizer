@@ -1,10 +1,11 @@
 from dataclasses import dataclass
 from Options import Choice, OptionGroup, PerGameCommonOptions, Range, Toggle
-#todo: randomize options for health/ammo/life force tiles
-#      whether to shuffle nuke parts, include it as a possible weapon, or just exclude them
-#      whether to include the nuke in the random ammo packs
-#      death link
-#      whether to mark the pickups as important in the game
+#todo:
+# individual pickup weights (health, life force)
+# whether to shuffle nuke parts, include it as a possible weapon, or  just exclude them
+# whether to include the nuke in the random ammo packs
+# death link
+# whether to mark the pickups as important in the game
 
 class Goal(Choice):
     """
