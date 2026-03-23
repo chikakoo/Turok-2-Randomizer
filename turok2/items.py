@@ -632,7 +632,7 @@ def get_required_seed_items():
     return [
         (name, data)
         for name, data in ITEM_TABLE.items()
-        if (data["msg_type"] == APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value or
+        if ((options.randomize_weapons and data["msg_type"] == APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value) or
             data["msg_type"] == APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value)
     ]
 
@@ -660,11 +660,17 @@ def get_random_filler_item_name(world: Turok2World) -> str:
     world.py will use this to generate filler items.
     This will generate a random filler by weight based on filler/useful items.
     """
-    categories = [
-        (ItemType.LIFE_FORCE.value, 50),
-        (ItemType.HEALTH.value, 25),
-        (ItemType.AMMO.value, 25)
-    ]
+    categories = []
+    
+    if world.options.randomize_health:
+        categories.append(ItemType.HEALTH.value, 25)
+        
+    if world.options.randomize_ammo:
+        categories.append(ItemType.AMMO.value, 25)
+    
+    # Use life forces if nothing valid is filler
+    if not categories or world.options.randomize_life_forces:
+        categories.append(ItemType.LIFE_FORCE.value, 50)
     
     category_names = [name for name, _ in categories]
     category_weights = [weight for _, weight in categories]
@@ -891,21 +897,22 @@ def create_all_items(world: Turok2World) -> None:
     )
 
     # Life Forces
-    needed_number_of_filler_items = add_weighted_items(
-        world,
-        itempool,
-        needed_number_of_filler_items,
-        world.options.life_force_fill_percentage,
-        get_random_life_force_item_name
-    )
+    if world.options.randomize_life_forces:
+        needed_number_of_filler_items = add_weighted_items(
+            world,
+            itempool,
+            needed_number_of_filler_items,
+            world.options.life_force_fill_percentage,
+            get_random_life_force_item_name
+        )
                 
     # Health and Ammo
     # If their percentages are > 100, they should instead be a ratio to fill out
     # the remaining item locations
     #
     # Otherwise, use them as percentages and let create_filler make the rest of the items
-    health_fill_percentage = world.options.health_fill_percentage
-    ammo_fill_percentage = world.options.ammo_fill_percentage
+    health_fill_percentage = world.options.health_fill_percentage if options.randomize_health else 0
+    ammo_fill_percentage = world.options.ammo_fill_percentage if options.randomize_ammo else 0
     percentage_sum = health_fill_percentage + ammo_fill_percentage
     
     if percentage_sum > 100:

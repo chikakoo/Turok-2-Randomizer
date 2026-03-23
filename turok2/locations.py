@@ -4,8 +4,9 @@ import pkgutil
 from typing import TYPE_CHECKING
 from BaseClasses import ItemClassification, Location, CollectionState, Entrance, Region
 from worlds.generic.Rules import set_rule
-from .options import GameLogicDifficulty, WeaponLogicDifficulty, Goal
+from .options import Goal, GameLogicDifficulty, WeaponLogicDifficulty
 from . import items
+from .items import ItemType
 
 if TYPE_CHECKING:
     from .world import Turok2World
@@ -42,6 +43,17 @@ def create_locations(world: Turok2World) -> None:
         
         region_locations = region_data.get("locations", {})
         for loc_name, loc_info in region_locations.items():
+            # Exclude life force locations if not shuffled
+            item_type = loc_info.get("type", -1)
+            if not world.options.randomize_life_forces and item_type == ItemType.LIFE_FORCE.value:
+                continue
+            if not world.options.randomize_health and item_type == ItemType.HEALTH.value:
+                continue
+            if not world.options.randomize_ammo and item_type == ItemType.AMMO.value:
+                continue
+            if not world.options.randomize_weapons and item_type == ItemType.WEAPON.value:
+                continue
+            
             location = Turok2Location(
                 world.player,
                 loc_name,

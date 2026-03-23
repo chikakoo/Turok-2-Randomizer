@@ -51,6 +51,46 @@ class WeaponLogicDifficulty(Choice):
     
     default = option_casual
     
+class RandomizeLifeForces(Toggle):
+    """
+    Whether to include life forces in the item pool.
+    Also affects whether life force locations are checks.
+    """
+    display_name = "Randomize Life Forces"
+    default = True
+    
+class RandomizeHealth(Toggle):
+    """
+    Whether to include health pickups in the item pool.
+    Also affects whether health locations are checks.
+    """
+    display_name = "Randomize Health"
+    default = True
+    
+class RandomizeAmmo(Toggle):
+    """
+    Whether to include ammo pickups in the item pool.
+    Also affects whether ammo locations are checks.
+    """
+    display_name = "Randomize Ammo"
+    default = True
+    
+class RandomizeWeapons(Toggle):
+    """
+    Whether to include weapon pickups in the item pool.
+    Also affects whether weapon pickup locations are checks.
+    """
+    display_name = "Randomize Weapons"
+    default = True
+    
+# health (testme)
+# ammo (testme)
+# weapons (testme)
+# level keys
+# primagen keys
+# eagle feathers
+# talismans (don't do until you can actually get them all)
+    
 class ForceEarlyWeapon(Toggle):
     """
     Forces an early progression weapon in the starting map so you have more than just the bow.
@@ -61,6 +101,8 @@ class ForceEarlyWeapon(Toggle):
 class TrapFillPercentage(Range):
     """
     Replaces a percentage of non-progression items with traps.
+    Recommended to have this lower (5% or less) if not shuffling life forces so you
+    have enough health and ammo pickups.
     """
     display_name = "Trap Fill Percentage"
     
@@ -70,6 +112,8 @@ class TrapFillPercentage(Range):
     
 class LifeForceFillPercentage(Range):
     """
+    Only applies if life forces are shuffled.
+    
     Replaces a percentage of non-progression, non-trap items with Life Forces.
     Higher numbers mean a more difficult seed, but keep in mind that
     most of the game consists of these normally.
@@ -190,6 +234,11 @@ class Turok2Options(PerGameCommonOptions):
     game_logic_difficulty: GameLogicDifficulty
     weapon_logic_difficulty: WeaponLogicDifficulty
     
+    randomize_life_forces: RandomizeLifeForces
+    randomize_health: RandomizeHealth
+    randomize_ammo: RandomizeAmmo
+    randomize_weapons: RandomizeWeapons
+    
     force_early_weapon: ForceEarlyWeapon
     
     trap_fill_percentage: TrapFillPercentage
@@ -210,6 +259,12 @@ option_groups = [
     OptionGroup("Difficulty Options", [
         GameLogicDifficulty,
         WeaponLogicDifficulty
+    ]),
+    OptionGroup("Item Pool Options", [
+        RandomizeLifeForces,
+        RandomizeHealth,
+        RandomizeAmmo,
+        RandomizeWeapons
     ]),
     OptionGroup("Progression Options", [
         ForceEarlyWeapon
