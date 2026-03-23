@@ -56,6 +56,9 @@ class IncludeHealthLocations(Toggle):
     """
     Whether to include static health pickups in the list of locations to check.
     Will result in weighted health pickups in the pool (see the relevant setting).
+    
+    Note that this does NOT affect whether they will show up in the item pool.
+    See the Minimum Percent and Junk Weight settings to affect that.
     """
     display_name = "Include Health Locations"
     default = True
@@ -64,6 +67,9 @@ class IncludeAmmoLocations(Toggle):
     """
     Whether to include static ammo pickups in the list of locations to check.
     Will result in weighted ammo pickups in the pool (see the relevant setting).
+    
+    Note that this does NOT affect whether they will show up in the item pool.
+    See the Minimum Percent and Junk Weight settings to affect that.
     """
     display_name = "Include Ammo Locations"
     default = True
@@ -72,6 +78,9 @@ class IncludeLifeForceLocations(Toggle):
     """
     Whether to include life forces in the list of locations to check.
     Will result in weighted life forces in the pool (see the relevant setting).
+    
+    Note that this does NOT affect whether they will show up in the item pool.
+    See the Minimum Percent and Junk Weight settings to affect that.
     """
     display_name = "Include Life Force Locations"
     default = True

@@ -43,17 +43,14 @@ def create_locations(world: Turok2World) -> None:
         
         region_locations = region_data.get("locations", {})
         for loc_name, loc_info in region_locations.items():
-            # Exclude life force locations if not shuffled
+            # Exclude relevent locations if not shuffled
             item_type = loc_info.get("type", -1)
-            """
-            # TODO: fix how this is done
-            if not world.options.randomize_life_forces and item_type == ItemType.LIFE_FORCE.value:
+            if not world.options.include_health_locations and item_type == ItemType.HEALTH.value:
                 continue
-            if not world.options.randomize_health and item_type == ItemType.HEALTH.value:
+            if not world.options.include_ammo_locations and item_type == ItemType.AMMO.value:
                 continue
-            if not world.options.randomize_ammo and item_type == ItemType.AMMO.value:
+            if not world.options.include_life_force_locations and item_type == ItemType.LIFE_FORCE.value:
                 continue
-            """
             if not world.options.include_weapon_locations and item_type == ItemType.WEAPON.value:
                 continue
             
