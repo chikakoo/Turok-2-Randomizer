@@ -229,7 +229,7 @@ class Turok2Context(CommonContext):
         """
         Process a message from the game by:
         - Checking the OUT_STATUS - if not AP_PROCESSING, do nothing, as the game hasn't sent anything.
-        - Writing the OUT_TYPE and OUT_DATA so we have the data the game sent us.
+        - Writing the OUT_DATA so we have the data the game sent us.
         - Doing something based on the type
           - This will eventually send the info to AP that the check was received.
         - Setting AP_READY to OUT_STATUS to let the game know it can send something else.
@@ -237,14 +237,8 @@ class Turok2Context(CommonContext):
         if self.read_int(APMemoryOffset.OUT_STATUS) != APStatus.AP_PROCESSING.value:
             return
         
-        msg_type = self.read_int(APMemoryOffset.OUT_TYPE)
         msg_data = self.read_int(APMemoryOffset.OUT_DATA)
-
-        # Send this check to Archipelago - msg_data is the location id
-        if msg_type == APMessageType.AP_OUT_MSGTYPE_SEND_CHECK.value:
-            await self.check_locations([msg_data])
-        else:
-            print(f"Tried to send unexpected type/data: {msg_type}/{msg_data}")
+        await self.check_locations([msg_data])
             
         # Mark block ready for next message
         self.write_int(APMemoryOffset.OUT_STATUS, APStatus.AP_READY)

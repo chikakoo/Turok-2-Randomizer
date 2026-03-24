@@ -35,8 +35,13 @@ class RandoPlayerObject : ScriptObject
 			// IsCollected and IsSentToAP should be false for every location
 			ResetCollectedStatuses();
 			
+			// Reset the messages in flight and unset the queue
+			g_outgoingMessageInFlight = false;
+			g_outgoingMessageQueue.resize(0);
+			
 			// Set outgoing index to 0 to receive all items from AP
 			ResetAPForLoadData(0);
+			
 		}
 		
 		// Check the goal - there's two checks here in case it's the
@@ -171,10 +176,11 @@ class RandoPlayerObject : ScriptObject
 	}
 	
 	//---------------------------
-	// Serializes the collectedLocations by converting it to a trailing-pipe string
+	// Serializes the collectedLocations, sentToAPLocations, and g_outgoingMessageQueue by converting it to a trailing-pipe string
 	// e.g. "51001|51002" for two locations
 	void OnSerialize(kDict &out dict)
     {
+		// Collected locations/sent to AP locations
 		kStr collectedLocations;
 		kStr sentToAPLocations;
 		for (uint i = 0; i < g_mapReplacements.length(); i++)
@@ -203,6 +209,18 @@ class RandoPlayerObject : ScriptObject
 		{
 			SERIALIZE(sentToAPLocations);
 		}
+		
+		// Outgoing message queue
+		kStr outgoingMessageQueue;
+		for (uint i = 0; i < g_outgoingMessageQueue.length(); i++)
+		{
+			outgoingMessageQueue += "" + g_outgoingMessageQueue[i] + "|";
+		}
+		
+		if (outgoingMessageQueue.Length() > 0)
+		{
+			SERIALIZE(outgoingMessageQueue);
+		}
 	
 		SERIALIZE(g_AP.OutgoingLastProcessedItemIdx);
 		Sys.Print("Saved last processed index: " + g_AP.OutgoingLastProcessedItemIdx);
@@ -219,7 +237,12 @@ class RandoPlayerObject : ScriptObject
 		
 		DeserializeLocationFlags(dict, "collectedLocations");
 		DeserializeLocationFlags(dict, "sentToAPLocations");
-
+		
+		// Reset the messages in flight and unset the queue
+		g_outgoingMessageInFlight = false;
+		g_outgoingMessageQueue.resize(0);
+		DeserializeOutgoingMessageQueue(dict);
+		
 		// We are now ready to receive data, so reset everything
 		DESERIALIZE_INT(g_AP.OutgoingLastProcessedItemIdx);
 		ResetAPForLoadData(g_AP.OutgoingLastProcessedItemIdx);
@@ -228,9 +251,9 @@ class RandoPlayerObject : ScriptObject
 	}
 	
 	//---------------------------
-	// Deserializes the saved data on the player object:
-	// - Writes the collected locations by converting the trailing pipe string
-	//   into its parts, then updating the map replacements global.
+	// Deserializes the saved location data on the player object:
+	// - Reads the collected locations by converting the trailing pipe string
+	//   and setting the flags on the replacement objects.
 	void DeserializeLocationFlags(
 		kDict &in dict,
 		const kStr &in key)
@@ -246,11 +269,7 @@ class RandoPlayerObject : ScriptObject
 		{
 			int8 c = data[i];
 			if (c == "|"[0])
-			{
-				// Send out all collected locations as well as adding to the list
-				g_outgoingMessageQueue.insertLast(
-					APOutgoingMessage(AP_OUT_MSGTYPE_SEND_CHECK, current.Atoi()));
-					
+			{		
 				int apId = current.Atoi();
 				int mapId = ConvertMapIdFromApId(apId);
 				if (key == "collectedLocations")
@@ -262,6 +281,34 @@ class RandoPlayerObject : ScriptObject
 					MarkSentToAP(apId, mapId);
 				}
 				
+				current = "";
+			}
+			else
+			{
+				current += m_asciiChars[c];
+			}
+		}
+	}
+	
+	//---------------------------
+	// Deserializes the saved outgoing message queue data on the player object:
+	// - Reads the items to sync by converting the trailing pipe string
+	//   and then places them into the array.
+	void DeserializeOutgoingMessageQueue(kDict &in dict)
+	{
+		kStr data;
+		if (!dict.GetString("outgoingMessageQueue", data))
+		{
+			return;
+		}
+	
+		kStr current = "";
+		for (uint i = 0; i < data.Length(); i++)
+		{
+			int8 c = data[i];
+			if (c == "|"[0])
+			{		
+				g_outgoingMessageQueue.insertLast(current.Atoi());
 				current = "";
 			}
 			else
@@ -460,28 +507,45 @@ class RandoPlayerObject : ScriptObject
 	
 	//----------------------------------
 	// Process messages to send to AP.
-	// First, waits until the client is ready to receive. 
-	// Then, sets our message data and type and lets sets the
-	// flag so the client knows there's data for it to process.
+	//
+	// We keep track of whether we're currently waiting for the server to process a message.
+	// Once it's processed, we remove it from the queue and unset that flag.
+	//
+	// Once the server is ready (and we aren't waiting for it anymore), we grab the
+	// next message from the queue and set it to the message data and type and set the
+	// flags so the client knows there's a new message.
+	//
+	// This is done this way so we can seriaize the outgoing message queue and reload it if
+	// not everything was synced before saving.
 	void ProcessOutgoingMessages(void)
 	{
+		// If something is sent but not confirmed, wait
+		if (g_outgoingMessageInFlight)
+		{
+			// If the client finished processing it, remove the message
+			if (g_AP.OutgoingStatus == AP_READY)
+			{
+				g_outgoingMessageQueue.removeAt(0);
+				g_outgoingMessageInFlight = false;
+			}
+		}
+		
 		// Do not process if AP is still processing the last message
-		if (g_AP.OutgoingStatus != AP_READY || 
+		if (g_outgoingMessageInFlight ||
+			g_AP.OutgoingStatus != AP_READY || 
 			g_outgoingMessageQueue.length() == 0)
 		{
 			return;
 		}
 		
-		APOutgoingMessage message = g_outgoingMessageQueue[0];
-		
-		g_AP.OutgoingMessageType = message.type;
-		g_AP.OutgoingMessageData = message.data;
-		
-		g_outgoingMessageQueue.removeAt(0);
-		
-		Sys.Print("Sent data to AP: " + message.data);
+		int apId = g_outgoingMessageQueue[0];
+		g_AP.OutgoingMessageData = apId;
+		Sys.Print("Sent check to AP: " + apId);
 		
 		// Now the python script knows it can read the data we set
 		g_AP.OutgoingStatus = AP_PROCESSING;
+		
+		// Mark as in-flight, but don't remove yet
+		g_outgoingMessageInFlight = true;
 	}
 }

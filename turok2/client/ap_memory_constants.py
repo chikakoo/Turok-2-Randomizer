@@ -39,8 +39,6 @@ class APMessageType(Enum):
     AP_IN_MSGTYPE_GET_INVENTORY_ITEM = 4
     AP_IN_MSGTYPE_GET_AMMO = 5
     AP_IN_MSGTYPE_GET_TRAP = 6
-    
-    AP_OUT_MSGTYPE_SEND_CHECK = 7
 
 class APMemoryOffset(Enum):
     """
@@ -60,7 +58,6 @@ class APMemoryOffset(Enum):
     IN_LAST_PROCESSED_ITEM_IDX = 28
 
     OUT_STATUS = 32
-    OUT_TYPE = 36
-    OUT_DATA = 40
-    OUT_LAST_PROCESSED_ITEM_IDX = 44
-    OUT_GOAL_REACHED = 48
+    OUT_DATA = 36
+    OUT_LAST_PROCESSED_ITEM_IDX = 40
+    OUT_GOAL_REACHED = 44

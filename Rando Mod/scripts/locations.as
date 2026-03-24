@@ -342,14 +342,12 @@ void DisplayCollectedLocationsForGame(const int &in visibleTime = 120)
 void SendCheckToAP(const int &in apId)
 {
 	ReplacementEntry@ location = GetReplacementWithApId(apId, Game.ActiveMapID());
-	if (location !is null)
+	if (location !is null && !location.isSentToAP)
 	{
 		location.isSentToAP = true;
-		g_outgoingMessageQueue.insertLast(
-			APOutgoingMessage(AP_OUT_MSGTYPE_SEND_CHECK, apId));
+		g_outgoingMessageQueue.insertLast(apId);
 	}
 }
-
 
 //------------------------------
 // Marks the given location as collected by setting it in the map.
@@ -374,6 +372,29 @@ void MarkSentToAP(const int &in apId, const int &in mapId)
 	if (location !is null)
 	{
 		location.isSentToAP = true;
+	}
+}
+
+//------------------------------
+// Intended to be called from the console. Adds ALL sent locations to the outgoing queue.
+// Used (hopefully never) in the case where the server doesn't know everything we received.
+void Resync()
+{
+	// Reset outgoing state first - we're resending everything again anyway!
+    g_outgoingMessageQueue.resize(0);
+    g_outgoingMessageInFlight = false;
+    g_AP.OutgoingStatus = AP_READY;
+	
+	for (uint i = 0; i < g_mapReplacements.length(); i++)
+	{
+		array<ReplacementEntry@>@ locations = g_mapReplacements[i];
+		for (uint j = 0; j < locations.length(); j++)
+		{
+			if (locations[j] !is null && locations[j].isSentToAP)
+			{
+				g_outgoingMessageQueue.insertLast(locations[j].apId);
+			}
+		}
 	}
 }
 

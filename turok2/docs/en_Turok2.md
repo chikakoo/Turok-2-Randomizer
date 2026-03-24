@@ -59,3 +59,11 @@ Items belonging to other worlds are represented by the blue baby-faced life forc
 Health/ammo/weapons will be collected with the usual sound effects. If the in-game setting is on, the auto-weapon switch will occur for new weapons.
 
 Due to modding limitations, life tiles will spawn where the player is. They will be instantly picked up when the player moves. If left uncollected before saving, they will be lost.
+
+## My server is messed up! How do I resync?
+
+This mod will listen for when the client has acknowledged that it has processed a check. It will the list of unsent locations when you save your game, and resync any unsent locations when you load. However, in the unlikely case that the server doesn't know that you got a check, you'll need to resync.
+
+To do this manually, load into your save file and **press the tilde (~) key**. This will open the console. Run the following command to resync: **call Resync**.
+
+Note that **this is not optimized for speed**, and will take a bit to run (it will process about 10 checks per second, due to the client's tick rate). It's not expected that this will ever be needed.

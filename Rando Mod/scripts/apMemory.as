@@ -16,7 +16,6 @@ class APMemory
 	// Whether we're waiting for AP to read data
 	// After they process it, they will change this status to ready
 	int OutgoingStatus;
-	int OutgoingMessageType;
 	int OutgoingMessageData;
 	int OutgoingLastProcessedItemIdx;
 	
@@ -39,30 +38,22 @@ void PrintAPMemory()
 	Sys.Print("IncomingLastProcessedItemIdx: " + g_AP.IncomingLastProcessedItemIdx);
 	
 	Sys.Print("OutgoingStatus: " + g_AP.OutgoingStatus);
-	Sys.Print("OutgoingMessageType: " + g_AP.OutgoingMessageType);
 	Sys.Print("OutgoingMessageData: " + g_AP.OutgoingMessageData);
 	Sys.Print("OutgoingLastProcessedItemIdx: " + g_AP.OutgoingLastProcessedItemIdx);
 	
 	Sys.Print("IsGoalReached: " + g_AP.IsGoalReached);
 }
 
-class APOutgoingMessage
-{
-	APMessageType type;
-	int data;
-	
-	APOutgoingMessage() {}
-	APOutgoingMessage(const APMessageType &in t, const int &in d)
-	{
-		type = t;
-		data = d;
-	}
-}
-// A global for all outgoing messages - this is here in case we cannot send out
-// a check in time for the next one to come in
-// The player will check whether we're good to send out the next one every tick
-// We will also fill this with EVERY checked location when the game loads, to resync
-array<APOutgoingMessage> g_outgoingMessageQueue;
+// A global for all outgoing location checks - this is here in case we cannot send out
+// a check in time for the next one to come in.
+//
+// The player will check whether we're good to send out the next one every tick.
+//
+// This will be saved/loaded so we can sync any items that failed to sync.
+array<int> g_outgoingMessageQueue;
+
+// Whether there's an outgoing message waiting to be processed
+bool g_outgoingMessageInFlight = false;
 
 enum APStatus
 {
@@ -105,7 +96,6 @@ void InitAP()
 	g_AP.IncomingLastProcessedItemIdx = 0;
 
     g_AP.OutgoingStatus = AP_READY;
-    g_AP.OutgoingMessageType = AP_MSGTYPE_NONE;
     g_AP.OutgoingMessageData = 0;
 	g_AP.OutgoingLastProcessedItemIdx = 0;
 	
@@ -124,7 +114,6 @@ void ResetAPForLoadData(int& in outgoingLastProcessedItemIdx)
     g_AP.IncomingMessageData = 0;
 	g_AP.IncomingLastProcessedItemIdx = 0;
 
-    g_AP.OutgoingMessageType = AP_MSGTYPE_NONE;
     g_AP.OutgoingMessageData = 0;
 	g_AP.OutgoingLastProcessedItemIdx = outgoingLastProcessedItemIdx;
 	
