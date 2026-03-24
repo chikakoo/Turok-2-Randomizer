@@ -1,8 +1,8 @@
 from __future__ import annotations
 import json
-import pkgutil
+import importlib.resources as resources
 from typing import TYPE_CHECKING
-from BaseClasses import ItemClassification, Location, CollectionState, Entrance, Region
+from BaseClasses import Location, Region
 from worlds.generic.Rules import set_rule
 from .options import Goal, GameLogicDifficulty, WeaponLogicDifficulty
 from . import items
@@ -17,14 +17,26 @@ class Turok2Location(Location):
 LOCATION_TABLE = {}
 LOCATION_NAME_TO_ID = {}
 
+def load_all_region_data():
+    """
+    Loads all regions from the "level" files in the data path.
+    """
+    all_regions = []
+    data_package = __package__ + ".data"
+
+    for file in resources.files(data_package).iterdir():
+        if file.name.startswith("level") and file.name.endswith(".json"):
+            data = json.loads(file.read_text())
+            all_regions.extend(data.get("regions", []))
+
+    return all_regions
+
 def _build_location_name_to_id():
     """
     Build the location name to id dictionary for the world to use.
     This has to be done at import time, or the world won't have it.
     """
-    data = json.loads(pkgutil.get_data(__name__, "data.json").decode())
-
-    for region_data in data.get("regions", []):
+    for region_data in load_all_region_data():
         for loc_name, loc_info in region_data.get("locations", {}).items():
             LOCATION_NAME_TO_ID[loc_name] = loc_info["ap_id"]
 
@@ -35,9 +47,7 @@ def create_locations(world: Turok2World) -> None:
     Creates the locations by looking at all of the regions defined in the json data.
     Includes putting a "rule" property in the table to construct the rules later on.
     """
-    data = json.loads(pkgutil.get_data(__name__, "data.json").decode())
-
-    for region_data in data.get("regions", []):
+    for region_data in load_all_region_data():
         region_name = region_data["name"]
         region_obj = world.get_region(region_name)
         
@@ -73,19 +83,18 @@ def create_regions_and_entrances(world: Turok2World) -> None:
     Creates regions and connects them together based on the json data.
     Includes putting a "rule_json" property in the table to construct the rules later on.
     """
-    data = json.loads(pkgutil.get_data(__name__, "data.json").decode())
-
+    regions = load_all_region_data()
     region_map = {}
 
     # Create all regions
-    for region_data in data.get("regions", []):
+    for region_data in regions:
         region_name = region_data["name"]
         region = Region(region_name, world.player, world.multiworld)
         region_map[region_name] = region
         world.multiworld.regions.append(region)
 
     # Connect the regions with entrances
-    for region_data in data.get("regions", []):
+    for region_data in regions:
         from_region = region_map[region_data["name"]]
 
         for exit_data in region_data.get("exits", []):

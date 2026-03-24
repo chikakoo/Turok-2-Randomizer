@@ -653,28 +653,6 @@
 				"PoA Oblivion - Nuke Part": { "ap_id": 78000, "position": "78_-1075_-358_0", "type": 7 }
 			},
 			"exits": []
-		},
-		{
-			"name": "Hub",
-			"locations": {},
-			"exits": [{
-				"to": "Primagen Boss", 
-				"rule": {
-					"has": [
-						"Primagen Key 1",
-						"Primagen Key 2",
-						"Primagen Key 3",
-						"Primagen Key 4",
-						"Primagen Key 5",
-						"Primagen Key 6"
-					]
-				}
-			}]
-		},
-		{
-			"name": "Primagen Boss",
-			"locations": {},
-			"exits": []
 		}
 	]
 }
