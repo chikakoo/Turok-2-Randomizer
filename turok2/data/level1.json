@@ -23,6 +23,9 @@
 				"PoA Start - Power Cell": { "ap_id": 51017, "position": "51_2304_0_0", "type": 8 },
 				"PoA Start - Pistol": { "ap_id": 51018, "position": "51_2615_1227_359", "type": 9 }
 			},
+			"events": {
+				"Beacon Power Cell 1": { "rule": "vanilla_mission_items" }
+			},
 			"exits": [
 				{ 
 					"to": "PoA Water Hub",
@@ -196,6 +199,10 @@
 				"Child 2 Rooms - Clip in Water": { "ap_id": 53084, "position": "53_-107_1964_0", "type": 2 },
 				"Child 2 Rooms - Blue Health by Cage Switch 1": { "ap_id": 53085, "position": "53_562_-102_0", "type": 1 },
 				"Child 2 Rooms - Blue Health by Cage Switch 2": { "ap_id": 53086, "position": "53_357_-101_0", "type": 1 }
+			},
+			"events": {
+				"Beacon Power Cell 2": { "rule": "vanilla_mission_items" },
+				"Beacon Power Cell 3": { "rule": "vanilla_mission_items" }
 			},
 			"exits": [
 				{ 
@@ -637,9 +644,14 @@
 								"weapon_requirement": { "category": "Good Weapon" }
 							},
 							{
-								"has": {
+								"mission_item_requirement": {
 									"item": "Beacon Power Cell",
-									"count": 3
+									"count": 3,
+									"event_items": [
+										"Beacon Power Cell 1",
+										"Beacon Power Cell 2",
+										"Beacon Power Cell 3"
+									]
 								}
 							}
 						]

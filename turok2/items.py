@@ -637,7 +637,11 @@ def get_required_seed_items(world: Turok2World):
         if name == "Nuke Part":
             return world.options.nuke_behavior == NukeBehavior.option_nuke_part_hunt
         
-        # Inventory items always included
+        # Mission items depend on the setting (they are also inventory items, so do this first)
+        if data["type"] == ItemType.MISSION_ITEM.value:
+            return world.options.include_mission_item_locations
+        
+        # Inventory items always included (for now)
         if data["msg_type"] == APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value:
             return True
         

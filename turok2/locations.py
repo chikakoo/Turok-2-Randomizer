@@ -62,6 +62,8 @@ def create_locations(world: Turok2World) -> None:
                 continue
             if not world.options.include_life_force_locations and item_type == ItemType.LIFE_FORCE.value:
                 continue
+            if not world.options.include_mission_item_locations and item_type == ItemType.MISSION_ITEM.value:
+                continue
             # TODO: When Nuke Parts can be vanilla, we'd disable their locations here
             
             location = Turok2Location(
@@ -106,6 +108,42 @@ def create_regions_and_entrances(world: Turok2World) -> None:
                 entrance_name
             )
             entrance.rule_json = exit_data.get("rule")
+            
+def create_events(world: Turok2World) -> None:
+    """
+    Creates events in regions from the JSON data.
+    Each event can optionally have a rule, which is parsed and applied.
+    """
+    for region_data in load_all_region_data():
+        region_name = region_data["name"]
+        region_obj = world.get_region(region_name)
+
+        for event_name, event_info in region_data.get("events", {}).items():
+            rule_func = None
+            if "rule" in event_info:
+                rule_func = build_rule(event_info["rule"], world)
+
+            region_obj.add_event(
+                event_name,
+                item_name=event_name,
+                rule=rule_func,
+                location_type=Turok2Location,
+                item_type=items.Turok2Item,
+            )
+                
+def create_completion_condition(world: Turok2World):
+    """
+    Creates the completion condition based on the goal setting.
+    - Primagen: Defeat the Primagen (vanilla) - this is the fallback
+    - Hub: Get to the hub by completing Level 1
+    """
+    if world.options.goal == Goal.option_hub:
+        victory_event = "Hub Reached"
+    else:
+        victory_event = "Primagen Defeated"
+
+    world.multiworld.completion_condition[world.player] = \
+        lambda state: state.has(victory_event, world.player)
     
 def apply_location_rules(world: Turok2World):
     """
@@ -251,30 +289,35 @@ def weapon_requirement(world: Turok2World, args: dict):
         return lambda state: True
 
     return compute_category_rule(world, category, exclude, count)
+    
+def vanilla_mission_items(world: Turok2World):
+    """Checks whether mission items in their vanilla locations."""
+    is_vanilla = not world.options.include_mission_item_locations
+    return lambda state: is_vanilla
+    
+def mission_item_requirement(world: Turok2World, args: dict):
+    """
+    Checks mission items, taking into account whether they've been shuffled.
+    """
+    count = args.get("count", 1)
+    
+    if world.options.include_mission_item_locations:
+        # Items are shuffled, so check the inventory
+        item = args.get("item")
+        return lambda state: state.has(item, world.player, count)
 
+    # Vanilla, so check all the needed events
+    # This will check that we have at least "count" number of events in the list
+    # This is meant to cover whether we can progress with any of the items
+    event_items = args.get("event_items", [])
+    return lambda state: sum(
+        state.has(event, world.player) for event in event_items
+    ) >= count
+    
 NAMED_RULES = {
     "advanced_game_logic": advanced_game_logic,
     "advanced_weapon_logic": advanced_weapon_logic,
-    "weapon_requirement": weapon_requirement
+    "weapon_requirement": weapon_requirement,
+    "vanilla_mission_items": vanilla_mission_items,
+    "mission_item_requirement": mission_item_requirement
 }
-    
-def create_completion_condition(world: Turok2World):
-    """
-    Creates the completion condition based on the goal setting.
-    - Primagen: Defeat the Primagen (vanilla) - this is the fallback
-    - Hub: Get to the hub by completing Level 1
-    """
-    if world.options.goal == Goal.option_hub:
-        victory_region = world.multiworld.get_region("Hub", world.player)
-    else:
-        victory_region = world.multiworld.get_region("Primagen Boss", world.player)
-        
-    victory_region.add_event(
-        "Final Boss Defeated", 
-        "Victory",
-        location_type=Turok2Location, 
-        item_type=items.Turok2Item
-    )
-
-    world.multiworld.completion_condition[world.player] = \
-        lambda state: state.has("Victory", world.player)

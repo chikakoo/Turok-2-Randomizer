@@ -3,6 +3,7 @@
 		{
 			"name": "Hub",
 			"locations": {},
+			"events": { "Hub Reached": {} },
 			"exits": [{
 				"to": "Primagen Boss", 
 				"rule": {
@@ -20,6 +21,13 @@
 		{
 			"name": "Primagen Boss",
 			"locations": {},
+			"events": {
+				"Primagen Defeated": {
+					"rule": {
+						"weapon_requirement": { "category": "Good Weapon", "count": 10 }
+					}
+				}
+			},
 			"exits": []
 		}
 	]

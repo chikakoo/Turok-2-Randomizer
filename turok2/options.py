@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from Options import Choice, OptionGroup, PerGameCommonOptions, Range, Toggle
 #todo:
 # individual pickup weights (health, life force)
+# settings for... level keys, feathers, primagen keys, talismans (can't do until all levels are done)
 # nuke vanilla behavior (when every level complete)
 # death link
 # whether to mark the pickups as important in the game
@@ -84,6 +85,14 @@ class IncludeLifeForceLocations(Toggle):
     See the Minimum Percent and Junk Weight settings to affect that.
     """
     display_name = "Include Life Force Locations"
+    default = True
+    
+class IncludeMissionItemLocations(Toggle):
+    """
+    Whether to include items needed to finish the level. For example, the beacon power cells
+    in level 1 or the graveyard keys in level 2.
+    """
+    display_name = "Include Mission Item Locations"
     default = True
     
 class MinimumHealthPercent(Range):
@@ -270,6 +279,7 @@ class Turok2Options(PerGameCommonOptions):
     include_health_locations: IncludeHealthLocations
     include_weapon_and_ammo_locations: IncludeWeaponAndAmmoLocations
     include_life_force_locations: IncludeLifeForceLocations
+    include_mission_item_locations: IncludeMissionItemLocations
     
     minimum_health_percent: MinimumHealthPercent
     minimum_ammo_percent: MinimumAmmoPercent
@@ -300,6 +310,7 @@ option_groups = [
         IncludeHealthLocations,
         IncludeWeaponAndAmmoLocations,
         IncludeLifeForceLocations,
+        IncludeMissionItemLocations,
         
         MinimumHealthPercent,
         MinimumAmmoPercent,
