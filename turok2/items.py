@@ -4,6 +4,7 @@ from enum import Enum
 from typing import TYPE_CHECKING, Callable
 from BaseClasses import Item, ItemClassification
 from .client.ap_memory_constants import APMessageType
+from .options import NukeBehavior
 
 if TYPE_CHECKING:
     from .world import Turok2World
@@ -463,8 +464,8 @@ ITEM_TABLE = {
         "type": ItemType.WEAPON.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
         "class": ItemClassification.useful,
-        "count": 1, # TODO: setting in yaml to not have nuke parts
-        "groups": ["Land Weapon"]
+        "count": 1,
+        "groups": ["Land Weapon", "Bad Weapon"] # Bad in terms of ammo
     },
 
     # Traps
@@ -627,13 +628,29 @@ def get_item_name_groups() -> dict[str, set[str]]:
 def get_required_seed_items(world: Turok2World):
     """
     All items required to be in the seed.
-    These are all weapons, and all inventory items.
+    These are all weapons, and all inventory items, depending on settings
     """
+    def include_item(name, data):
+        # Nuke item special cases
+        if name == "Nuke":
+            return world.options.nuke_behavior == NukeBehavior.option_weapon_pickup
+        if name == "Nuke Part":
+            return world.options.nuke_behavior == NukeBehavior.option_nuke_part_hunt
+        
+        # Inventory items always included
+        if data["msg_type"] == APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value:
+            return True
+        
+        # Other weapons depend on whether they are shuffled
+        if data["type"] == ItemType.WEAPON.value:
+            return world.options.include_weapon_and_ammo_locations
+
+        return False
+
     return [
         (name, data)
         for name, data in ITEM_TABLE.items()
-        if ((world.options.include_weapon_locations and data["type"] == ItemType.WEAPON.value) or
-            data["msg_type"] == APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value) # TODO: use ItemType here
+        if include_item(name, data)
     ]
 
 class Turok2Item(Item):
@@ -642,9 +659,8 @@ class Turok2Item(Item):
 def get_random_filler_item_name(world: Turok2World) -> str:
     """
     world.py will use this to generate filler items.
-    This will generate a random filler by weight based on filler/useful items.
+    This will generate a random filler by the item weights set in the options.
     """
-    
     categories = [
         (ItemType.HEALTH.value, world.options.junk_item_pool_health_weight),
         (ItemType.AMMO.value, world.options.junk_item_pool_ammo_weight),
@@ -799,10 +815,9 @@ def force_local_items(world: Turok2World, item_type: int, percentage: int):
 
 def try_force_early_weapon(world: Turok2World):
     """
-    If the setting is on, forces a land weapon that is not bad into
-    the starting area.
+    If the setting is on, forces a land weapon that is not bad into the starting area.
     """
-    if not world.options.include_weapon_locations or not world.options.force_early_weapon:
+    if not world.options.include_weapon_and_ammo_locations or not world.options.force_early_weapon:
         return
         
     def is_valid_early_weapon(item_name: str) -> bool:

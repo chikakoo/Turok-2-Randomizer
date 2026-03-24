@@ -47,12 +47,12 @@ def create_locations(world: Turok2World) -> None:
             item_type = loc_info.get("type", -1)
             if not world.options.include_health_locations and item_type == ItemType.HEALTH.value:
                 continue
-            if not world.options.include_ammo_locations and item_type == ItemType.AMMO.value:
+            if (not world.options.include_weapon_and_ammo_locations and
+                (item_type == ItemType.AMMO.value or item_type == ItemType.WEAPON.value)):
                 continue
             if not world.options.include_life_force_locations and item_type == ItemType.LIFE_FORCE.value:
                 continue
-            if not world.options.include_weapon_locations and item_type == ItemType.WEAPON.value:
-                continue
+            # TODO: When Nuke Parts can be vanilla, we'd disable their locations here
             
             location = Turok2Location(
                 world.player,
@@ -238,7 +238,7 @@ def weapon_requirement(world: Turok2World, args: dict):
     exclude = args.get("exclude", [])
     count = args.get("count", 1)
 
-    if not world.options.include_weapon_locations:
+    if not world.options.include_weapon_and_ammo_locations:
         return lambda state: True
 
     return compute_category_rule(world, category, exclude, count)
