@@ -1,5 +1,6 @@
 from __future__ import annotations
 import json
+import pkgutil
 import importlib.resources as resources
 from typing import TYPE_CHECKING
 from BaseClasses import Location, Region
@@ -14,8 +15,12 @@ if TYPE_CHECKING:
 class Turok2Location(Location):
     game = "Turok 2"
 
-LOCATION_TABLE = {}
-LOCATION_NAME_TO_ID = {}
+LOCATION_TABLE = json.loads(
+    pkgutil.get_data(__name__, "data/locations.json").decode()
+)
+LOCATION_NAME_TO_ID = {
+    name: data["ap_id"] for name, data in LOCATION_TABLE.items()
+}
 
 def load_all_region_data():
     """
@@ -31,54 +36,33 @@ def load_all_region_data():
 
     return all_regions
 
-def _build_location_name_to_id():
-    """
-    Build the location name to id dictionary for the world to use.
-    This has to be done at import time, or the world won't have it.
-    """
-    for region_data in load_all_region_data():
-        for loc_name, loc_info in region_data.get("locations", {}).items():
-            LOCATION_NAME_TO_ID[loc_name] = loc_info["ap_id"]
-
-_build_location_name_to_id()
-
 def create_locations(world: Turok2World) -> None:
     """
     Creates the locations by looking at all of the regions defined in the json data.
     Includes putting a "rule" property in the table to construct the rules later on.
     """
-    for region_data in load_all_region_data():
-        region_name = region_data["name"]
-        region_obj = world.get_region(region_name)
+    for loc_name, loc_info in LOCATION_TABLE.items():
+        # Exclude relevent locations if not shuffled
+        item_type = loc_info.get("type", -1)
+        if not world.options.include_health_locations and item_type == ItemType.HEALTH.value:
+            continue
+        if (not world.options.include_weapon_and_ammo_locations and
+            (item_type == ItemType.AMMO.value or item_type == ItemType.WEAPON.value)):
+            continue
+        if not world.options.include_life_force_locations and item_type == ItemType.LIFE_FORCE.value:
+            continue
+        if not world.options.include_mission_item_locations and item_type == ItemType.MISSION_ITEM.value:
+            continue
+        # TODO: When Nuke Parts can be vanilla, we'd disable their locations here
         
-        region_locations = region_data.get("locations", {})
-        for loc_name, loc_info in region_locations.items():
-            # Exclude relevent locations if not shuffled
-            item_type = loc_info.get("type", -1)
-            if not world.options.include_health_locations and item_type == ItemType.HEALTH.value:
-                continue
-            if (not world.options.include_weapon_and_ammo_locations and
-                (item_type == ItemType.AMMO.value or item_type == ItemType.WEAPON.value)):
-                continue
-            if not world.options.include_life_force_locations and item_type == ItemType.LIFE_FORCE.value:
-                continue
-            if not world.options.include_mission_item_locations and item_type == ItemType.MISSION_ITEM.value:
-                continue
-            # TODO: When Nuke Parts can be vanilla, we'd disable their locations here
-            
-            location = Turok2Location(
-                world.player,
-                loc_name,
-                loc_info["ap_id"],
-                region_obj
-            )
-            region_obj.locations.append(location)
-            
-            LOCATION_TABLE[loc_name] = {
-                "ap_id": loc_info["ap_id"],
-                "position": loc_info["position"],
-                "rule": loc_info.get("rule")
-            }
+        region_obj = world.get_region(loc_info["region"])
+        location = Turok2Location(
+            world.player,
+            loc_name,
+            loc_info["ap_id"],
+            region_obj
+        )
+        region_obj.locations.append(location)
 
 def create_regions_and_entrances(world: Turok2World) -> None:
     """
@@ -147,13 +131,18 @@ def create_completion_condition(world: Turok2World):
     
 def apply_location_rules(world: Turok2World):
     """
-    Set the rules grabbed from the json earlier for for each location.
+    Apply rules that need to go on locations based on locationRules.json
     """
-    for loc_name, data in LOCATION_TABLE.items():
-        if data.get("rule") is not None:
-            location = world.get_location(loc_name)
-            rule_func = build_rule(data["rule"], world)
-            set_rule(location, rule_func)
+    location_rules = json.loads(
+        pkgutil.get_data(__name__, "data/locationRules.json").decode()
+    )
+    for loc_name, rule in location_rules.items():
+        location = world.get_location(loc_name)
+        if location is None:
+            #TODO: print instead of raise in the final version
+            raise Exception(f"Could not apply location rule to location: {loc_name}")
+        rule_func = build_rule(rule, world)
+        set_rule(location, rule_func)
 
 def apply_entrance_rules(world: Turok2World) -> None:
     """

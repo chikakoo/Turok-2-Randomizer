@@ -55,6 +55,23 @@ void InitMapReplacements(void)
 	portOfAdiaMaps.insertLast(kLevel_PortOfAdia_9);
 	portOfAdiaMaps.insertLast(kLevel_PortOfAdia_T);
 	portOfAdiaMaps.insertLast(kLevel_PortOfAdia_OBL);
+	portOfAdiaMaps.insertLast(kLevel_PortOfAdia_Totem);
+	
+	array<int>@ riverOfSoulsMaps = g_mapLevelNumberToMapIds[LEVEL_RIVER_OF_SOULS];
+	riverOfSoulsMaps.insertLast(kLevel_RiverOfSouls_1);
+	riverOfSoulsMaps.insertLast(kLevel_RiverOfSouls_2);
+	riverOfSoulsMaps.insertLast(kLevel_RiverOfSouls_3);
+	riverOfSoulsMaps.insertLast(kLevel_RiverOfSouls_4);
+	riverOfSoulsMaps.insertLast(kLevel_RiverOfSouls_5);
+	riverOfSoulsMaps.insertLast(kLevel_RiverOfSouls_6);
+	riverOfSoulsMaps.insertLast(kLevel_RiverOfSouls_7);
+	riverOfSoulsMaps.insertLast(kLevel_RiverOfSouls_8);
+	riverOfSoulsMaps.insertLast(kLevel_RiverOfSouls_9);
+	riverOfSoulsMaps.insertLast(kLevel_RiverOfSouls_10);
+	riverOfSoulsMaps.insertLast(kLevel_RiverOfSouls_11);
+	riverOfSoulsMaps.insertLast(kLevel_RiverOfSouls_T);
+	riverOfSoulsMaps.insertLast(kLevel_RiverOfSouls_OBL);
+	riverOfSoulsMaps.insertLast(kLevel_RiverOfSouls_Totem);
 }
 
 //------------------------------
@@ -80,8 +97,26 @@ int GetLevelNumberFromMapId(const int &in mapId)
 		case kLevel_PortOfAdia_7:
 		case kLevel_PortOfAdia_8:
 		case kLevel_PortOfAdia_9:
+		case kLevel_PortOfAdia_T:
 		case kLevel_PortOfAdia_OBL:
+		case kLevel_PortOfAdia_Totem:
 			return LEVEL_PORT_OF_ADIA;
+
+		case kLevel_RiverOfSouls_1:
+		case kLevel_RiverOfSouls_2:
+		case kLevel_RiverOfSouls_3:
+		case kLevel_RiverOfSouls_4:
+		case kLevel_RiverOfSouls_5:
+		case kLevel_RiverOfSouls_6:
+		case kLevel_RiverOfSouls_7:
+		case kLevel_RiverOfSouls_8:
+		case kLevel_RiverOfSouls_9:
+		case kLevel_RiverOfSouls_10:
+		case kLevel_RiverOfSouls_11:
+		case kLevel_RiverOfSouls_T:
+		case kLevel_RiverOfSouls_OBL:
+		case kLevel_RiverOfSouls_Totem:
+			return LEVEL_RIVER_OF_SOULS;
 	}
 	
 	return LEVEL_UNMAPPED;

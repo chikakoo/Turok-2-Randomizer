@@ -376,13 +376,19 @@ class RandoPlayerObject : ScriptObject
 				Hud.AddMessage(
 					"Power Cells: " + inventory.GetCount(kActor_MissionItem_BeaconPowerCell),
 					m_progressMenuDisplayTime);
-				DisplayCollectedLocationsForLevel(mapId, "Level Checks", m_progressMenuDisplayTime);
-				DisplayCollectedLocationsForCurrentMap(m_progressMenuDisplayTime);
+				break;
+			case LEVEL_RIVER_OF_SOULS:
+				Hud.AddMessage(
+					"Gate Keys: " + inventory.GetCount(kActor_MissionItem_GateKey),
+					m_progressMenuDisplayTime);
 				break;
 			default:
 				Hud.AddMessage("Unmapped map id!");
-				break;
+				return;
 		}
+		
+		DisplayCollectedLocationsForLevel(mapId, "Level Checks", m_progressMenuDisplayTime);
+		DisplayCollectedLocationsForCurrentMap(m_progressMenuDisplayTime);
 	}
 	
 	//---------------------------
