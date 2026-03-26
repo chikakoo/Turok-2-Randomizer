@@ -7,7 +7,7 @@ from .client.ap_memory_constants import APMessageType
 from .options import NukeBehavior
 
 if TYPE_CHECKING:
-    from .world import Turok2World
+    from . import Turok2World
     
 class ItemType(Enum):
     """
@@ -73,7 +73,7 @@ ITEM_TABLE = {
         "actor_id": 1703,
         "type": ItemType.HEALTH.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_PICKUP.value,
-        "class": ItemClassification.useful,
+        "class": ItemClassification.filler,
         "weight": 7
     },
     "Ultra Health": {
@@ -81,7 +81,7 @@ ITEM_TABLE = {
         "actor_id": 1704,
         "type": ItemType.HEALTH.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_PICKUP.value,
-        "class": ItemClassification.useful,
+        "class": ItemClassification.filler,
         "weight": 3
     },
     
@@ -783,15 +783,14 @@ def add_items_to_itempool(
         if name:
             itempool.append(world.create_item(name))
     
-def force_local_items(world: Turok2World, item_type: int, percentage: int):
+def force_local_items(world: Turok2World, itempool: list[Item], item_type: int, percentage: int):
     """
     Forces the percentage of items in the item pool of the given type to
     be placed in this world.
     """
     items = [
-        item for item in world.multiworld.itempool 
-        if item.player == world.player
-        and ITEM_TABLE[item.name].get("type", -1) == item_type
+        item for item in itempool
+        if ITEM_TABLE[item.name].get("type", -1) == item_type
     ]
     world.multiworld.random.shuffle(items) # Avoids bias for earlier items
     
@@ -808,16 +807,14 @@ def force_local_items(world: Turok2World, item_type: int, percentage: int):
     count = min(count, len(locations))
     selected_items = items[:count]
     
-    for item in selected_items:
-        world.multiworld.itempool.remove(item)
-
     world.multiworld.random.shuffle(locations) # Avoids bias for earlier locations
     for item, loc in zip(selected_items, locations):
         loc.place_locked_item(item)
+        itempool.remove(item)
         
     print(f"Forced {count} {ItemType(item_type)} items locally for Player {world.player}")
 
-def try_force_early_weapon(world: Turok2World):
+def try_force_early_weapon(world: Turok2World, itempool: list[Item]):
     """
     If the setting is on, forces a land weapon that is not bad into the starting area.
     """
@@ -833,17 +830,15 @@ def try_force_early_weapon(world: Turok2World):
             and "Melee Weapon" not in groups)
 
     weapon_items = [
-        item for item in world.multiworld.itempool
-        if item.player == world.player
-        and is_valid_early_weapon(item.name)
+        item for item in itempool
+        if is_valid_early_weapon(item.name)
     ]
     
     # If we don't have a valid weapon, use any
     if not weapon_items:
         weapon_items = [
-            item for item in world.multiworld.itempool
-            if item.player == world.player and 
-                ITEM_TABLE[item.name].get("type", "-1") == ItemType.WEAPON.value
+            item for item in itempool
+            if ITEM_TABLE[item.name].get("type", "-1") == ItemType.WEAPON.value
         ]
 
     starting_locations = [
@@ -857,9 +852,8 @@ def try_force_early_weapon(world: Turok2World):
     if weapon_items and starting_locations:
         weapon = world.multiworld.random.choice(weapon_items)
         location = world.multiworld.random.choice(starting_locations)
-
-        world.multiworld.itempool.remove(weapon)
         location.place_locked_item(weapon)
+        itempool.remove(weapon)
         
         print(f"Placed early weapon {weapon.name} at {location.name} for Player {world.player}")
 
@@ -922,13 +916,14 @@ def create_all_items(world: Turok2World) -> None:
     
     # Fill out the rest of the pool (calls get_random_filler_item_name)
     itempool += [world.create_filler() for _ in range(needed_number_of_filler_items)]
-    world.multiworld.itempool += itempool
-    
+
     # Force local items depending on options
-    try_force_early_weapon(world)
-    force_local_items(world, ItemType.HEALTH.value, world.options.local_health_percentage)
-    force_local_items(world, ItemType.AMMO.value, world.options.local_ammo_percentage)
-    force_local_items(world, ItemType.WEAPON.value, world.options.local_weapon_percentage)
+    try_force_early_weapon(world, itempool)
+    force_local_items(world, itempool, ItemType.HEALTH.value, world.options.local_health_percentage)
+    force_local_items(world, itempool, ItemType.AMMO.value, world.options.local_ammo_percentage)
+    force_local_items(world, itempool, ItemType.WEAPON.value, world.options.local_weapon_percentage)
+
+    world.multiworld.itempool += itempool
     
     """
     Print out the item pool by type for debugging
