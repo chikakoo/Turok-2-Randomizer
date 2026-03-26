@@ -19,6 +19,7 @@ void InitDefManager()
 	g_indexDefManager.LoadFile("defs/actors/eagleFeathers.txt");
 	g_indexDefManager.LoadFile("defs/actors/talismans.txt");
 	g_indexDefManager.LoadFile("defs/actors/ap.txt");
+	g_indexDefManager.LoadFile("defs/actors/generatorPickups.txt");
 	
 	g_defManager = kDefManager();
 	g_defManager.LoadFile("defs/ammoInfo.txt");
@@ -88,8 +89,7 @@ void PlayPickupNotificationSoundAndMessage(WeaponInfo@ weaponInfo)
 
 //---------------------------
 // Tries to get the actor def of the given class.
-// Returns false if not found or if the class name is not correct.
-// Writes the actor to actorDef, which is null if not found.
+// Returns the actor def, if found, else null.
 kDictMem@ TryGetActorDefWithClass(int &in actorId, kStr &in className)
 {
 	kDictMem@ actorDef = g_indexDefManager.GetEntry(actorId);
@@ -240,6 +240,57 @@ void SpawnActorOnPlayer(int &in actorId)
 }
 
 //---------------------------
+// Replace all ammo generators with those that spawn the random ammo pickup.
+void UseRandomAmmoGenerators(void)
+{
+	// Check if the map has any generators we want to replace
+	int16 mapId = Game.ActiveMapID();
+	if (!DoesMapHaveAmmoGeneratorsToReplace(mapId))
+	{
+		return;
+	}
+
+	// Iterate through all the actors and replace the ones we want to replace
+	kActorIterator cIterator;
+	kActor@ pActor;
+	array<kActor@> actorsToRemove;
+	while(!((@pActor = cIterator.GetNext()) is null) && 
+		pActor.Type() != kActor_Generator_RandomAmmo)
+	{
+		kVec3 position = pActor.Origin();
+		kStr posStr = "" +
+			int(position.x) + "_" +
+			int(position.y) + "_" +
+			int(position.z);
+			
+		// TESTING
+		//if (pActor.HasComponent("kexGeneratorComponent"))
+		//{
+		//	Sys.Print("GENERATOR AT: " + posStr);
+		//}
+			
+		if (IsAmmoGeneratorToReplace(mapId, posStr))
+		{
+			actorsToRemove.insertLast(pActor);
+			ActorFactory.Spawn(
+				kActor_Generator_RandomAmmo,
+				pActor.Origin(),
+				pActor.Yaw(),
+				pActor.Pitch(),
+				pActor.Roll(),
+				true, // Unknown - always set to true
+				pActor.WorldComponent().RegionIndex());
+		}
+	}
+	
+	// Remove everything we flagged
+	for (uint i = 0; i < actorsToRemove.length(); i++)
+	{
+		actorsToRemove[i].Remove();
+	}
+}
+
+//---------------------------
 // Temporary stupid thing to remove all generators and generated items from the map
 void RemoveAllGenerators(void)
 {
@@ -284,6 +335,7 @@ void RemoveAllGenerators(void)
 		actorsToRemove[i].Remove();
 	}
 }
+
 
 //---------------------------
 // Helper function that a couple places use.

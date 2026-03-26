@@ -88,7 +88,7 @@ ITEM_TABLE = {
     # Ammo
     "Random Ammo Pack": {
         "id": 400000,
-        "actor_id": 400000,
+        "actor_id": 30000, # This is limited to an int16 in-game
         "type": ItemType.AMMO.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_AMMO.value,
         "class": ItemClassification.filler,
@@ -292,7 +292,7 @@ ITEM_TABLE = {
         "actor_id": 2001,
         "type": ItemType.WEAPON.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
-        "class": ItemClassification.useful,
+        "class": ItemClassification.progression,
         "count": 1,
         "groups": ["Land Weapon", "Underwater Weapon", "Melee Weapon"]
     },
@@ -328,7 +328,7 @@ ITEM_TABLE = {
         "actor_id": 2006,
         "type": ItemType.WEAPON.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
-        "class": ItemClassification.useful,
+        "class": ItemClassification.progression,
         "count": 1,
         "groups": ["Land Weapon", "Bad Weapon"]
     },
@@ -382,7 +382,7 @@ ITEM_TABLE = {
         "actor_id": 2012,
         "type": ItemType.WEAPON.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
-        "class": ItemClassification.useful,
+        "class": ItemClassification.progression,
         "count": 1,
         "groups": ["Land Weapon", "Bad Weapon"]
     },
@@ -400,7 +400,7 @@ ITEM_TABLE = {
         "actor_id": 2015,
         "type": ItemType.WEAPON.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
-        "class": ItemClassification.useful,
+        "class": ItemClassification.progression,
         "count": 1,
         "groups": ["Land Weapon", "Bad Weapon"]
     },
@@ -445,7 +445,7 @@ ITEM_TABLE = {
         "actor_id": 2100,
         "type": ItemType.WEAPON.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
-        "class": ItemClassification.useful,
+        "class": ItemClassification.progression,
         "count": 1,
         "groups": ["Underwater Weapon", "Bad Weapon"]
     },
@@ -463,7 +463,7 @@ ITEM_TABLE = {
         "actor_id": 2112,
         "type": ItemType.WEAPON.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
-        "class": ItemClassification.useful,
+        "class": ItemClassification.progression,
         "count": 1,
         "groups": ["Land Weapon", "Bad Weapon"] # Bad in terms of ammo
     },

@@ -51,8 +51,11 @@ class RandoPlayerObject : ScriptObject
 			g_AP.IsGoalReached = 1;
 		}
 		
-		// TODO: Remove this when done adding locations
-		//RemoveAllGenerators();
+		//RemoveAllGenerators(); //TODO: disable this, enable the next
+		if (OPTION_INCLUDE_WEAPONS_AND_AMMO)
+		{
+			UseRandomAmmoGenerators();
+		}
 		
 		// Replace all the actors that should be replaced
 		ReplaceAllActors();
@@ -129,7 +132,7 @@ class RandoPlayerObject : ScriptObject
 				actorClassName == "kexWeaponPickup")
 			{
 				Sys.Print("NOT MAPPED: " + posStr + " (" + GetFriendlyActorName(actor.Type()) + ")"); 
-				//actor.Flags() |= AF_IMPORTANT;  // TODO: remove this after mapping stuff
+				actor.Flags() |= AF_IMPORTANT;  // TODO: remove this after mapping stuff
 			}
 		}
 	}
@@ -169,7 +172,7 @@ class RandoPlayerObject : ScriptObject
 		// If it was already sent to AP, do not do this since it was "collected" already
 		if (!replacement.isSentToAP)
 		{
-			replacedActor.Flags() |= AF_IMPORTANT; // TODO: enable this when done adding items
+			//replacedActor.Flags() |= AF_IMPORTANT; // TODO: enable this when done adding items
 		}
 		
 	    initialActor.Remove();

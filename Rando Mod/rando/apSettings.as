@@ -1,1 +1,3 @@
-// Eventually, this will have settings for macros!
+#define OPTION_GOAL_LEVEL_A 60
+#define OPTION_GOAL_LEVEL_B 60
+#define OPTION_INCLUDE_WEAPONS_AND_AMMO true

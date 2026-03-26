@@ -440,3 +440,43 @@ int ConvertMapIdFromApId(const int &in apId)
 {
 	return apId / 1000;
 }
+
+//------------------------------
+// For performance, checks if the map has ammo generators to replace
+bool DoesMapHaveAmmoGeneratorsToReplace(const int16 &in mapId)
+{
+	switch(mapId)
+	{
+		case kLevel_RiverOfSouls_5:
+		case kLevel_RiverOfSouls_9:
+		case kLevel_RiverOfSouls_10:
+			return true;
+	}
+	
+	return false;
+}
+
+//------------------------------
+// Returns whether the passed position is an ammo generator we need to replace.
+bool IsAmmoGeneratorToReplace(
+	const int16 &in mapId,
+	const kStr &in position)
+{
+	switch(mapId)
+	{
+		// Soul Gate 1
+		case kLevel_RiverOfSouls_5:
+			return position == "-3635_3788_-612" ||
+				position == "-4659_3788_-612";
+		// Graveyard 1
+		case kLevel_RiverOfSouls_9:
+			return position == "-672_795_-4761" ||
+				position == "-1172_793_-4761";
+		// Graveyard 2
+		case kLevel_RiverOfSouls_10:
+			return position == "153_-1638_1024" ||
+				position == "153_-102_1024";
+	}
+	
+	return false;
+}

@@ -1,8 +1,33 @@
 #include "defs/common.txt"
+#include "defs/randoConstants.as"
+
+//------------------------------------
+// Generator for our random ammo - this needs to exist on a def file somewhere,
+// So we'll put it here since we need this one and not generatorPickups.txt.
+Generator_Ammo_Random kActor_Generator_RandomAmmo
+{
+    className                   "kexActor"
+    flags.noDamage              TRUE
+    flags.allowTracking         FALSE
+    placeable                   TRUE
+    
+    Begin_Component "kexGeneratorComponent"
+        maxActive               1
+        intervalTime1           30
+        intervalTime2           60
+        singleObjectType        kActor_Item_RandomAmmo
+        bInfiniteTotal          TRUE
+        bInitiallyActive        TRUE
+    End_Component
+    Begin_Component "kexWorldComponent"
+        bTrackGround            FALSE
+        bNonSolid               TRUE
+    End_Component
+}
 
 //-----------------------------------------------------------------------------
 //
-// ammo
+// Vanilla ammo
 //
 //-----------------------------------------------------------------------------
 

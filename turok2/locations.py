@@ -103,6 +103,10 @@ def create_events(world: Turok2World) -> None:
         region_obj = world.get_region(region_name)
 
         for event_name, event_info in region_data.get("events", {}).items():
+            # Do NOT add events that will not be relevent
+            if event_info.get("rule")  == "vanilla_mission_items" and world.options.include_mission_item_locations:
+                continue
+
             rule_func = None
             if "rule" in event_info:
                 rule_func = build_rule(event_info["rule"], world)
@@ -114,7 +118,7 @@ def create_events(world: Turok2World) -> None:
                 location_type=Turok2Location,
                 item_type=items.Turok2Item,
             )
-                
+
 def create_completion_condition(world: Turok2World):
     """
     Creates the completion condition based on the goal setting.
@@ -122,12 +126,20 @@ def create_completion_condition(world: Turok2World):
     - Hub: Get to the hub by completing Level 1
     """
     if world.options.goal == Goal.option_hub:
-        victory_event = "Hub Reached"
+        victory_region = world.multiworld.get_region("Hub", world.player)
     else:
-        victory_event = "Primagen Defeated"
+        victory_region = world.multiworld.get_region("Primagen Boss", world.player)
+        
+    victory_region.add_event(
+        "Goal Reached",
+        "Victory",
+        location_type=Turok2Location, 
+        item_type=items.Turok2Item
+    )
 
     world.multiworld.completion_condition[world.player] = \
-        lambda state: state.has(victory_event, world.player)
+        lambda state: state.has("Victory", world.player)
+
     
 def apply_location_rules(world: Turok2World):
     """
@@ -248,7 +260,7 @@ def compute_category_rule(world: Turok2World, category: str, exclude: list, coun
             base_items.discard(ex)
         else:
             raise Exception(f"Unknown exclusion: {ex}")
-    
+
     valid_items = tuple(base_items)
     return lambda state: state.has_from_list_unique(valid_items, world.player, count)
     
@@ -267,15 +279,15 @@ def weapon_requirement(world: Turok2World, args: dict):
     Checks whether the weapon requirements are met (categories and count).
     Returns true if weapons are not randomized, as it's assumed the game's given weapons are enough.
     """
+    if not world.options.include_weapon_and_ammo_locations:
+        return lambda state: True
+
     category = args.get("category")
     if not category:
         raise Exception("weapon_requirement missing 'category'")
 
     exclude = args.get("exclude", [])
     count = args.get("count", 1)
-
-    if not world.options.include_weapon_and_ammo_locations:
-        return lambda state: True
 
     return compute_category_rule(world, category, exclude, count)
     

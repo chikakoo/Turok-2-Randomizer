@@ -96,10 +96,20 @@ def get_settings_string(self: "Turok2World") -> str:
     Goal:
     - Primagen (default/fallback): The ending cutscenes are id 10 or 11, depending on which ending
     - Goal: The hub's id is 60, so set both macros to that
+    
+    Inclue weapon and ammo locations:
+    - Used to determine whether to replace some generators with the random ammo pack
+      to prevent ammo starvation in some maps where you get temporarily trapped inside
     """
     if self.options.goal == Goal.option_hub:
-        settings = "#define OPTION_GOAL_LEVEL_A 60\n#define OPTION_GOAL_LEVEL_B 60"
+        settings = "#define OPTION_GOAL_LEVEL_A 60\n#define OPTION_GOAL_LEVEL_B 60\n"
     else:
-        settings = "#define OPTION_GOAL_LEVEL_A 10\n#define OPTION_GOAL_LEVEL_B 11"
+        settings = "#define OPTION_GOAL_LEVEL_A 10\n#define OPTION_GOAL_LEVEL_B 11\n"
+
+    if self.options.include_weapon_and_ammo_locations:
+        settings += "#define OPTION_INCLUDE_WEAPONS_AND_AMMO true\n"
+    else:
+        settings += "#define OPTION_INCLUDE_WEAPONS_AND_AMMO false\n"
+
         
-    return settings;
+    return settings

@@ -16,6 +16,9 @@ class RandoPickupObject : ScriptObject
 	    @self = actor;
 		m_position = GetPositionString();
 		SetReplacementEntryProperties();
+		
+		// Force the pickup to be non-solid - this is mainly for generated ammo
+		self.WorldComponent().Flags() |= WCF_NONSOLID;
     }
 	
 	// Gets a unique id for the pickup.
@@ -61,7 +64,7 @@ class RandoPickupObject : ScriptObject
 	// Note that health and ammo ARE sent to AP still when touched
 	// so that it knows you could have received it.
 	void OnCollide(kActor@ pCollider)
-	{
+	{			
 		if (m_id != 0 && 
 			!m_wasSentToAP &&
 			!(pCollider is null) &&
@@ -85,6 +88,12 @@ class RandoPickupObject : ScriptObject
 	void OnTouch(kActor@ pInstigator)
 	{
 		Sys.Print(m_position);
+	
+		if (self.Type() == kActor_Item_RandomAmmo)
+		{
+			GetAmmoInRandomWeapon();
+		}
+			
 		if (m_id != 0)
 		{
 			CollectLocation(m_id, Game.ActiveMapID());
@@ -104,12 +113,6 @@ class RandoPickupObject : ScriptObject
 			else if (self.Type() == kActor_Item_APItem)
 			{
 				Hud.AddMessage(m_displayString);
-			}
-			
-			// If it's ammo, give ammo
-			else if(self.Type() == kActor_Item_RandomAmmo)
-			{
-				GetAmmoInRandomWeapon();
 			}
 		}
 	}
