@@ -245,6 +245,12 @@ def force_early_weapons(world: Turok2World, itempool: list[Item]):
 
         print(f"Early weapon {weapon.name} for Player {world.player}")
 
+def force_early_key_items(world: Turok2World):
+    """
+    Forces the Beacon Power Cells and level 2 keys early on so you can progress.
+    """
+    world.multiworld.early_items[world.player]["Beacon Power Cell"] = 3
+    world.multiworld.early_items[world.player]["Level 2 Key"] = 3
 
 def create_all_items(world: Turok2World) -> None:
     """
@@ -315,6 +321,7 @@ def create_all_items(world: Turok2World) -> None:
     
     # Force 3 early weapons, and make one in the first area if the setting ison
     force_early_weapons(world, itempool)
+    force_early_key_items(world)
     
     world.multiworld.itempool += itempool
     
