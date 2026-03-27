@@ -450,6 +450,8 @@ bool DoesMapHaveAmmoGeneratorsToReplace(const int16 &in mapId)
 		case kLevel_RiverOfSouls_5:
 		case kLevel_RiverOfSouls_9:
 		case kLevel_RiverOfSouls_10:
+		case kLevel_RiverOfSouls_8:
+		case kLevel_RiverOfSouls_11:
 			return true;
 	}
 	
@@ -476,6 +478,17 @@ bool IsAmmoGeneratorToReplace(
 		case kLevel_RiverOfSouls_10:
 			return position == "153_-1638_1024" ||
 				position == "153_-102_1024";
+		// Soul Gate 2
+		case kLevel_RiverOfSouls_8:
+			return position == "10547_-972_872" ||
+				position == "10547_-1996_872";
+		// Graveyard 3
+		case kLevel_RiverOfSouls_11:
+			return position == "-1382_-4147_0" ||
+				position == "-1280_-2611_0" ||
+				position == "870_-1996_0" ||
+				position == "870_6195_4" ||
+				position == "-716_6195_1";
 	}
 	
 	return false;

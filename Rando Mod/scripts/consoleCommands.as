@@ -43,13 +43,6 @@ void LowHealth()
 }
 
 // --------------------------
-// Level-specific items
-void BeaconPowerCell(void)
-{
-	TryGetInventoryItem(kActor_MissionItem_BeaconPowerCell);
-}
-
-// --------------------------
 // Level keys
 void Level2Key(void)
 {
@@ -184,4 +177,21 @@ void Shotgun()
 void Shredder()
 {
 	TryGivePlayerWeapon(kActor_Item_WpnScatter);
+}
+
+//---------------------------
+// Mission Items
+void BeaconPowerCell(void)
+{
+	TryGetInventoryItem(kActor_MissionItem_BeaconPowerCell);
+}
+
+void GateKey(void)
+{
+	TryGetInventoryItem(kActor_MissionItem_GateKey);
+}
+
+void GraveyardKey(void)
+{
+	TryGetInventoryItem(kActor_MissionItem_GraveyardKey);
 }

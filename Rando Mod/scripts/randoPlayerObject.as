@@ -382,7 +382,8 @@ class RandoPlayerObject : ScriptObject
 				break;
 			case LEVEL_RIVER_OF_SOULS:
 				Hud.AddMessage(
-					"Gate Keys: " + inventory.GetCount(kActor_MissionItem_GateKey),
+					"Gate Keys: " + inventory.GetCount(kActor_MissionItem_GateKey) +
+					"  -  Graveyard Keys: " + inventory.GetCount(kActor_MissionItem_GraveyardKey),
 					m_progressMenuDisplayTime);
 				break;
 			default:
