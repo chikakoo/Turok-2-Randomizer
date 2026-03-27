@@ -2,9 +2,6 @@
 	"regions": [
 		{
 			"name": "PoA Start",
-			"events": {
-				"Beacon Power Cell 1": { "rule": "vanilla_mission_items" }
-			},
 			"exits": [{ "to": "PoA Water Hub" }]
 		},
 		{
@@ -13,10 +10,6 @@
 		},
 		{
 			"name":  "PoA Ships",
-			"events": {
-				"Beacon Power Cell 2": { "rule": "vanilla_mission_items" },
-				"Beacon Power Cell 3": { "rule": "vanilla_mission_items" }
-			},
 			"exits": [{ "to": "PoA Water Hub Upper" }]
 		},
 		{
@@ -83,14 +76,9 @@
 					"rule": {
 						"mission_item_requirement": {
 							"item": "Beacon Power Cell",
-							"count": 3,
-							"event_items": [
-								"Beacon Power Cell 1",
-								"Beacon Power Cell 2",
-								"Beacon Power Cell 3"
-							]
+							"count": 3
 						}
-					}
+					}	
 				}
 			]
 		},

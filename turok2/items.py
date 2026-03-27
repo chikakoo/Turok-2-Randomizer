@@ -204,24 +204,22 @@ def force_local_weapons(world: Turok2World, itempool: list[Item]):
     ]
     
     count = int(len(weapons) * world.options.local_weapon_percentage / 100)
-    selected_weapons = weapons[:count]
-
-    for weapon in selected_weapons:
+    for weapon in world.random.sample(weapons, k=count):
         world.options.local_items.value.add(weapon.name)
         
     print(f"Forced {count} {ItemType.WEAPON} items locally for Player {world.player}")
 
 
-def try_force_early_weapon(world: Turok2World, itempool: list[Item]):
+def force_early_weapons(world: Turok2World, itempool: list[Item]):
     """
-    If the setting is on, forces an appropriate early weapon into the starting area.
+    If we are randomizing weapons, force 3 early in the seed.
+    If force_early_weapon is on, force it in the first map locally.
     """
-    if not world.options.include_weapon_and_ammo_locations or not world.options.force_early_weapon:
+    if not world.options.include_weapon_and_ammo_locations:
         return
         
     def is_valid_early_weapon(item_name: str) -> bool:
         data = ITEM_TABLE[item_name]
-
         groups = data.get("groups", [])
         return "Early Weapon" in groups 
 
@@ -229,29 +227,23 @@ def try_force_early_weapon(world: Turok2World, itempool: list[Item]):
         item for item in itempool
         if is_valid_early_weapon(item.name)
     ]
-    
-    # If we don't have a valid weapon, use any
-    if not weapon_items:
-        weapon_items = [
-            item for item in itempool
-            if ITEM_TABLE[item.name].get("type", "-1") == ItemType.WEAPON.value
-        ]
 
-    starting_locations = [
-        loc for loc in world.multiworld.get_unfilled_locations(world.player)
-        if loc.parent_region.name == world.origin_region_name
-        and loc.address is not None
-        and not loc.locked
-        and loc.item is None
-    ]
-    
-    if weapon_items and starting_locations:
-        weapon = world.multiworld.random.choice(weapon_items)
-        location = world.multiworld.random.choice(starting_locations)
-        location.place_locked_item(weapon)
-        itempool.remove(weapon)
-        
-        print(f"Placed early weapon {weapon.name} at {location.name} for Player {world.player}")
+    for index, weapon in enumerate(world.random.sample(weapon_items, k=3)):
+        if index == 0 and world.options.force_early_weapon:
+            starting_locations = [
+                loc for loc in world.multiworld.get_unfilled_locations(world.player)
+                if loc.parent_region.name == world.origin_region_name
+                and loc.address is not None
+                and not loc.locked
+                and loc.item is None
+            ]
+            location = world.random.choice(starting_locations)
+            location.place_locked_item(weapon)
+            itempool.remove(weapon)
+        else:
+            world.multiworld.early_items[world.player][weapon.name] = 1
+
+        print(f"Early weapon {weapon.name} for Player {world.player}")
 
 
 def create_all_items(world: Turok2World) -> None:
@@ -321,8 +313,8 @@ def create_all_items(world: Turok2World) -> None:
     force_local_items(world, itempool, ItemType.AMMO.value, world.options.local_ammo_percentage)
     force_local_weapons(world, itempool)
     
-    # Force local weapons depending on options
-    try_force_early_weapon(world, itempool)
+    # Force 3 early weapons, and make one in the first area if the setting ison
+    force_early_weapons(world, itempool)
     
     world.multiworld.itempool += itempool
     

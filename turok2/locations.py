@@ -92,7 +92,7 @@ def create_regions_and_entrances(world: Turok2World) -> None:
                 entrance_name
             )
             entrance.rule_json = exit_data.get("rule")
-            
+
 def create_events(world: Turok2World) -> None:
     """
     Creates events in regions from the JSON data.
@@ -277,23 +277,20 @@ def vanilla_mission_items(world: Turok2World):
     
 def mission_item_requirement(world: Turok2World, args: dict):
     """
-    Checks mission items, taking into account whether they've been shuffled.
+    Checks mission items. Returns True if we aren't shuffling them because the game logic should work here.
     """
-    count = args.get("count", 1)
-    player = world.player
-    
     if world.options.include_mission_item_locations:
-        # Items are shuffled, so check the inventory
+        count = args.get("count", 1)
         item = args.get("item")
-        return lambda state: state.has(item, player, count)
+        return lambda state: state.has(item, world.player, count)
+    
+    return lambda state: True
 
     # Vanilla, so check all the needed events
     # This will check that we have at least "count" number of events in the list
     # This is meant to cover whether we can progress with any of the items
-    event_items = args.get("event_items", [])
-    return lambda state: sum(
-        state.has(event, player) for event in event_items
-    ) >= count
+    #event_items = args.get("event_items", [])
+    #return lambda state: all(state.has(event, player) for event in event_items)
     
 NAMED_RULES = {
     "advanced_game_logic": advanced_game_logic,

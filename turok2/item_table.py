@@ -341,7 +341,7 @@ ITEM_TABLE = {
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
         "class": ItemClassification.useful,
         "count": 1,
-        "groups": []
+        "groups": ["Early Weapon"]
     },
     "Pistol": {
         "id": 300002,
@@ -350,7 +350,7 @@ ITEM_TABLE = {
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
         "class": ItemClassification.useful,
         "count": 1,
-        "groups": []
+        "groups": ["Early Weapon"]
     },
     "Mag 60": {
         "id": 300003,
@@ -386,7 +386,7 @@ ITEM_TABLE = {
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
         "class": ItemClassification.useful,
         "count": 1,
-        "groups": ["Good Weapon"]
+        "groups": ["Early Weapon", "Good Weapon"]
     },
     "Shredder": {
         "id": 300007,
@@ -404,7 +404,7 @@ ITEM_TABLE = {
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
         "class": ItemClassification.useful,
         "count": 1,
-        "groups": ["Good Weapon"]
+        "groups": ["Early Weapon", "Good Weapon"]
     },
     "Firestorm Cannon": {
         "id": 300009,
@@ -449,7 +449,7 @@ ITEM_TABLE = {
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
         "class": ItemClassification.useful,
         "count": 1,
-        "groups": ["Good Weapon"]
+        "groups": ["Early Weapon", "Good Weapon"]
     },
     "Scorpion Launcher": {
         "id": 300014,
@@ -467,7 +467,7 @@ ITEM_TABLE = {
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
         "class": ItemClassification.useful,
         "count": 1,
-        "groups": ["Good Weapon"]
+        "groups": ["Early Weapon", "Good Weapon"]
     },
     "Razor Wind": {
         "id": 300016,
@@ -476,7 +476,7 @@ ITEM_TABLE = {
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_WEAPON.value,
         "class": ItemClassification.useful,
         "count": 1,
-        "groups": ["Good Weapon"]
+        "groups": ["Early Weapon", "Good Weapon"]
     },
     "Harpoon Gun": {
         "id": 300017,
