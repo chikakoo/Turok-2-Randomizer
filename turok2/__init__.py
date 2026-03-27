@@ -1,9 +1,9 @@
 import settings
 import typing
 from . import components as components
-from collections.abc import Mapping
 from worlds.AutoWorld import World
 from . import items, locations, web_world
+from .item_table import ITEM_NAME_TO_ID
 from . import options as turok2_options
 from .turok2_seed import gen_turok2_seed
 
@@ -31,7 +31,7 @@ class Turok2World(World):
     settings: typing.ClassVar[Turok2Settings]
 
     location_name_to_id = locations.LOCATION_NAME_TO_ID
-    item_name_to_id = items.ITEM_NAME_TO_ID
+    item_name_to_id = ITEM_NAME_TO_ID
     item_name_groups = items.get_item_name_groups()
     origin_region_name = "PoA Start"
 
@@ -56,3 +56,12 @@ class Turok2World(World):
         
     def generate_output(self, output_directory: str) -> None:
         gen_turok2_seed(self, output_directory)
+    
+    """
+    def fill_hook(self,
+        progitempool: List["Item"],
+        usefulitempool: List["Item"],
+        filleritempool: List["Item"],
+        fill_locations: List["Location"]) -> None:
+            progitempool.sort(key = lambda item: item.player == self.player and (item.name == "Shredder" or item.name == "Mag 60" or item.name == "Tek Bow"))
+    """

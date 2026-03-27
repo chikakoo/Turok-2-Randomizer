@@ -6,18 +6,13 @@
 			"exits": [{
 				"to": "Primagen Boss", 
 				"rule": {
-					"and": [
-						{
-							"has": [
-								"Primagen Key 1",
-								"Primagen Key 2",
-								"Primagen Key 3",
-								"Primagen Key 4",
-								"Primagen Key 5",
-								"Primagen Key 6"
-							]
-						},
-						{ "weapon_requirement": { "category": "Good Weapon", "count": 6 } }
+					"has": [
+						"Primagen Key 1",
+						"Primagen Key 2",
+						"Primagen Key 3",
+						"Primagen Key 4",
+						"Primagen Key 5",
+						"Primagen Key 6"
 					]
 				}
 			}]

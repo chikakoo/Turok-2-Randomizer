@@ -10,7 +10,7 @@ from . import items
 from .items import ItemType
 
 if TYPE_CHECKING:
-    from .world import Turok2World
+    from . import Turok2World
 
 class Turok2Location(Location):
     game = "Turok 2"
@@ -104,7 +104,7 @@ def create_events(world: Turok2World) -> None:
 
         for event_name, event_info in region_data.get("events", {}).items():
             # Do NOT add events that will not be relevent
-            if event_info.get("rule")  == "vanilla_mission_items" and world.options.include_mission_item_locations:
+            if event_info.get("rule") == "vanilla_mission_items" and world.options.include_mission_item_locations:
                 continue
 
             rule_func = None
@@ -137,8 +137,7 @@ def create_completion_condition(world: Turok2World):
         item_type=items.Turok2Item
     )
 
-    world.multiworld.completion_condition[world.player] = \
-        lambda state: state.has("Victory", world.player)
+    world.multiworld.completion_condition[world.player] = lambda state: state.has("Victory", world.player)
 
     
 def apply_location_rules(world: Turok2World):
@@ -216,7 +215,6 @@ def build_has_rule(has_data, world: Turok2World):
     - Has all the given items, if passed a list
     - Has the given count of items, if given an "item" object
     - Has the given count of unique items of the given category, if given a "category" object
-      - If it contains an "exclude" property, will not include items in that category
     """
     player = world.player
     
@@ -237,33 +235,16 @@ def build_has_rule(has_data, world: Turok2World):
     if item:
         return lambda state: state.has(item, player, count)
     if category:
-        exclude = has_data.get("exclude", [])
-        return compute_category_rule(world, category, exclude, count)
+        return compute_category_rule(world, category, count)
         
     raise Exception(f"Invalid 'has' rule: {has_data}")
 
-def compute_category_rule(world: Turok2World, category: str, exclude: list, count: int = 1):
+def compute_category_rule(world: Turok2World, category: str, count: int = 1):
     """
     Checks whether the player has the given count of unique items of the given category
-    - If it contains an "exclude" property, will not include items in that category
     """
-    if category not in world.item_name_groups:
-        raise Exception(f"Unknown category: {category}")
-            
-    base_items = set(world.item_name_groups[category])
-    
-    # Apply exclusions - groups and items work here
-    for ex in exclude:
-        if ex in world.item_name_groups:
-            base_items -= set(world.item_name_groups[ex])
-        elif ex in items.ITEM_TABLE:
-            base_items.discard(ex)
-        else:
-            raise Exception(f"Unknown exclusion: {ex}")
+    return lambda state: state.has_group_unique(category, world.player, count)
 
-    valid_items = tuple(base_items)
-    return lambda state: state.has_from_list_unique(valid_items, world.player, count)
-    
 def advanced_game_logic(world: Turok2World):
     """Checks advanced game logic is on."""
     enabled = world.options.game_logic_difficulty == GameLogicDifficulty.option_advanced
@@ -286,10 +267,8 @@ def weapon_requirement(world: Turok2World, args: dict):
     if not category:
         raise Exception("weapon_requirement missing 'category'")
 
-    exclude = args.get("exclude", [])
     count = args.get("count", 1)
-
-    return compute_category_rule(world, category, exclude, count)
+    return compute_category_rule(world, category, count)
     
 def vanilla_mission_items(world: Turok2World):
     """Checks whether mission items in their vanilla locations."""
@@ -301,18 +280,19 @@ def mission_item_requirement(world: Turok2World, args: dict):
     Checks mission items, taking into account whether they've been shuffled.
     """
     count = args.get("count", 1)
+    player = world.player
     
     if world.options.include_mission_item_locations:
         # Items are shuffled, so check the inventory
         item = args.get("item")
-        return lambda state: state.has(item, world.player, count)
+        return lambda state: state.has(item, player, count)
 
     # Vanilla, so check all the needed events
     # This will check that we have at least "count" number of events in the list
     # This is meant to cover whether we can progress with any of the items
     event_items = args.get("event_items", [])
     return lambda state: sum(
-        state.has(event, world.player) for event in event_items
+        state.has(event, player) for event in event_items
     ) >= count
     
 NAMED_RULES = {

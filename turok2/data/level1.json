@@ -5,23 +5,11 @@
 			"events": {
 				"Beacon Power Cell 1": { "rule": "vanilla_mission_items" }
 			},
-			"exits": [
-				{ 
-					"to": "PoA Water Hub",
-					"rule": {
-						"weapon_requirement": {
-							"category": "Land Weapon",
-							"exclude": ["Bad Weapon", "Melee Weapon"]
-						}
-					}
-				}
-			]
+			"exits": [{ "to": "PoA Water Hub" }]
 		},
 		{
 			"name": "PoA Water Hub",
-			"exits": [
-				{ "to": "PoA Ships" }
-			]
+			"exits": [{ "to": "PoA Ships" }]
 		},
 		{
 			"name":  "PoA Ships",
@@ -29,17 +17,7 @@
 				"Beacon Power Cell 2": { "rule": "vanilla_mission_items" },
 				"Beacon Power Cell 3": { "rule": "vanilla_mission_items" }
 			},
-			"exits": [
-				{ 
-					"to": "PoA Water Hub Upper",
-					"rule": {
-						"weapon_requirement": {
-							"category": "Land Weapon",
-							"count": 2
-						}
-					}
-				}
-			]
+			"exits": [{ "to": "PoA Water Hub Upper" }]
 		},
 		{
 			"name":  "PoA Water Hub Upper",
@@ -50,24 +28,8 @@
 		{
 			"name":  "PoA Talisman Portal Map",
 			"exits": [
-				{ 
-					"to": "PoA Bird Door", 
-					"rule": {
-						"or": [
-							{ "weapon_requirement": { "category": "Bird Killer" } },
-							"advanced_weapon_logic"
-						]
-					}
-				},
-				{ 
-					"to": "PoA Upper Primagen Key", 
-					"rule": {
-						"or": [
-							{ "weapon_requirement": { "category": "Long Range" } },
-							"advanced_weapon_logic"
-						]
-					}
-				},
+				{ "to": "PoA Bird Door" },
+				{ "to": "PoA Upper Primagen Key" },
 				{ "to": "PoA Child 3 Map" }
 			]
 		},
@@ -115,31 +77,19 @@
 		{
 			"name": "PoA Catwalks",
 			"exits": [
-				{ 
-					"to": "PoA Oblivion",
-					"rule": {
-						"weapon_requirement": { "category": "Good Weapon" }
-					}
-				},
+				{ "to": "PoA Oblivion" },
 				{
 					"to": "Hub",
 					"rule": {
-						"and": [
-							{
-								"weapon_requirement": { "category": "Good Weapon" }
-							},
-							{
-								"mission_item_requirement": {
-									"item": "Beacon Power Cell",
-									"count": 3,
-									"event_items": [
-										"Beacon Power Cell 1",
-										"Beacon Power Cell 2",
-										"Beacon Power Cell 3"
-									]
-								}
-							}
-						]
+						"mission_item_requirement": {
+							"item": "Beacon Power Cell",
+							"count": 3,
+							"event_items": [
+								"Beacon Power Cell 1",
+								"Beacon Power Cell 2",
+								"Beacon Power Cell 3"
+							]
+						}
 					}
 				}
 			]
