@@ -11,12 +11,14 @@ class Goal(Choice):
     """
     Defines the goal of the seed.
     - Primagen: Defeat the Primagen (vanilla)
-    - Hub: Get to the hub by completing Level 1 (that's that exists so far)
+    - 1 Totem: Save one totem (level 1)
+    - 2 Totems: Save two totems (level 1 and 2)
     """
     display_name = "Goal"
     
     option_primagen = 0
-    option_hub = 1
+    option_1_totem = 1
+    option_2_totems = 2
     
     default = option_primagen
 

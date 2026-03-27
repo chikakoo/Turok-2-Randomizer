@@ -125,8 +125,10 @@ def create_completion_condition(world: Turok2World):
     - Primagen: Defeat the Primagen (vanilla) - this is the fallback
     - Hub: Get to the hub by completing Level 1
     """
-    if world.options.goal == Goal.option_hub:
+    if world.options.goal == Goal.option_1_totem:
         victory_region = world.multiworld.get_region("Hub", world.player)
+    elif world.options.goal == Goal.option_2_totems:
+        victory_region = world.multiworld.get_region("Level 2 Totem", world.player)
     else:
         victory_region = world.multiworld.get_region("Primagen Boss", world.player)
         

@@ -315,6 +315,7 @@ ITEM_TABLE = {
         "count": 6
     },
     
+    # Mission Items
     "Beacon Power Cell": {
         "id": 200100,
         "actor_id": 4200,
@@ -322,6 +323,22 @@ ITEM_TABLE = {
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value,
         "class": ItemClassification.progression,
         "count": 3
+    },
+    "Gate Key": {
+        "id": 200200,
+        "actor_id": 4030,
+        "type": ItemType.MISSION_ITEM.value,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value,
+        "class": ItemClassification.progression,
+        "count": 2
+    },
+    "Graveyard Key": {
+        "id": 200300,
+        "actor_id": 4025,
+        "type": ItemType.MISSION_ITEM.value,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value,
+        "class": ItemClassification.progression,
+        "count": 2
     },
 
     # Weapons

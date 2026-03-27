@@ -94,22 +94,24 @@ def get_settings_string(self: "Turok2World") -> str:
     Gets the macro file with any settings the game needs to know.
     
     Goal:
-    - Primagen (default/fallback): The ending cutscenes are id 10 or 11, depending on which ending
-    - Goal: The hub's id is 60, so set both macros to that
+    - Primagen or totem count
     
     Inclue weapon and ammo locations:
     - Used to determine whether to replace some generators with the random ammo pack
       to prevent ammo starvation in some maps where you get temporarily trapped inside
     """
-    if self.options.goal == Goal.option_hub:
-        settings = "#define OPTION_GOAL_LEVEL_A 60\n#define OPTION_GOAL_LEVEL_B 60\n"
-    else:
-        settings = "#define OPTION_GOAL_LEVEL_A 10\n#define OPTION_GOAL_LEVEL_B 11\n"
+    primagen_setting = "#define OPTION_GOAL_PRIMAGEN false\n"
+    totem_setting = "#define OPTION_GOAL_LEVELS 0\n"
+    weapon_and_ammo_setting = "#define OPTION_INCLUDE_WEAPONS_AND_AMMO false\n"
+
+    if self.options.goal == Goal.option_primagen:
+        primagen_setting = "#define OPTION_GOAL_PRIMAGEN true\n"
+    elif self.options.goal == Goal.option_1_totem:
+        totem_setting = "#define OPTION_GOAL_LEVELS 1\n"
+    elif self.options.goal == Goal.option_2_totems:
+        totem_setting = "#define OPTION_GOAL_LEVELS 2\n"
 
     if self.options.include_weapon_and_ammo_locations:
-        settings += "#define OPTION_INCLUDE_WEAPONS_AND_AMMO true\n"
-    else:
-        settings += "#define OPTION_INCLUDE_WEAPONS_AND_AMMO false\n"
+        weapon_and_ammo_setting = "#define OPTION_INCLUDE_WEAPONS_AND_AMMO true\n"
 
-        
-    return settings
+    return primagen_setting + totem_setting + weapon_and_ammo_setting
