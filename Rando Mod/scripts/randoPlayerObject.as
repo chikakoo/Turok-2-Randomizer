@@ -46,7 +46,15 @@ class RandoPlayerObject : ScriptObject
 		
 		// Check the goal - there's two checks here in case it's the
 		// Primagen, which has two different maps for the two endings
-		if (mapId == OPTION_GOAL_LEVEL_A || mapId == OPTION_GOAL_LEVEL_B)
+		if (OPTION_GOAL_PRIMAGEN && 
+			(mapId == kLevel_Ending || mapId == kLevel_EndingB))
+		{
+			g_AP.IsGoalReached = 1;
+		}
+		
+		// If the goal is x levels, check that that was done
+		if (OPTION_GOAL_LEVELS > 0 &&
+			OPTION_GOAL_LEVELS <= LocalPlayer.Inventory().GetCount(kActor_Misc_TotemInventory))
 		{
 			g_AP.IsGoalReached = 1;
 		}
