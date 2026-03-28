@@ -86,7 +86,7 @@ enum APMessageType
 void InitAP()
 {
 	g_AP.Magic = 0x4150524B; // APRK
-    g_AP.Version = 1;
+    g_AP.Version = 2;
 	g_AP.Signature1 = 0x43110DAD;
 	g_AP.Signature2 = 0x1337BEEF;
 
