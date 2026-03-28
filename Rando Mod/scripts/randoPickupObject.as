@@ -110,7 +110,8 @@ class RandoPickupObject : ScriptObject
 			}
 			
 			// If it's an AP item, display the check
-			else if (self.Type() == kActor_Item_APItem)
+			else if (self.Type() == kActor_Item_APItemProgression ||
+				self.Type() == kActor_Item_APItemNonProgression)
 			{
 				Hud.AddMessage(m_displayString);
 			}

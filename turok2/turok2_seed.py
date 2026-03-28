@@ -82,8 +82,12 @@ def get_angelscript_from_filled_locations(self: "Turok2World") -> str:
             snippet += f", {ITEM_TABLE[location.item.name]["actor_id"]});"
         # Else, it should be the location name and player name (so we can display it on pickup)
         else:
+            if location.item.advancement:
+                is_progression = "true"
+            else:
+                is_progression = "false"
             player_name = self.multiworld.get_player_name(location.item.player)
-            snippet += f", \"{player_name}'s {location.item.name}\");"
+            snippet += f", \"{player_name}'s {location.item.name}\", {is_progression});"
         
         angelscript_snippets.append(snippet)
         

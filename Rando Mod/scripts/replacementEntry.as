@@ -43,13 +43,16 @@ class ReplacementEntry
 		const kStr &in initName,
 		const int &in initApId,
 		const kStr &in initPosition,
-		const kStr &in initDisplayString)
+		const kStr &in initDisplayString,
+		const bool &in isProgression = false)
     {
         name = initName;
         apId = initApId;
 		position = initPosition;
 		mapId = position.Atoi();
-		replacementActorId = kActor_Item_APItem;
+		replacementActorId = isProgression
+			? kActor_Item_APItemProgression
+			: kActor_Item_APItemNonProgression;
         displayString = initDisplayString;
 		isSentToAP = false;
 		isCollected = false;

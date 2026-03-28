@@ -1,4 +1,5 @@
-#define kActor_Item_APItem 100000
+#define kActor_Item_APItemProgression 100000
+#define kActor_Item_APItemNonProgression 100001
 #define kActor_Item_RandomAmmo 30000 // Limited to int16 for generators
 #define kActor_Generator_RandomAmmo 30100
 

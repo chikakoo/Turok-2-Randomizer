@@ -145,15 +145,17 @@ void AddReplacement(
 // - name: The friendly name of the actor
 // - apId: The AP id of the location
 // - position: The position of the actor, to identify it on the map
-// - replacementActorId: The actor id to replace this with
+// - displayString: What text to display when picking up the item
+// - isProgression: Affects whether we use the gold or gray outined model
 void AddReplacement(
 	const kStr &in name,
 	const int &in apId, 
 	const kStr &in position,
-	const kStr &in displayString)
+	const kStr &in displayString,
+	const bool &in isProgression = false)
 {
 	ReplacementEntry @entry = ReplacementEntry(
-		name, apId, position, displayString);
+		name, apId, position, displayString, isProgression);
     g_mapReplacements[entry.mapId].insertLast(entry);
 }
 
