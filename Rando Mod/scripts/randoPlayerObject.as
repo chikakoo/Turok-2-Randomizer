@@ -398,6 +398,11 @@ class RandoPlayerObject : ScriptObject
 					"  -  Graveyard Keys: " + inventory.GetCount(kActor_MissionItem_GraveyardKey),
 					m_progressMenuDisplayTime);
 				break;
+			case LEVEL_DEATH_MARSHES:
+				Hud.AddMessage(
+					"Satchel Charges: " + inventory.GetCount(kActor_MissionItem_L3SatchelCharge),
+					m_progressMenuDisplayTime);
+				break;
 			default:
 				Hud.AddMessage("Unmapped map id!");
 				return;
