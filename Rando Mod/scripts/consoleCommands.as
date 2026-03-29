@@ -195,3 +195,18 @@ void GraveyardKey(void)
 {
 	TryGetInventoryItem(kActor_MissionItem_GraveyardKey);
 }
+
+void L3SatchelCharge(void)
+{
+	TryGetInventoryItem(kActor_MissionItem_L3SatchelCharge);
+}
+
+void L4SatchelCharge(void)
+{
+	TryGetInventoryItem(kActor_MissionItem_L4SatchelCharge);
+}
+
+void L5SatchelCharge(void)
+{
+	TryGetInventoryItem(kActor_MissionItem_L5SatchelCharge);
+}

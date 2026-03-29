@@ -20,6 +20,7 @@ void InitDefManager()
 	g_indexDefManager.LoadFile("defs/actors/talismans.txt");
 	g_indexDefManager.LoadFile("defs/actors/ap.txt");
 	g_indexDefManager.LoadFile("defs/actors/keys.txt");
+	g_indexDefManager.LoadFile("defs/actors/satchels.txt");
 	
 	g_defManager = kDefManager();
 	g_defManager.LoadFile("defs/ammoInfo.txt");

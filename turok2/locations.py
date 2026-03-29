@@ -70,7 +70,12 @@ def create_locations(world: Turok2World) -> None:
     Creates the locations by looking at all of the regions defined in the json data.
     Includes putting a "rule" property in the table to construct the rules later on.
     """
+    include_level_2 = world.options.goal != Goal.option_1_totem
+    
     for loc_name, loc_info in LOCATION_TABLE.items():
+        if not include_level_2 and loc_name.startswith("RoS"):
+            continue
+        
         # Exclude relevent locations if not shuffled
         item_type = loc_info.get("type", -1)
         if not world.options.include_health_locations and item_type == ItemType.HEALTH.value:

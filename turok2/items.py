@@ -29,6 +29,8 @@ def get_required_seed_items(world: Turok2World):
     These are all weapons, and all inventory items, depending on settings
     """
     def include_item(name, data):
+        include_level_2 = world.options.goal != Goal.option_1_totem
+        
         # Nuke item special cases
         if name == "Nuke":
             return world.options.nuke_behavior == NukeBehavior.option_weapon_pickup
@@ -38,22 +40,21 @@ def get_required_seed_items(world: Turok2World):
         # Mission items depend on the setting (they are also inventory items, so do this first)
         if data["type"] == ItemType.MISSION_ITEM.value:
             return (world.options.include_mission_item_locations and (
-                name == "Beacon Power Cell" or
-                world.options.goal == Goal.option_2_totems))
+                name == "Beacon Power Cell" or include_level_2))
         
         # Inventory items
         if data["type"] == ItemType.PRIMAGEN_KEY.value:
             return world.options.goal == Goal.option_primagen
             
         if data["type"] == ItemType.LEVEL_KEY.value:
-            return name == "Level 2 Key" and world.options.goal == Goal.option_2_totems
+            return include_level_2 and name == "Level 2 Key"
             
         if data["type"] == ItemType.EAGLE_FEATHER.value:
-            return name == "Level 2 Eagle Feather" and world.options.goal == Goal.option_2_totems
+            return include_level_2 and name == "Level 2 Eagle Feather"
             
         if data["type"] == ItemType.TALISMAN.value:
             return (name == "Leap of Faith" or 
-                (name == "Breath of Life" and world.options.goal == Goal.option_2_totems))
+                (include_level_2 and name == "Breath of Life"))
         
         if data["msg_type"] == APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value:
             return True

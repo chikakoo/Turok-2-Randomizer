@@ -1,0 +1,95 @@
+#include "defs/common.txt"
+#include "defs/randoConstants.as"
+
+//-----------------------------------------------------------------------------
+//
+// inventory satchels
+//
+//-----------------------------------------------------------------------------
+
+Satchel1 kActor_MissionItem_L3SatchelCharge 
+{ 
+	className "kexInventoryPickup" 
+	placeable TRUE 
+	flags.noDamage TRUE 
+	flags.important TRUE 
+	pickup.pickupSound "sounds/shaders/Ammo Pickup.ksnd" 
+	pickup.pickupMessage "L3 Satchel Charge"
+	
+	initialScale              "0.25 0.25 0.25"
+	Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Satchel_0.staticmesh"
+    End_Component
+	Begin_Component "kexScriptComponent"
+        scriptClass           "RandoPickupObject"
+        triggerRadius         81.92
+    End_Component
+}
+
+Satchel11 kActor_MissionItem_L4SatchelCharge 
+{ 
+	className "kexInventoryPickup" 
+	placeable TRUE 
+	flags.noDamage TRUE 
+	flags.important TRUE 
+	pickup.pickupSound "sounds/shaders/Ammo Pickup.ksnd" 
+	pickup.pickupMessage "L4 Satchel Charge"
+	
+	initialScale              "0.25 0.25 0.25"
+	Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Satchel_11_Cave.staticmesh"
+    End_Component
+	Begin_Component "kexScriptComponent"
+        scriptClass           "RandoPickupObject"
+        triggerRadius         81.92
+    End_Component
+}
+
+Satchel12 kActor_MissionItem_L5SatchelCharge 
+{ 
+	className "kexInventoryPickup" 
+	placeable TRUE 
+	flags.noDamage TRUE 
+	flags.important TRUE 
+	pickup.pickupSound "sounds/shaders/Ammo Pickup.ksnd" 
+	pickup.pickupMessage "L5 Satchel Charge"
+	
+	initialScale              "0.25 0.25 0.25"
+	Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Satchel_10_Hive.staticmesh"
+    End_Component
+	Begin_Component "kexScriptComponent"
+        scriptClass           "RandoPickupObject"
+        triggerRadius         81.92
+    End_Component
+}
+
+Satchel2 4101 { className "kexInventoryPickup" placeable TRUE flags.noDamage TRUE flags.important TRUE pickup.pickupSound "sounds/shaders/Ammo Pickup.ksnd" pickup.pickupMessage "$str_103" }
+Satchel3 4102 { className "kexInventoryPickup" placeable TRUE flags.noDamage TRUE flags.important TRUE pickup.pickupSound "sounds/shaders/Ammo Pickup.ksnd" pickup.pickupMessage "$str_103" }
+Satchel4 4103 { className "kexInventoryPickup" placeable TRUE flags.noDamage TRUE flags.important TRUE pickup.pickupSound "sounds/shaders/Ammo Pickup.ksnd" pickup.pickupMessage "$str_103" }
+Satchel5 4104 { className "kexInventoryPickup" placeable TRUE flags.noDamage TRUE flags.important TRUE pickup.pickupSound "sounds/shaders/Ammo Pickup.ksnd" pickup.pickupMessage "$str_103" }
+Satchel6 4105 { className "kexInventoryPickup" placeable TRUE flags.noDamage TRUE flags.important TRUE pickup.pickupSound "sounds/shaders/Ammo Pickup.ksnd" pickup.pickupMessage "$str_103" }
+Satchel7 4106 { className "kexInventoryPickup" placeable TRUE flags.noDamage TRUE flags.important TRUE pickup.pickupSound "sounds/shaders/Ammo Pickup.ksnd" pickup.pickupMessage "$str_103" }
+Satchel8 4107 { className "kexInventoryPickup" placeable TRUE flags.noDamage TRUE flags.important TRUE pickup.pickupSound "sounds/shaders/Ammo Pickup.ksnd" pickup.pickupMessage "$str_103" }
+Satchel9 4108 { className "kexInventoryPickup" placeable TRUE flags.noDamage TRUE flags.important TRUE pickup.pickupSound "sounds/shaders/Ammo Pickup.ksnd" pickup.pickupMessage "$str_103" }
+Satchel10 4109 { className "kexInventoryPickup" placeable TRUE flags.noDamage TRUE flags.important TRUE pickup.pickupSound "sounds/shaders/Ammo Pickup.ksnd" pickup.pickupMessage "$str_103" }
+Satchel13 4112 { className "kexInventoryPickup" placeable TRUE flags.noDamage TRUE flags.important TRUE pickup.pickupSound "sounds/shaders/Ammo Pickup.ksnd" pickup.pickupMessage "$str_103" }
+Satchel14 4113 { className "kexInventoryPickup" placeable TRUE flags.noDamage TRUE flags.important TRUE pickup.pickupSound "sounds/shaders/Ammo Pickup.ksnd" pickup.pickupMessage "$str_103" }
+Satchel15 4114 { className "kexInventoryPickup" placeable TRUE flags.noDamage TRUE flags.important TRUE pickup.pickupSound "sounds/shaders/Ammo Pickup.ksnd" pickup.pickupMessage "$str_103" }
+Satchel16 4115 { className "kexInventoryPickup" placeable TRUE flags.noDamage TRUE flags.important TRUE pickup.pickupSound "sounds/shaders/Ammo Pickup.ksnd" pickup.pickupMessage "$str_103" }
+Satchel17 4116 { className "kexInventoryPickup" placeable TRUE flags.noDamage TRUE flags.important TRUE pickup.pickupSound "sounds/shaders/Ammo Pickup.ksnd" pickup.pickupMessage "$str_103" }
+Satchel18 4117 { className "kexInventoryPickup" placeable TRUE flags.noDamage TRUE flags.important TRUE pickup.pickupSound "sounds/shaders/Ammo Pickup.ksnd" pickup.pickupMessage "$str_103" }
+Satchel19 4118 { className "kexInventoryPickup" placeable TRUE flags.noDamage TRUE flags.important TRUE pickup.pickupSound "sounds/shaders/Ammo Pickup.ksnd" pickup.pickupMessage "$str_103" }
+Satchel20 4119 { className "kexInventoryPickup" placeable TRUE flags.noDamage TRUE flags.important TRUE pickup.pickupSound "sounds/shaders/Ammo Pickup.ksnd" pickup.pickupMessage "$str_103" }
+Satchel21 4120 { className "kexInventoryPickup" placeable TRUE flags.noDamage TRUE flags.important TRUE pickup.pickupSound "sounds/shaders/Ammo Pickup.ksnd" pickup.pickupMessage "$str_103" }
+Satchel22 4121 { className "kexInventoryPickup" placeable TRUE flags.noDamage TRUE flags.important TRUE pickup.pickupSound "sounds/shaders/Ammo Pickup.ksnd" pickup.pickupMessage "$str_103" }
+Satchel23 4122 { className "kexInventoryPickup" placeable TRUE flags.noDamage TRUE flags.important TRUE pickup.pickupSound "sounds/shaders/Ammo Pickup.ksnd" pickup.pickupMessage "$str_103" }
+Satchel24 4123 { className "kexInventoryPickup" placeable TRUE flags.noDamage TRUE flags.important TRUE pickup.pickupSound "sounds/shaders/Ammo Pickup.ksnd" pickup.pickupMessage "$str_103" }
+Satchel25 4124 { className "kexInventoryPickup" placeable TRUE flags.noDamage TRUE flags.important TRUE pickup.pickupSound "sounds/shaders/Ammo Pickup.ksnd" pickup.pickupMessage "$str_103" }
+Satchel26 4125 { className "kexInventoryPickup" placeable TRUE flags.noDamage TRUE flags.important TRUE pickup.pickupSound "sounds/shaders/Ammo Pickup.ksnd" pickup.pickupMessage "$str_103" }
+Satchel27 4126 { className "kexInventoryPickup" placeable TRUE flags.noDamage TRUE flags.important TRUE pickup.pickupSound "sounds/shaders/Ammo Pickup.ksnd" pickup.pickupMessage "$str_103" }
+Satchel28 4127 { className "kexInventoryPickup" placeable TRUE flags.noDamage TRUE flags.important TRUE pickup.pickupSound "sounds/shaders/Ammo Pickup.ksnd" pickup.pickupMessage "$str_103" }
+Satchel29 4128 { className "kexInventoryPickup" placeable TRUE flags.noDamage TRUE flags.important TRUE pickup.pickupSound "sounds/shaders/Ammo Pickup.ksnd" pickup.pickupMessage "$str_103" }
+Satchel30 4129 { className "kexInventoryPickup" placeable TRUE flags.noDamage TRUE flags.important TRUE pickup.pickupSound "sounds/shaders/Ammo Pickup.ksnd" pickup.pickupMessage "$str_103" }
+Satchel31 4130 { className "kexInventoryPickup" placeable TRUE flags.noDamage TRUE flags.important TRUE pickup.pickupSound "sounds/shaders/Ammo Pickup.ksnd" pickup.pickupMessage "$str_103" }
+Satchel32 4131 { className "kexInventoryPickup" placeable TRUE flags.noDamage TRUE flags.important TRUE pickup.pickupSound "sounds/shaders/Ammo Pickup.ksnd" pickup.pickupMessage "$str_103" }

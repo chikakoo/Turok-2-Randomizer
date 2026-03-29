@@ -72,6 +72,22 @@ void InitMapReplacements(void)
 	riverOfSoulsMaps.insertLast(kLevel_RiverOfSouls_T);
 	riverOfSoulsMaps.insertLast(kLevel_RiverOfSouls_OBL);
 	riverOfSoulsMaps.insertLast(kLevel_RiverOfSouls_Totem);
+	
+	array<int>@ deathMarshesMaps = g_mapLevelNumberToMapIds[LEVEL_DEATH_MARSHES];
+	deathMarshesMaps.insertLast(kLevel_DeathMarsh_1);
+	deathMarshesMaps.insertLast(kLevel_DeathMarsh_2);
+	deathMarshesMaps.insertLast(kLevel_DeathMarsh_3);
+	deathMarshesMaps.insertLast(kLevel_DeathMarsh_4);
+	deathMarshesMaps.insertLast(kLevel_DeathMarsh_5);
+	deathMarshesMaps.insertLast(kLevel_DeathMarsh_6);
+	deathMarshesMaps.insertLast(kLevel_DeathMarsh_7);
+	deathMarshesMaps.insertLast(kLevel_DeathMarsh_8);
+	deathMarshesMaps.insertLast(kLevel_DeathMarsh_9);
+	deathMarshesMaps.insertLast(kLevel_DeathMarsh_10);
+	deathMarshesMaps.insertLast(kLevel_DeathMarsh_11);
+	deathMarshesMaps.insertLast(kLevel_DeathMarsh_T);
+	deathMarshesMaps.insertLast(kLevel_DeathMarsh_OBL);
+	deathMarshesMaps.insertLast(kLevel_DeathMarsh_Totem);
 }
 
 //------------------------------
@@ -117,6 +133,22 @@ int GetLevelNumberFromMapId(const int &in mapId)
 		case kLevel_RiverOfSouls_OBL:
 		case kLevel_RiverOfSouls_Totem:
 			return LEVEL_RIVER_OF_SOULS;
+			
+		case kLevel_DeathMarsh_1:
+		case kLevel_DeathMarsh_2:
+		case kLevel_DeathMarsh_3:
+		case kLevel_DeathMarsh_4:
+		case kLevel_DeathMarsh_5:
+		case kLevel_DeathMarsh_6:
+		case kLevel_DeathMarsh_7:
+		case kLevel_DeathMarsh_8:
+		case kLevel_DeathMarsh_9:
+		case kLevel_DeathMarsh_10:
+		case kLevel_DeathMarsh_11:
+		case kLevel_DeathMarsh_T:
+		case kLevel_DeathMarsh_OBL:
+		case kLevel_DeathMarsh_Totem:
+			return LEVEL_DEATH_MARSHES;
 	}
 	
 	return LEVEL_UNMAPPED;

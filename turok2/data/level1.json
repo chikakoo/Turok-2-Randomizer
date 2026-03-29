@@ -11,12 +11,11 @@
 		{
 			"name":  "PoA Ships",
 			"exits": [{ "to": "PoA Water Hub Upper" }]
+			
 		},
 		{
 			"name":  "PoA Water Hub Upper",
-			"exits": [
-				{ "to": "PoA Talisman Portal Map" }
-			]
+			"exits": [{ "to": "PoA Talisman Portal Map"	}]
 		},
 		{
 			"name":  "PoA Talisman Portal Map",
