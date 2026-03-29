@@ -34,7 +34,7 @@ class Turok2World(World):
     item_name_to_id = ITEM_NAME_TO_ID
     item_name_groups = items.get_item_name_groups()
     origin_region_name = "PoA Start"
-
+    
     def create_regions(self) -> None:
         locations.create_regions_and_entrances(self)
         locations.create_locations(self)

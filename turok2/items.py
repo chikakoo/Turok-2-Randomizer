@@ -2,9 +2,9 @@ from __future__ import annotations
 from .item_table import *
 from collections import Counter
 from typing import TYPE_CHECKING, Callable
-from BaseClasses import Item
+from BaseClasses import Item, ItemClassification
 from .client.ap_memory_constants import APMessageType
-from .options import NukeBehavior
+from .options import NukeBehavior, Goal
 
 if TYPE_CHECKING:
     from . import Turok2World
@@ -37,9 +37,24 @@ def get_required_seed_items(world: Turok2World):
         
         # Mission items depend on the setting (they are also inventory items, so do this first)
         if data["type"] == ItemType.MISSION_ITEM.value:
-            return world.options.include_mission_item_locations
+            return (world.options.include_mission_item_locations and (
+                name == "Beacon Power Cell" or
+                world.options.goal == Goal.option_2_totems))
         
-        # Inventory items always included (for now)
+        # Inventory items
+        if data["type"] == ItemType.PRIMAGEN_KEY.value:
+            return world.options.goal == Goal.option_primagen
+            
+        if data["type"] == ItemType.LEVEL_KEY.value:
+            return name == "Level 2 Key" and world.options.goal == Goal.option_2_totems
+            
+        if data["type"] == ItemType.EAGLE_FEATHER.value:
+            return name == "Level 2 Eagle Feather" and world.options.goal == Goal.option_2_totems
+            
+        if data["type"] == ItemType.TALISMAN.value:
+            return (name == "Leap of Faith" or 
+                (name == "Breath of Life" and world.options.goal == Goal.option_2_totems))
+        
         if data["msg_type"] == APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value:
             return True
         
@@ -89,6 +104,10 @@ def create_item_with_correct_classification(world: Turok2World, name: str) -> Tu
     classification of any item based on the options the player chooses.
     """
     classification = DEFAULT_ITEM_CLASSIFICATIONS[name]
+    
+    # TODO: Change this when level 4 exists
+    if name == "Torpedo Launcher":
+        classification = ItemClassification.useful
 
     return Turok2Item(
         name,

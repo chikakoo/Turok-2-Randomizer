@@ -36,34 +36,6 @@ def load_all_region_data():
 
     return all_regions
 
-def create_locations(world: Turok2World) -> None:
-    """
-    Creates the locations by looking at all of the regions defined in the json data.
-    Includes putting a "rule" property in the table to construct the rules later on.
-    """
-    for loc_name, loc_info in LOCATION_TABLE.items():
-        # Exclude relevent locations if not shuffled
-        item_type = loc_info.get("type", -1)
-        if not world.options.include_health_locations and item_type == ItemType.HEALTH.value:
-            continue
-        if (not world.options.include_weapon_and_ammo_locations and
-            (item_type == ItemType.AMMO.value or item_type == ItemType.WEAPON.value)):
-            continue
-        if not world.options.include_life_force_locations and item_type == ItemType.LIFE_FORCE.value:
-            continue
-        if not world.options.include_mission_item_locations and item_type == ItemType.MISSION_ITEM.value:
-            continue
-        # TODO: When Nuke Parts can be vanilla, we'd disable their locations here
-        
-        region_obj = world.get_region(loc_info["region"])
-        location = Turok2Location(
-            world.player,
-            loc_name,
-            loc_info["ap_id"],
-            region_obj
-        )
-        region_obj.locations.append(location)
-
 def create_regions_and_entrances(world: Turok2World) -> None:
     """
     Creates regions and connects them together based on the json data.
@@ -92,7 +64,35 @@ def create_regions_and_entrances(world: Turok2World) -> None:
                 entrance_name
             )
             entrance.rule_json = exit_data.get("rule")
-
+            
+def create_locations(world: Turok2World) -> None:
+    """
+    Creates the locations by looking at all of the regions defined in the json data.
+    Includes putting a "rule" property in the table to construct the rules later on.
+    """
+    for loc_name, loc_info in LOCATION_TABLE.items():
+        # Exclude relevent locations if not shuffled
+        item_type = loc_info.get("type", -1)
+        if not world.options.include_health_locations and item_type == ItemType.HEALTH.value:
+            continue
+        if (not world.options.include_weapon_and_ammo_locations and
+            (item_type == ItemType.AMMO.value or item_type == ItemType.WEAPON.value)):
+            continue
+        if not world.options.include_life_force_locations and item_type == ItemType.LIFE_FORCE.value:
+            continue
+        if not world.options.include_mission_item_locations and item_type == ItemType.MISSION_ITEM.value:
+            continue
+        # TODO: When Nuke Parts can be vanilla, we'd disable their locations here
+        
+        region_obj = world.get_region(loc_info["region"])
+        location = Turok2Location(
+            world.player,
+            loc_name,
+            loc_info["ap_id"],
+            region_obj
+        )
+        region_obj.locations.append(location)
+            
 def create_events(world: Turok2World) -> None:
     """
     Creates events in regions from the JSON data.
@@ -161,7 +161,7 @@ def apply_entrance_rules(world: Turok2World) -> None:
     """
     Set the rules grabbed from the json earlier for for each entrance.
     """
-    for region in world.multiworld.regions:
+    for region in world.multiworld.get_regions(world.player):
         for entrance in region.exits:
             rule_json = getattr(entrance, "rule_json", None)
 
