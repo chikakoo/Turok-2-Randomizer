@@ -47,19 +47,41 @@ class RandoPlayerObject : ScriptObject
 			LocalPlayer.GiveWeapon(kWpn_Flare, 1000);
 		}
 		
-		// Check the goal - there's two checks here in case it's the
-		// Primagen, which has two different maps for the two endings
-		if (OPTION_GOAL_PRIMAGEN && 
+		
+		//-------------------------
+		// Goals!
+		
+		// Primagen boss room
+		if (OPTION_GOAL_PRIMAGEN_LAIR && mapId == kLevel_PrimagenBoss)
+		{
+			g_AP.IsGoalReached = 1;
+		}
+		
+		// Defeat the Primagen (both endings)
+		else if (OPTION_GOAL_DEFEAT_PRIMAGEN && 
 			(mapId == kLevel_Ending || mapId == kLevel_EndingB))
 		{
 			g_AP.IsGoalReached = 1;
 		}
 		
-		// If the goal is x levels, check that that was done
-		if (OPTION_GOAL_LEVELS > 0 &&
-			OPTION_GOAL_LEVELS <= LocalPlayer.Inventory().GetCount(kActor_Misc_TotemInventory))
+		// Totems - if they give primagen keys, give them, otherwise it's the main goal
+		else if (mapId == kLevel_Hub &&
+			OPTION_GOAL_TOTEMS > 0 &&
+			LocalPlayer.Inventory().GetCount(kActor_Misc_TotemInventory) >= OPTION_GOAL_TOTEMS)
 		{
-			g_AP.IsGoalReached = 1;
+			if (OPTION_GOAL_TOTEMS_GIVE_PRIMAGEN_KEYS)
+			{	
+				TryGetInventoryItem(kActor_PrimagenKey_1);
+				TryGetInventoryItem(kActor_PrimagenKey_2);
+				TryGetInventoryItem(kActor_PrimagenKey_3);
+				TryGetInventoryItem(kActor_PrimagenKey_4);
+				TryGetInventoryItem(kActor_PrimagenKey_5);
+				TryGetInventoryItem(kActor_PrimagenKey_6);
+			}
+			else 
+			{
+				g_AP.IsGoalReached = 1;
+			}
 		}
 		
 		//RemoveAllGenerators(); //TODO: disable this, enable the next

@@ -4,7 +4,7 @@ from collections import Counter
 from typing import TYPE_CHECKING, Callable
 from BaseClasses import Item, ItemClassification
 from .client.ap_memory_constants import APMessageType
-from .options import NukeBehavior, Goal
+from .options import NukeBehavior, Goal, PrimagenLair
 
 if TYPE_CHECKING:
     from . import Turok2World
@@ -29,8 +29,6 @@ def get_required_seed_items(world: Turok2World):
     These are all weapons, and all inventory items, depending on settings
     """
     def include_item(name, data):
-        include_level_2 = world.options.goal != Goal.option_1_totem
-        
         # Nuke item special cases
         if name == "Nuke":
             return world.options.nuke_behavior == NukeBehavior.option_weapon_pickup
@@ -39,22 +37,12 @@ def get_required_seed_items(world: Turok2World):
         
         # Mission items depend on the setting (they are also inventory items, so do this first)
         if data["type"] == ItemType.MISSION_ITEM.value:
-            return (world.options.include_mission_item_locations and (
-                name == "Beacon Power Cell" or include_level_2))
+            return world.options.include_mission_item_locations
         
         # Inventory items
         if data["type"] == ItemType.PRIMAGEN_KEY.value:
-            return world.options.goal == Goal.option_primagen
-            
-        if data["type"] == ItemType.LEVEL_KEY.value:
-            return include_level_2 and name == "Level 2 Key"
-            
-        if data["type"] == ItemType.EAGLE_FEATHER.value:
-            return include_level_2 and name == "Level 2 Eagle Feather"
-            
-        if data["type"] == ItemType.TALISMAN.value:
-            return (name == "Leap of Faith" or 
-                (include_level_2 and name == "Breath of Life"))
+            return (world.options.goal == Goal.option_primagen and 
+                world.options.primagen_lair != PrimagenLair.option_keys_vanilla)
         
         if data["msg_type"] == APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value:
             return True
@@ -267,10 +255,9 @@ def force_early_weapons(world: Turok2World, itempool: list[Item]):
 
 def force_early_key_items(world: Turok2World):
     """
-    Forces the Beacon Power Cells and level 2 keys early on so you can progress.
+    Forces the Beacon Power Cells early, since you will always want them early.
     """
     world.multiworld.early_items[world.player]["Beacon Power Cell"] = 3
-    world.multiworld.early_items[world.player]["Level 2 Key"] = 3
 
 def create_all_items(world: Turok2World) -> None:
     """

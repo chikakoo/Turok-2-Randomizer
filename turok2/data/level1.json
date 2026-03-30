@@ -71,19 +71,28 @@
 			"exits": [
 				{ "to": "PoA Oblivion" },
 				{
-					"to": "Hub",
+					"to": "PoA Totem",
 					"rule": {
 						"mission_item_requirement": {
 							"item": "Beacon Power Cell",
 							"count": 3
 						}
-					}	
+					}
 				}
 			]
 		},
 		{
 			"name": "PoA Oblivion",
 			"exits": []
+		},
+		{
+			"name": "PoA Totem",
+			"exits":[{ "to": "Hub" }],
+			"events": {
+				"Totem": {
+					"location_name": "PoA Totem"
+				}
+			}
 		}
 	]
 }

@@ -5,7 +5,7 @@ import importlib.resources as resources
 from typing import TYPE_CHECKING
 from BaseClasses import Location, Region
 from worlds.generic.Rules import set_rule
-from .options import Goal, GameLogicDifficulty, WeaponLogicDifficulty
+from .options import Goal, PrimagenLair, GameLogicDifficulty, WeaponLogicDifficulty
 from . import items
 from .items import ItemType
 
@@ -70,12 +70,7 @@ def create_locations(world: Turok2World) -> None:
     Creates the locations by looking at all of the regions defined in the json data.
     Includes putting a "rule" property in the table to construct the rules later on.
     """
-    include_level_2 = world.options.goal != Goal.option_1_totem
-    
     for loc_name, loc_info in LOCATION_TABLE.items():
-        if not include_level_2 and loc_name.startswith("RoS"):
-            continue
-        
         # Exclude relevent locations if not shuffled
         item_type = loc_info.get("type", -1)
         if not world.options.include_health_locations and item_type == ItemType.HEALTH.value:
@@ -117,7 +112,7 @@ def create_events(world: Turok2World) -> None:
                 rule_func = build_rule(event_info["rule"], world)
 
             region_obj.add_event(
-                event_name,
+                event_info.get("location_name"),
                 item_name=event_name,
                 rule=rule_func,
                 location_type=Turok2Location,
@@ -127,25 +122,27 @@ def create_events(world: Turok2World) -> None:
 def create_completion_condition(world: Turok2World):
     """
     Creates the completion condition based on the goal setting.
-    - Primagen: Defeat the Primagen (vanilla) - this is the fallback
-    - Hub: Get to the hub by completing Level 1
+    - Primagen: The primagen goal - can be getting to it, or defeating it
+    - Totems: The number of totems to save for the goal
     """
-    if world.options.goal == Goal.option_1_totem:
-        victory_region = world.multiworld.get_region("Hub", world.player)
-    elif world.options.goal == Goal.option_2_totems:
-        victory_region = world.multiworld.get_region("Level 2 Totem", world.player)
-    else:
-        victory_region = world.multiworld.get_region("Primagen Boss", world.player)
-        
-    victory_region.add_event(
-        "Goal Reached",
-        "Victory",
-        location_type=Turok2Location, 
-        item_type=items.Turok2Item
-    )
+    # Totem goal - just check number of totems
+    if world.options.goal == Goal.option_totems:
+        world.multiworld.completion_condition[world.player] = \
+            lambda state: state.has("Totem", world.player, world.options.totems_goal)
 
-    world.multiworld.completion_condition[world.player] = lambda state: state.has("Victory", world.player)
-
+    # Primagen goal (the lair is in the Hub, so always check for that)
+    elif world.options.goal == Goal.option_primagen:
+        # If there's totems also, check the keys and the totem count
+        if world.options.primagen_lair == PrimagenLair.option_totems:
+            world.multiworld.completion_condition[world.player] = \
+                lambda state: (state.can_reach_region("Hub", world.player) and
+                    state.has("Totem", world.player, world.options.totems_goal) and
+                    state.has_group_unique("Primagen Key", world.player, 6))
+        # Otherwise,  we just need to check for keys
+        else:
+            world.multiworld.completion_condition[world.player] = \
+                lambda state: (state.can_reach_region("Hub", world.player) and
+                    state.has_group_unique("Primagen Key", world.player, 6))
     
 def apply_location_rules(world: Turok2World):
     """

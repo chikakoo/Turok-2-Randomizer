@@ -123,7 +123,7 @@
                 },
                 { "to": "RoS Graveyard 3" },
                 { 
-                    "to": "Level 2 Totem",
+                    "to": "RoS Totem",
                     "rule": {
                         "has": {
                             "item": "Graveyard Key",
@@ -175,8 +175,13 @@
             "exits": []
         },
         {
-            "name": "Level 2 Totem",
-            "exits": [{ "to": "Hub" }]
+            "name": "RoS Totem",
+            "exits": [{ "to": "Hub" }],
+            "events": {
+				"Totem": {
+					"location_name": "RoS Totem"
+				}
+			}
         }
     ]
 }

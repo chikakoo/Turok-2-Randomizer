@@ -181,7 +181,8 @@ ITEM_TABLE = {
         "type": ItemType.PRIMAGEN_KEY.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value,
         "class": ItemClassification.progression_skip_balancing,
-        "count": 1
+        "count": 1,
+        "groups": ["Primagen Key"]
     },
     "Primagen Key 2": {
         "id": 200007,
@@ -189,7 +190,8 @@ ITEM_TABLE = {
         "type": ItemType.PRIMAGEN_KEY.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value,
         "class": ItemClassification.progression_skip_balancing,
-        "count": 1
+        "count": 1,
+        "groups": ["Primagen Key"]
     },
     "Primagen Key 3": {
         "id": 200008,
@@ -197,7 +199,8 @@ ITEM_TABLE = {
         "type": ItemType.PRIMAGEN_KEY.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value,
         "class": ItemClassification.progression_skip_balancing,
-        "count": 1
+        "count": 1,
+        "groups": ["Primagen Key"]
     },
     "Primagen Key 4": {
         "id": 200009,
@@ -205,7 +208,8 @@ ITEM_TABLE = {
         "type": ItemType.PRIMAGEN_KEY.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value,
         "class": ItemClassification.progression_skip_balancing,
-        "count": 1
+        "count": 1,
+        "groups": ["Primagen Key"]
     },
     "Primagen Key 5": {
         "id": 200010,
@@ -213,7 +217,8 @@ ITEM_TABLE = {
         "type": ItemType.PRIMAGEN_KEY.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value,
         "class": ItemClassification.progression_skip_balancing,
-        "count": 1
+        "count": 1,
+        "groups": ["Primagen Key"]
     },
     "Primagen Key 6": {
         "id": 200011,
@@ -221,7 +226,8 @@ ITEM_TABLE = {
         "type": ItemType.PRIMAGEN_KEY.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value,
         "class": ItemClassification.progression_skip_balancing,
-        "count": 1
+        "count": 1,
+        "groups": ["Primagen Key"]
     },
     
     "Level 2 Eagle Feather": {

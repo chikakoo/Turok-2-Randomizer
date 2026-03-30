@@ -6,7 +6,7 @@ from worlds.Files import APPlayerContainer
 from typing import TYPE_CHECKING
 from .locations import LOCATION_TABLE
 from .items import ITEM_TABLE
-from .options import Goal
+from .options import Goal, PrimagenGoal, PrimagenLair
 
 if TYPE_CHECKING:
     from . import Turok2World
@@ -98,24 +98,46 @@ def get_settings_string(self: "Turok2World") -> str:
     Gets the macro file with any settings the game needs to know.
     
     Goal:
-    - Primagen or totem count
+    - OPTION_GOAL_PRIMAGEN_LAIR: Whether entering the lair is the goal
+    - OPTION_GOAL_DEFEAT_PRIMAGEN: Whether defeating the Primagen is the goal
+    - OPTION_GOAL_TOTEMS: How many totems is the goal (0 to disable)
+    - OPTION_GOAL_TOTEMS_GIVE_PRIMAGEN_KEYS: Whether reaching the totem goal should give all primagen keys
+    - OPTION_INCLUDE_WEAPONS_AND_AMMO: Whether weapons and ammo are shuffled (used for replacing ammo spawns)
     
     Inclue weapon and ammo locations:
     - Used to determine whether to replace some generators with the random ammo pack
       to prevent ammo starvation in some maps where you get temporarily trapped inside
     """
-    primagen_setting = "#define OPTION_GOAL_PRIMAGEN false\n"
-    totem_setting = "#define OPTION_GOAL_LEVELS 0\n"
-    weapon_and_ammo_setting = "#define OPTION_INCLUDE_WEAPONS_AND_AMMO false\n"
+    # Defaults - will result in no goal
+    primagen_lair_is_goal = "false"
+    defeat_primagen_is_goal = "false"
+    totems_goal = 0
+    totems_give_primagen_keys = "false"
+    weapon_and_ammo_setting = "false"
 
-    if self.options.goal == Goal.option_primagen:
-        primagen_setting = "#define OPTION_GOAL_PRIMAGEN true\n"
-    elif self.options.goal == Goal.option_1_totem:
-        totem_setting = "#define OPTION_GOAL_LEVELS 1\n"
-    elif self.options.goal == Goal.option_2_totems:
-        totem_setting = "#define OPTION_GOAL_LEVELS 2\n"
+    # Totem goal - just set the goal
+    if self.options.goal == Goal.option_totems:
+        totems_goal = self.options.totems_goal
 
+    # Primagen goal
+    elif self.options.goal == Goal.option_primagen:
+        # Set whether totems give primagen keys
+        if self.options.primagen_lair == PrimagenLair.option_totems:
+            totems_goal = self.options.totems_goal
+            totems_give_primagen_keys = "true"
+    
+        # Set whether the goal is to get to the lair or to defeat the Primagen
+        if self.options.primagen_goal == PrimagenGoal.option_get_to_lair:
+            primagen_lair_is_goal = "true"
+        elif self.options.primagen_goal == PrimagenGoal.option_defeat:
+            defeat_primagen_is_goal = "true"
+
+    # Weapon and ammo locations
     if self.options.include_weapon_and_ammo_locations:
-        weapon_and_ammo_setting = "#define OPTION_INCLUDE_WEAPONS_AND_AMMO true\n"
+        weapon_and_ammo_setting = "true"
 
-    return primagen_setting + totem_setting + weapon_and_ammo_setting
+    return (f"#define OPTION_GOAL_PRIMAGEN_LAIR {primagen_lair_is_goal}\n" +
+        f"#define OPTION_GOAL_DEFEAT_PRIMAGEN {defeat_primagen_is_goal}\n" +
+        f"#define OPTION_GOAL_TOTEMS {totems_goal}\n" +
+        f"#define OPTION_GOAL_TOTEMS_GIVE_PRIMAGEN_KEYS {totems_give_primagen_keys}\n" +
+        f"#define OPTION_INCLUDE_WEAPONS_AND_AMMO {weapon_and_ammo_setting}\n")

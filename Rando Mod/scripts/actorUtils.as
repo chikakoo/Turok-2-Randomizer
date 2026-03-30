@@ -364,7 +364,6 @@ void TriggerDoors(void)
 		return;
 	}
 	
-	Sys.Print("LENGTH: " + g_doorsToTrigger.length());
 	for (uint i = 0; i < g_doorsToTrigger.length(); i++)
 	{
 		g_doorsToTrigger[i].ModeStateComponent().SetMode(DOOR_MODE_OPEN);

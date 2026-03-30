@@ -10,18 +10,64 @@ from Options import Choice, OptionGroup, PerGameCommonOptions, Range, Toggle
 class Goal(Choice):
     """
     Defines the goal of the seed.
-    - Primagen: Defeat the Primagen (vanilla)
-    - 1 Totem: Save one totem (level 1)
-    - 2 Totems: Save two totems (level 1 and 2)
+    - Primagen: Defeat the Primagen (see the PrimagenGoal setting for options)
+    - Totems: Save the number of totems specified in the TotemsGoal setting
+              by completing levels
     """
     display_name = "Goal"
     
     option_primagen = 0
-    option_1_totem = 1
-    option_2_totems = 2
+    option_totems = 1
     
     default = option_primagen
 
+class PrimagenGoal(Choice):
+    """
+    If the goal is Primagen, sets what you need to do to win.
+    See the PrimagenLair setting for options on how to get to the lair.
+    - Defeat: Defeat the Primagen and view the ending cutscene
+    - Get to Lair: Arriving at the lair will complete the goal (becomes a hunt for the Primagen keys)
+    """
+    display_name = "Primagen Goal"
+
+    option_defeat = 0
+    option_get_to_lair = 1
+
+    default = option_defeat
+
+class PrimagenLair(Choice):
+    """
+    If the goal is Primagen, sets how you get to the lair.
+    - Keys in Pool: The Primagen keys will be in the item pool to find.
+    - Keys Vanilla: The Primagen keys will be in their vanilla locations.
+                    NOTE: Not fully implemented; you will have to play vanilla levels
+                          to get keys 4-6
+    - Totems: The Primagen keys will be given to you after you save the number
+              of totems specified in the TotemsGoal setting.
+    """
+    display_name = "Primagen Lair"
+
+    option_keys_in_pool = 0
+    option_keys_vanilla = 1
+    option_totems = 2
+
+    default = option_keys_in_pool
+
+class TotemsGoal(Range):
+    """
+    Used when the goal is totems, or when the Primagen Keys are given when all totems are saved.
+    
+    The number of totems you need to save. The first totem will always be level 1, and the other two can be
+    in any others you get the ability to do.
+
+    The current limit is 3, as that's all that's in the AP world so far.
+    """
+    display_name = "Totems Goal"
+    
+    range_start = 1
+    range_end = 3
+    default = 3
+    
 class GameLogicDifficulty(Choice):
     """
     Affects the logic of the game itself.
@@ -93,6 +139,8 @@ class IncludeMissionItemLocations(Toggle):
     """
     Whether to include items needed to finish the level. For example, the beacon power cells
     in level 1 or the graveyard keys in level 2.
+
+    Also includes level keys (for now). See the PrimagenLair setting for how Primagen keys work.
     """
     display_name = "Include Mission Item Locations"
     default = True
@@ -274,6 +322,9 @@ class SpamTrapWeight(BaseWeight):
 @dataclass
 class Turok2Options(PerGameCommonOptions):
     goal: Goal
+    primagen_goal: PrimagenGoal
+    primagen_lair: PrimagenLair
+    totems_goal: TotemsGoal
     
     game_logic_difficulty: GameLogicDifficulty
     weapon_logic_difficulty: WeaponLogicDifficulty
@@ -303,7 +354,12 @@ class Turok2Options(PerGameCommonOptions):
     spam_trap_weight: SpamTrapWeight
     
 option_groups = [
-    OptionGroup("Goal", [Goal]),
+    OptionGroup("Goal", [
+        Goal,
+        PrimagenGoal,
+        PrimagenLair,
+        TotemsGoal
+    ]),
     OptionGroup("Difficulty Options", [
         GameLogicDifficulty,
         WeaponLogicDifficulty

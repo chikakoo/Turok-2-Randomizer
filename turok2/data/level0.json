@@ -12,26 +12,8 @@
 							"count": 3
 						}
 					}
-				},
-				{
-					"to": "Primagen Boss", 
-					"rule": {
-						"has": [
-							"Primagen Key 1",
-							"Primagen Key 2",
-							"Primagen Key 3",
-							"Primagen Key 4",
-							"Primagen Key 5",
-							"Primagen Key 6"
-						]
-					}
 				}
 			]
-		},
-		{
-			"name": "Primagen Boss",
-			"locations": {},
-			"exits": []
 		}
 	]
 }
