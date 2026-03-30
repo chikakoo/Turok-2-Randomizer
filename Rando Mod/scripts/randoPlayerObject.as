@@ -45,7 +45,6 @@ class RandoPlayerObject : ScriptObject
 			// Give max explosive shells to allow the Flare Gun to be 
 			// used and to prevent depots from spawning it prematurely
 			LocalPlayer.GiveWeapon(kWpn_Flare, 1000);
-			
 		}
 		
 		// Check the goal - there's two checks here in case it's the
@@ -69,6 +68,9 @@ class RandoPlayerObject : ScriptObject
 			UseRandomAmmoGenerators();
 		}
 		
+		// Reset the doors to trigger BEFORE replacing actors
+		g_doorsToTrigger.resize(0);
+		
 		// Replace all the actors that should be replaced
 		ReplaceAllActors();
 	}
@@ -77,6 +79,8 @@ class RandoPlayerObject : ScriptObject
 	// Replaces all actors with the intended replacemnt.
 	// STOP iterating on the player, as that would be the LAST actor spawned.
 	// We prevent infinite spawn loops this way.
+	//
+	// Also stores any doors we need to trigger when an actor is collected.
 	void ReplaceAllActors()
 	{
 		kActorIterator actorIterator;
@@ -104,12 +108,16 @@ class RandoPlayerObject : ScriptObject
 				}
 				
 				ReplaceActor(actor, replacement);
-				
 			}
 			else
 			{	
 				HandleWhetherActorShouldHaveBeenReplaced(actor, posStr);
 			}				
+			
+			if (IsDoorToTrigger(mapId, posStr))
+			{
+				g_doorsToTrigger.insertLast(actor);
+			}
 		}
 		
 		for (uint i = 0; i < actorsToRemove.length(); i++)

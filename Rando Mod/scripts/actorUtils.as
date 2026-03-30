@@ -350,6 +350,28 @@ bool IsHealthOrAmmo(kActor@ actor)
 }
 
 //---------------------------
+// Doors to trigger on the current map
+// Used when grabbing a randomized actor needs to trigger doors
+// Cleared/set on player spawn
+array<kActor@> g_doorsToTrigger;
+
+//---------------------------
+// Trigger all the doors to trigger.
+void TriggerDoors(void)
+{
+	if (g_doorsToTrigger is null)
+	{
+		return;
+	}
+	
+	Sys.Print("LENGTH: " + g_doorsToTrigger.length());
+	for (uint i = 0; i < g_doorsToTrigger.length(); i++)
+	{
+		g_doorsToTrigger[i].ModeStateComponent().SetMode(DOOR_MODE_OPEN);
+	}
+}
+
+//---------------------------
 // Gets a friendly name given the actor type, for debugging
 // actorType: The type of actor to get a name for
 kStr GetFriendlyActorName(const int &in actorType)

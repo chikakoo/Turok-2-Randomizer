@@ -77,9 +77,15 @@ class RandoPickupObject : ScriptObject
 				PlayPickupNotificationSound(self.Definition());
 			}
 			
-			// Turn the flags off now, since we already sent the check.
+			// Turn the flags off now, since we already sent the check
 			self.WorldComponent().Flags() &= ~WCF_INVOKE_COLLIDE_CALLBACK;
 			self.Flags() &= ~AF_IMPORTANT;
+			
+			// Try to trigger doors
+			if (IsDoorTriggeringActor(m_position))
+			{
+				TriggerDoors();
+			}
 		}
 	}
 	

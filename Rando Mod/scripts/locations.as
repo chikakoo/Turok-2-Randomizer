@@ -486,6 +486,7 @@ bool DoesMapHaveAmmoGeneratorsToReplace(const int16 &in mapId)
 		case kLevel_RiverOfSouls_10:
 		case kLevel_RiverOfSouls_8:
 		case kLevel_RiverOfSouls_11:
+		case kLevel_DeathMarsh_8:
 			return true;
 	}
 	
@@ -523,7 +524,39 @@ bool IsAmmoGeneratorToReplace(
 				position == "870_-1996_0" ||
 				position == "870_6195_4" ||
 				position == "-716_6195_1";
+		
+		// Ratpor Battle	
+		case kLevel_DeathMarsh_8:
+			return position == "-2150_-1177_0" ||
+				position == "-1945_-1382_0" ||
+				position == "-2150_-1587_0" ||
+				position == "-2355_-1382_0";
 	}
 	
 	return false;
+}
+
+//------------------------------
+// Returns whether the passed position is a door we need to trigger.
+bool IsDoorToTrigger(
+	const int16 &in mapId,
+	const kStr &in position)
+{
+	switch(mapId)
+	{
+		// Ratpor Battle	
+		case kLevel_DeathMarsh_8:
+			return position == "68_-1448_-769_0" ||
+				position == "68_-1446_-2004_0" ||
+				position == "68_-2847_-2006_0" ||
+				position == "68_-2849_-767_0";
+	}
+	
+	return false;
+}
+
+bool IsDoorTriggeringActor(const kStr &in position)
+{
+	// DM Ratpor Rooms - Level Key
+	return position == "68_-2150_-1381_30";
 }
