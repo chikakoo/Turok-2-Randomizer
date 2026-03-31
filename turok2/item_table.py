@@ -339,12 +339,20 @@ ITEM_TABLE = {
         "count": 2
     },
     "Graveyard Key": {
-        "id": 200300,
+        "id": 200201,
         "actor_id": 4025,
         "type": ItemType.MISSION_ITEM.value,
         "msg_type": APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value,
         "class": ItemClassification.progression,
         "count": 2
+    },
+    "L3 Satchel Charge": {
+        "id": 200300,
+        "actor_id": 4100,
+        "type": ItemType.MISSION_ITEM.value,
+        "msg_type": APMessageType.AP_IN_MSGTYPE_GET_INVENTORY_ITEM.value,
+        "class": ItemClassification.progression,
+        "count": 3
     },
 
     # Weapons

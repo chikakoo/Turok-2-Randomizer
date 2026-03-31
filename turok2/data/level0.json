@@ -12,6 +12,15 @@
 							"count": 3
 						}
 					}
+				},
+				{
+					"to": "DM Start",
+					"rule": {
+						"has": {
+							"item": "Level 3 Key",
+							"count": 3
+						}
+					}
 				}
 			]
 		}
