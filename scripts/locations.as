@@ -544,6 +544,10 @@ bool IsDoorToTrigger(
 {
 	switch(mapId)
 	{
+		// PoA Start
+		case kLevel_PortOfAdia_1:
+			return position == "51_921_-1702_-307";
+		
 		// Ratpor Battle	
 		case kLevel_DeathMarsh_8:
 			return position == "68_-1448_-769_0" ||

@@ -45,8 +45,7 @@ class RandoPlayerObject : ScriptObject
 			// Give max explosive shells to allow the Flare Gun to be 
 			// used and to prevent depots from spawning it prematurely
 			LocalPlayer.GiveWeapon(kWpn_Flare, 1000);
-		}
-		
+		}		
 		
 		//-------------------------
 		// Goals!
@@ -95,6 +94,12 @@ class RandoPlayerObject : ScriptObject
 		
 		// Replace all the actors that should be replaced
 		ReplaceAllActors();
+		
+		// Open the level 1 hub door if the setting wants it
+		if (OPTION_OPEN_HUB && mapId == kLevel_PortOfAdia_1)
+		{
+			TriggerDoors();
+		}
 	}
 	
 	//----------------------------------
