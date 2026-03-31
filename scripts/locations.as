@@ -42,7 +42,7 @@ void InitMapReplacements(void)
         g_mapLevelNumberToMapIds[i] = array<int>();
     }
 	
-	// Port of Adia
+	// All maps
 	array<int>@ portOfAdiaMaps = g_mapLevelNumberToMapIds[LEVEL_PORT_OF_ADIA];
 	portOfAdiaMaps.insertLast(kLevel_PortOfAdia_1);
 	portOfAdiaMaps.insertLast(kLevel_PortOfAdia_2);
@@ -88,6 +88,58 @@ void InitMapReplacements(void)
 	deathMarshesMaps.insertLast(kLevel_DeathMarsh_T);
 	deathMarshesMaps.insertLast(kLevel_DeathMarsh_OBL);
 	deathMarshesMaps.insertLast(kLevel_DeathMarsh_Totem);
+	
+	array<int>@ lairOfTheBlindOnesMaps = g_mapLevelNumberToMapIds[LEVEL_LAIR_OF_THE_BLIND_ONES];
+	lairOfTheBlindOnesMaps.insertLast(kLevel_BlindLair_1);
+	lairOfTheBlindOnesMaps.insertLast(kLevel_BlindLair_2);
+	lairOfTheBlindOnesMaps.insertLast(kLevel_BlindLair_3);
+	lairOfTheBlindOnesMaps.insertLast(kLevel_BlindLair_4);
+	lairOfTheBlindOnesMaps.insertLast(kLevel_BlindLair_5);
+	lairOfTheBlindOnesMaps.insertLast(kLevel_BlindLair_6);
+	lairOfTheBlindOnesMaps.insertLast(kLevel_BlindLair_7);
+	lairOfTheBlindOnesMaps.insertLast(kLevel_BlindLair_8);
+	lairOfTheBlindOnesMaps.insertLast(kLevel_BlindLair_9);
+	lairOfTheBlindOnesMaps.insertLast(kLevel_BlindLair_10);
+	lairOfTheBlindOnesMaps.insertLast(kLevel_BlindLair_11);
+	lairOfTheBlindOnesMaps.insertLast(kLevel_BlindLair_T);
+	lairOfTheBlindOnesMaps.insertLast(kLevel_BlindLair_OBL);
+	lairOfTheBlindOnesMaps.insertLast(kLevel_BlindLair_Totem);
+	lairOfTheBlindOnesMaps.insertLast(kLevel_BlindOneBoss);
+	
+	array<int>@ hiveOfTheMantidsMaps = g_mapLevelNumberToMapIds[LEVEL_HIVE_OF_THE_MANTIDS];
+	hiveOfTheMantidsMaps.insertLast(kLevel_HiveTop);
+	hiveOfTheMantidsMaps.insertLast(kLevel_Hive_1);
+	hiveOfTheMantidsMaps.insertLast(kLevel_Hive_2);
+	hiveOfTheMantidsMaps.insertLast(kLevel_Hive_3);
+	hiveOfTheMantidsMaps.insertLast(kLevel_Hive_4);
+	hiveOfTheMantidsMaps.insertLast(kLevel_Hive_5);
+	hiveOfTheMantidsMaps.insertLast(kLevel_Hive_6);
+	hiveOfTheMantidsMaps.insertLast(kLevel_Hive_7);
+	hiveOfTheMantidsMaps.insertLast(kLevel_Hive_8);
+	hiveOfTheMantidsMaps.insertLast(kLevel_Hive_9);
+	hiveOfTheMantidsMaps.insertLast(kLevel_Hive_10);
+	hiveOfTheMantidsMaps.insertLast(kLevel_Hive_11);
+	hiveOfTheMantidsMaps.insertLast(kLevel_Hive_12);
+	hiveOfTheMantidsMaps.insertLast(kLevel_Hive_13);
+	hiveOfTheMantidsMaps.insertLast(kLevel_Hive_T);
+	hiveOfTheMantidsMaps.insertLast(kLevel_Hive_OBL);
+	hiveOfTheMantidsMaps.insertLast(kLevel_Hive_Totem);
+	hiveOfTheMantidsMaps.insertLast(kLevel_QueenBoss);
+	
+	array<int>@ primagensLightshipMaps = g_mapLevelNumberToMapIds[LEVEL_PRIMAGENS_LIGHTSHIP];
+	primagensLightshipMaps.insertLast(kLevel_Lightship_1);
+	primagensLightshipMaps.insertLast(kLevel_Lightship_2);
+	primagensLightshipMaps.insertLast(kLevel_Lightship_3);
+	primagensLightshipMaps.insertLast(kLevel_Lightship_4);
+	primagensLightshipMaps.insertLast(kLevel_Lightship_5);
+	primagensLightshipMaps.insertLast(kLevel_Lightship_6);
+	primagensLightshipMaps.insertLast(kLevel_Lightship_7);
+	primagensLightshipMaps.insertLast(kLevel_Lightship_8);
+	primagensLightshipMaps.insertLast(kLevel_Lightship_9);
+	primagensLightshipMaps.insertLast(kLevel_Lightship_10);
+	primagensLightshipMaps.insertLast(kLevel_LightShip_T);
+	primagensLightshipMaps.insertLast(kLevel_LightShip_OBL);
+	primagensLightshipMaps.insertLast(kLevel_MotherBoss);
 }
 
 //------------------------------
@@ -149,6 +201,58 @@ int GetLevelNumberFromMapId(const int &in mapId)
 		case kLevel_DeathMarsh_OBL:
 		case kLevel_DeathMarsh_Totem:
 			return LEVEL_DEATH_MARSHES;
+			
+		case kLevel_BlindLair_1:
+		case kLevel_BlindLair_2:
+		case kLevel_BlindLair_3:
+		case kLevel_BlindLair_4:
+		case kLevel_BlindLair_5:
+		case kLevel_BlindLair_6:
+		case kLevel_BlindLair_7:
+		case kLevel_BlindLair_8:
+		case kLevel_BlindLair_9:
+		case kLevel_BlindLair_10:
+		case kLevel_BlindLair_11:
+		case kLevel_BlindLair_T:
+		case kLevel_BlindLair_OBL:
+		case kLevel_BlindLair_Totem:
+		case kLevel_BlindOneBoss:
+			return LEVEL_LAIR_OF_THE_BLIND_ONES;
+			
+		case kLevel_HiveTop:
+		case kLevel_Hive_1:
+		case kLevel_Hive_2:
+		case kLevel_Hive_3:
+		case kLevel_Hive_4:
+		case kLevel_Hive_5:
+		case kLevel_Hive_6:
+		case kLevel_Hive_7:
+		case kLevel_Hive_8:
+		case kLevel_Hive_9:
+		case kLevel_Hive_10:
+		case kLevel_Hive_11:
+		case kLevel_Hive_12:
+		case kLevel_Hive_13:
+		case kLevel_Hive_T:
+		case kLevel_Hive_OBL:
+		case kLevel_Hive_Totem:
+		case kLevel_QueenBoss:
+			return LEVEL_HIVE_OF_THE_MANTIDS;
+			
+		case kLevel_Lightship_1:
+		case kLevel_Lightship_2:
+		case kLevel_Lightship_3:
+		case kLevel_Lightship_4:
+		case kLevel_Lightship_5:
+		case kLevel_Lightship_6:
+		case kLevel_Lightship_7:
+		case kLevel_Lightship_8:
+		case kLevel_Lightship_9:
+		case kLevel_Lightship_10:
+		case kLevel_LightShip_T:
+		case kLevel_LightShip_OBL:
+		case kLevel_MotherBoss:
+			return LEVEL_PRIMAGENS_LIGHTSHIP;
 	}
 	
 	return LEVEL_UNMAPPED;

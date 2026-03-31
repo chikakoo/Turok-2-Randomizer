@@ -438,6 +438,21 @@ class RandoPlayerObject : ScriptObject
 					"Satchel Charges: " + inventory.GetCount(kActor_MissionItem_L3SatchelCharge),
 					m_progressMenuDisplayTime);
 				break;
+			case LEVEL_LAIR_OF_THE_BLIND_ONES:
+				Hud.AddMessage(
+					"Satchel Charges: " + inventory.GetCount(kActor_MissionItem_L4SatchelCharge) +
+					"  -  Cave Door Keys: TODO",
+					m_progressMenuDisplayTime);
+				break;
+			case LEVEL_HIVE_OF_THE_MANTIDS:
+				Hud.AddMessage(
+					"Satchel Charges: " + inventory.GetCount(kActor_MissionItem_L5SatchelCharge),
+					m_progressMenuDisplayTime);
+				break;
+			case LEVEL_PRIMAGENS_LIGHTSHIP:
+				Hud.AddMessage(
+					"Ion Capacitors: TODO");
+				break;
 			default:
 				Hud.AddMessage("Unmapped map id!");
 				return;
