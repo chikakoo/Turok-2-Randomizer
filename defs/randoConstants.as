@@ -32,6 +32,7 @@
 #define kActor_MissionItem_BeaconPowerCell 4200
 #define kActor_MissionItem_GateKey 4030
 #define kActor_MissionItem_GraveyardKey 4025
+#define kActor_MissionItem_CaveDoorKey 4020
 
 // 0 = marshes; cave for blind oens; hive for hive
 #define kActor_MissionItem_L3SatchelCharge 4100

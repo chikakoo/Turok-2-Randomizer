@@ -164,17 +164,17 @@ void EyeOfTruth(void)
 
 //---------------------------
 // Weapons
-void Pistol()
+void Pistol(void)
 {
 	TryGivePlayerWeapon(kActor_Item_WpnPistol);
 }
 
-void Shotgun()
+void Shotgun(void)
 {
 	TryGivePlayerWeapon(kActor_Item_WpnShotgun);
 }
 
-void Shredder()
+void Shredder(void)
 {
 	TryGivePlayerWeapon(kActor_Item_WpnScatter);
 }
@@ -199,6 +199,11 @@ void GraveyardKey(void)
 void L3SatchelCharge(void)
 {
 	TryGetInventoryItem(kActor_MissionItem_L3SatchelCharge);
+}
+
+void CaveDoorKey(void)
+{
+	TryGetInventoryItem(kActor_MissionItem_CaveDoorKey);
 }
 
 void L4SatchelCharge(void)

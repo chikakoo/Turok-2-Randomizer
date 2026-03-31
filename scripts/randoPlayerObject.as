@@ -179,7 +179,7 @@ class RandoPlayerObject : ScriptObject
 				actorClassName == "kexWeaponPickup")
 			{
 				Sys.Print("NOT MAPPED: " + posStr + " (" + GetFriendlyActorName(actor.Type()) + ")"); 
-				actor.Flags() |= AF_IMPORTANT;  // TODO: remove this after mapping stuff
+				//actor.Flags() |= AF_IMPORTANT;  // TODO: remove this after mapping stuff
 			}
 		}
 	}
@@ -219,7 +219,7 @@ class RandoPlayerObject : ScriptObject
 		// If it was already sent to AP, do not do this since it was "collected" already
 		if (!replacement.isSentToAP)
 		{
-			//replacedActor.Flags() |= AF_IMPORTANT; // TODO: enable this when done adding items
+			replacedActor.Flags() |= AF_IMPORTANT; // TODO: enable this when done adding items
 		}
 		
 	    initialActor.Remove();
