@@ -100,8 +100,8 @@ def get_settings_string(self: "Turok2World") -> str:
     Goal:
     - OPTION_GOAL_PRIMAGEN_LAIR: Whether entering the lair is the goal
     - OPTION_GOAL_DEFEAT_PRIMAGEN: Whether defeating the Primagen is the goal
-    - OPTION_GOAL_TOTEMS: How many totems is the goal (0 to disable)
-    - OPTION_GOAL_TOTEMS_GIVE_PRIMAGEN_KEYS: Whether reaching the totem goal should give all primagen keys
+    - OPTION_GOAL_LEVELS: How many levels is the goal (0 to disable)
+    - OPTION_GOAL_LEVELS_GIVE_PRIMAGEN_KEYS: Whether reaching the level goal should give all primagen keys
     - OPTION_INCLUDE_WEAPONS_AND_AMMO: Whether weapons and ammo are shuffled (used for replacing ammo spawns)
     
     Inclue weapon and ammo locations:
@@ -111,20 +111,20 @@ def get_settings_string(self: "Turok2World") -> str:
     # Defaults - will result in no goal
     primagen_lair_is_goal = "false"
     defeat_primagen_is_goal = "false"
-    totems_goal = 0
-    totems_give_primagen_keys = "false"
+    levels_goal = 0
+    levels_give_primagen_keys = "false"
     weapon_and_ammo_setting = "false"
 
-    # Totem goal - just set the goal
-    if self.options.goal == Goal.option_totems:
-        totems_goal = self.options.totems_goal
+    # Levels goal - just set the goal
+    if self.options.goal == Goal.option_levels:
+        levels_goal = self.options.levels_goal
 
     # Primagen goal
     elif self.options.goal == Goal.option_primagen:
-        # Set whether totems give primagen keys
-        if self.options.primagen_lair == PrimagenLair.option_totems:
-            totems_goal = self.options.totems_goal
-            totems_give_primagen_keys = "true"
+        # Set whether levels give primagen keys
+        if self.options.primagen_lair == PrimagenLair.option_levels:
+            levels_goal = self.options.levels_goal
+            levels_give_primagen_keys = "true"
     
         # Set whether the goal is to get to the lair or to defeat the Primagen
         if self.options.primagen_goal == PrimagenGoal.option_get_to_lair:
@@ -138,6 +138,6 @@ def get_settings_string(self: "Turok2World") -> str:
 
     return (f"#define OPTION_GOAL_PRIMAGEN_LAIR {primagen_lair_is_goal}\n" +
         f"#define OPTION_GOAL_DEFEAT_PRIMAGEN {defeat_primagen_is_goal}\n" +
-        f"#define OPTION_GOAL_TOTEMS {totems_goal}\n" +
-        f"#define OPTION_GOAL_TOTEMS_GIVE_PRIMAGEN_KEYS {totems_give_primagen_keys}\n" +
+        f"#define OPTION_GOAL_LEVELS {levels_goal}\n" +
+        f"#define OPTION_GOAL_LEVELS_GIVE_PRIMAGEN_KEYS {levels_give_primagen_keys}\n" +
         f"#define OPTION_INCLUDE_WEAPONS_AND_AMMO {weapon_and_ammo_setting}\n")

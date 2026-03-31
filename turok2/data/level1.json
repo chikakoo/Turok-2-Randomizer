@@ -89,8 +89,8 @@
 			"name": "PoA Totem",
 			"exits":[{ "to": "Hub" }],
 			"events": {
-				"Totem": {
-					"location_name": "PoA Totem"
+				"Level Complete": {
+					"location_name": "PoA Complete"
 				}
 			}
 		}

@@ -123,22 +123,22 @@ def create_completion_condition(world: Turok2World):
     """
     Creates the completion condition based on the goal setting.
     - Primagen: The primagen goal - can be getting to it, or defeating it
-    - Totems: The number of totems to save for the goal
+    - Levels: The number of levels to complete for the goal
     """
-    # Totem goal - just check number of totems
-    if world.options.goal == Goal.option_totems:
+    # Levels goal - just check number of levels
+    if world.options.goal == Goal.option_levels:
         world.multiworld.completion_condition[world.player] = \
-            lambda state: state.has("Totem", world.player, world.options.totems_goal)
+            lambda state: state.has("Level Complete", world.player, world.options.levels_goal)
 
     # Primagen goal (the lair is in the Hub, so always check for that)
     elif world.options.goal == Goal.option_primagen:
-        # If there's totems also, check the keys and the totem count
-        if world.options.primagen_lair == PrimagenLair.option_totems:
+        # If there's levels also, check the keys and the level goal count
+        if world.options.primagen_lair == PrimagenLair.option_levels:
             world.multiworld.completion_condition[world.player] = \
                 lambda state: (state.can_reach_region("Hub", world.player) and
-                    state.has("Totem", world.player, world.options.totems_goal) and
+                    state.has("Level Complete", world.player, world.options.levels_goal) and
                     state.has_group_unique("Primagen Key", world.player, 6))
-        # Otherwise,  we just need to check for keys
+        # Otherwise, we just need to check for keys
         else:
             world.multiworld.completion_condition[world.player] = \
                 lambda state: (state.can_reach_region("Hub", world.player) and

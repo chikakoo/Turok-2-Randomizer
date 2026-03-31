@@ -64,12 +64,12 @@ class RandoPlayerObject : ScriptObject
 			g_AP.IsGoalReached = 1;
 		}
 		
-		// Totems - if they give primagen keys, give them, otherwise it's the main goal
+		// Levels - if they give primagen keys, give them, otherwise it's the main goal
 		else if (mapId == kLevel_Hub &&
-			OPTION_GOAL_TOTEMS > 0 &&
-			LocalPlayer.Inventory().GetCount(kActor_Misc_TotemInventory) >= OPTION_GOAL_TOTEMS)
+			OPTION_GOAL_LEVELS > 0 &&
+			LocalPlayer.Inventory().GetCount(kActor_Misc_TotemInventory) >= OPTION_GOAL_LEVELS)
 		{
-			if (OPTION_GOAL_TOTEMS_GIVE_PRIMAGEN_KEYS)
+			if (OPTION_GOAL_LEVELS_GIVE_PRIMAGEN_KEYS)
 			{	
 				TryGetInventoryItem(kActor_PrimagenKey_1);
 				TryGetInventoryItem(kActor_PrimagenKey_2);

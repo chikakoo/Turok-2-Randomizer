@@ -11,13 +11,12 @@ class Goal(Choice):
     """
     Defines the goal of the seed.
     - Primagen: Defeat the Primagen (see the PrimagenGoal setting for options)
-    - Totems: Save the number of totems specified in the TotemsGoal setting
-              by completing levels
+    - Levels: Complete the number of levels specified in the LevelsGoal setting
     """
     display_name = "Goal"
     
     option_primagen = 0
-    option_totems = 1
+    option_levels = 1
     
     default = option_primagen
 
@@ -40,29 +39,25 @@ class PrimagenLair(Choice):
     If the goal is Primagen, sets how you get to the lair.
     - Keys in Pool: The Primagen keys will be in the item pool to find.
     - Keys Vanilla: The Primagen keys will be in their vanilla locations.
-                    NOTE: Not fully implemented; you will have to play vanilla levels
-                          to get keys 4-6
-    - Totems: The Primagen keys will be given to you after you save the number
-              of totems specified in the TotemsGoal setting.
+                    NOTE: Not fully implemented; you will have to play vanilla levels to get keys 4-6
+    - Levels: The Primagen keys will be given to you after you complete the number of levels 
+              specified in the LevelsGoal setting
     """
     display_name = "Primagen Lair"
 
     option_keys_in_pool = 0
     option_keys_vanilla = 1
-    option_totems = 2
+    option_levels = 2
 
     default = option_keys_in_pool
 
-class TotemsGoal(Range):
+class LevelsGoal(Range):
     """
-    Used when the goal is totems, or when the Primagen Keys are given when all totems are saved.
+    Used when the goal is levels, or when the Primagen Keys are given when all required levels are completed.
     
-    The number of totems you need to save. The first totem will always be level 1, and the other two can be
-    in any others you get the ability to do.
-
-    The current limit is 3, as that's all that's in the AP world so far.
+    The number of levels you need to complete. The current limit is 3, as that's all that's in the AP world so far.
     """
-    display_name = "Totems Goal"
+    display_name = "Levels Goal"
     
     range_start = 1
     range_end = 3
@@ -324,7 +319,7 @@ class Turok2Options(PerGameCommonOptions):
     goal: Goal
     primagen_goal: PrimagenGoal
     primagen_lair: PrimagenLair
-    totems_goal: TotemsGoal
+    levels_goal: LevelsGoal
     
     game_logic_difficulty: GameLogicDifficulty
     weapon_logic_difficulty: WeaponLogicDifficulty
@@ -358,7 +353,7 @@ option_groups = [
         Goal,
         PrimagenGoal,
         PrimagenLair,
-        TotemsGoal
+        LevelsGoal
     ]),
     OptionGroup("Difficulty Options", [
         GameLogicDifficulty,

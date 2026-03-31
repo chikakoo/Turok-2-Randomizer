@@ -178,8 +178,8 @@
             "name": "RoS Totem",
             "exits": [{ "to": "Hub" }],
             "events": {
-				"Totem": {
-					"location_name": "RoS Totem"
+				"Level Complete": {
+					"location_name": "RoS Complete"
 				}
 			}
         }
