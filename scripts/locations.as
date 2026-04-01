@@ -641,40 +641,21 @@ bool IsAmmoGeneratorToReplace(
 }
 
 //------------------------------
-// Returns whether the passed position is a door we need to trigger.
-bool IsDoorToTrigger(
-	const int16 &in mapId,
-	const kStr &in position)
-{
-	switch(mapId)
-	{
-		// PoA Start
-		case kLevel_PortOfAdia_1:
-			return position == "51_921_-1702_-307";
-		
-		// Ratpor Battle	
-		case kLevel_DeathMarsh_8:
-			return position == "68_-1448_-769_0" ||
-				position == "68_-1446_-2004_0" ||
-				position == "68_-2847_-2006_0" ||
-				position == "68_-2849_-767_0";
-	}
-	
-	return false;
-}
-
-bool IsDoorTriggeringActor(const kStr &in position)
-{
-	// DM Ratpor Rooms - Level Key
-	return position == "68_-2150_-1381_30";
-}
-
+// Whether this is an actor that needs to be triggered by our pickup.
 bool IsActorToTrigger(
 	const int16 &in mapId,
 	const int &in tagId) 
 {
 	switch(mapId)
 	{
+		// Raptor Rooms
+		case kLevel_DeathMarsh_8:
+			return tagId == 200001 || 
+				tagId == 200002 ||
+				tagId == 200003 || 
+				tagId == 200004 ||
+				tagId == 200005;
+
 		// Level Key Trap 1
 		case kLevel_BlindLair_3:
 			return tagId == 200009 ||
@@ -694,13 +675,25 @@ bool IsActorToTrigger(
 				tagId == 200036 ||
 				tagId == 200037 ||
 				tagId == 200038;
+				
+		// Level Key Trap 3
+		case kLevel_BlindLair_6:
+			return tagId == 200031 || 
+				tagId == 200032 ||
+				tagId == 200033 || 
+				tagId == 200034;
 	}
 	
 	return false;
 }
 
+//------------------------------
+// Whether this is an actor to trigger an action object.
+// If this gets too big, we'll want a switch-case on the map.
 bool IsActorTriggeringActor(const kStr &in position)
 {
-	return position == "100_1074_3630_-2437" ||
-		position == "105_-5429_-3174_-2734";
+	return position == "68_-2150_-1381_30" ||
+		position == "100_1074_3630_-2437" ||
+		position == "105_-5429_-3174_-2734" ||
+		position == "103_-8652_-149_-3604";
 }

@@ -261,23 +261,7 @@ bool IsHealthOrAmmo(kActor@ actor)
 // Actors to trigger on the current map
 // Used when grabbing a randomized actor needs to trigger actors
 // Cleared/set on player spawn
-array<kActor@> g_doorsToTrigger;
 array<kActor@> g_actorsToTrigger;
-
-//---------------------------
-// Trigger all the doors to trigger.
-void TriggerDoors(void)
-{
-	if (g_doorsToTrigger is null)
-	{
-		return;
-	}
-	
-	for (uint i = 0; i < g_doorsToTrigger.length(); i++)
-	{
-		g_doorsToTrigger[i].ModeStateComponent().SetMode(DOOR_MODE_OPEN);
-	}
-}
 
 //---------------------------
 // Trigger all the actors to trigger.

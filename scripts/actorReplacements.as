@@ -15,18 +15,10 @@ void DoActorReplacementsOnPlayerSpawn()
 	}
 	
 	// Reset the actors to trigger BEFORE replacing actors
-	g_doorsToTrigger.resize(0);
 	g_actorsToTrigger.resize(0);
 	
 	// Replace all the actors that should be replaced
 	ReplaceAllActors(mapId);
-	
-	// Open the level 1 hub door if the setting wants it
-	if (OPTION_OPEN_HUB && mapId == kLevel_PortOfAdia_1)
-	{
-		TriggerDoors();
-	}
-	
 	PlaceHubWarps(mapId);
 }
 
@@ -46,14 +38,14 @@ void ReplaceAllActors(const int16 &in mapId)
 	array<kActor@> actorsToRemove; // Remove outside of the iterator, to be safe
 	while(!((@actor = actorIterator.GetNext()) is null) &&
 		!actor.InstanceOf("kexPuppet")) // STOP on the player so we don't iterate forever
-	{		
+	{			
 		position = actor.Origin();
 		posStr = "" + mapId + "_" +
 			int(position.x) + "_" +
 			int(position.y) + "_" +
 			int(position.z);
 		
-		MapSpecificEdits(actor, mapId);
+		DoMapSpecificEdits(actor, mapId);
 			
 		if (TryGetReplacement(mapId, posStr, replacement))
 		{
@@ -70,11 +62,7 @@ void ReplaceAllActors(const int16 &in mapId)
 			HandleWhetherActorShouldHaveBeenReplaced(actor, posStr);
 		}				
 		
-		if (IsDoorToTrigger(mapId, posStr))
-		{
-			g_doorsToTrigger.insertLast(actor);
-		}
-		else if (IsActorToTrigger(mapId, actor.TID()))
+		if (IsActorToTrigger(mapId, actor.TID()))
 		{
 			g_actorsToTrigger.insertLast(actor);
 		}
@@ -111,7 +99,7 @@ void HandleWhetherActorShouldHaveBeenReplaced(kActor@ actor, kStr posStr)
 			actorClassName == "kexLifeForcePickup" ||
 			actorClassName == "kexWeaponPickup")
 		{
-			Sys.Print("NOT MAPPED: " + posStr + " (" + GetFriendlyActorName(actor.Type()) + ")"); 
+			//Sys.Print("NOT MAPPED: " + posStr + " (" + GetFriendlyActorName(actor.Type()) + ")"); 
 			//actor.Flags() |= AF_IMPORTANT;  // TODO: remove this after mapping stuff
 		}
 	}
@@ -151,11 +139,21 @@ void ReplaceActor(kActor@ initialActor, ReplacementEntry@ replacement)
 	initialActor.Remove();
 }
 
-void MapSpecificEdits(kActor@ actor, const int &in mapId)
+//----------------------------------
+// Actor edits specific to maps.
+void DoMapSpecificEdits(kActor@ actor, const int &in mapId)
 {
-	switch(mapId) 
+	switch(mapId)
 	{
-		// Trap rooms... the actors have a touch radius so big,
+		// Open the door to the hub if the setting is on
+		case kLevel_PortOfAdia_1:
+			if (OPTION_OPEN_HUB && actor.TID() == 450)
+			{
+				actor.ModeStateComponent().SetMode(DOOR_MODE_OPEN);
+			}
+			break;
+	
+		// Level key trap rooms... these actors have a touch radius so big,
 		// it doesn't let any of our own collision events trigger.
 		// These actors don't need a collision event, so we remove the touch radius.
 		case kLevel_BlindLair_3:
@@ -177,17 +175,6 @@ void MapSpecificEdits(kActor@ actor, const int &in mapId)
 			{
 				actor.WorldComponent().TouchRadius() = 0;
 			}
-			break;
-		case kLevel_BlindLair_6:
-			/*
-			if (actor.TID() == 51 ||
-				actor.TID() == 52 || 
-				actor.TID() == 53 || 
-				actor.TID() == 54)
-			{
-				actor.WorldComponent().TouchRadius() = 0;
-			}
-			*/
 			break;
 	}
 }

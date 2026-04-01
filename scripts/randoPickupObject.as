@@ -64,12 +64,12 @@ class RandoPickupObject : ScriptObject
 	// Note that health and ammo ARE sent to AP still when touched
 	// so that it knows you could have received it.
 	void OnCollide(kActor@ pCollider)
-	{			
+	{
 		if (m_id != 0 && 
 			!m_wasSentToAP &&
 			!(pCollider is null) &&
 			pCollider.InstanceOf("kexPuppet"))
-		{			
+		{
 			SendCheckToAP(m_id);
 			DisplayCollectedLocationsForCurrentMap();
 			if (IsHealthOrAmmo(self))
@@ -85,10 +85,6 @@ class RandoPickupObject : ScriptObject
 			if (IsActorTriggeringActor(m_position))
 			{
 				TriggerActors();
-			}
-			else if (IsDoorTriggeringActor(m_position))
-			{
-				TriggerDoors();
 			}
 		}
 	}
