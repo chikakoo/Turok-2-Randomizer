@@ -81,8 +81,12 @@ class RandoPickupObject : ScriptObject
 			self.WorldComponent().Flags() &= ~WCF_INVOKE_COLLIDE_CALLBACK;
 			self.Flags() &= ~AF_IMPORTANT;
 			
-			// Try to trigger doors
-			if (IsDoorTriggeringActor(m_position))
+			// Try to trigger events
+			if (IsActorTriggeringActor(m_position))
+			{
+				TriggerActors();
+			}
+			else if (IsDoorTriggeringActor(m_position))
 			{
 				TriggerDoors();
 			}

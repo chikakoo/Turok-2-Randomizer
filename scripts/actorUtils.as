@@ -91,12 +91,18 @@ void PlayPickupNotificationSoundAndMessage(WeaponInfo@ weaponInfo)
 //---------------------------
 // Tries to get the actor def of the given class.
 // Returns the actor def, if found, else null.
-kDictMem@ TryGetActorDefWithClass(int &in actorId, kStr &in className)
+kDictMem@ TryGetActorDefWithClass(
+	int &in actorId, 
+	kStr &in className, 
+	bool &in suppressErrorMessage = false)
 {
 	kDictMem@ actorDef = g_indexDefManager.GetEntry(actorId);
 	if (actorDef is null)
 	{
-		Sys.Print("Tried to use non-existant actor def: " + actorId + ", " + className);
+		if (!suppressErrorMessage)
+		{
+			Sys.Print("Tried to use non-existant actor def: " + actorId + ", " + className);
+		}
 		return null;
 	}
 	
@@ -183,7 +189,7 @@ void HandleGiveSecondItem(int &in actorId, kDictMem@ missionItemDef = null)
 {
 	if (missionItemDef is null)
 	{
-		@missionItemDef = TryGetActorDefWithClass(actorId, "kexInventoryPickup");
+		@missionItemDef = TryGetActorDefWithClass(actorId, "kexInventoryPickup", true);
 		if (missionItemDef is null)
 		{
 			return;
@@ -252,10 +258,11 @@ bool IsHealthOrAmmo(kActor@ actor)
 }
 
 //---------------------------
-// Doors to trigger on the current map
-// Used when grabbing a randomized actor needs to trigger doors
+// Actors to trigger on the current map
+// Used when grabbing a randomized actor needs to trigger actors
 // Cleared/set on player spawn
 array<kActor@> g_doorsToTrigger;
+array<kActor@> g_actorsToTrigger;
 
 //---------------------------
 // Trigger all the doors to trigger.
@@ -269,6 +276,21 @@ void TriggerDoors(void)
 	for (uint i = 0; i < g_doorsToTrigger.length(); i++)
 	{
 		g_doorsToTrigger[i].ModeStateComponent().SetMode(DOOR_MODE_OPEN);
+	}
+}
+
+//---------------------------
+// Trigger all the actors to trigger.
+void TriggerActors(void)
+{
+	if (g_actorsToTrigger is null)
+	{
+		return;
+	}
+	
+	for (uint i = 0; i < g_actorsToTrigger.length(); i++)
+	{
+		g_actorsToTrigger[i].Trigger(LocalPlayer.Actor().CastToActor());
 	}
 }
 

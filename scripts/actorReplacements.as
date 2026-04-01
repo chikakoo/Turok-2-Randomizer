@@ -14,8 +14,9 @@ void DoActorReplacementsOnPlayerSpawn()
 		UseRandomAmmoGenerators();
 	}
 	
-	// Reset the doors to trigger BEFORE replacing actors
+	// Reset the actors to trigger BEFORE replacing actors
 	g_doorsToTrigger.resize(0);
+	g_actorsToTrigger.resize(0);
 	
 	// Replace all the actors that should be replaced
 	ReplaceAllActors(mapId);
@@ -30,7 +31,7 @@ void DoActorReplacementsOnPlayerSpawn()
 }
 
 //----------------------------------
-// Replaces all actors with the intended replacemnt.
+// Replaces all actors with the intended replacement.
 // STOP iterating on the player, as that would be the LAST actor spawned.
 // We prevent infinite spawn loops this way.
 //
@@ -51,11 +52,13 @@ void ReplaceAllActors(const int16 &in mapId)
 			int(position.x) + "_" +
 			int(position.y) + "_" +
 			int(position.z);
+		
+		MapSpecificEdits(actor, mapId);
+			
 		if (TryGetReplacement(mapId, posStr, replacement))
 		{
 			if (replacement.isCollected)
 			{
-				Sys.Print("COLLECTED ON SPAWN: " + replacement.name + " (" + posStr + ")" + " (" + replacement.apId + ")");
 				actorsToRemove.insertLast(actor);
 				continue;
 			}
@@ -70,6 +73,10 @@ void ReplaceAllActors(const int16 &in mapId)
 		if (IsDoorToTrigger(mapId, posStr))
 		{
 			g_doorsToTrigger.insertLast(actor);
+		}
+		else if (IsActorToTrigger(mapId, actor.TID()))
+		{
+			g_actorsToTrigger.insertLast(actor);
 		}
 	}
 	
@@ -126,16 +133,9 @@ void ReplaceActor(kActor@ initialActor, ReplacementEntry@ replacement)
 		
 	kWorldComponent@ newWorldComponent = replacedActor.WorldComponent();
 	newWorldComponent.Radius() = worldComponent.Radius();
+	newWorldComponent.TouchRadius() = worldComponent.TouchRadius();
 	newWorldComponent.Height() = worldComponent.Height();
 	newWorldComponent.Flags() = worldComponent.Flags();
-	
-	// Fixes console warnings
-	if (initialActor.ModeStateComponent() !is null)
-	{
-		Sys.Print("MODE STATE ACTUALLY WAS SET??");
-		replacedActor.ModeStateComponent().SetMode(
-			initialActor.ModeStateComponent().Mode());
-	}
 	
 	// Turn on collision for health/ammo detection and to
 	// have a common place to show the pickup status message
@@ -149,6 +149,47 @@ void ReplaceActor(kActor@ initialActor, ReplacementEntry@ replacement)
 	}
 	
 	initialActor.Remove();
+}
+
+void MapSpecificEdits(kActor@ actor, const int &in mapId)
+{
+	switch(mapId) 
+	{
+		// Trap rooms... the actors have a touch radius so big,
+		// it doesn't let any of our own collision events trigger.
+		// These actors don't need a collision event, so we remove the touch radius.
+		case kLevel_BlindLair_3:
+			if (actor.TID() == 51 ||
+				actor.TID() == 52 || 
+				actor.TID() == 53 || 
+				actor.TID() == 54)
+			{
+				actor.WorldComponent().TouchRadius() = 0;
+			}
+			break;
+		case kLevel_BlindLair_8:
+			if (actor.TID() == 88 ||
+				actor.TID() == 89 ||
+				actor.TID() == 90 ||
+				actor.TID() == 91 || 
+				actor.TID() == 92 || 
+				actor.TID() == 93)
+			{
+				actor.WorldComponent().TouchRadius() = 0;
+			}
+			break;
+		case kLevel_BlindLair_6:
+			/*
+			if (actor.TID() == 51 ||
+				actor.TID() == 52 || 
+				actor.TID() == 53 || 
+				actor.TID() == 54)
+			{
+				actor.WorldComponent().TouchRadius() = 0;
+			}
+			*/
+			break;
+	}
 }
 
 //---------------------------

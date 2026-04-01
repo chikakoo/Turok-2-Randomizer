@@ -668,3 +668,39 @@ bool IsDoorTriggeringActor(const kStr &in position)
 	// DM Ratpor Rooms - Level Key
 	return position == "68_-2150_-1381_30";
 }
+
+bool IsActorToTrigger(
+	const int16 &in mapId,
+	const int &in tagId) 
+{
+	switch(mapId)
+	{
+		// Level Key Trap 1
+		case kLevel_BlindLair_3:
+			return tagId == 200009 ||
+				tagId == 200010 ||
+				tagId == 200011 ||
+				tagId == 200012 ||
+				tagId == 200013 ||
+				tagId == 200014 ||
+				tagId == 200015;
+				
+		// Level Key Trap 2
+		case kLevel_BlindLair_8:
+			return tagId == 200032 || 
+				tagId == 200033 ||
+				tagId == 200034 ||
+				tagId == 200035 ||
+				tagId == 200036 ||
+				tagId == 200037 ||
+				tagId == 200038;
+	}
+	
+	return false;
+}
+
+bool IsActorTriggeringActor(const kStr &in position)
+{
+	return position == "100_1074_3630_-2437" ||
+		position == "105_-5429_-3174_-2734";
+}
