@@ -67,7 +67,7 @@ void DisplayLevelProgress()
 		case LEVEL_LAIR_OF_THE_BLIND_ONES:
 			Hud.AddMessage(
 				"Satchel Charges: " + inventory.GetCount(kActor_MissionItem_L4SatchelCharge) +
-				"  -  Cave Door Keys: TODO",
+				"  -  Cave Door Keys: " + inventory.GetCount(kActor_MissionItem_CaveDoorKey),
 				g_progressMenuDisplayTime);
 			break;
 		case LEVEL_HIVE_OF_THE_MANTIDS:

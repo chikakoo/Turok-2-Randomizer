@@ -36,7 +36,6 @@
 #define kActor_MissionItem_GraveyardKey 4025
 #define kActor_MissionItem_CaveDoorKey 4020
 
-// 0 = marshes; cave for blind oens; hive for hive
 #define kActor_MissionItem_L3SatchelCharge 4100
 #define kActor_MissionItem_L4SatchelCharge 4111
 #define kActor_MissionItem_L5SatchelCharge 4110
