@@ -648,6 +648,10 @@ bool IsActorToTrigger(
 {
 	switch(mapId)
 	{
+		// Oblivion City Pickup Trap
+		case kLevel_DeathMarsh_3:
+			return tagId == 200009;
+		
 		// Raptor Rooms
 		case kLevel_DeathMarsh_8:
 			return tagId == 200001 || 
@@ -692,7 +696,8 @@ bool IsActorToTrigger(
 // If this gets too big, we'll want a switch-case on the map.
 bool IsActorTriggeringActor(const kStr &in position)
 {
-	return position == "68_-2150_-1381_30" ||
+	return position == "63_-1839_-991_0" || 
+		position == "68_-2150_-1381_30" ||
 		position == "100_1074_3630_-2437" ||
 		position == "105_-5429_-3174_-2734" ||
 		position == "103_-8652_-149_-3604";
