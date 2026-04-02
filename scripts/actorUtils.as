@@ -265,14 +265,23 @@ array<kActor@> g_actorsToTrigger;
 
 //---------------------------
 // Trigger all the actors to trigger.
-void TriggerActors(void)
+// Starts at the starting index, and triggers the amount indicated (ending at the max).
+void TriggerActors(const int &in startIndex = 0, const int &in count = 1000)
 {
-	if (g_actorsToTrigger is null)
+	if (g_actorsToTrigger is null ||
+		startIndex < 0 || 
+		count <= 0)
 	{
 		return;
 	}
-	
-	for (uint i = 0; i < g_actorsToTrigger.length(); i++)
+
+	uint endIndex = startIndex + count;
+	if (endIndex > g_actorsToTrigger.length())
+	{
+		endIndex = g_actorsToTrigger.length();
+	}
+
+	for (uint i = startIndex; i < endIndex; i++)
 	{
 		g_actorsToTrigger[i].Trigger(LocalPlayer.Actor().CastToActor());
 	}

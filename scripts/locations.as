@@ -686,19 +686,42 @@ bool IsActorToTrigger(
 				tagId == 200032 ||
 				tagId == 200033 || 
 				tagId == 200034;
+		
+
+		case kLevel_Hive_3:
+			// Flame Thrower Tank
+			return tagId == 200005 ||
+			
+				// Box of Grenades
+				tagId == 200006 ||
+				tagId == 200007 ||
+				tagId == 200008 ||
+				tagId == 200009;
+		
 	}
 	
 	return false;
 }
 
 //------------------------------
-// Whether this is an actor to trigger an action object.
+// Tries to trigger the actors for the given actor positioin.
 // If this gets too big, we'll want a switch-case on the map.
-bool IsActorTriggeringActor(const kStr &in position)
+void TryTriggerActors(const kStr &in position)
 {
-	return position == "63_-1839_-991_0" || 
+	if (position == "86_-153_-2457_-921")
+	{
+		TriggerActors(0, 1); // Just the first actor
+	}
+	else if (position == "86_5376_-614_-1535")
+	{
+		TriggerActors(1); // Everything after the first actor
+	}
+	else if (position == "63_-1839_-991_0" || 
 		position == "68_-2150_-1381_30" ||
 		position == "100_1074_3630_-2437" ||
 		position == "105_-5429_-3174_-2734" ||
-		position == "103_-8652_-149_-3604";
+		position == "103_-8652_-149_-3604")
+	{
+		TriggerActors();
+	}
 }

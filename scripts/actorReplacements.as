@@ -8,10 +8,10 @@ void DoActorReplacementsOnPlayerSpawn()
 {
 	int16 mapId = Game.ActiveMapID();
 	
-	//RemoveAllGenerators(); //TODO: disable this, enable the next
+	RemoveAllGenerators(); //TODO: disable this, enable the next
 	if (OPTION_INCLUDE_WEAPONS_AND_AMMO)
 	{
-		UseRandomAmmoGenerators();
+		//UseRandomAmmoGenerators();
 	}
 	
 	// Reset the actors to trigger BEFORE replacing actors
@@ -47,20 +47,25 @@ void ReplaceAllActors(const int16 &in mapId)
 		
 		DoMapSpecificEdits(actor, mapId);
 			
-		if (TryGetReplacement(mapId, posStr, replacement))
+		if (ShouldReplaceActor(actor, posStr))
 		{
-			if (replacement.isCollected)
+			if (TryGetReplacement(mapId, posStr, replacement))
 			{
-				actorsToRemove.insertLast(actor);
-				continue;
+				if (replacement.isCollected)
+				{
+					actorsToRemove.insertLast(actor);
+					continue;
+				}
+				
+				ReplaceActor(actor, replacement);
 			}
-			
-			ReplaceActor(actor, replacement);
+			else 
+			{
+				// TODO: remove this after mapping stuff
+				Sys.Print("NOT MAPPED: " + posStr + " (" + GetFriendlyActorName(actor.Type()) + ")"); 
+				actor.Flags() |= AF_IMPORTANT;
+			}
 		}
-		else
-		{	
-			HandleWhetherActorShouldHaveBeenReplaced(actor, posStr);
-		}				
 		
 		if (IsActorToTrigger(mapId, actor.TID()))
 		{
@@ -75,34 +80,27 @@ void ReplaceAllActors(const int16 &in mapId)
 }
 
 //----------------------------------
-// Called when an actor was NOT replaced.
-// Checks if it should have been. If so, prints to the console and
-// marks it as important so it's easier to find.
+// Checks if an actor should be replaced, based on the actor class.
 //
-// We may want to NOT execute this in release versions, since
-// it does nothing for the player.
-void HandleWhetherActorShouldHaveBeenReplaced(kActor@ actor, kStr posStr)
+// Certain actors of other types might spawn on others (like if an actor is at 0, 0, 0),
+// and we'll crash if we try to replace those.
+bool ShouldReplaceActor(kActor@ actor, kStr posStr)
 {
 	kDictMem@ actorDef = actor.Definition();
-	if (actorDef is null)
+	if (actorDef !is null)
 	{
-		return;
-	}
-	
-	kStr actorClassName;
-	if (actorDef.GetString("className", actorClassName))
-	{
-		// These are all the current randomized actor types
-		if (actorClassName == "kexAmmoPickup" ||
-			actorClassName == "kexHealthPickup" ||
-			actorClassName == "kexInventoryPickup" ||
-			actorClassName == "kexLifeForcePickup" ||
-			actorClassName == "kexWeaponPickup")
+		kStr actorClassName;
+		if (actorDef.GetString("className", actorClassName))
 		{
-			//Sys.Print("NOT MAPPED: " + posStr + " (" + GetFriendlyActorName(actor.Type()) + ")"); 
-			//actor.Flags() |= AF_IMPORTANT;  // TODO: remove this after mapping stuff
+			return actorClassName == "kexAmmoPickup" ||
+				actorClassName == "kexHealthPickup" ||
+				actorClassName == "kexInventoryPickup" ||
+				actorClassName == "kexLifeForcePickup" ||
+				actorClassName == "kexWeaponPickup";
 		}
 	}
+	
+	return false;
 }
 
 //----------------------------------
@@ -133,7 +131,7 @@ void ReplaceActor(kActor@ initialActor, ReplacementEntry@ replacement)
 	// If it was already sent to AP, do not do this since it was "collected" already
 	if (!replacement.isSentToAP)
 	{
-		replacedActor.Flags() |= AF_IMPORTANT; // TODO: enable this when done adding items
+		//replacedActor.Flags() |= AF_IMPORTANT; // TODO: enable this when done adding items
 	}
 	
 	initialActor.Remove();

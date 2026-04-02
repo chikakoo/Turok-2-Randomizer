@@ -82,10 +82,7 @@ class RandoPickupObject : ScriptObject
 			self.Flags() &= ~AF_IMPORTANT;
 			
 			// Try to trigger events
-			if (IsActorTriggeringActor(m_position))
-			{
-				TriggerActors();
-			}
+			TryTriggerActors(m_position);
 		}
 	}
 	
