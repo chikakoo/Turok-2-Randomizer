@@ -697,7 +697,21 @@ bool IsActorToTrigger(
 				tagId == 200007 ||
 				tagId == 200008 ||
 				tagId == 200009;
-		
+				
+		case kLevel_Hive_5:
+			// Firestorm Trap
+			return tagId == 200000 ||
+			
+				// Full Health Trap;
+				tagId == 200020 ||
+				tagId == 200021;
+				
+		// Scorpion Launcher Trap
+		case kLevel_Hive_7:
+			return tagId == 200005 ||
+				tagId == 200006 ||
+				tagId == 200007 || 
+				tagId == 200008;
 	}
 	
 	return false;
@@ -705,23 +719,76 @@ bool IsActorToTrigger(
 
 //------------------------------
 // Tries to trigger the actors for the given actor positioin.
-// If this gets too big, we'll want a switch-case on the map.
 void TryTriggerActors(const kStr &in position)
 {
-	if (position == "86_-153_-2457_-921")
+	switch(Game.ActiveMapID())
 	{
-		TriggerActors(0, 1); // Just the first actor
-	}
-	else if (position == "86_5376_-614_-1535")
-	{
-		TriggerActors(1); // Everything after the first actor
-	}
-	else if (position == "63_-1839_-991_0" || 
-		position == "68_-2150_-1381_30" ||
-		position == "100_1074_3630_-2437" ||
-		position == "105_-5429_-3174_-2734" ||
-		position == "103_-8652_-149_-3604")
-	{
-		TriggerActors();
+		// Box of Shells
+		case kLevel_DeathMarsh_3:
+			if (position == "63_-1839_-991_0")
+			{
+				TriggerActors();
+			}
+			break;
+			
+		// Raptor Level Key
+		case kLevel_DeathMarsh_8:
+			if (position == "68_-2150_-1381_30")
+			{
+				TriggerActors();
+			}
+			break;
+			
+		// Level Key Traps 1/2/3
+		case kLevel_BlindLair_3:
+			if (position == "100_1074_3630_-2437")
+			{
+				TriggerActors();
+			}
+			break;
+		case kLevel_BlindLair_8:
+			if (position == "105_-5429_-3174_-2734")
+			{
+				TriggerActors();
+			}
+			break;
+		case kLevel_BlindLair_6:
+			if (position == "103_-8652_-149_-3604")
+			{
+				TriggerActors();
+			}
+			break;
+	
+		// Flame Thrower Tank/Box of Grenades
+		case kLevel_Hive_3: 
+			if (position == "86_-153_-2457_-921")
+			{
+				TriggerActors(0, 1); // Just the first actor
+			}
+			else if (position == "86_5376_-614_-1535")
+			{
+				TriggerActors(1); // Everything after the first actor
+			}
+			break;
+		
+		// Firestorm/Full Health
+		case kLevel_Hive_5:
+			if (position == "88_6454_1715_1540")
+			{
+				TriggerActors(0, 1); // Just the frist actor
+			}
+			else if (position == "88_614_1996_1191")
+			{
+				TriggerActors(1); // Everything after the first actor
+			}
+			break;
+		
+		// Scorpion Launcher
+		case kLevel_Hive_7:
+			if (position == "90_3379_-5836_307")
+			{
+				TriggerActors();
+			}
+			break;
 	}
 }
