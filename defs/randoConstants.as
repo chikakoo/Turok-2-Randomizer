@@ -1,3 +1,8 @@
+#define AF_EASY 1 << 10
+#define AF_NORMAL 1 << 11
+#define AF_HARD 1 << 12
+#define AF_HARDCORE 1 << 13
+
 #define kActor_Item_APItemProgression 100000
 #define kActor_Item_APItemNonProgression 100001
 #define kActor_Portal_HubWarp 200000
@@ -35,6 +40,9 @@
 #define kActor_MissionItem_GateKey 4030
 #define kActor_MissionItem_GraveyardKey 4025
 #define kActor_MissionItem_CaveDoorKey 4020
+#define kActor_MissionItem_IonCapacitor 4231
+#define kActor_MissionItem_BlueLaserCell 4230
+#define kActor_MissionItem_RedLaserCell 4229
 
 #define kActor_MissionItem_L3SatchelCharge 4100
 #define kActor_MissionItem_L4SatchelCharge 4111

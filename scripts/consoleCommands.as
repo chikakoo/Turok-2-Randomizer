@@ -215,3 +215,18 @@ void L5SatchelCharge(void)
 {
 	TryGetInventoryItem(kActor_MissionItem_L5SatchelCharge);
 }
+
+void IonCapacitor(void)
+{
+	TryGetInventoryItem(kActor_MissionItem_IonCapacitor);
+}
+
+void BlueLaserCell(void)
+{
+	TryGetInventoryItem(kActor_MissionItem_BlueLaserCell);
+}
+
+void RedLaserCell(void)
+{
+	TryGetInventoryItem(kActor_MissionItem_RedLaserCell);
+}

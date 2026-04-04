@@ -77,7 +77,10 @@ void DisplayLevelProgress()
 			break;
 		case LEVEL_PRIMAGENS_LIGHTSHIP:
 			Hud.AddMessage(
-				"Ion Capacitors: TODO");
+				"Ion Capacitors: " + inventory.GetCount(kActor_MissionItem_IonCapacitor) + 
+				"  -  Blue Laser Cells: " + inventory.GetCount(kActor_MissionItem_BlueLaserCell) + 
+				"  -  Red Laser Cells: " + inventory.GetCount(kActor_MissionItem_RedLaserCell),
+				g_progressMenuDisplayTime);
 			break;
 		default:
 			Hud.AddMessage("Unmapped map id!");
