@@ -8,10 +8,10 @@ void DoActorReplacementsOnPlayerSpawn()
 {
 	int16 mapId = Game.ActiveMapID();
 	
-	RemoveAllGenerators(); //TODO: disable this, enable the next
+	//RemoveAllGenerators(); //TODO: disable this, enable the next
 	if (OPTION_INCLUDE_WEAPONS_AND_AMMO)
 	{
-		//UseRandomAmmoGenerators();
+		UseRandomAmmoGenerators();
 	}
 	
 	// Reset the actors to trigger BEFORE replacing actors
@@ -19,7 +19,7 @@ void DoActorReplacementsOnPlayerSpawn()
 	
 	// Replace all the actors that should be replaced
 	ReplaceAllActors(mapId);
-	PlaceHubWarps(mapId);
+	DoHubModifications(mapId);
 }
 
 //----------------------------------
@@ -45,9 +45,12 @@ void ReplaceAllActors(const int16 &in mapId)
 			int(position.y) + "_" +
 			int(position.z);
 		
-		DoMapSpecificEdits(actor, mapId);
-			
-		if (ShouldReplaceActor(actor, posStr))
+		if (DoMapSpecificEdits(actor, mapId))
+		{
+			actorsToRemove.insertLast(actor);
+		}
+		
+		else if (ShouldReplaceActor(actor, posStr))
 		{
 			if (TryGetReplacement(mapId, posStr, replacement))
 			{
@@ -59,12 +62,12 @@ void ReplaceAllActors(const int16 &in mapId)
 				
 				ReplaceActor(actor, replacement);
 			}
-			else 
-			{
+			//else 
+			//{
 				// TODO: remove this after mapping stuff
-				Sys.Print("NOT MAPPED: " + posStr + " (" + GetFriendlyActorName(actor.Type()) + ")"); 
-				actor.Flags() |= AF_IMPORTANT;
-			}
+				//Sys.Print("NOT MAPPED: " + posStr + " (" + GetFriendlyActorName(actor.Type()) + ")"); 
+				//actor.Flags() |= AF_IMPORTANT;
+			//}
 		}
 		
 		if (IsActorToTrigger(mapId, actor.TID()))
@@ -131,7 +134,7 @@ void ReplaceActor(kActor@ initialActor, ReplacementEntry@ replacement)
 	// If it was already sent to AP, do not do this since it was "collected" already
 	if (!replacement.isSentToAP)
 	{
-		//replacedActor.Flags() |= AF_IMPORTANT; // TODO: enable this when done adding items
+		replacedActor.Flags() |= AF_IMPORTANT; // TODO: enable this when done adding items
 	}
 	
 	initialActor.Remove();
@@ -139,10 +142,30 @@ void ReplaceActor(kActor@ initialActor, ReplacementEntry@ replacement)
 
 //----------------------------------
 // Actor edits specific to maps.
-void DoMapSpecificEdits(kActor@ actor, const int &in mapId)
+// Returns whether to remove the actor.
+bool DoMapSpecificEdits(kActor@ actor, const int &in mapId)
 {
 	switch(mapId)
 	{
+		// Edit the Primagen Key turn-ins to handle level requirements
+		case kLevel_Hub:
+			if (!AreLevelRequirementsUsed() ||
+				AreLevelRequirementsUsedAndMet())
+			{
+				break;
+			}
+		
+			if (actor.TID() == 19 ||
+				actor.TID() == 20 ||
+				actor.TID() == 21 ||
+				actor.TID() == 22 ||
+				actor.TID() == 23 ||
+				actor.TID() == 24) 
+				{
+					actor.WorldComponent().TouchRadius() = 0;
+				}
+			break;
+	
 		// Open the door to the hub if the setting is on
 		case kLevel_PortOfAdia_1:
 			if (OPTION_OPEN_HUB && actor.TID() == 450)
@@ -175,6 +198,8 @@ void DoMapSpecificEdits(kActor@ actor, const int &in mapId)
 			}
 			break;
 	}
+	
+	return false;
 }
 
 //---------------------------
@@ -277,12 +302,31 @@ void RemoveAllGenerators(void)
 }
 
 //---------------------------
+// Modifies the Primagen Key turn-ins so they aren't active if level requirements aren't met.
 // Places the hub warps in the level so the player can always go back.
-void PlaceHubWarps(const int16 &in mapId)
+void DoHubModifications(const int16 &in mapId)
 {
 	kVec3 origin;
 	switch(mapId)
 	{
+		// Primagen Key turn-ins - only modified if level requirements are used and not met
+		case kLevel_Hub:
+			if (!AreLevelRequirementsUsed() ||
+				AreLevelRequirementsUsedAndMet())
+			{
+				break;
+			}
+			
+			origin.x = -30.72;
+			origin.y = 51.2;
+			origin.z = 0;
+			ActorFactory.Spawn(
+				kActor_Hub_PrimagenKeyTrigger,
+				origin,
+				0, 0, 0);
+			break;
+			
+		// Add hub warps to each level
 		case kLevel_RiverOfSouls_1:
 			origin.x = -2887.68;
 			origin.y = -10629.12;
@@ -339,4 +383,36 @@ void PlaceHubWarps(const int16 &in mapId)
 				0);
 			break;
 	}
+}
+
+//---------------------------
+// Whether level requirements are met.
+// Will return false if there are no level requirements.
+bool AreLevelRequirementsUsedAndMet()
+{
+	return AreLevelRequirementsUsed() &&
+		(LocalPlayer.Inventory().GetCount(kActor_Misc_TotemInventory) >= OPTION_GOAL_LEVELS);
+}
+
+//---------------------------
+// Whether level requirements are being used.
+bool AreLevelRequirementsUsed()
+{
+	return OPTION_GOAL_LEVELS > 0;
+}
+
+//---------------------------
+// Whether Primagen requirements are being used and are met.
+bool ArePrimagenRequirementsUsedAndMet(const int &in mapId)
+{
+	return (OPTION_GOAL_PRIMAGEN_LAIR && mapId == kLevel_PrimagenBoss) ||
+		(OPTION_GOAL_DEFEAT_PRIMAGEN && 
+			(mapId == kLevel_Ending || mapId == kLevel_EndingB));
+}
+
+//---------------------------
+// Whether Primagen requirements are being used.
+bool ArePrimagenRequirementsUsed()
+{
+	return OPTION_GOAL_PRIMAGEN_LAIR || OPTION_GOAL_DEFEAT_PRIMAGEN;
 }

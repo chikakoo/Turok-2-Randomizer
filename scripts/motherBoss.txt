@@ -1,0 +1,2203 @@
+//
+// Copyright(C) 2014-2015 Samuel Villarreal
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either version 2
+// of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// DESCRIPTION:
+//      Mother Boss behavior logic
+//
+
+//-----------------------------------------------------------------------------
+//
+// Vars
+//
+//-----------------------------------------------------------------------------
+
+#define MOTHER_GRUB_OBJECT_TYPE                 kActor_AI_MotherGrub
+#define MOTHER_TENTACLE_OBJECT_TYPE             kActor_ActionObject_MTentacle
+#define MOTHER_BLOWN_TENTACLE_OBJECT_TYPE       kActor_ActionObject_MTentacle
+
+// Cinema defines
+#define MOTHER_MAX_PUPPETS                      4
+#define MOTHER_ARM_GROW_SPEED                   0.01
+
+#define LegPopTime                              8.8f
+#define LegGrowSpeed                            0.4f
+#define LegContractSpeed                        0.12f
+#define LegMaxSize                              3.0f
+
+#define MOTHER_STAGES                           (3)
+#define MOTHER_TURN_SPEED                       Math::Deg2Rad(15) // Speed at which mother turns
+#define MOTHER_FACING_ANGLE                     Math::Deg2Rad(20)  // Angle for when mother is facing target
+
+// stage 1 defines
+#define MOTHER_TENTACLES                        (6)
+#define TENTACLE_RANGE_S1                       (120.0f * GAME_SCALE)
+#define TENTACLE_HIT_POINTS_S1                  80
+#define STAGE_1_AMMO_RATE                       (10*60)
+#define STAGE_1_AMMO_LONGEVITY                  30
+#define STAGE_1_PICKUP_RANGE_MIN                (50 * GAME_SCALE)
+#define STAGE_1_PICKUP_RANGE_MAX                (150 * GAME_SCALE)
+
+// stage 2 defines
+#define TENTACLE_RANGE_S2                       (140.0f * GAME_SCALE)
+#define TENTACLE_HIT_POINTS_S2                  220
+#define NUM_SAFE_ZONES                          (4)
+#define SAFE_ZONE_RADIUS                        (45.0f * GAME_SCALE)
+#define SAFE_ZONE_DROP_RADIUS                   (90.0f * GAME_SCALE)
+#define DANGER_RADIUS_MIN                       (20.0f * GAME_SCALE)
+#define DANGER_RADIUS_MAX                       (90.0f * GAME_SCALE)
+#define MOTHER_SWING_DAMAGE                     5
+#define MOTHER_SWING_VELOCITY_MULTIPLIER        (50.0f)
+#define MOTHER_SWING_VELOCITY_UP                (20.0f)
+#define STAGE_2_AMMO_RATE                       (5*60)
+#define STAGE_2_AMMO_LONGEVITY                  40
+#define STAGE_2_HEALTH_RATE                     (15*60)
+#define STAGE_2_HEALTH_LONGEVITY                22
+#define STAGE_2_PICKUP_RANGE_MIN                (150 * GAME_SCALE)
+#define STAGE_2_PICKUP_RANGE_MAX                (225 * GAME_SCALE)
+
+// [Turok2EX]
+#define STAGE_2_COLLIDE_RADIUS                  (30  * GAME_SCALE)
+
+// stage 3 defines
+#define HEAD_HITPOINT_S3                        670
+#define STALK_RANGE                             (100 * GAME_SCALE)
+#define STALK_TIME_LIMIT                        (200)
+#define STAGE_3_MED_HEALTH                      (0.60f)
+#define STAGE_3_LOW_HEALTH                      (0.40f)
+#define STAGE_3_AMMO_RATE                       (10*60)
+#define STAGE_3_AMMO_LONGEVITY                  30
+#define STAGE_3_HEALTH_RATE                     (15*60)
+#define STAGE_3_HEALTH_LONGEVITY                22
+#define STAGE_3_PICKUP_RANGE_MIN                (50 * GAME_SCALE)
+#define STAGE_3_PICKUP_RANGE_MAX                (150 * GAME_SCALE)
+
+// arena defines for falling rocks
+#define MOTHER_ARENA_RADIUS                     (160.0f * GAME_SCALE)
+#define MOTHER_ARENA_CENTER_X                   (  0.0f * GAME_SCALE)
+#define MOTHER_ARENA_CENTER_Y                   ( 46.0f * GAME_SCALE)
+#define MOTHER_ARENA_HEIGHT                     (100.0f * GAME_SCALE)
+
+#define DEGREE0                                 (0)
+#define DEGREE90                                (Math::pi / 2.0f)
+#define DEGREE180                               Math::pi
+#define DEGREE270                               (3.0f * Math::pi / 2.0f)
+#define DEGREE360                               (2.0f * Math::pi)
+
+enum motherModels
+{
+    MOTHER_MAIN_MODEL_PART = 0,
+    MOTHER_S2_LEFT_TENTACLE,
+    MOTHER_S1_LEFT_TENTACLE_1,
+    MOTHER_S1_LEFT_TENTACLE_2,
+    MOTHER_S1_LEFT_TENTACLE_3,
+    MOTHER_S2_RIGHT_TENTACLE,
+    MOTHER_S1_RIGHT_TENTACLE_1,
+    MOTHER_S1_RIGHT_TENTACLE_2,
+    MOTHER_S1_RIGHT_TENTACLE_3,
+    MOTHER_S3_LEGS,
+    MOTHER_UPPER_ARM_LEFT,
+    MOTHER_LOWER_ARM_LEFT,
+    MOTHER_LOWER_ARM_RIGHT,
+    MOTHER_HEAD,
+    MOTHER_UPPER_ARM_RIGHT,
+    MOTHER_MODEL_PARTS
+};
+
+// bone defines
+#define MOTHER_NODE_FING_L1_A       21
+#define MOTHER_NODE_FING_L2_A       26
+#define MOTHER_NODE_FING_L3_A       31
+#define MOTHER_NODE_FING_L4_A       36
+
+#define MOTHER_NODE_FING_R1_A       46
+#define MOTHER_NODE_FING_R2_A       51
+#define MOTHER_NODE_FING_R3_A       56
+#define MOTHER_NODE_FING_R4_A       61
+
+#define MOTHER_NODE_LEG_L1_A        89
+#define MOTHER_NODE_LEG_L2_A        93
+#define MOTHER_NODE_LEG_L3_A        97
+
+#define MOTHER_NODE_LEG_R1_A        101
+#define MOTHER_NODE_LEG_R2_A        105
+#define MOTHER_NODE_LEG_R3_A        109
+
+enum motherTargets
+{
+    NOTARGET = NONE,
+    LEFT_ARM,
+    RIGHT_ARM,
+    HEAD
+};
+
+const array<int> g_motherStageActiveModels =
+{
+    (
+    (1 << MOTHER_MAIN_MODEL_PART)       |
+    (1 << MOTHER_S1_RIGHT_TENTACLE_1)   |
+    (1 << MOTHER_S1_RIGHT_TENTACLE_2)   |
+    (1 << MOTHER_S1_RIGHT_TENTACLE_3)   |
+    (1 << MOTHER_S1_LEFT_TENTACLE_1)    |
+    (1 << MOTHER_S1_LEFT_TENTACLE_2)    |
+    (1 << MOTHER_S1_LEFT_TENTACLE_3)    |
+    (1 << MOTHER_HEAD)                  |
+    (1 << MOTHER_UPPER_ARM_LEFT)        |    
+    (1 << MOTHER_UPPER_ARM_RIGHT)       |
+    (1 << MOTHER_LOWER_ARM_LEFT)        |
+    (1 << MOTHER_LOWER_ARM_RIGHT)
+    )
+    ,
+    (
+    (1 << MOTHER_MAIN_MODEL_PART)       |
+    (1 << MOTHER_S2_RIGHT_TENTACLE)     |    
+    (1 << MOTHER_S2_LEFT_TENTACLE)      |
+    (1 << MOTHER_HEAD)                  |
+    (1 << MOTHER_UPPER_ARM_LEFT)        |
+    (1 << MOTHER_UPPER_ARM_RIGHT)       |
+    (1 << MOTHER_LOWER_ARM_LEFT)        |
+    (1 << MOTHER_LOWER_ARM_RIGHT)
+    )
+    ,
+    (
+    (1 << MOTHER_MAIN_MODEL_PART)       |
+    (1 << MOTHER_S3_LEGS)               |
+    (1 << MOTHER_HEAD)                  |
+    (1 << MOTHER_UPPER_ARM_LEFT)        |
+    (1 << MOTHER_UPPER_ARM_RIGHT)       |
+    (1 << MOTHER_LOWER_ARM_LEFT)        |
+    (1 << MOTHER_LOWER_ARM_RIGHT)
+    )
+};
+
+const array<int> g_motherStageTargetModels =
+{
+    (
+    (1 << MOTHER_UPPER_ARM_LEFT)        |
+    (1 << MOTHER_UPPER_ARM_RIGHT)       |
+    (1 << MOTHER_LOWER_ARM_LEFT)        |
+    (1 << MOTHER_LOWER_ARM_RIGHT)
+    )
+    ,
+    (
+    (1 << MOTHER_UPPER_ARM_LEFT)        |
+    (1 << MOTHER_UPPER_ARM_RIGHT)       |
+    (1 << MOTHER_LOWER_ARM_LEFT)        |
+    (1 << MOTHER_LOWER_ARM_RIGHT)
+    )
+    ,
+    (
+    (1 << MOTHER_HEAD)
+    )
+};
+
+const array<int> g_motherStageDamageModels =
+{
+    (
+    (1 << MOTHER_S1_RIGHT_TENTACLE_1)   |
+    (1 << MOTHER_S1_RIGHT_TENTACLE_2)   |
+    (1 << MOTHER_S1_RIGHT_TENTACLE_3)   |
+    (1 << MOTHER_S1_LEFT_TENTACLE_1)    |
+    (1 << MOTHER_S1_LEFT_TENTACLE_2)    |
+    (1 << MOTHER_S1_LEFT_TENTACLE_3)
+    )
+    ,
+    (
+    (1 << MOTHER_S2_RIGHT_TENTACLE)     |
+    (1 << MOTHER_S2_LEFT_TENTACLE)
+    )
+    ,
+    (
+    (1 << MOTHER_HEAD)
+    )
+};
+
+//-----------------------------------------------------------------------------
+//
+// Modes
+//
+//-----------------------------------------------------------------------------
+
+// modes 0 - 55 are already reserved by the enemy ai component
+enum motherModes
+{
+    MOTHER_STAGE_1_INTRO = 1000,            //  0
+    MOTHER_STAGE_1_START,
+    MOTHER_STAGE_1_DO_SOMETHING,
+    MOTHER_STAGE_1_IDLE_SHORT,
+    MOTHER_STAGE_1_ATTACK_NORMAL,
+    MOTHER_STAGE_1_ATTACK_SPIT,             // 5
+    MOTHER_STAGE_1_ATTACK_THRUST,
+    MOTHER_STAGE_1_LEFT_BLOWN,
+    MOTHER_STAGE_1_RIGHT_BLOWN,
+    MOTHER_STAGE_2_INTRO,
+    MOTHER_STAGE_2_START,                   // 10
+    MOTHER_STAGE_2_IDLE,
+    MOTHER_STAGE_2_DO_SOMETHING,
+    MOTHER_STAGE_2_ATTACK_NORMAL,
+    MOTHER_STAGE_2_SWING_NEAR,
+    MOTHER_STAGE_2_SWING_FAR,               // 15
+    MOTHER_STAGE_2_PULL_UP,
+    MOTHER_STAGE_2_DROP_DOWN,
+    MOTHER_STAGE_2_INHALE,
+    MOTHER_STAGE_3_INTRO,
+    MOTHER_STAGE_3_START,                   // 20
+    MOTHER_STAGE_3_START_2,
+    MOTHER_STAGE_3_DO_SOMETHING,
+    MOTHER_STAGE_3_WALK,
+    MOTHER_STAGE_3_EVADE,
+    MOTHER_STAGE_3_ATTACK_SPIT,             // 25
+    MOTHER_STAGE_3_ATTACK_LEFT,
+    MOTHER_STAGE_3_ATTACK_RIGHT,
+    MOTHER_STAGE_3_ATTACK_SCREAM,
+    MOTHER_STAGE_3_ATTACK_BLAST,
+    MOTHER_STAGE_3_END,
+    MOTHER_STAGE_FINAL
+};
+
+#define DEFINE_MOTHER_MODE(mode, anim, flags) \
+    DefineMode("MotherModeTable", mode, "void MODE_Setup"#mode"(void)", "void MODE_Tick"#mode"(void)", CF_CHARACTER, anim, "", 0, 10, 0, flags);
+    
+#define DEFINE_MOTHER_MODE_ANIMFUNC(mode, anim, flags) \
+    DefineMode("MotherModeTable", mode, "void MODE_Setup"#mode"(void)", "void MODE_Tick"#mode"(void)", CF_CHARACTER, 0, "int MODE_Anim"#anim"(void)", 0, 10, 0, flags);
+
+void InitMotherBossModeTable(void)
+{
+    DEFINE_MOTHER_MODE(MOTHER_STAGE_1_INTRO,            0, 0);
+    DEFINE_MOTHER_MODE(MOTHER_STAGE_1_START,            ANIM_MOTHER_S1_IDLE_SHORT, 0);
+    DEFINE_MOTHER_MODE(MOTHER_STAGE_1_DO_SOMETHING,     0, 0);
+    DEFINE_MOTHER_MODE(MOTHER_STAGE_1_IDLE_SHORT,       ANIM_MOTHER_S1_IDLE_SHORT, 0);
+    DEFINE_MOTHER_MODE(MOTHER_STAGE_1_ATTACK_SPIT,      ANIM_MOTHER_S1_ATTACK_SPIT_GRUB, 0);
+    DEFINE_MOTHER_MODE(MOTHER_STAGE_1_ATTACK_THRUST,    ANIM_MOTHER_S1_ATTACK_THRUST, 0);
+    DEFINE_MOTHER_MODE(MOTHER_STAGE_1_LEFT_BLOWN,       ANIM_MOTHER_S1_LEFT_TENTACLE_BLOWN, 0);
+    DEFINE_MOTHER_MODE(MOTHER_STAGE_1_RIGHT_BLOWN,      ANIM_MOTHER_S1_RIGHT_TENTACLE_BLOWN, 0);
+    DEFINE_MOTHER_MODE(MOTHER_STAGE_2_IDLE,             ANIM_MOTHER_S1_IDLE_LONG, 0);
+    DEFINE_MOTHER_MODE(MOTHER_STAGE_2_DO_SOMETHING,     0, 0);
+    DEFINE_MOTHER_MODE(MOTHER_STAGE_2_SWING_NEAR,       ANIM_MOTHER_S2_SWINGING_ATTACK_NEAR, 0);
+    DEFINE_MOTHER_MODE(MOTHER_STAGE_2_SWING_FAR,        ANIM_MOTHER_S2_SWINGING_ATTACK_FAR, 0);
+    DEFINE_MOTHER_MODE(MOTHER_STAGE_2_DROP_DOWN,        ANIM_MOTHER_S2_DROP_DOWN, 0);
+    DEFINE_MOTHER_MODE(MOTHER_STAGE_2_INHALE,           ANIM_MOTHER_S2_INHALE, 0);
+    DEFINE_MOTHER_MODE(MOTHER_STAGE_3_START,            ANIM_MOTHER_S3_ATTACK_LEFT, 0);
+    DEFINE_MOTHER_MODE(MOTHER_STAGE_3_START_2,          ANIM_MOTHER_S3_ATTACK_RIGHT, 0);
+    DEFINE_MOTHER_MODE(MOTHER_STAGE_3_DO_SOMETHING,     0, 0);
+    DEFINE_MOTHER_MODE(MOTHER_STAGE_3_WALK,             ANIM_MOTHER_S3_WALK, 0);
+    DEFINE_MOTHER_MODE(MOTHER_STAGE_3_EVADE,            ANIM_MOTHER_S3_WALK, 0);
+    DEFINE_MOTHER_MODE(MOTHER_STAGE_3_ATTACK_LEFT,      ANIM_MOTHER_S3_ATTACK_LEFT, 0);
+    DEFINE_MOTHER_MODE(MOTHER_STAGE_3_ATTACK_RIGHT,     ANIM_MOTHER_S3_ATTACK_RIGHT, 0);
+    DEFINE_MOTHER_MODE(MOTHER_STAGE_3_ATTACK_SCREAM,    ANIM_MOTHER_S3_ATTACK_SCREAM, 0);
+    DEFINE_MOTHER_MODE(MOTHER_STAGE_3_ATTACK_BLAST,     ANIM_MOTHER_S3_ATTACK_ORAL_BLAST, 0);
+    DEFINE_MOTHER_MODE(MOTHER_STAGE_3_ATTACK_SPIT,      ANIM_MOTHER_S3_ATTACK_SPIT_GRUB, 0);
+    DEFINE_MOTHER_MODE(MOTHER_STAGE_2_INTRO,            0, 0);
+    DEFINE_MOTHER_MODE(MOTHER_STAGE_3_INTRO,            0, 0);
+    DEFINE_MOTHER_MODE(MOTHER_STAGE_3_END,              ANIM_MOTHER_DEATH, 0);
+    DEFINE_MOTHER_MODE(MOTHER_STAGE_FINAL,              0, 0);
+    
+    DEFINE_MOTHER_MODE_ANIMFUNC(MOTHER_STAGE_1_ATTACK_NORMAL, Attack, 0);
+    DEFINE_MOTHER_MODE_ANIMFUNC(MOTHER_STAGE_2_START, Attack, 0);
+    DEFINE_MOTHER_MODE_ANIMFUNC(MOTHER_STAGE_2_ATTACK_NORMAL, Attack, 0);
+    DEFINE_MOTHER_MODE_ANIMFUNC(MOTHER_STAGE_2_PULL_UP, PullUp, 0);
+}
+
+#undef DEFINE_MOTHER_MODE
+#undef DEFINE_MOTHER_MODE_ANIMFUNC
+
+#define MOTHER_MODE_FUNCTION(mode, Setup, Tick) \
+    void MODE_Setup##mode(void) \
+    Setup   \
+    void MODE_Tick##mode(void)  \
+    Tick
+
+//-----------------------------------------------------------------------------
+//
+// Structs
+//
+//-----------------------------------------------------------------------------
+
+// position, angleMin, angleMax
+const array<float> g_mothSafeZoneBottom         = {    0.0f * GAME_SCALE, -187.0f * GAME_SCALE, 0.0f, -DEGREE90,  DEGREE90  };
+const array<float> g_mothSafeZoneLeft           = {  237.0f * GAME_SCALE,   50.0f * GAME_SCALE, 0.0f,  DEGREE180, DEGREE360 };
+const array<float> g_mothSafeZoneTop            = {    0.0f * GAME_SCALE,  287.0f * GAME_SCALE, 0.0f,  DEGREE90,  DEGREE270 };
+const array<float> g_mothSafeZoneRight          = { -237.0f * GAME_SCALE,   50.0f * GAME_SCALE, 0.0f,  DEGREE0,   DEGREE180 };
+
+const array<const array<float>@> g_mothSafeZones =
+{
+    @g_mothSafeZoneBottom,
+    @g_mothSafeZoneLeft,
+    @g_mothSafeZoneTop,
+    @g_mothSafeZoneRight
+};
+
+const array<kVec3> g_vMothStartPosition =
+{
+    kVec3(0.0f * GAME_SCALE, 100.0f * GAME_SCALE, 0.0f),
+    kVec3(0.0f * GAME_SCALE, 203.0f * GAME_SCALE, 0.0f),
+    kVec3(0.0f * GAME_SCALE, 203.0f * GAME_SCALE, 0.0f)
+};
+
+const array<int> g_motherRandomAmmo =
+{
+    kActor_Item_AmmoShells, 10,
+    kActor_Item_AmmoShellBox, 5,
+    kActor_Item_AmmoPlasma, 10,
+    kActor_Item_AmmoPlasmaPack, 5,
+    kActor_Item_AmmoBulletBox, 5,
+    kActor_Item_AmmoExpShells, 10,
+    kActor_Item_AmmoGrenade, 10,
+    -1, -1
+};
+
+// NOTE: NOT USED
+/*
+const array<int> g_motherRandomHealth =
+{
+    kActor_Item_Health2, 10,
+    kActor_Item_Health10, 3,
+    -1, -1
+};
+*/
+
+const array<int> g_motherRandomHealthS2 =
+{
+    kActor_Item_Health2, 10,
+    kActor_Item_Health10, 3,
+    -1, -1
+};
+
+const array<int> g_motherRandomHealthS3 =
+{
+    kActor_Item_Health2, 10,
+    kActor_Item_Health10, 10,
+    -1, -1
+};
+
+const array<int> g_motherRandomSmallHealth =
+{
+    kActor_Item_Health2, 10,
+    -1, -1
+};
+
+//-----------------------------------------------------------------------------
+//
+// Controller
+//
+//-----------------------------------------------------------------------------
+
+final class CMotherBossController
+{
+    kActor@                 m_pOwner;
+    array<kActor@>          m_pPuppets;
+    array<float>            m_modelHealth;
+    array<kActor@>          m_pTentacles;
+    kActor@                 m_pBlownTentacle;
+    int                     m_stage;
+    int                     m_targetModel;
+    int                     m_damageModel;
+    int                     m_lastMode;
+    bool                    m_bIdle;
+    int                     m_nActiveTentacles;
+    float                   m_totalHealth;
+    float                   m_currentHealth;
+    int                     m_counter;
+    int                     m_ammoPickups;
+    int                     m_healthPickups;
+    float                   m_pickupRangeMin;
+    float                   m_pickupRangeMax;
+    array<kActor@>          m_pPlayers;
+    
+    //--------------------------------------------------
+    CMotherBossController(void) {}
+    
+    //--------------------------------------------------
+    void Initialize(kActor@ pActor, const bool bIsDeserialized)
+    {
+        if(!bIsDeserialized)
+        {
+            m_stage = 0;
+            m_targetModel = 0;
+            m_damageModel = 0;
+            m_lastMode = 0;
+            m_bIdle = false;
+            m_nActiveTentacles = 0;
+            m_totalHealth = 0;
+            m_currentHealth = 0;
+            m_counter = 0;
+            m_ammoPickups = 0;
+            m_healthPickups = 0;
+            m_pickupRangeMin = 0;
+            m_pickupRangeMax = 0;
+        }
+    
+        @m_pOwner = @pActor;
+        @m_pBlownTentacle = null;
+        
+        if(!bIsDeserialized)
+        {
+            SetMotherModelVisibility(m_pOwner, m_stage);
+            m_modelHealth.resize(MOTHER_MODEL_PARTS);
+        }
+        
+        kActorIterator cIterator;
+        kActor@ pDude;
+        
+        // gather all important actors
+        while(!((@pDude = cIterator.GetNext()) is null))
+        {
+            switch(pDude.Type())
+            {
+            case MOTHER_TENTACLE_OBJECT_TYPE:
+                pDude.Flags() |= AF_HIDDEN;
+                
+                if(pDude.TID() == 1)
+                {
+                    @m_pBlownTentacle = @pDude;
+                }
+                else
+                {
+                    m_pTentacles.insertLast(pDude);
+                }
+                break;
+                
+            case kActor_AI_MotherPuppet:
+                m_pPuppets.insertLast(pDude);
+                SetMotherModelVisibility(pDude, m_stage);
+                break;
+                
+            case kActor_Player:
+                m_pPlayers.insertLast(pActor);
+                break;
+                
+            default:
+                break;
+            }
+        }
+        
+        if(!bIsDeserialized)
+        {
+            m_nActiveTentacles = m_pTentacles.length();
+        }
+    }
+    
+    //--------------------------------------------------
+    void SpawnPickup(const int nType, const kVec3&in vPos)
+    {
+        if(m_pOwner is null)
+        {
+            return;
+        }
+        
+        if(m_pOwner.WorldComponent() is null)
+        {
+            return;
+        }
+        
+        kVec3 vRegPos = vPos;
+        int16 nRegionIdx = m_pOwner.WorldComponent().GetNearPositionAndRegionIndex(vRegPos, vRegPos);
+        kActor@ pItem = ActorFactory.Spawn(nType, vRegPos, 0, 0, 0, true, nRegionIdx);
+        
+        if(!(pItem is null))
+        {
+            pItem.AddComponent("kexMovementComponent", true);
+            pItem.MovementComponent().Velocity().z = 50.0f;
+            pItem.RunFxEvent("MotherItemWaitVanish");
+            
+            ParticleFactory.Spawn(kParticle_MotherItemFlash, pItem, vRegPos, kQuat(0, 0, 0), Math::vecZero);
+        }
+    }
+    
+    //--------------------------------------------------
+    void SpawnRandomPickupInArena(const array<int>@ pList)
+    {
+        kSelectionListInt cPickups;
+        
+        for(uint i = 0; i < pList.length() && pList[i] != -1; i += 2)
+        {
+            cPickups.AddItem(pList[i+0], pList[i+1]);
+        }
+        
+        if(cPickups.GetNumEntries() == 0)
+        {
+            return;
+        }
+        
+        float fRadius = Math::RandRange(m_pickupRangeMin, m_pickupRangeMax);
+        float fTheta = Math::RandRange(-Math::pi, Math::pi);
+        
+        kVec3 vPos;
+        
+        vPos.x = Math::Sin(fTheta) * fRadius;
+        vPos.y = Math::Cos(fTheta) * fRadius;
+        
+        int nType = cPickups.Select(true);
+        
+        if(nType <= -1)
+        {
+            // just in case....
+            return;
+        }
+        
+        SpawnPickup(nType, vPos);
+    }
+    
+    //--------------------------------------------------
+    void SpawnRandomPickupInSafeZone(const array<int>@ pList)
+    {
+        kSelectionListInt cPickups;
+        
+        for(uint i = 0; i < pList.length() && pList[i] != -1; i += 2)
+        {
+            cPickups.AddItem(pList[i+0], pList[i+1]);
+        }
+        
+        if(cPickups.GetNumEntries() == 0)
+        {
+            return;
+        }
+        
+        kEnemyAIComponent@ pEAIC = m_pOwner.EnemyAIComponent();
+        pEAIC.GetTargetInfo(true, false);
+        
+        if(pEAIC.PathTarget().Target() is null)
+        {
+            return;
+        }
+        
+        for(int i = 0; i < NUM_SAFE_ZONES; ++i)
+        {
+            int nType = cPickups.Select(true);
+        
+            if(nType <= -1)
+            {
+                // just in case....
+                continue;
+            }
+            
+            kVec3 vSafePos(g_mothSafeZones[i][0], g_mothSafeZones[i][1], g_mothSafeZones[i][2]);
+            
+            float dx = Math::RandRange(-15, 15);
+            float dy = Math::RandRange(-15, 15);
+            
+            dx *= GAME_SCALE;
+            dy *= GAME_SCALE;
+            
+            float fDistance = vSafePos.Distance(pEAIC.PathTarget().Target().Origin());
+            
+            if(fDistance > SAFE_ZONE_RADIUS)
+            {
+                vSafePos.z += (3*GAME_SCALE);
+                SpawnPickup(nType, vSafePos);
+            }
+        }
+    }
+    
+    //--------------------------------------------------
+    void Update(void)
+    {
+        if(!CinemaPlayer.Playing())
+        {
+            bool bGenerateAmmo = false;
+            
+            m_ammoPickups++;
+            m_healthPickups++;
+            
+            switch(m_stage)
+            {
+            case 0:
+                if(m_ammoPickups > STAGE_1_AMMO_RATE)
+                {
+                    bGenerateAmmo = true;
+                }
+                break;
+                
+            case 1:
+                if(m_ammoPickups > STAGE_2_AMMO_RATE)
+                {
+                    bGenerateAmmo = true;
+                }
+                
+                if(m_healthPickups > STAGE_2_HEALTH_RATE)
+                {
+                    m_healthPickups = 0;
+                    SpawnRandomPickupInSafeZone(@g_motherRandomHealthS2);
+                }
+                break;
+                
+            case 2:
+                if(m_ammoPickups > STAGE_3_AMMO_RATE)
+                {
+                    bGenerateAmmo = true;
+                }
+                
+                if(m_healthPickups > STAGE_3_HEALTH_RATE)
+                {
+                    m_healthPickups = 0;
+                    SpawnRandomPickupInSafeZone(@g_motherRandomHealthS3);
+                }
+                break;
+                
+            default:
+                break;
+            }
+            
+            if(bGenerateAmmo)
+            {
+                m_ammoPickups = 0;
+                
+                SpawnRandomPickupInArena(@g_motherRandomAmmo);
+            }
+        }
+    }
+    
+    //--------------------------------------------------
+    void SetMotherModelVisibility(kActor@ pActor, const int stage)
+    {
+        for(int i = 0; i < MOTHER_MODEL_PARTS; ++i)
+        {
+            if(i == MOTHER_MAIN_MODEL_PART)
+            {
+                continue;
+            }
+                
+            if((g_motherStageActiveModels[stage] & (1 << i)) != 0)
+            {
+                pActor.RenderMeshComponent().SetAttachedMeshVisibility(i - 1, true);
+            }
+            else
+            {
+                pActor.RenderMeshComponent().SetAttachedMeshVisibility(i - 1, false);
+            }
+        }
+        
+        m_targetModel = g_motherStageTargetModels[stage];
+        m_damageModel = g_motherStageDamageModels[stage];
+    }
+    
+    //--------------------------------------------------
+    void SetMotherModelVisibility(const int stage)
+    {
+        SetMotherModelVisibility(m_pOwner, stage);
+    }
+};
+
+/*
+==============================================================
+TurokMotherBoss
+==============================================================
+*/
+
+class TurokMotherBoss : ScriptObject
+{
+    kActor@                 self;
+    kEnemyAIComponent@      m_pEAIC;
+    CMotherBossController   m_cController;
+    float                   m_fLegScale;
+    float                   m_fArmScale;
+    float                   m_fLegTimer;
+    bool                    m_bLegsRebounding;
+    
+    TurokMotherBoss(kActor@ actor)
+    {
+        @self = actor;
+        self.AddComponent("kexModeStateComponent", true);
+        m_fLegScale = 0;
+        m_fArmScale = 1;
+        m_fLegTimer = 0;
+        m_bLegsRebounding = false;
+    }
+    
+    //--------------------------------------------------
+    void OnSpawn(void)
+    {
+        m_cController.Initialize(self, self.Deserialized());
+        @m_pEAIC = self.EnemyAIComponent();
+        
+        // seize control of our ai
+        self.EnableComponent("kexEnemyAIComponent", false);
+        self.ModeStateComponent().AssignModeTable("MotherModeTable");
+        
+        if(!self.Deserialized())
+        {
+            self.ModeStateComponent().SetMode(MOTHER_STAGE_1_INTRO);
+            self.RenderMeshComponent().CanFlinch() = false;
+            self.Flags() |= AF_HIDDEN;
+        }
+        else
+        {
+            m_cController.SetMotherModelVisibility(m_cController.m_stage);
+            Hud.SetBar(0, 50, 255, 50, 255, int(m_cController.m_totalHealth));
+            StartFx("MotherFlashRepeat", m_cController.m_targetModel);
+        }
+    }
+    
+    //--------------------------------------------------
+    void OnSerialize(kDict& out dict)
+    {
+        SERIALIZE(m_cController.m_modelHealth[MOTHER_MAIN_MODEL_PART]);
+        SERIALIZE(m_cController.m_modelHealth[MOTHER_S2_LEFT_TENTACLE]);
+        SERIALIZE(m_cController.m_modelHealth[MOTHER_S1_LEFT_TENTACLE_1]);
+        SERIALIZE(m_cController.m_modelHealth[MOTHER_S1_LEFT_TENTACLE_2]);
+        SERIALIZE(m_cController.m_modelHealth[MOTHER_S1_LEFT_TENTACLE_3]);
+        SERIALIZE(m_cController.m_modelHealth[MOTHER_S2_RIGHT_TENTACLE]);
+        SERIALIZE(m_cController.m_modelHealth[MOTHER_S1_RIGHT_TENTACLE_1]);
+        SERIALIZE(m_cController.m_modelHealth[MOTHER_S1_RIGHT_TENTACLE_2]);
+        SERIALIZE(m_cController.m_modelHealth[MOTHER_S1_RIGHT_TENTACLE_3]);
+        SERIALIZE(m_cController.m_modelHealth[MOTHER_S3_LEGS]);
+        SERIALIZE(m_cController.m_modelHealth[MOTHER_UPPER_ARM_LEFT]);
+        SERIALIZE(m_cController.m_modelHealth[MOTHER_LOWER_ARM_LEFT]);
+        SERIALIZE(m_cController.m_modelHealth[MOTHER_LOWER_ARM_RIGHT]);
+        SERIALIZE(m_cController.m_modelHealth[MOTHER_HEAD]);
+        SERIALIZE(m_cController.m_modelHealth[MOTHER_UPPER_ARM_RIGHT]);
+        
+        SERIALIZE(m_cController.m_stage);
+        SERIALIZE(m_cController.m_targetModel);
+        SERIALIZE(m_cController.m_damageModel);
+        SERIALIZE(m_cController.m_lastMode);
+        SERIALIZE(m_cController.m_bIdle);
+        SERIALIZE(m_cController.m_nActiveTentacles);
+        SERIALIZE(m_cController.m_totalHealth);
+        SERIALIZE(m_cController.m_currentHealth);
+        SERIALIZE(m_cController.m_counter);
+        SERIALIZE(m_cController.m_ammoPickups);
+        SERIALIZE(m_cController.m_healthPickups);
+        SERIALIZE(m_cController.m_pickupRangeMin);
+        SERIALIZE(m_cController.m_pickupRangeMax);
+        
+        SERIALIZE(m_fLegScale);
+        SERIALIZE(m_fArmScale);
+        SERIALIZE(m_fLegTimer);
+        SERIALIZE(m_bLegsRebounding);
+    }
+    
+    //--------------------------------------------------
+    void OnDeserialize(kDict& in dict)
+    {
+        m_cController.m_modelHealth.resize(MOTHER_MODEL_PARTS);
+        
+        DESERIALIZE_FLOAT(m_cController.m_modelHealth[MOTHER_MAIN_MODEL_PART]);
+        DESERIALIZE_FLOAT(m_cController.m_modelHealth[MOTHER_S2_LEFT_TENTACLE]);
+        DESERIALIZE_FLOAT(m_cController.m_modelHealth[MOTHER_S1_LEFT_TENTACLE_1]);
+        DESERIALIZE_FLOAT(m_cController.m_modelHealth[MOTHER_S1_LEFT_TENTACLE_2]);
+        DESERIALIZE_FLOAT(m_cController.m_modelHealth[MOTHER_S1_LEFT_TENTACLE_3]);
+        DESERIALIZE_FLOAT(m_cController.m_modelHealth[MOTHER_S2_RIGHT_TENTACLE]);
+        DESERIALIZE_FLOAT(m_cController.m_modelHealth[MOTHER_S1_RIGHT_TENTACLE_1]);
+        DESERIALIZE_FLOAT(m_cController.m_modelHealth[MOTHER_S1_RIGHT_TENTACLE_2]);
+        DESERIALIZE_FLOAT(m_cController.m_modelHealth[MOTHER_S1_RIGHT_TENTACLE_3]);
+        DESERIALIZE_FLOAT(m_cController.m_modelHealth[MOTHER_S3_LEGS]);
+        DESERIALIZE_FLOAT(m_cController.m_modelHealth[MOTHER_UPPER_ARM_LEFT]);
+        DESERIALIZE_FLOAT(m_cController.m_modelHealth[MOTHER_LOWER_ARM_LEFT]);
+        DESERIALIZE_FLOAT(m_cController.m_modelHealth[MOTHER_LOWER_ARM_RIGHT]);
+        DESERIALIZE_FLOAT(m_cController.m_modelHealth[MOTHER_HEAD]);
+        DESERIALIZE_FLOAT(m_cController.m_modelHealth[MOTHER_UPPER_ARM_RIGHT]);
+        
+        DESERIALIZE_INT(m_cController.m_stage);
+        DESERIALIZE_INT(m_cController.m_targetModel);
+        DESERIALIZE_INT(m_cController.m_damageModel);
+        DESERIALIZE_INT(m_cController.m_lastMode);
+        DESERIALIZE_BOOL(m_cController.m_bIdle);
+        DESERIALIZE_INT(m_cController.m_nActiveTentacles);
+        DESERIALIZE_FLOAT(m_cController.m_totalHealth);
+        DESERIALIZE_FLOAT(m_cController.m_currentHealth);
+        DESERIALIZE_INT(m_cController.m_counter);
+        DESERIALIZE_INT(m_cController.m_ammoPickups);
+        DESERIALIZE_INT(m_cController.m_healthPickups);
+        DESERIALIZE_FLOAT(m_cController.m_pickupRangeMin);
+        DESERIALIZE_FLOAT(m_cController.m_pickupRangeMax);
+        
+        DESERIALIZE_FLOAT(m_fLegScale);
+        DESERIALIZE_FLOAT(m_fArmScale);
+        DESERIALIZE_FLOAT(m_fLegTimer);
+        DESERIALIZE_BOOL(m_bLegsRebounding);
+    }
+    
+    //--------------------------------------------------
+    void StartFx(const kStr&in szFxFile, const int modelBits)
+    {
+        int bits = 0;
+        
+        for(int i = 1; i < MOTHER_MODEL_PARTS; ++i)
+        {
+            if(((1 << i) & modelBits) != 0)
+            {
+                bits |= (1 << (i-1));
+            }
+        }
+        
+        self.RenderMeshComponent().FxFlags() = bits;
+        self.RunFxEvent(szFxFile);
+    }
+    
+    //--------------------------------------------------
+    void StopFx(void)
+    {
+        StartFx("MotherStopFlash", m_cController.m_targetModel);
+    }
+    
+    //--------------------------------------------------
+    void OnCollide(kActor@ pCollider)
+    {
+        if( self.ModeStateComponent().Mode() != MOTHER_STAGE_2_SWING_NEAR &&
+            self.ModeStateComponent().Mode() != MOTHER_STAGE_2_SWING_FAR)
+        {
+            return;
+        }
+        
+        if(pCollider is null || !(pCollider is LocalPlayer.Actor().CastToActor()))
+        {
+            return;
+        }
+        
+        if((LocalPlayer.Actor().MovementComponent().Flags() & MCF_DISABLE_AIR_FRICTION_UNTIL_LAND) != 0)
+        {
+            return;
+        }
+        
+        float x = self.Origin().x - MOTHER_ARENA_CENTER_X;
+        float y = self.Origin().y - MOTHER_ARENA_CENTER_Y;
+        float z = MOTHER_SWING_VELOCITY_UP;
+        
+        float d = Math::Sqrt(x*x+y*y);
+        if(d != 0.0f)
+        {
+            x *= (1.0f / d);
+            y *= (1.0f / d);
+        }
+        
+        x *= MOTHER_SWING_VELOCITY_MULTIPLIER;
+        y *= MOTHER_SWING_VELOCITY_MULTIPLIER;
+        
+        DamagePlayer(MOTHER_SWING_DAMAGE);
+        
+        LocalPlayer.Actor().MovementComponent().Velocity().x += x;
+        LocalPlayer.Actor().MovementComponent().Velocity().y += y;
+        LocalPlayer.Actor().MovementComponent().Velocity().z += z;
+        
+        LocalPlayer.Actor().MovementComponent().Flags() |= MCF_DISABLE_AIR_FRICTION_UNTIL_LAND;
+    }
+    
+    //--------------------------------------------------
+    void OnPreDamage(kDamageInfo& in dmgInfo)
+    {
+        self.Flags() |= AF_NOINFLICTDAMAGE;
+        int targetModel = (m_cController.m_targetModel & dmgInfo.boneFlags);
+        int targetHit = -1;
+        int modelsToFlash = 0;
+        
+        for(int i = 0; i < MOTHER_MODEL_PARTS; ++i)
+        {
+            if(((1 << i) & targetModel) != 0)
+            {
+                targetHit = i;
+                break;
+            }
+        }
+        
+        int targetArea = NOTARGET;
+        
+        switch(targetHit)
+        {
+        case MOTHER_UPPER_ARM_LEFT:
+        case MOTHER_LOWER_ARM_LEFT:
+            targetArea = LEFT_ARM;
+            modelsToFlash |= (1<<MOTHER_LOWER_ARM_LEFT);
+            modelsToFlash |= (1<<MOTHER_UPPER_ARM_LEFT);
+            break;
+            
+        case MOTHER_UPPER_ARM_RIGHT:
+        case MOTHER_LOWER_ARM_RIGHT:
+            targetArea = RIGHT_ARM;
+            modelsToFlash |= (1<<MOTHER_LOWER_ARM_RIGHT);
+            modelsToFlash |= (1<<MOTHER_UPPER_ARM_RIGHT);
+            break;
+            
+        case MOTHER_HEAD:
+            targetArea = HEAD;
+            modelsToFlash |= (1<<MOTHER_HEAD);
+            break;
+            
+        default:
+            return;
+        }
+        
+        int modelDamaged = NONE;
+        
+        switch(m_cController.m_stage)
+        {
+        case 0:
+            switch(targetArea)
+            {
+            case LEFT_ARM:
+                if(m_cController.m_modelHealth[MOTHER_S1_LEFT_TENTACLE_1] > 0)
+                {
+                    modelDamaged = MOTHER_S1_LEFT_TENTACLE_1;
+                }
+                else if(m_cController.m_modelHealth[MOTHER_S1_LEFT_TENTACLE_2] > 0)
+                {
+                    modelDamaged = MOTHER_S1_LEFT_TENTACLE_2;
+                }
+                else if(m_cController.m_modelHealth[MOTHER_S1_LEFT_TENTACLE_3] > 0)
+                {
+                    modelDamaged = MOTHER_S1_LEFT_TENTACLE_3;
+                }
+                break;
+                
+            case RIGHT_ARM:
+                if(m_cController.m_modelHealth[MOTHER_S1_RIGHT_TENTACLE_1] > 0)
+                {
+                    modelDamaged = MOTHER_S1_RIGHT_TENTACLE_1;
+                }
+                else if(m_cController.m_modelHealth[MOTHER_S1_RIGHT_TENTACLE_2] > 0)
+                {
+                    modelDamaged = MOTHER_S1_RIGHT_TENTACLE_2;
+                }
+                else if(m_cController.m_modelHealth[MOTHER_S1_RIGHT_TENTACLE_3] > 0)
+                {
+                    modelDamaged = MOTHER_S1_RIGHT_TENTACLE_3;
+                }
+                break;
+                
+            default:
+                break;
+            }
+            break;
+            
+        case 1:
+            switch(targetArea)
+            {
+            case LEFT_ARM:
+                if(m_cController.m_modelHealth[MOTHER_S2_LEFT_TENTACLE] > 0)
+                {
+                    modelDamaged = MOTHER_S2_LEFT_TENTACLE;
+                }
+                break;
+                
+            case RIGHT_ARM:
+                if(m_cController.m_modelHealth[MOTHER_S2_RIGHT_TENTACLE] > 0)
+                {
+                    modelDamaged = MOTHER_S2_RIGHT_TENTACLE;
+                }
+                break;
+                
+            default:
+                break;
+            }
+            break;
+            
+        case 2:
+            if(targetArea == HEAD)
+            {
+                if(m_cController.m_modelHealth[MOTHER_HEAD] > 0)
+                {
+                    modelDamaged = MOTHER_HEAD;
+                }
+            }
+            break;
+            
+        default:
+            break;
+        }
+        
+        if(modelDamaged == NONE)
+        {
+            return;
+        }
+        
+        float fHits = dmgInfo.hits;
+        if((dmgInfo.flags & DF_EXPLOSIVE) != 0)
+        {
+            fHits *= 0.5f;
+        }
+        
+        if(!(dmgInfo.particle is null))
+        {
+            // nerf damage if razor wind
+            if(dmgInfo.particle.ParticleType() == kParticle_RazorWind)
+            {
+                fHits *= 0.25f;
+            }
+        }
+        
+        m_cController.m_modelHealth[modelDamaged] -= fHits;
+        m_cController.m_currentHealth -= fHits;
+        
+        if(m_cController.m_modelHealth[modelDamaged] < 0)
+        {
+            m_cController.m_modelHealth[modelDamaged] = 0;
+        }
+        
+        if(m_cController.m_currentHealth < 0)
+        {
+            m_cController.m_currentHealth = 0;
+        }
+        
+        Hud.UpdateBar(0, int(m_cController.m_currentHealth));
+        StartFx("MotherFlashDamage", modelsToFlash);
+        
+        if(m_cController.m_modelHealth[modelDamaged]  <= 0)
+        {
+            switch(m_cController.m_stage)
+            {
+            case 0:
+                self.RenderMeshComponent().SetAttachedMeshVisibility(modelDamaged-1, false);
+                m_cController.m_nActiveTentacles--;
+                switch(targetArea)
+                {
+                case LEFT_ARM:
+                    self.ModeStateComponent().SetMode(MOTHER_STAGE_1_LEFT_BLOWN);
+                    break;
+                    
+                case RIGHT_ARM:
+                    self.ModeStateComponent().SetMode(MOTHER_STAGE_1_RIGHT_BLOWN);
+                    break;
+                    
+                default:
+                    break;
+                }
+                break;
+                
+            case 1:
+                self.RenderMeshComponent().SetAttachedMeshVisibility(modelDamaged-1, false);
+                break;
+                
+            default:
+                break;
+            }
+        }
+        
+        m_cController.m_damageModel &= ~(1 << modelDamaged);
+        
+        if(m_cController.m_currentHealth <= 0)
+        {
+            switch(m_cController.m_stage)
+            {
+            case 0:
+                self.ModeStateComponent().SetMode(MOTHER_STAGE_2_INTRO);
+                break;
+                
+            case 1:
+                self.ModeStateComponent().SetMode(MOTHER_STAGE_3_INTRO);
+                break;
+                
+            case 2:
+                self.ModeStateComponent().SetMode(MOTHER_STAGE_3_END);
+                break;
+                
+            default:
+                break;
+            }
+        }
+    }
+    
+    //--------------------------------------------------
+    void OnDeath(kDamageInfo& in dmgInfo)
+    {
+    }
+    
+    //--------------------------------------------------
+    void OnTick(void)
+    {
+        self.RenderMeshComponent().CanFlinch() = false;
+        self.WorldComponent().Flags() |= WCF_INVOKE_COLLIDE_CALLBACK;
+        self.Flags() &= ~AF_ALLOWTRACKING;
+        
+        m_cController.Update();
+        
+        /*if( self.ModeStateComponent().Mode() == MOTHER_STAGE_2_SWING_NEAR ||
+            self.ModeStateComponent().Mode() == MOTHER_STAGE_2_SWING_FAR)
+        {
+            if(GetClosestTargetDistance() <= STAGE_2_COLLIDE_RADIUS &&
+                m_pEAIC.PathTarget().Target() is LocalPlayer.Actor().CastToActor())
+            {
+                OnCollide(LocalPlayer.Actor().CastToActor());
+            }
+        }*/
+        
+        kVec3 vLegScale(m_fLegScale, m_fLegScale, m_fLegScale);
+        kVec3 vArmScale(m_fArmScale, m_fArmScale, m_fArmScale);
+
+        self.RenderMeshComponent().SetScale(MOTHER_NODE_LEG_L1_A, vLegScale);
+        self.RenderMeshComponent().SetScale(MOTHER_NODE_LEG_L2_A, vLegScale);
+        self.RenderMeshComponent().SetScale(MOTHER_NODE_LEG_L3_A, vLegScale);
+        self.RenderMeshComponent().SetScale(MOTHER_NODE_LEG_R1_A, vLegScale);
+        self.RenderMeshComponent().SetScale(MOTHER_NODE_LEG_R2_A, vLegScale);
+        self.RenderMeshComponent().SetScale(MOTHER_NODE_LEG_R3_A, vLegScale);
+        
+        self.RenderMeshComponent().SetScale(MOTHER_NODE_FING_L1_A, vArmScale);
+        self.RenderMeshComponent().SetScale(MOTHER_NODE_FING_L2_A, vArmScale);
+        self.RenderMeshComponent().SetScale(MOTHER_NODE_FING_L3_A, vArmScale);
+        self.RenderMeshComponent().SetScale(MOTHER_NODE_FING_R1_A, vArmScale);
+        self.RenderMeshComponent().SetScale(MOTHER_NODE_FING_R2_A, vArmScale);
+        self.RenderMeshComponent().SetScale(MOTHER_NODE_FING_R3_A, vArmScale);
+        self.RenderMeshComponent().SetScale(MOTHER_NODE_FING_R4_A, vArmScale);
+        
+        for(uint i = 0; i < m_cController.m_pPuppets.length(); ++i)
+        {
+            m_cController.m_pPuppets[i].RenderMeshComponent().SetScale(MOTHER_NODE_LEG_L1_A, vLegScale);
+            m_cController.m_pPuppets[i].RenderMeshComponent().SetScale(MOTHER_NODE_LEG_L2_A, vLegScale);
+            m_cController.m_pPuppets[i].RenderMeshComponent().SetScale(MOTHER_NODE_LEG_L3_A, vLegScale);
+            m_cController.m_pPuppets[i].RenderMeshComponent().SetScale(MOTHER_NODE_LEG_R1_A, vLegScale);
+            m_cController.m_pPuppets[i].RenderMeshComponent().SetScale(MOTHER_NODE_LEG_R2_A, vLegScale);
+            m_cController.m_pPuppets[i].RenderMeshComponent().SetScale(MOTHER_NODE_LEG_R3_A, vLegScale);
+            
+            m_cController.m_pPuppets[i].RenderMeshComponent().SetScale(MOTHER_NODE_FING_L1_A, vArmScale);
+            m_cController.m_pPuppets[i].RenderMeshComponent().SetScale(MOTHER_NODE_FING_L2_A, vArmScale);
+            m_cController.m_pPuppets[i].RenderMeshComponent().SetScale(MOTHER_NODE_FING_L3_A, vArmScale);
+            m_cController.m_pPuppets[i].RenderMeshComponent().SetScale(MOTHER_NODE_FING_L4_A, vArmScale);
+            m_cController.m_pPuppets[i].RenderMeshComponent().SetScale(MOTHER_NODE_FING_R1_A, vArmScale);
+            m_cController.m_pPuppets[i].RenderMeshComponent().SetScale(MOTHER_NODE_FING_R2_A, vArmScale);
+            m_cController.m_pPuppets[i].RenderMeshComponent().SetScale(MOTHER_NODE_FING_R3_A, vArmScale);
+            m_cController.m_pPuppets[i].RenderMeshComponent().SetScale(MOTHER_NODE_FING_R4_A, vArmScale);
+        }
+    }
+    
+    //--------------------------------------------------
+    void ClearEnemies(void)
+    {
+        kActorIterator cIterator;
+        kActor@ pDude;
+        
+        // gather all important actors
+        while(!((@pDude = cIterator.GetNext()) is null))
+        {
+            if( pDude.Type() == kActor_AI_Mite ||
+                pDude.Type() == kActor_AI_MotherGrub)
+            {
+                pDude.RunFxEvent("Hostage_Fade");
+            }
+        }
+    }
+    
+    //--------------------------------------------------
+    bool CanSpitGrub(const int nMaxGrubs)
+    {
+        int nTotal = 0;
+        
+        kActorIterator cIterator;
+        kActor@ pDude;
+        
+        // gather all important actors
+        while(!((@pDude = cIterator.GetNext()) is null))
+        {
+            if(pDude.Health() <= 0 || (pDude.Flags() & AF_DEAD) != 0)
+            {
+                if( pDude.Type() == kActor_AI_Mite ||
+                    pDude.Type() == kActor_AI_MotherGrub)
+                {
+                    if(pDude.TID() >= 0)
+                    {
+                        pDude.TID() = -1;
+                    }
+                    else
+                    {
+                        if(--pDude.TID() == -5)
+                        {
+                            pDude.RunFxEvent("Hostage_Fade");
+                        }
+                    }
+                }
+                
+                continue;
+            }
+            
+            if(pDude.Type() == kActor_AI_MotherGrub)
+            {
+                nTotal++;
+            }
+        }
+        
+        return nTotal < nMaxGrubs;
+    }
+    
+    //--------------------------------------------------
+    void FaceTarget(void)
+    {
+        m_pEAIC.GetTargetInfo(false, true);
+        m_pEAIC.GetMovementInfo();
+        m_pEAIC.Turn(MOTHER_TURN_SPEED, m_pEAIC.SightTarget().m_fDeltaAngle);
+    }
+    
+    //--------------------------------------------------
+    float GetClosestTargetDistance(void)
+    {
+        m_pEAIC.GetTargetInfo(true, false);
+        return m_pEAIC.PathTarget().m_fDistXY;
+    }
+    
+    //--------------------------------------------------
+    void DropRocks(const bool bDropOnTarget)
+    {
+        float fDist = GetClosestTargetDistance();
+        
+        if(m_pEAIC.PathTarget().Target() is null)
+        {
+            return;
+        }
+        
+        int inSafeZone = -1;
+        bool bTargetInSafeZone = true;
+        float fRadius, fTheta;
+        kVec3 vRockPos = m_pEAIC.PathTarget().Target().Origin();
+        
+        // check to see if player is in a safe zone
+        for(int i = 0; i < NUM_SAFE_ZONES; ++i)
+        {
+            kVec3 vSafePos(g_mothSafeZones[i][0], g_mothSafeZones[i][1], g_mothSafeZones[i][2]);
+            float fDistance = vSafePos.Distance(m_pEAIC.PathTarget().Target().Origin());
+            
+            if(fDistance < SAFE_ZONE_RADIUS)
+            {
+                inSafeZone = i;
+                break;
+            }
+        }
+        
+        // make sure rock is not in a safe zone
+        while(bTargetInSafeZone)
+        {
+            float x, y, z;
+            
+            // if player is in a safe zone drop around safe zone
+            if(inSafeZone >= 0 )
+            {
+                // center on safe zone
+                x = g_mothSafeZones[inSafeZone][0];
+                y = g_mothSafeZones[inSafeZone][1];
+
+                // random disance and angle (around the safe zone)
+                fRadius = Math::RandRange(SAFE_ZONE_RADIUS, SAFE_ZONE_DROP_RADIUS);
+                fTheta  = Math::RandRange(g_mothSafeZones[inSafeZone][3], g_mothSafeZones[inSafeZone][4]);
+            }
+            // player is not in safe zone!
+            else
+            {
+                // center on player
+                x = m_pEAIC.PathTarget().Target().Origin().x;
+                y = m_pEAIC.PathTarget().Target().Origin().y;
+
+                // drop this one on the player?
+                if(bDropOnTarget)
+                {
+                    // right on top of him!
+                    fRadius = 0.0f;
+                    fTheta  = 0.0f;
+                }
+                // random distance and angle (around the player)
+                else
+                {
+                    fRadius = Math::RandRange(DANGER_RADIUS_MIN, DANGER_RADIUS_MAX);
+                    fTheta  = Math::RandRange(-Math::pi, Math::pi);
+                }
+            }
+            
+            x += fRadius * Math::Sin(fTheta);
+            y += fRadius * Math::Cos(fTheta);
+            z = MOTHER_ARENA_HEIGHT;
+            
+            // set rock position
+            kVec3 vPos = kVec3(x, y, z);
+            vRockPos = vPos;
+            
+            bTargetInSafeZone = false;
+            
+            for(int i = 0; i < NUM_SAFE_ZONES && !bTargetInSafeZone; ++i)
+            {
+                kVec3 sPos;
+                kVec3 vSafePos(g_mothSafeZones[i][0], g_mothSafeZones[i][1], g_mothSafeZones[i][2]);
+                
+                sPos = vPos;
+                sPos.y = 0.0f;
+                
+                if(sPos.Distance(vSafePos) < SAFE_ZONE_RADIUS)
+                {
+                    bTargetInSafeZone = true;
+                }
+            }
+        }
+        
+        ParticleFactory.Spawn(kParticle_MotherRock1, self, vRockPos, kQuat(0, 0, 0), Math::vecZero);
+    }
+    
+    //--------------------------------------------------
+    void DamagePlayer(const int damage)
+    {
+        kDamageInfo cDamageInfo;
+        
+        cDamageInfo.radius = 10;
+        cDamageInfo.flags = DF_NORMAL;
+        @cDamageInfo.inflictor = @self;
+        @cDamageInfo.source = @self;
+        @cDamageInfo.target = @LocalPlayer.Actor().CastToActor();
+        @cDamageInfo.particle = null;
+        cDamageInfo.hits = float(damage);
+        
+        //Sys.Print("Damage: " + damage);
+        LocalPlayer.Actor().InflictDamage(cDamageInfo);
+    }
+    
+    //--------------------------------------------------
+    void UserEvent(const float x, const float y, const float z, const float f1, const float f2, const float f3, const float f4)
+    {
+        float fDist = GetClosestTargetDistance();
+        
+        if(m_pEAIC.PathTarget().Target() is null)
+        {
+            return;
+        }
+        
+        switch(int(f1))
+        {
+        case 0:
+            if(CanSpitGrub(3))
+            {
+                if(m_cController.m_stage == 2 || fDist > TENTACLE_RANGE_S1)
+                {
+                    kVec3 vPos = kVec3(x, y, z);
+                    int16 nRegionIdx = self.WorldComponent().GetNearPositionAndRegionIndex(vPos, vPos);
+                    kActor@ pGrub = ActorFactory.Spawn(kActor_AI_MotherGrub, vPos, self.Yaw(), 0, 0, true, nRegionIdx);
+                    if(!(pGrub is null))
+                    {
+                        pGrub.Scale() = kVec3(0.5f, 0.5f, 0.5f);
+                    }
+                }
+            }
+            break;
+            
+        case 1:
+            if(fDist < TENTACLE_RANGE_S1)
+            {
+                // do no damage if jumping
+                if((LocalPlayer.Actor().PlayerFlags() & PF_JUMPING) != 0)
+                {
+                    return;
+                }
+                
+                DamagePlayer(5);
+            }
+            break;
+            
+        case 2:
+            if(!(m_pEAIC.PathTarget().Target() is null))
+            {
+                for(int i = 0; i < m_cController.m_nActiveTentacles; ++i)
+                {
+                    float fRadius = Math::RandRange(15*GAME_SCALE, 25*GAME_SCALE);
+                    float fTheta = Math::pi + self.Yaw() + Math::RandRange(-Math::pi / 6.0f, Math::pi / 6.0f);
+                    
+                    float tx = m_pEAIC.PathTarget().Target().Origin().x;
+                    float ty = m_pEAIC.PathTarget().Target().Origin().y;
+                    float tz = Math::RandRange(-20*GAME_SCALE, -5*GAME_SCALE);
+                    
+                    tx += Math::Sin(fTheta) * fRadius;
+                    ty += Math::Cos(fTheta) * fRadius;
+                    
+                    m_cController.m_pTentacles[i].Flags() &= ~AF_HIDDEN;
+                    m_cController.m_pTentacles[i].Origin() = kVec3(tx, ty, tz);
+                    
+                    m_cController.m_pTentacles[i].ModeStateComponent().SetMode(ACTIONOBJECT_MODE_TRIGGER);
+                }
+            }
+            break;
+            
+        case 3:
+            // do no damage if jumping
+            if((LocalPlayer.Actor().PlayerFlags() & (PF_HASJUMPED|PF_JUMPING)) != 0)
+            {
+                return;
+            }
+            DamagePlayer(10);
+            break;
+            
+        case 4:
+            if(fDist < TENTACLE_RANGE_S2)
+            {
+                DamagePlayer(5);
+            }
+            break;
+            
+        case 5:
+            if(!(m_pEAIC.PathTarget().Target() is null))
+            {
+                kActor@ pTarget = m_pEAIC.PathTarget().Target();
+                kVec3 vDir = self.Origin() - pTarget.Origin();
+                
+                vDir.Normalize();
+                vDir *= fDist;
+                
+                pTarget.MovementComponent().Velocity() += (vDir / 60.0f);
+            }
+            break;
+        }
+    }
+    
+    //--------------------------------------------------
+    int MODE_AnimAttack(void)
+    {
+        kSelectionListInt cMotherAttacks;
+        
+        switch(m_cController.m_stage)
+        {
+        case 0:
+            if(m_cController.m_damageModel &
+            ((1 << MOTHER_S1_LEFT_TENTACLE_1)   |
+             (1 << MOTHER_S1_LEFT_TENTACLE_2)   |
+             (1 << MOTHER_S1_LEFT_TENTACLE_3)) != 0)
+            {
+                cMotherAttacks.AddItem(ANIM_MOTHER_S1_ATTACK_WHIP_LEFT, 4);
+            }
+            
+            if(m_cController.m_damageModel &
+            ((1 << MOTHER_S1_RIGHT_TENTACLE_1)   |
+             (1 << MOTHER_S1_RIGHT_TENTACLE_2)   |
+             (1 << MOTHER_S1_RIGHT_TENTACLE_3)) != 0)
+            {
+                cMotherAttacks.AddItem(ANIM_MOTHER_S1_ATTACK_WHIP_RIGHT, 4);
+            }
+            break;
+            
+        case 1:
+            if((m_cController.m_damageModel & MOTHER_S2_LEFT_TENTACLE) != 0)
+            {
+                cMotherAttacks.AddItem(ANIM_MOTHER_S2_ATTACK_LEFT, 4);
+            }
+            
+            if((m_cController.m_damageModel & MOTHER_S2_RIGHT_TENTACLE) != 0)
+            {
+                cMotherAttacks.AddItem(ANIM_MOTHER_S2_ATTACK_RIGHT, 4);
+            }
+            break;
+        }
+        
+        return cMotherAttacks.Select(true);
+    }
+    
+    //--------------------------------------------------
+    int MODE_AnimPullUp(void)
+    {
+        bool bUseLeft  = m_cController.m_modelHealth[MOTHER_S2_LEFT_TENTACLE] > 0;
+        bool bUseRight = m_cController.m_modelHealth[MOTHER_S2_RIGHT_TENTACLE] > 0;
+        
+        if(bUseLeft && !bUseRight)
+        {
+            return ANIM_MOTHER_S2_PULL_UP_LEFT;
+        }
+        else if(bUseRight && !bUseLeft)
+        {
+            return ANIM_MOTHER_S2_PULL_UP_RIGHT;
+        }
+        else if(!bUseLeft && !bUseRight)
+        {
+            return ANIM_MOTHER_S1_IDLE_LONG;
+        }
+        
+        return ANIM_MOTHER_S2_PULL_UP;
+    }
+    
+    //--------------------------------------------------
+    MOTHER_MODE_FUNCTION(MOTHER_STAGE_1_INTRO,
+    {
+        CinemaPlayer.StartCinema("cinemas/mother start cine A.txt");
+    },
+    {
+        if(!CinemaPlayer.Playing())
+        {
+            self.Flags() &= ~AF_HIDDEN;
+            self.ModeStateComponent().SetMode(MOTHER_STAGE_1_START);
+            
+            Game.PlayMusic(9);
+        }
+    });
+    
+    //--------------------------------------------------
+    MOTHER_MODE_FUNCTION(MOTHER_STAGE_1_START,
+    {
+        m_cController.m_stage = 0;
+        m_cController.m_counter = 0;
+        m_cController.m_totalHealth = TENTACLE_HIT_POINTS_S1*6;
+        m_cController.m_currentHealth = TENTACLE_HIT_POINTS_S1*6;
+        m_cController.m_pickupRangeMin = STAGE_1_PICKUP_RANGE_MIN;
+        m_cController.m_pickupRangeMax = STAGE_1_PICKUP_RANGE_MAX;
+        
+        m_cController.m_modelHealth[MOTHER_S1_RIGHT_TENTACLE_1] = TENTACLE_HIT_POINTS_S1;
+        m_cController.m_modelHealth[MOTHER_S1_RIGHT_TENTACLE_2] = TENTACLE_HIT_POINTS_S1;
+        m_cController.m_modelHealth[MOTHER_S1_RIGHT_TENTACLE_3] = TENTACLE_HIT_POINTS_S1;
+        m_cController.m_modelHealth[MOTHER_S1_LEFT_TENTACLE_1]  = TENTACLE_HIT_POINTS_S1;
+        m_cController.m_modelHealth[MOTHER_S1_LEFT_TENTACLE_2]  = TENTACLE_HIT_POINTS_S1;
+        m_cController.m_modelHealth[MOTHER_S1_LEFT_TENTACLE_3]  = TENTACLE_HIT_POINTS_S1;
+        
+        m_cController.SetMotherModelVisibility(m_cController.m_stage);
+        
+        Hud.SetBar(0, 50, 255, 50, 255, int(m_cController.m_totalHealth));
+        
+        StartFx("MotherFlashRepeat", m_cController.m_targetModel);
+    },
+    {
+        if(self.AnimTrackComponent().CycleCompleted())
+        {
+            StopFx();
+            self.ModeStateComponent().SetMode(MOTHER_STAGE_1_DO_SOMETHING);
+        }
+    });
+    
+    //--------------------------------------------------
+    MOTHER_MODE_FUNCTION(MOTHER_STAGE_1_DO_SOMETHING, { },
+    {
+        float fDist = GetClosestTargetDistance();
+        kSelectionListInt cMotherAttacks;
+        
+        self.RenderMeshComponent().ToggleHotPoint(27, false);
+        self.RenderMeshComponent().ToggleHotPoint(28, false);
+        
+        // close?
+        if(fDist < TENTACLE_RANGE_S1)
+        {
+            cMotherAttacks.AddItem(MOTHER_STAGE_1_ATTACK_NORMAL, 6);
+            
+            // don't idle 2 times in a row
+            if(self.ModeStateComponent().PrevMode() == MOTHER_STAGE_1_ATTACK_NORMAL)
+            {
+                cMotherAttacks.AddItem(MOTHER_STAGE_1_IDLE_SHORT, 6);
+            }
+        }
+        // nope... do long range stuff
+        else
+        {
+            m_cController.m_bIdle = false; // !m_cController.m_bIdle;
+            
+            if(m_cController.m_bIdle)
+            {
+                cMotherAttacks.AddItem(MOTHER_STAGE_1_IDLE_SHORT, 5);
+            }
+            else
+            {
+                if(CanSpitGrub(3))
+                {
+                    cMotherAttacks.AddItem(MOTHER_STAGE_1_ATTACK_SPIT, 5);
+                }
+                else
+                {
+                    cMotherAttacks.AddItem(MOTHER_STAGE_1_ATTACK_THRUST, 5);
+                }
+            }
+        }
+        
+        if(cMotherAttacks.GetNumEntries() == 0)
+        {
+            return;
+        }
+        
+        m_cController.m_counter = 0;
+        
+        self.ModeStateComponent().PrevMode() = cMotherAttacks.Select(true);
+        self.ModeStateComponent().SetMode(self.ModeStateComponent().PrevMode());
+        
+    });
+    
+    //--------------------------------------------------
+    MOTHER_MODE_FUNCTION(MOTHER_STAGE_1_IDLE_SHORT, { },
+    {
+        FaceTarget();
+        
+        if(self.AnimTrackComponent().CycleCompleted())
+        {
+            self.ModeStateComponent().SetMode(MOTHER_STAGE_1_DO_SOMETHING);
+        }
+    });
+    
+    //--------------------------------------------------
+    MOTHER_MODE_FUNCTION(MOTHER_STAGE_1_ATTACK_NORMAL, { },
+    {
+        FaceTarget();
+        
+        if(self.AnimTrackComponent().CycleCompleted())
+        {
+            self.ModeStateComponent().SetMode(MOTHER_STAGE_1_DO_SOMETHING);
+        }
+    });
+    
+    //--------------------------------------------------
+    MOTHER_MODE_FUNCTION(MOTHER_STAGE_1_ATTACK_SPIT, { },
+    {
+        FaceTarget();
+        
+        if(self.AnimTrackComponent().CycleCompleted())
+        {
+            self.ModeStateComponent().SetMode(MOTHER_STAGE_1_DO_SOMETHING);
+        }
+    });
+    
+    //--------------------------------------------------
+    MOTHER_MODE_FUNCTION(MOTHER_STAGE_1_ATTACK_THRUST, { },
+    {
+        m_pEAIC.GetTargetInfo(false, true);
+        
+        if(!(m_pEAIC.SightTarget().Target() is null))
+        {
+            FaceTarget();
+        }
+        
+        if(self.AnimTrackComponent().CycleCompleted())
+        {
+            for(uint i = 0; i < m_cController.m_pTentacles.length(); ++i)
+            {
+                m_cController.m_pTentacles[i].ModeStateComponent().SetMode(ACTIONOBJECT_MODE_IDLE);
+            }
+            
+            self.ModeStateComponent().SetMode(MOTHER_STAGE_1_DO_SOMETHING);
+        }
+    });
+    
+    //--------------------------------------------------
+    MOTHER_MODE_FUNCTION(MOTHER_STAGE_1_LEFT_BLOWN,
+    {
+        self.RenderMeshComponent().ToggleHotPoint(27, true);
+    },
+    {
+        if(self.AnimTrackComponent().CycleCompleted())
+        {
+            self.RenderMeshComponent().ToggleHotPoint(27, false);
+            self.ModeStateComponent().SetMode(MOTHER_STAGE_1_DO_SOMETHING);
+        }
+    });
+    
+    //--------------------------------------------------
+    MOTHER_MODE_FUNCTION(MOTHER_STAGE_1_RIGHT_BLOWN,
+    {
+        self.RenderMeshComponent().ToggleHotPoint(28, true);
+    },
+    {
+        if(self.AnimTrackComponent().CycleCompleted())
+        {
+            self.RenderMeshComponent().ToggleHotPoint(28, false);
+            self.ModeStateComponent().SetMode(MOTHER_STAGE_1_DO_SOMETHING);
+        }
+    });
+    
+    //--------------------------------------------------
+    MOTHER_MODE_FUNCTION(MOTHER_STAGE_2_INTRO,
+    {
+        ClearEnemies();
+        Hud.DisableBar(0);
+        
+        self.RenderMeshComponent().ToggleHotPoint(27, false);
+        self.RenderMeshComponent().ToggleHotPoint(28, false);
+        
+        m_cController.m_stage = 1;
+        m_cController.m_counter = 0;
+        m_cController.m_totalHealth = TENTACLE_HIT_POINTS_S2*2;
+        m_cController.m_currentHealth = TENTACLE_HIT_POINTS_S2*2;
+        m_cController.m_pickupRangeMin = STAGE_2_PICKUP_RANGE_MIN;
+        m_cController.m_pickupRangeMax = STAGE_2_PICKUP_RANGE_MAX;
+        
+        m_cController.m_modelHealth[MOTHER_S2_LEFT_TENTACLE] = TENTACLE_HIT_POINTS_S2;
+        m_cController.m_modelHealth[MOTHER_S2_RIGHT_TENTACLE] = TENTACLE_HIT_POINTS_S2;
+        
+        m_cController.SetMotherModelVisibility(m_cController.m_stage);
+        
+        for(uint i = 0; i < m_cController.m_pPuppets.length(); ++i)
+        {
+            m_cController.m_pPuppets[i].Flags() |= AF_HIDDEN;
+            m_cController.SetMotherModelVisibility(m_cController.m_pPuppets[i], m_cController.m_stage);
+        }
+        
+        for(int i = 0; i < 3; ++i)
+        {
+            m_cController.SpawnRandomPickupInSafeZone(@g_motherRandomSmallHealth);
+        }
+        
+        self.Flags() |= AF_HIDDEN;
+        CinemaPlayer.StartCinema("cinemas/big tents.txt");
+    },
+    {
+        if(!CinemaPlayer.Playing())
+        {
+            LocalPlayer.Actor().WorldComponent().SetNearestPosition(g_vMothStartPosition[1]);
+            LocalPlayer.Actor().Yaw() = Math::pi;
+            
+            self.Flags() &= ~AF_HIDDEN;
+            self.ModeStateComponent().SetMode(MOTHER_STAGE_2_START);
+        }
+    });
+    
+    //--------------------------------------------------
+    MOTHER_MODE_FUNCTION(MOTHER_STAGE_2_START,
+    {
+        Hud.SetBar(0, 50, 255, 50, 255, int(m_cController.m_totalHealth));
+        StartFx("MotherFlashRepeat", m_cController.m_targetModel);
+    },
+    {
+        FaceTarget();
+        
+        if(self.AnimTrackComponent().CycleCompleted())
+        {
+            StopFx();
+            self.ModeStateComponent().SetMode(MOTHER_STAGE_2_DO_SOMETHING);
+        }
+    });
+    
+    //--------------------------------------------------
+    MOTHER_MODE_FUNCTION(MOTHER_STAGE_2_IDLE, { },
+    {
+        FaceTarget();
+        
+        if(self.AnimTrackComponent().CycleCompleted())
+        {
+            self.ModeStateComponent().SetMode(MOTHER_STAGE_2_DO_SOMETHING);
+        }
+    });
+    
+    //--------------------------------------------------
+    MOTHER_MODE_FUNCTION(MOTHER_STAGE_2_DO_SOMETHING, { },
+    {
+        float fDist = GetClosestTargetDistance();
+        kSelectionListInt cMotherAttacks;
+        float fHealthPercnt = 1.0f;
+        
+        if(m_cController.m_totalHealth > 1.0f)
+        {
+            fHealthPercnt = m_cController.m_currentHealth / m_cController.m_totalHealth;
+        }
+        
+        if(fDist < TENTACLE_RANGE_S2)
+        {
+            cMotherAttacks.AddItem(MOTHER_STAGE_2_PULL_UP, 4);
+            cMotherAttacks.AddItem(MOTHER_STAGE_2_ATTACK_NORMAL, 5);
+        }
+        else
+        {
+            // don't swing two times in a row
+            if(self.ModeStateComponent().PrevMode() != MOTHER_STAGE_2_SWING_FAR)
+            {
+                cMotherAttacks.AddItem(MOTHER_STAGE_2_SWING_FAR, 5);
+            }
+            
+            cMotherAttacks.AddItem(MOTHER_STAGE_2_PULL_UP, 4);
+            
+            int weight = 2;
+            if(fHealthPercnt < 0.75f)
+            {
+                weight = fHealthPercnt < 0.5f ? 10 : 5;
+            }
+            
+            cMotherAttacks.AddItem(MOTHER_STAGE_2_INHALE, weight);
+        }
+        
+        if(cMotherAttacks.GetNumEntries() == 0)
+        {
+            return;
+        }
+        
+        m_cController.m_counter = 0;
+        
+        self.ModeStateComponent().PrevMode() = cMotherAttacks.Select(true);
+        self.ModeStateComponent().SetMode(self.ModeStateComponent().PrevMode());
+    });
+    
+    //--------------------------------------------------
+    MOTHER_MODE_FUNCTION(MOTHER_STAGE_2_ATTACK_NORMAL, { },
+    {
+        FaceTarget();
+        
+        if(self.AnimTrackComponent().CycleCompleted())
+        {
+            self.ModeStateComponent().SetMode(MOTHER_STAGE_2_DO_SOMETHING);
+        }
+    });
+    
+    //--------------------------------------------------
+    MOTHER_MODE_FUNCTION(MOTHER_STAGE_2_SWING_NEAR, { },
+    {
+        if(self.AnimTrackComponent().CycleCompleted())
+        {
+            self.ModeStateComponent().SetMode(MOTHER_STAGE_2_IDLE);
+        }
+    });
+    
+    //--------------------------------------------------
+    MOTHER_MODE_FUNCTION(MOTHER_STAGE_2_SWING_FAR, { },
+    {
+        if(self.AnimTrackComponent().CycleCompleted())
+        {
+            self.ModeStateComponent().SetMode(MOTHER_STAGE_2_IDLE);
+        }
+    });
+    
+    //--------------------------------------------------
+    MOTHER_MODE_FUNCTION(MOTHER_STAGE_2_PULL_UP, { },
+    {
+        FaceTarget();
+        
+        if(self.AnimTrackComponent().CycleCompleted())
+        {
+            if(m_cController.m_counter % 9 == 0)
+            {
+                DropRocks(m_cController.m_counter == 0);
+            }
+            
+            if(++m_cController.m_counter > 120)
+            {
+                self.ModeStateComponent().SetMode(MOTHER_STAGE_2_DROP_DOWN);
+            }
+        }
+    });
+    
+    //--------------------------------------------------
+    MOTHER_MODE_FUNCTION(MOTHER_STAGE_2_DROP_DOWN,
+    {
+        self.WorldComponent().SetNearestPosition(kVec3(MOTHER_ARENA_CENTER_X, MOTHER_ARENA_CENTER_Y, 0));
+    },
+    {
+        FaceTarget();
+        m_cController.m_counter = 0;
+        
+        if(self.AnimTrackComponent().CycleCompleted())
+        {
+            self.ModeStateComponent().SetMode(MOTHER_STAGE_2_DO_SOMETHING);
+        }
+    });
+    
+    //--------------------------------------------------
+    MOTHER_MODE_FUNCTION(MOTHER_STAGE_2_INHALE, { },
+    {
+        FaceTarget();
+        
+        if(self.AnimTrackComponent().CycleCompleted())
+        {
+            if(GetClosestTargetDistance() < TENTACLE_RANGE_S2)
+            {
+                self.ModeStateComponent().SetMode(MOTHER_STAGE_2_ATTACK_NORMAL);
+                return;
+            }
+            
+            self.ModeStateComponent().SetMode(MOTHER_STAGE_2_DO_SOMETHING);
+        }
+    });
+    
+    //--------------------------------------------------
+    MOTHER_MODE_FUNCTION(MOTHER_STAGE_3_START,
+    {
+        Hud.SetBar(0, 50, 255, 50, 255, int(m_cController.m_totalHealth));
+        StartFx("MotherFlashRepeat", m_cController.m_targetModel);
+    },
+    {
+        if(self.AnimTrackComponent().CycleCompleted())
+        {
+            self.ModeStateComponent().SetMode(MOTHER_STAGE_3_START_2);
+        }
+    });
+    
+    //--------------------------------------------------
+    MOTHER_MODE_FUNCTION(MOTHER_STAGE_3_START_2, { },
+    {
+        if(self.AnimTrackComponent().CycleCompleted())
+        {
+            StopFx();
+            self.ModeStateComponent().SetMode(MOTHER_STAGE_3_DO_SOMETHING);
+        }
+    });
+    
+    //--------------------------------------------------
+    MOTHER_MODE_FUNCTION(MOTHER_STAGE_3_DO_SOMETHING, { },
+    {
+        float fDist = GetClosestTargetDistance();
+        kSelectionListInt cMotherAttacks;
+        float fHealthPercnt = 1.0f;
+        bool bLowHealth = false;
+        bool bMedHealth = false;
+        bool bShortRange = false;
+        bool bLongRange = false;
+        bool bCanStalk = false;
+        
+        if(m_cController.m_totalHealth > 1.0f)
+        {
+            fHealthPercnt = m_cController.m_currentHealth / m_cController.m_totalHealth;
+        }
+        
+        bLowHealth = (fHealthPercnt < STAGE_3_LOW_HEALTH);
+        bMedHealth = (fHealthPercnt < STAGE_3_MED_HEALTH);
+        
+        // finished stalking?
+        if(self.ModeStateComponent().PrevMode() == MOTHER_STAGE_3_WALK)
+        {
+            if(m_cController.m_counter > STALK_TIME_LIMIT)
+            {
+                // the bastard escaped! go to center and scream at him!
+                cMotherAttacks.AddItem(MOTHER_STAGE_3_EVADE, 5);
+            }
+            else
+            {
+                // caught him! kick his ass!
+                bShortRange = true;
+            }
+        }
+        else if(fDist < STALK_RANGE)
+        {
+            // kick his ass!
+            bShortRange = true;
+        }
+        else
+        {
+            // gotta stalk or do a long range attack
+            bLongRange = true;
+            bCanStalk = true;
+        }
+        
+        // decide what to do
+        if(bShortRange)
+        {
+            // WHACK WHACK!!
+            cMotherAttacks.AddItem(MOTHER_STAGE_3_ATTACK_LEFT, 5);
+            cMotherAttacks.AddItem(MOTHER_STAGE_3_ATTACK_RIGHT, 5);
+        }
+        else
+        {
+            if(bLongRange)
+            {
+                if(CanSpitGrub(2))
+                {
+                    // spit a grub! how about them apples?
+                    cMotherAttacks.AddItem(MOTHER_STAGE_3_ATTACK_SPIT, 4);
+                }
+                
+                // blast him! thats what I'm talking about!
+                cMotherAttacks.AddItem(MOTHER_STAGE_3_ATTACK_BLAST, 6);
+                
+                // [Turok2EX]: make it scream every now and then
+                cMotherAttacks.AddItem(MOTHER_STAGE_3_ATTACK_SCREAM, 2);
+            }
+            
+            if(bCanStalk)
+            {
+                int weight = 12;
+                
+                if(bLowHealth)
+                {
+                    weight = 6;
+                }
+                else if(bMedHealth)
+                {
+                    weight = 9;
+                }
+                
+                cMotherAttacks.AddItem(MOTHER_STAGE_3_WALK, weight);
+            }
+        }
+        
+        if(cMotherAttacks.GetNumEntries() == 0)
+        {
+            return;
+        }
+        
+        m_cController.m_counter = 0;
+        
+        self.ModeStateComponent().PrevMode() = cMotherAttacks.Select(true);
+        self.ModeStateComponent().SetMode(self.ModeStateComponent().PrevMode());
+    });
+    
+    //--------------------------------------------------
+    MOTHER_MODE_FUNCTION(MOTHER_STAGE_3_WALK, { },
+    {
+        bool bDoSomething = false;
+        
+        m_pEAIC.GetTargetInfo(true, true);
+        m_pEAIC.Turn(MOTHER_TURN_SPEED, m_pEAIC.PathTarget().m_fDeltaAngle);
+        
+        // time expired?
+        bDoSomething = (++m_cController.m_counter > STALK_TIME_LIMIT);
+        
+        // close enough and facing the right direction?
+        if(!(m_pEAIC.PathTarget().Target() is null) && !(m_pEAIC.SightTarget().Target() is null))
+        {
+            if(m_pEAIC.PathTarget().m_fDistXY < STALK_RANGE &&
+                Math::Fabs(m_pEAIC.PathTarget().m_fDeltaAngle) <= MOTHER_FACING_ANGLE)
+            {
+                bDoSomething = true;
+            }
+        }
+        
+        if(bDoSomething)
+        {
+            self.ModeStateComponent().SetMode(MOTHER_STAGE_3_DO_SOMETHING);
+        }
+    });
+    
+    //--------------------------------------------------
+    MOTHER_MODE_FUNCTION(MOTHER_STAGE_3_EVADE, { },
+    {
+        kVec3 vCenter = kVec3(MOTHER_ARENA_CENTER_X, MOTHER_ARENA_CENTER_Y, 0);
+        float fDeltaAngle = self.GetDeltaFromPoint(vCenter);
+        
+        // turn towards center
+        m_pEAIC.Turn(MOTHER_TURN_SPEED, fDeltaAngle);
+        
+        if(self.Origin().Distance(vCenter) < (5*GAME_SCALE))
+        {
+            // scream at the bastard!
+            self.ModeStateComponent().SetMode(MOTHER_STAGE_3_ATTACK_SCREAM);
+        }
+    });
+    
+    //--------------------------------------------------
+    MOTHER_MODE_FUNCTION(MOTHER_STAGE_3_ATTACK_LEFT, { },
+    {
+        FaceTarget();
+        
+        if(self.AnimTrackComponent().CycleCompleted())
+        {
+            self.ModeStateComponent().SetMode(MOTHER_STAGE_3_DO_SOMETHING);
+        }
+    });
+    
+    //--------------------------------------------------
+    MOTHER_MODE_FUNCTION(MOTHER_STAGE_3_ATTACK_RIGHT, { },
+    {
+        FaceTarget();
+        
+        if(self.AnimTrackComponent().CycleCompleted())
+        {
+            self.ModeStateComponent().SetMode(MOTHER_STAGE_3_DO_SOMETHING);
+        }
+    });
+    
+    //--------------------------------------------------
+    MOTHER_MODE_FUNCTION(MOTHER_STAGE_3_ATTACK_SCREAM, { },
+    {
+        FaceTarget();
+        
+        if((++m_cController.m_counter) % 9 == 0)
+        {
+            DropRocks(m_cController.m_counter == 0);
+        }
+        
+        if(self.AnimTrackComponent().CycleCompleted())
+        {
+            m_cController.m_counter = 0;
+            self.ModeStateComponent().SetMode(MOTHER_STAGE_3_DO_SOMETHING);
+        }
+    });
+    
+    //--------------------------------------------------
+    MOTHER_MODE_FUNCTION(MOTHER_STAGE_3_ATTACK_BLAST, { },
+    {
+        FaceTarget();
+        
+        if(self.AnimTrackComponent().CycleCompleted())
+        {
+            self.ModeStateComponent().SetMode(MOTHER_STAGE_3_DO_SOMETHING);
+        }
+    });
+    
+    //--------------------------------------------------
+    MOTHER_MODE_FUNCTION(MOTHER_STAGE_3_ATTACK_SPIT, { },
+    {
+        FaceTarget();
+        
+        if(self.AnimTrackComponent().CycleCompleted())
+        {
+            self.ModeStateComponent().SetMode(MOTHER_STAGE_3_DO_SOMETHING);
+        }
+    });
+    
+    //--------------------------------------------------
+    MOTHER_MODE_FUNCTION(MOTHER_STAGE_3_INTRO,
+    {
+        Hud.DisableBar(0);
+        
+        m_cController.m_stage = 2;
+        m_cController.m_counter = 0;
+        m_cController.m_totalHealth = HEAD_HITPOINT_S3;
+        m_cController.m_currentHealth = HEAD_HITPOINT_S3;
+        m_cController.m_modelHealth[MOTHER_HEAD] = HEAD_HITPOINT_S3;
+        m_cController.m_pickupRangeMin = STAGE_3_PICKUP_RANGE_MIN;
+        m_cController.m_pickupRangeMax = STAGE_3_PICKUP_RANGE_MAX;
+        
+        m_fLegScale = 0;
+        m_fArmScale = 0;
+        m_fLegTimer = 0;
+        m_bLegsRebounding = false;
+        
+        for(uint i = 0; i < m_cController.m_pPuppets.length(); ++i)
+        {
+            m_cController.m_pPuppets[i].Flags() |= AF_HIDDEN;
+        }
+        
+        self.Flags() |= AF_HIDDEN;
+        CinemaPlayer.StartCinema("cinemas/grow legs.txt");
+    },
+    {
+        if(m_fLegTimer < LegPopTime)
+        {
+            m_fLegTimer += GAME_DELTA_TIME;
+            if(m_fLegTimer >= LegPopTime)
+            {
+                m_cController.SetMotherModelVisibility(m_cController.m_stage);
+                for(uint i = 0; i < m_cController.m_pPuppets.length(); ++i)
+                {
+                    m_cController.SetMotherModelVisibility(m_cController.m_pPuppets[i], m_cController.m_stage);
+                }
+            }
+        }
+        else
+        {
+            if(!m_bLegsRebounding)
+            {
+                m_fLegScale += (LegGrowSpeed * GAME_FRAME_TIME);
+                m_fLegTimer += GAME_DELTA_TIME;
+                
+                if(m_fLegScale > LegMaxSize)
+                {
+                    m_bLegsRebounding = true;
+                }
+            }
+            else
+            {
+                m_fLegScale = Math::Max(1.0f, m_fLegScale - (LegContractSpeed * GAME_FRAME_TIME));
+            }
+        }
+        
+        if(!CinemaPlayer.Playing())
+        {
+            self.Flags() &= ~AF_HIDDEN;
+            self.ModeStateComponent().SetMode(MOTHER_STAGE_3_START);
+        }
+    });
+    
+    //--------------------------------------------------
+    MOTHER_MODE_FUNCTION(MOTHER_STAGE_3_END, { },
+    {
+        Hud.DisableBar(0);
+        m_fLegScale = 1;
+        
+        if(self.AnimTrackComponent().CycleCompleted())
+        {
+            self.ModeStateComponent().SetMode(MOTHER_STAGE_FINAL);
+        }
+    });
+    
+    //--------------------------------------------------
+    MOTHER_MODE_FUNCTION(MOTHER_STAGE_FINAL,
+    {
+        ClearEnemies();
+        Hud.DisableBar(0);
+        CinemaPlayer.StartCinema("cinemas/escape - end.txt");
+    },
+    {
+        self.Flags() &= ~AF_HIDDEN;
+        
+        if(!CinemaPlayer.Playing())
+        {
+			// Added by Rando - give the totem item here to track that the level is complete
+			LocalPlayer.Inventory().Give(kActor_Misc_TotemInventory);
+		
+            DoPlayerWarp(0, 16999, kLevel_Hub, true);
+        }
+    });
+};
+
+#undef MOTHER_MODE_FUNCTION

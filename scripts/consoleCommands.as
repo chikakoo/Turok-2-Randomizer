@@ -101,6 +101,16 @@ void PrimagenKey6(void)
 	TryGetInventoryItem(kActor_PrimagenKey_6);
 }
 
+void AllPrimagenKeys(void)
+{
+	TryGetInventoryItem(kActor_PrimagenKey_1);
+	TryGetInventoryItem(kActor_PrimagenKey_2);
+	TryGetInventoryItem(kActor_PrimagenKey_3);
+	TryGetInventoryItem(kActor_PrimagenKey_4);
+	TryGetInventoryItem(kActor_PrimagenKey_5);
+	TryGetInventoryItem(kActor_PrimagenKey_6);
+}
+
 //---------------------------
 // Nuke parts
 void NukePart(void)

@@ -90,7 +90,7 @@ class RandoPickupObject : ScriptObject
 	// Marks it as collected so it won't respawn.
 	void OnTouch(kActor@ pInstigator)
 	{
-		Sys.Print(m_position);
+		//Sys.Print(m_position);
 	
 		if (self.Type() == kActor_Item_RandomAmmo)
 		{

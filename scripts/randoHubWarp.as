@@ -12,7 +12,7 @@ class RandoHubWarp : ScriptObject
 		actor.WorldComponent().Flags() |= WCF_NONSOLID;
 		actor.WorldComponent().Flags() |= WCF_INVOKE_COLLIDE_CALLBACK;
 		
-		kActor@ frame = ActorFactory.Spawn(
+		ActorFactory.Spawn(
 			kActor_Portal_HubWarpFrame,
 			actor.Origin(),
 			actor.Yaw(),

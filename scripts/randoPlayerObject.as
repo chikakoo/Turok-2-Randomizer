@@ -35,6 +35,7 @@ class RandoPlayerObject : ScriptObject
 			// Reset the messages in flight and unset the queue
 			g_outgoingMessageInFlight = false;
 			g_outgoingMessageQueue.resize(0);
+			g_AP.IsGoalReached = 0;
 			
 			// Set outgoing index to 0 to receive all items from AP
 			ResetAPForLoadData(0);
@@ -47,37 +48,34 @@ class RandoPlayerObject : ScriptObject
 		//-------------------------
 		// Goals!
 		
-		// Primagen boss room
-		if (OPTION_GOAL_PRIMAGEN_LAIR && mapId == kLevel_PrimagenBoss)
+		// Check whether levels give primagen keys
+		// Only give them once
+		if (mapId == kLevel_Hub &&
+			OPTION_GOAL_LEVELS_GIVE_PRIMAGEN_KEYS &&
+			AreLevelRequirementsUsedAndMet() &&
+			LocalPlayer.Inventory().GetCount(kActor_PrimagenKey_1) == 0)
 		{
-			g_AP.IsGoalReached = 1;
+			AllPrimagenKeys();
 		}
 		
-		// Defeat the Primagen (both endings)
-		else if (OPTION_GOAL_DEFEAT_PRIMAGEN && 
-			(mapId == kLevel_Ending || mapId == kLevel_EndingB))
+		// If the Primagen goal is active, check that for the goal
+		// Any level requirement will be covered already becuase the
+		// player can't place the key if it isn't met
+		if (ArePrimagenRequirementsUsed())
 		{
-			g_AP.IsGoalReached = 1;
-		}
-		
-		// Levels - if they give primagen keys, give them, otherwise it's the main goal
-		else if (mapId == kLevel_Hub &&
-			OPTION_GOAL_LEVELS > 0 &&
-			LocalPlayer.Inventory().GetCount(kActor_Misc_TotemInventory) >= OPTION_GOAL_LEVELS)
-		{
-			if (OPTION_GOAL_LEVELS_GIVE_PRIMAGEN_KEYS)
-			{	
-				TryGetInventoryItem(kActor_PrimagenKey_1);
-				TryGetInventoryItem(kActor_PrimagenKey_2);
-				TryGetInventoryItem(kActor_PrimagenKey_3);
-				TryGetInventoryItem(kActor_PrimagenKey_4);
-				TryGetInventoryItem(kActor_PrimagenKey_5);
-				TryGetInventoryItem(kActor_PrimagenKey_6);
-			}
-			else 
+			if (ArePrimagenRequirementsUsedAndMet(mapId))
 			{
 				g_AP.IsGoalReached = 1;
 			}
+		}
+		
+		// Else, check whether the level goal is met
+		// We must check the level here because we don't want to goal before bosses are defeated
+		else if (mapId == kLevel_Hub &&
+			AreLevelRequirementsUsed() && 
+			AreLevelRequirementsUsedAndMet())
+		{
+			g_AP.IsGoalReached = 1;
 		}
 		
 		// Handle the actor replacements
@@ -132,7 +130,7 @@ class RandoPlayerObject : ScriptObject
 		}
 	
 		SERIALIZE(g_AP.OutgoingLastProcessedItemIdx);
-		Sys.Print("Saved last processed index: " + g_AP.OutgoingLastProcessedItemIdx);
+		//Sys.Print("Saved last processed index: " + g_AP.OutgoingLastProcessedItemIdx);
 	}
 
 	//---------------------------
@@ -143,6 +141,7 @@ class RandoPlayerObject : ScriptObject
 	void OnDeserialize(kDict &in dict)
     {
 		ResetCollectedStatuses();
+		g_AP.IsGoalReached = 0;
 		
 		DeserializeLocationFlags(dict, "collectedLocations");
 		DeserializeLocationFlags(dict, "sentToAPLocations");
@@ -156,7 +155,7 @@ class RandoPlayerObject : ScriptObject
 		DESERIALIZE_INT(g_AP.OutgoingLastProcessedItemIdx);
 		ResetAPForLoadData(g_AP.OutgoingLastProcessedItemIdx);
 		
-		Sys.Print("Loaded last processed index: " + g_AP.OutgoingLastProcessedItemIdx);
+		//Sys.Print("Loaded last processed index: " + g_AP.OutgoingLastProcessedItemIdx);
 	}
 	
 	//---------------------------

@@ -2,7 +2,7 @@
 
 //------------------------------
 // Off-world AP items
-APItem kActor_Item_APItemProgression
+APItemProgression kActor_Item_APItemProgression
 {
     className                   "kexLifeForcePickup"
     placeable                   TRUE
@@ -25,7 +25,7 @@ APItem kActor_Item_APItemProgression
     End_Component
 }
 
-APItem kActor_Item_APItemNonProgression
+APItemNonProgression kActor_Item_APItemNonProgression
 {
     className                   "kexLifeForcePickup"
     placeable                   TRUE
@@ -76,7 +76,7 @@ RandomAmmo kActor_Item_RandomAmmo
 //------------------------------
 // Portal - warp back to the hub even if mission objectives aren't complete.
 //------------------------------
-HubWarp kActor_Portal_HubWarp
+HubWarpPortal kActor_Portal_HubWarp
 {
 	className				  "kexActor"
 	placeable                 TRUE
@@ -98,7 +98,7 @@ HubWarp kActor_Portal_HubWarp
     End_Component
 }
 
-HubWarp kActor_Portal_HubWarpFrame
+HubWarpFrame kActor_Portal_HubWarpFrame
 {
 	className				  "kexActor"
 	placeable                 TRUE
@@ -112,6 +112,28 @@ HubWarp kActor_Portal_HubWarpFrame
     End_Component
     Begin_Component "kexStaticMeshComponent"
         mesh                  "models/model2278.staticmesh"
+    End_Component
+}
+
+//------------------------------
+// Primagen Key Trigger - used to display a message if you didn't yet meet the level goal
+//------------------------------
+PrimagenKeyTrigger kActor_Hub_PrimagenKeyTrigger
+{
+	className				  "kexActor"
+	placeable                 TRUE
+	flags.noDamage            TRUE
+	flags.allowTracking       FALSE
+	
+	initialScale              "0.5 0.5 0.5"
+    Begin_Component "kexWorldComponent"
+		touchRadius           225.00
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+    Begin_Component "kexScriptComponent"
+        scriptClass           "RandoPrimagenKeyTrigger"
+        triggerRadius         81.92
     End_Component
 }
 
