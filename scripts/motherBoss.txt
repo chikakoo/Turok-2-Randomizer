@@ -498,10 +498,25 @@ final class CMotherBossController
         {
             return;
         }
+		
+		//------------------
+		// Added by Rando
+		// If we're randomizing weapons/ammo, make all ammo spawns into random ammo.
+		//------------------
+		int typeToSpawn = nType;
+		if (OPTION_INCLUDE_WEAPONS_AND_AMMO)
+		{
+			kDictMem@ actorDef = TryGetActorDefWithClass(typeToSpawn, "kexAmmoPickup");
+			if (actorDef !is null)
+			{
+				typeToSpawn = kActor_Item_RandomAmmo;
+			}
+		}
+		//------------------
         
         kVec3 vRegPos = vPos;
         int16 nRegionIdx = m_pOwner.WorldComponent().GetNearPositionAndRegionIndex(vRegPos, vRegPos);
-        kActor@ pItem = ActorFactory.Spawn(nType, vRegPos, 0, 0, 0, true, nRegionIdx);
+        kActor@ pItem = ActorFactory.Spawn(typeToSpawn, vRegPos, 0, 0, 0, true, nRegionIdx);
         
         if(!(pItem is null))
         {

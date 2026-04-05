@@ -11,6 +11,7 @@ void InitDefManager()
 	g_indexDefManager = kIndexDefManager();
 	g_indexDefManager.LoadFile("defs/weaponInfo.txt");
 	g_indexDefManager.LoadFile("defs/actors/health.txt");
+	g_indexDefManager.LoadFile("defs/actors/ammo.txt");
 	g_indexDefManager.LoadFile("defs/actors/pickups.txt");
 	g_indexDefManager.LoadFile("defs/actors/weaponPickups.txt");
 	g_indexDefManager.LoadFile("defs/actors/powerCells.txt");
