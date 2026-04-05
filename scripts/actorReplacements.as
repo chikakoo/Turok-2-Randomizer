@@ -173,6 +173,15 @@ bool DoMapSpecificEdits(kActor@ actor, const int &in mapId)
 				actor.ModeStateComponent().SetMode(DOOR_MODE_OPEN);
 			}
 			break;
+			
+		// The touch radius on these explosion actors are too big and will eat the collection of the Tek Bow
+		case kLevel_RiverOfSouls_2:
+		
+			if (actor.TID() == 28 || actor.TID() == 29)
+			{
+				actor.WorldComponent().TouchRadius() = 0;
+			}
+			break;
 	
 		// Level key trap rooms... these actors have a touch radius so big,
 		// it doesn't let any of our own collision events trigger.
