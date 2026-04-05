@@ -167,7 +167,6 @@ bool TryGivePlayerHealth(int &in actorId)
 
 //---------------------------
 // Gets the given item and adds it to your inventory.
-// TODO: there are multiple things called power cells, deal with the display...
 bool TryGetInventoryItem(int &in actorId)
 {
 	kDictMem@ missionItemDef = TryGetActorDefWithClass(actorId, "kexInventoryPickup");
