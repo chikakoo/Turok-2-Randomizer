@@ -10,6 +10,12 @@ void Help(void)
 	Sys.Print("Debug commands - invoke them by doing \"call EnterCommandHere\"");
 	Sys.Print("");
 	Sys.Print("-----------------");
+	Sys.Print("Archipelago");
+	Sys.Print("-----------------");
+	Sys.Print("PrintAPMemory (the memory block the client communicates with)");
+	Sys.Print("Resync (every check you've done at ~10 per second, so it will take time)");
+	Sys.Print("");
+	Sys.Print("-----------------");
 	Sys.Print("Life Forces");
 	Sys.Print("-----------------");
 	Sys.Print("LifeForce1");
