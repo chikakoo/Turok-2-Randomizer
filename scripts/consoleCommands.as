@@ -4,6 +4,122 @@
 // --------------------------
 
 // --------------------------
+// Lists all the debug commands
+void Help(void)
+{
+	Sys.Print("Debug commands - invoke them by doing \"call EnterCommandHere\"");
+	Sys.Print("");
+	Sys.Print("-----------------");
+	Sys.Print("Life Forces");
+	Sys.Print("-----------------");
+	Sys.Print("LifeForce1");
+	Sys.Print("LifeForce10");
+	Sys.Print("");
+	Sys.Print("-----------------");
+	Sys.Print("Health Pickups");
+	Sys.Print("-----------------");
+	Sys.Print("Health2");
+	Sys.Print("Health10");
+	Sys.Print("FullHealth");
+	Sys.Print("UltraHealth");
+	Sys.Print("LowHealth (sets health to 1)");
+	Sys.Print("");
+	Sys.Print("-----------------");
+	Sys.Print("Level Keys");
+	Sys.Print("-----------------");
+	Sys.Print("Level2Key");
+	Sys.Print("Level3Key");
+	Sys.Print("Level4Key");
+	Sys.Print("Level5Key");
+	Sys.Print("Level6Key");
+	Sys.Print("");
+	Sys.Print("-----------------");
+	Sys.Print("Primagen Keys");
+	Sys.Print("-----------------");
+	Sys.Print("PrimagenKey1");
+	Sys.Print("PrimagenKey2");
+	Sys.Print("PrimagenKey3");
+	Sys.Print("PrimagenKey4");
+	Sys.Print("PrimagenKey5");
+	Sys.Print("PrimagenKey6");
+	Sys.Print("AllPrimagenKeys");
+	Sys.Print("");
+	Sys.Print("-----------------");
+	Sys.Print("Nuke Parts");
+	Sys.Print("-----------------");
+	Sys.Print("NukePart");
+	Sys.Print("");
+	Sys.Print("-----------------");
+	Sys.Print("Eagle Feathers");
+	Sys.Print("-----------------");
+	Sys.Print("Feather2");
+	Sys.Print("Feather3");
+	Sys.Print("Feather4");
+	Sys.Print("Feather5");
+	Sys.Print("Feather6");
+	Sys.Print("");
+	Sys.Print("-----------------");
+	Sys.Print("Talismans");
+	Sys.Print("-----------------");
+	Sys.Print("LeapOfFaith");
+	Sys.Print("BreathOfLife");
+	Sys.Print("HeartOfFire");
+	Sys.Print("Whispers");
+	Sys.Print("EyeOfTruth");
+	Sys.Print("");
+	Sys.Print("-----------------");
+	Sys.Print("Mission Items");
+	Sys.Print("-----------------");
+	Sys.Print("BeaconPowerCell");
+	Sys.Print("GateKey");
+	Sys.Print("GraveyardKey");
+	Sys.Print("L3SatchelCharge");
+	Sys.Print("CaveDoorKey");
+	Sys.Print("L4SatchelCharge");
+	Sys.Print("L5SatchelCharge");
+	Sys.Print("IonCapacitor");
+	Sys.Print("BlueLaserCell");
+	Sys.Print("RedLaserCell");
+	Sys.Print("");
+	Sys.Print("-----------------");
+	Sys.Print("Weapons");
+	Sys.Print("-----------------");
+	Sys.Print("WarBlade");
+	Sys.Print("Bow");
+	Sys.Print("TekBow");
+	Sys.Print("Pistol");
+	Sys.Print("Mag60");
+	Sys.Print("Tranquilizer");
+	Sys.Print("ChargeDartRifle");
+	Sys.Print("Shotgun");
+	Sys.Print("Shredder");
+	Sys.Print("PlasmaRifle");
+	Sys.Print("FirestormCannon");
+	Sys.Print("SunfirePod");
+	Sys.Print("CerebralBore");
+	Sys.Print("PFMLayer");
+	Sys.Print("GrenadeLauncher");
+	Sys.Print("ScorpionLauncher");
+	Sys.Print("HarpoonGun");
+	Sys.Print("TorpedoLauncher");
+	Sys.Print("FlameThrower");
+	Sys.Print("RazorWind");
+	Sys.Print("Nuke");
+	Sys.Print("");
+	Sys.Print("-----------------");
+	Sys.Print("Ammo");
+	Sys.Print("-----------------");
+	Sys.Print("GetAmmoInRandomWeapon");
+	Sys.Print("");
+	Sys.Print("-----------------");
+	Sys.Print("Traps");
+	Sys.Print("-----------------");
+	Sys.Print("HandleEnemyTrap");
+	Sys.Print("HandleDamageTrap");
+	Sys.Print("HandleSpamTrap");
+}
+
+// --------------------------
 // Life force tiles
 void LifeForce1(void)
 {
@@ -17,27 +133,27 @@ void LifeForce10(void)
 
 // --------------------------
 // Health pickups, including one to set it to 1, for testing.
-void Health2()
+void Health2(void)
 {
 	TryGivePlayerHealth(kActor_Item_Health2);
 }
 
-void Health10()
+void Health10(void)
 {
 	TryGivePlayerHealth(kActor_Item_Health10);
 }
 
-void FullHealth()
+void FullHealth(void)
 {
 	TryGivePlayerHealth(kActor_Item_HealthFull);
 }
 
-void UltraHealth()
+void UltraHealth(void)
 {
 	TryGivePlayerHealth(kActor_Item_HealthUltra);
 }
 
-void LowHealth()
+void LowHealth(void)
 {
 	LocalPlayer.Actor().CastToActor().Health() = 1;
 }
@@ -174,9 +290,39 @@ void EyeOfTruth(void)
 
 //---------------------------
 // Weapons
+void WarBlade(void)
+{
+	TryGivePlayerWeapon(kActor_Item_WpnWarBlade);
+}
+
+void Bow(void)
+{
+	TryGivePlayerWeapon(kActor_Item_WpnBow);
+}
+
+void TekBow(void)
+{
+	TryGivePlayerWeapon(kActor_Item_WpnTekBow);
+}
+
 void Pistol(void)
 {
 	TryGivePlayerWeapon(kActor_Item_WpnPistol);
+}
+
+void Mag60(void)
+{
+	TryGivePlayerWeapon(kActor_Item_WpnMag60);
+}
+
+void Tranquilizer(void)
+{
+	TryGivePlayerWeapon(kActor_Item_WpnTranq);
+}
+
+void ChargeDartRifle(void)
+{
+	TryGivePlayerWeapon(kActor_Item_WpnChargeDart);
 }
 
 void Shotgun(void)
@@ -187,6 +333,66 @@ void Shotgun(void)
 void Shredder(void)
 {
 	TryGivePlayerWeapon(kActor_Item_WpnScatter);
+}
+
+void PlasmaRifle(void)
+{
+	TryGivePlayerWeapon(kActor_Item_WpnPlasmaRifle);
+}
+
+void FirestormCannon(void)
+{
+	TryGivePlayerWeapon(kActor_Item_WpnFireStorm);
+}
+
+void SunfirePod(void)
+{
+	TryGivePlayerWeapon(kActor_Item_WpnSunfirePod);
+}
+
+void CerebralBore(void)
+{
+	TryGivePlayerWeapon(kActor_Item_WpnCerebralBore);
+}
+
+void PFMLayer(void)
+{
+	TryGivePlayerWeapon(kActor_Item_WpnPFMLayer);
+}
+
+void GrenadeLauncher(void)
+{
+	TryGivePlayerWeapon(kActor_Item_WpnGrenadeLauncher);
+}
+
+void ScorpionLauncher(void)
+{
+	TryGivePlayerWeapon(kActor_Item_WpnMissileLauncher);
+}
+
+void HarpoonGun(void)
+{
+	TryGivePlayerWeapon(kActor_Item_WpnSpearGun);
+}
+
+void TorpedoLauncher(void)
+{
+	TryGivePlayerWeapon(kActor_Item_WpnTorpedoLauncher);
+}
+
+void FlameThrower(void)
+{
+	TryGivePlayerWeapon(kActor_Item_WpnFlameThrower);
+}
+
+void RazorWind(void)
+{
+	TryGivePlayerWeapon(kActor_Item_WpnRazorWind);
+}
+
+void Nuke(void)
+{
+	TryGivePlayerWeapon(kActor_Item_WpnNuke);
 }
 
 //---------------------------
