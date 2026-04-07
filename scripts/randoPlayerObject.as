@@ -80,6 +80,20 @@ class RandoPlayerObject : ScriptObject
 		
 		// Handle the actor replacements
 		DoActorReplacementsOnPlayerSpawn();
+		
+		// Show a warning for the riding Gun
+		if (mapId == kLevel_RiverOfSouls_1)
+		{
+			kStr autoSwitchValue;
+			if (Sys.GetCvarValue("g_autoswitchnewweapon", autoSwitchValue))
+			{
+				if (autoSwitchValue == "1")
+				{
+					Hud.AddMessage("!!! If softlocked, press Tilde, then type warp 125 !!!", 600);
+					Hud.AddMessage("!!! Disable Auto-Switch new weapon before getting on the mount !!!", 600);
+				}
+			}
+		}
 	}
 	
 	//---------------------------
