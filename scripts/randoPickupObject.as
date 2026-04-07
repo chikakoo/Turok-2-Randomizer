@@ -60,38 +60,56 @@ class RandoPickupObject : ScriptObject
 		}
 	}
 	
-	// This is called when the actor is collided with, even if not collected.
+	//----------------------------------
+	// Called every tick to see if the player is touching the pickup
 	// Note that health and ammo ARE sent to AP still when touched
 	// so that it knows you could have received it.
-	void OnCollide(kActor@ pCollider)
-	{
-		if (m_id != 0 && 
-			!m_wasSentToAP &&
-			!(pCollider is null) &&
-			pCollider.InstanceOf("kexPuppet"))
+	void OnTick()
+	{	
+		if (m_id != 0 && !m_wasSentToAP)
 		{
+			kActor@ player = LocalPlayer.Actor().CastToActor();
+			if (player is null)
+			{
+				return;
+			}
+			
+			// Check if it's close enough - calculations without using a sqrt
+			kVec3 delta = self.Origin() - player.Origin();
+			float distSq = delta.UnitSq(); // Squared distance
+			float triggerDist = self.WorldComponent().TouchRadius() + player.WorldComponent().Radius();
+			float triggerDistSq = triggerDist * triggerDist;
+
+			if (distSq > triggerDistSq)
+			{
+				return;
+			}
+		
+			// If close enough, we're good to pick it up
 			SendCheckToAP(m_id);
+			m_wasSentToAP = true;
+			
 			DisplayCollectedLocationsForCurrentMap();
 			if (IsHealthOrAmmo(self))
 			{
 				PlayPickupNotificationSound(self.Definition());
 			}
 			
-			// Turn the flags off now, since we already sent the check
-			self.WorldComponent().Flags() &= ~WCF_INVOKE_COLLIDE_CALLBACK;
+			// Turn the important flag off now, since we already sent the check
 			self.Flags() &= ~AF_IMPORTANT;
 			
-			// Try to trigger events
+			// Try to trigger events from the item being picked up
 			TryTriggerActors(m_position);
 		}
 	}
 	
+	//----------------------------------
 	// Called when the actor is collected.
 	// Marks it as collected so it won't respawn.
 	void OnTouch(kActor@ pInstigator)
 	{
 		//Sys.Print(m_position);
-	
+		
 		if (self.Type() == kActor_Item_RandomAmmo)
 		{
 			GetAmmoInRandomWeapon();
@@ -101,6 +119,7 @@ class RandoPickupObject : ScriptObject
 		{
 			CollectLocation(m_id, Game.ActiveMapID());
 			SendCheckToAP(m_id);
+			m_wasSentToAP = true;
 			
 			// If this item is marked with rando.give2, do this to give the second one
 			// This is true for primagen keys currently

@@ -126,10 +126,6 @@ void ReplaceActor(kActor@ initialActor, ReplacementEntry@ replacement)
 	newWorldComponent.Height() = worldComponent.Height();
 	newWorldComponent.Flags() = worldComponent.Flags();
 	
-	// Turn on collision for health/ammo detection and to
-	// have a common place to show the pickup status message
-	newWorldComponent.Flags() |= WCF_INVOKE_COLLIDE_CALLBACK;
-
 	// Flag the actor as important so it can be found easier
 	// If it was already sent to AP, do not do this since it was "collected" already
 	if (!replacement.isSentToAP)
@@ -171,98 +167,6 @@ bool DoMapSpecificEdits(kActor@ actor, const int &in mapId)
 			if (OPTION_OPEN_HUB && actor.TID() == 450)
 			{
 				actor.ModeStateComponent().SetMode(DOOR_MODE_OPEN);
-			}
-			break;
-			
-		// Touch radius of the bridges eating the shotgun shell collision
-		case kLevel_PortOfAdia_4:
-			if (actor.TID() == 34 ||
-				actor.TID() == 20 ||
-				actor.TID() == 21)
-			{
-				actor.WorldComponent().TouchRadius() = 0;
-			}
-			break;
-			
-		// The touch radius on these explosion actors are too big and will eat the collection of the Tek Bow
-		case kLevel_RiverOfSouls_2:
-		
-			if (actor.TID() == 28 || actor.TID() == 29)
-			{
-				actor.WorldComponent().TouchRadius() = 0;
-			}
-			break;
-	
-		// Level key trap rooms... these actors have a touch radius so big,
-		// it doesn't let any of our own collision events trigger.
-		// These actors don't need a collision event, so we remove the touch radius.
-		case kLevel_BlindLair_3:
-			if (actor.TID() == 51 ||
-				actor.TID() == 52 || 
-				actor.TID() == 53 || 
-				actor.TID() == 54)
-			{
-				actor.WorldComponent().TouchRadius() = 0;
-			}
-			break;
-		case kLevel_BlindLair_8:
-			if (actor.TID() == 88 ||
-				actor.TID() == 89 ||
-				actor.TID() == 90 ||
-				actor.TID() == 91 || 
-				actor.TID() == 92 || 
-				actor.TID() == 93)
-			{
-				actor.WorldComponent().TouchRadius() = 0;
-			}
-			break;
-			
-		// Touch radius of the barrier eating the LF10 collisions
-		case kLevel_HiveTop:
-			if (actor.TID() == 22 ||
-				actor.TID() == 23 ||
-				actor.TID() == 24 ||
-				actor.TID() == 25)
-			{
-				actor.WorldComponent().TouchRadius() = 0;
-			}
-			break;
-			
-		// Touch radius of the explodable wall eating collisions
-		case kLevel_Hive_1:
-			if (actor.TID() == 33 ||
-				actor.TID() == 35 ||
-				actor.TID() == 41)
-			{
-				actor.WorldComponent().TouchRadius() = 0;
-			}
-			break;
-		case kLevel_Hive_6:
-			if (actor.TID() == 65 ||
-				actor.TID() == 66 ||
-				actor.TID() == 67 ||
-				actor.TID() == 68 ||
-				actor.TID() == 69 ||
-				actor.TID() == 70 ||
-				actor.TID() == 71 ||
-				actor.TID() == 72 ||
-				actor.TID() == 77 ||
-				actor.TID() == 78 ||
-				actor.TID() == 79 ||
-				actor.TID() == 80 ||
-				actor.TID() == 82 ||
-				actor.TID() == 83)
-			{
-				actor.WorldComponent().TouchRadius() = 0;
-			}
-			break;
-		case kLevel_Hive_8:
-			if (actor.TID() == 43)
-			{
-				// This is a door and needs a radius to open still
-				// The default is just too big, but this is small enough
-				// to not mess up the pickup
-				actor.WorldComponent().TouchRadius() = 100;
 			}
 			break;
 	}
