@@ -174,6 +174,16 @@ bool DoMapSpecificEdits(kActor@ actor, const int &in mapId)
 			}
 			break;
 			
+		// Touch radius of the bridges eating the shotgun shell collision
+		case kLevel_PortOfAdia_4:
+			if (actor.TID() == 34 ||
+				actor.TID() == 20 ||
+				actor.TID() == 21)
+			{
+				actor.WorldComponent().TouchRadius() = 0;
+			}
+			break;
+			
 		// The touch radius on these explosion actors are too big and will eat the collection of the Tek Bow
 		case kLevel_RiverOfSouls_2:
 		
@@ -204,6 +214,55 @@ bool DoMapSpecificEdits(kActor@ actor, const int &in mapId)
 				actor.TID() == 93)
 			{
 				actor.WorldComponent().TouchRadius() = 0;
+			}
+			break;
+			
+		// Touch radius of the barrier eating the LF10 collisions
+		case kLevel_HiveTop:
+			if (actor.TID() == 22 ||
+				actor.TID() == 23 ||
+				actor.TID() == 24 ||
+				actor.TID() == 25)
+			{
+				actor.WorldComponent().TouchRadius() = 0;
+			}
+			break;
+			
+		// Touch radius of the explodable wall eating collisions
+		case kLevel_Hive_1:
+			if (actor.TID() == 33 ||
+				actor.TID() == 35 ||
+				actor.TID() == 41)
+			{
+				actor.WorldComponent().TouchRadius() = 0;
+			}
+			break;
+		case kLevel_Hive_6:
+			if (actor.TID() == 65 ||
+				actor.TID() == 66 ||
+				actor.TID() == 67 ||
+				actor.TID() == 68 ||
+				actor.TID() == 69 ||
+				actor.TID() == 70 ||
+				actor.TID() == 71 ||
+				actor.TID() == 72 ||
+				actor.TID() == 77 ||
+				actor.TID() == 78 ||
+				actor.TID() == 79 ||
+				actor.TID() == 80 ||
+				actor.TID() == 82 ||
+				actor.TID() == 83)
+			{
+				actor.WorldComponent().TouchRadius() = 0;
+			}
+			break;
+		case kLevel_Hive_8:
+			if (actor.TID() == 43)
+			{
+				// This is a door and needs a radius to open still
+				// The default is just too big, but this is small enough
+				// to not mess up the pickup
+				actor.WorldComponent().TouchRadius() = 100;
 			}
 			break;
 	}
