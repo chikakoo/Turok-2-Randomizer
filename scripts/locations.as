@@ -648,6 +648,10 @@ bool IsActorToTrigger(
 {
 	switch(mapId)
 	{
+		// Full Health behind buildings trap
+		case kLevel_DeathMarsh_2:
+			return tagId == 200009;
+			
 		// Oblivion City Pickup Trap
 		case kLevel_DeathMarsh_3:
 			return tagId == 200009;
@@ -723,7 +727,13 @@ void TryTriggerActors(const kStr &in position)
 {
 	switch(Game.ActiveMapID())
 	{
-		// Box of Shells
+		// Full Health and Box of Shells enemy traps
+		case kLevel_DeathMarsh_2:
+			if (position == "62_900_5451_8")
+			{
+				TriggerActors();
+			}
+			break;
 		case kLevel_DeathMarsh_3:
 			if (position == "63_-1839_-991_0")
 			{

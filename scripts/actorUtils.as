@@ -247,17 +247,6 @@ void SpawnActorOnPlayer(int &in actorId)
 }
 
 //---------------------------
-// Helper function that a couple places use.
-// Helps determine if it's an actor that can be sent to AP, but 
-// not collected.
-bool IsHealthOrAmmo(kActor@ actor) 
-{
-	kStr className;
-	actor.Definition().GetString("className", className);
-	return className == "kexHealthPickup" || className == "kexAmmoPickup";
-}
-
-//---------------------------
 // Actors to trigger on the current map
 // Used when grabbing a randomized actor needs to trigger actors
 // Cleared/set on player spawn

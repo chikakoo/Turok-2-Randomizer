@@ -90,10 +90,6 @@ class RandoPickupObject : ScriptObject
 			m_wasSentToAP = true;
 			
 			DisplayCollectedLocationsForCurrentMap();
-			if (IsHealthOrAmmo(self))
-			{
-				PlayPickupNotificationSound(self.Definition());
-			}
 			
 			// Turn the important flag off now, since we already sent the check
 			self.Flags() &= ~AF_IMPORTANT;
@@ -139,6 +135,8 @@ class RandoPickupObject : ScriptObject
 			}
 			
 			// Try to trigger events from the item being picked up
+			// Done here as well to make absolutely sure that it's triggered
+			// Not doing so can lead to soft-locks
 			TryTriggerActors(m_position);
 		}
 	}
