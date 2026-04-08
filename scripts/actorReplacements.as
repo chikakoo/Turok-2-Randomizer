@@ -169,6 +169,14 @@ bool DoMapSpecificEdits(kActor@ actor, const int &in mapId)
 				actor.ModeStateComponent().SetMode(DOOR_MODE_OPEN);
 			}
 			break;
+			
+		// Remove the actors that close the last graveyard so the player can't get stuck there
+		case kLevel_RiverOfSouls_11:
+			if (actor.TID() == 200001)
+			{
+				return true;
+			}
+			break;
 	}
 	
 	return false;
