@@ -77,7 +77,7 @@ class RandoPickupObject : ScriptObject
 			// Check if it's close enough - calculations without using a sqrt
 			kVec3 delta = self.Origin() - player.Origin();
 			float distSq = delta.UnitSq(); // Squared distance
-			float triggerDist = self.WorldComponent().TouchRadius() + player.WorldComponent().Radius();
+			float triggerDist = (self.WorldComponent().Radius() + 0.1 * GAME_SCALE) + player.WorldComponent().Radius();
 			float triggerDistSq = triggerDist * triggerDist;
 
 			if (distSq > triggerDistSq)

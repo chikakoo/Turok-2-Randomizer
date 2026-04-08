@@ -121,9 +121,8 @@ void ReplaceActor(kActor@ initialActor, ReplacementEntry@ replacement)
 		worldComponent.RegionIndex());
 		
 	kWorldComponent@ newWorldComponent = replacedActor.WorldComponent();
-	newWorldComponent.Radius() = worldComponent.Radius();
-	newWorldComponent.TouchRadius() = worldComponent.TouchRadius();
-	newWorldComponent.Height() = worldComponent.Height();
+	newWorldComponent.Radius() = newWorldComponent.Radius();
+	newWorldComponent.Height() = newWorldComponent.Height();
 	newWorldComponent.Flags() = worldComponent.Flags();
 	
 	// Flag the actor as important so it can be found easier
