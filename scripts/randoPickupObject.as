@@ -137,6 +137,9 @@ class RandoPickupObject : ScriptObject
 			{
 				Hud.AddMessage(m_displayString);
 			}
+			
+			// Try to trigger events from the item being picked up
+			TryTriggerActors(m_position);
 		}
 	}
 }
