@@ -68,7 +68,7 @@ class RandoPickupObject : ScriptObject
 	{	
 		if (m_id != 0 && !m_wasSentToAP)
 		{
-			kActor@ player = LocalPlayer.Actor().CastToActor();
+			kPuppet@ player = LocalPlayer.Actor();
 			if (player is null)
 			{
 				return;
@@ -77,9 +77,8 @@ class RandoPickupObject : ScriptObject
 			// Check if it's close enough - calculations without using a sqrt
 			kVec3 delta = self.Origin() - player.Origin();
 			float distSq = delta.UnitSq(); // Squared distance
-			float triggerDist = (self.WorldComponent().Radius() + 0.1 * GAME_SCALE) + player.WorldComponent().Radius();
-			float triggerDistSq = triggerDist * triggerDist;
-
+			float triggerDistance = self.WorldComponent().Radius() + player.WorldComponent().Radius();
+			float triggerDistSq = triggerDistance * triggerDistance;
 			if (distSq > triggerDistSq)
 			{
 				return;
