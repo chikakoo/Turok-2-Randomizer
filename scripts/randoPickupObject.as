@@ -1,3 +1,6 @@
+//----------------------------------
+// ScriptObject placed on every pickup that AP cares about.
+// Used to handle whether we've collected and sent pickup checks to AP.
 class RandoPickupObject : ScriptObject
 {
 	// Used in ReplaceActor to copy the position properties
@@ -9,6 +12,7 @@ class RandoPickupObject : ScriptObject
 	kStr m_displayString;
 	bool m_wasSentToAP;
 	
+	//----------------------------------
 	// Constructor
 	// @actor: The actor that was loaded
     RandoPickupObject(kActor @actor)
@@ -19,8 +23,15 @@ class RandoPickupObject : ScriptObject
 		
 		// Force the pickup to be non-solid - this is mainly for generated ammo
 		self.WorldComponent().Flags() |= WCF_NONSOLID;
+		
+		// Hack to increase the touch radius of the previously missable Level 4 boss pickup
+		if (m_position == "1_-2611_0_972")
+		{
+			self.WorldComponent().Radius() = 100.0f;
+		}
     }
 	
+	//----------------------------------
 	// Gets a unique id for the pickup.
 	// Will be the key for the rando dictionary for replacements
 	kStr GetPositionString(void)
@@ -38,6 +49,7 @@ class RandoPickupObject : ScriptObject
 			int(position.z);
 	}
 	
+	//----------------------------------
 	// Tries to get the name/id/display string out of the dictionary.
 	// If not there, returns a placeholder for the name.
 	void SetReplacementEntryProperties(void)
