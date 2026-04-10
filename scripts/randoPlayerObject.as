@@ -295,7 +295,7 @@ class RandoPlayerObject : ScriptObject
 		g_AP.OutgoingLastProcessedItemIdx = g_AP.IncomingLastProcessedItemIdx;
 		g_AP.IncomingStatus = AP_READY;
 		
-		Sys.Print("Updated last processed index: " + g_AP.OutgoingLastProcessedItemIdx);
+		//Sys.Print("Updated last processed index: " + g_AP.OutgoingLastProcessedItemIdx);
 	}
 	
 	//----------------------------------
@@ -362,7 +362,7 @@ class RandoPlayerObject : ScriptObject
 		
 		int apId = g_outgoingMessageQueue[0];
 		g_AP.OutgoingMessageData = apId;
-		Sys.Print("Sent check to AP: " + apId);
+		//Sys.Print("Sent check to AP: " + apId);
 		
 		// Now the python script knows it can read the data we set
 		g_AP.OutgoingStatus = AP_PROCESSING;
