@@ -5,3 +5,4 @@ A randomizer for Turok 2 Remastered for the PC, including full Archipelago multi
 For more info, see:
 - [What this randomizes](turok2/docs/en_Turok2.md)
 - [Setup](turok2/docs/setup_en.md)
+- [The AP world repo](url)
