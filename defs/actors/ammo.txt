@@ -1,0 +1,695 @@
+#include "defs/common.txt"
+#include "defs/randoConstants.as"
+
+//------------------------------------
+// Generator for our random ammo - this needs to exist on a def file somewhere,
+// So we'll put it here since we need this one and not generatorPickups.txt.
+Generator_Ammo_Random kActor_Generator_RandomAmmo
+{
+    className                   "kexActor"
+    flags.noDamage              TRUE
+    flags.allowTracking         FALSE
+    placeable                   TRUE
+    
+    Begin_Component "kexGeneratorComponent"
+        maxActive               1
+        intervalTime1           30
+        intervalTime2           60
+        singleObjectType        kActor_Item_RandomAmmo
+        bInfiniteTotal          TRUE
+        bInitiallyActive        TRUE
+    End_Component
+    Begin_Component "kexWorldComponent"
+        bTrackGround            FALSE
+        bNonSolid               TRUE
+    End_Component
+}
+
+//-----------------------------------------------------------------------------
+//
+// Vanilla ammo
+//
+//-----------------------------------------------------------------------------
+
+Arrows kActor_Item_AmmoArrows
+{
+    className                   "kexAmmoPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Ammo Pickup.ksnd"
+    pickup.ammo.amount          5
+    pickup.ammo.definition      "Ammo_Arrow"
+    pickup.pickupMessage        "$str_175"
+    
+    initialScale              "0.5 0.5 0.5"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+    Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Pickup_Ammo_Arrows.staticmesh"
+    End_Component
+	Begin_Component "kexScriptComponent"
+		scriptClass           "RandoPickupObject"
+		triggerRadius         81.92
+	End_Component
+}
+
+Arrows kActor_Item_AmmoArrowParticle
+{
+    className                   "kexAmmoPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Arrow Release.ksnd"
+    pickup.ammo.amount          1
+    pickup.ammo.definition      "Ammo_Arrow"
+    pickup.pickupMessage        "$str_173"
+    
+    initialScale              "0.5 0.5 0.5"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        heightOffset         -30.72
+        bNonSolid             TRUE
+    End_Component
+}
+
+Arrows kActor_Item_AmmoSpearParticle
+{
+    className                   "kexAmmoPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.ammo.amount          1
+    pickup.ammo.definition      "Ammo_Spears"
+    pickup.pickupMessage        "$str_197"
+    
+    initialScale              "0.5 0.5 0.5"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        heightOffset         -30.72
+        bNonSolid             TRUE
+    End_Component
+}
+
+Quiver kActor_Item_AmmoQuiver
+{
+    className                   "kexAmmoPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Ammo Pickup.ksnd"
+    pickup.ammo.amount          10
+    pickup.ammo.definition      "Ammo_Arrow"
+    pickup.pickupMessage        "$str_176"
+    
+    initialScale              "0.5 0.5 0.5"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+    Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Pickup_Ammo_Quiver_of_Arrows.staticmesh"
+    End_Component
+	Begin_Component "kexScriptComponent"
+		scriptClass           "RandoPickupObject"
+		triggerRadius         81.92
+	End_Component
+}
+
+TekArrows kActor_Item_AmmoTekArrows
+{
+    className                   "kexAmmoPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Ammo Pickup.ksnd"
+    pickup.ammo.amount          3
+    pickup.ammo.definition      "Ammo_TekArrow"
+    pickup.pickupMessage        "$str_177"
+    
+    initialScale              "0.5 0.5 0.5"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+    Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Pickup_Ammo_Tek_Arrows.staticmesh"
+    End_Component
+	Begin_Component "kexScriptComponent"
+		scriptClass           "RandoPickupObject"
+		triggerRadius         81.92
+	End_Component
+}
+
+QuiverTek kActor_Item_AmmoQuiverTek
+{
+    className                   "kexAmmoPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Ammo Pickup.ksnd"
+    pickup.ammo.amount          5
+    pickup.ammo.definition      "Ammo_TekArrow"
+    pickup.pickupMessage        "$str_178"
+    
+    initialScale              "0.5 0.5 0.5"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+    Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Pickup_Ammo_Quiver_of_Tek_Arrows.staticmesh"
+    End_Component
+	Begin_Component "kexScriptComponent"
+		scriptClass           "RandoPickupObject"
+		triggerRadius         81.92
+	End_Component
+}
+
+Clip kActor_Item_AmmoClip
+{
+    className                   "kexAmmoPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Ammo Pickup.ksnd"
+    pickup.ammo.amount          10
+    pickup.ammo.definition      "Ammo_Bullet"
+    pickup.pickupMessage        "$str_179"
+    
+    initialScale              "0.5 0.5 0.5"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+    Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Pickup_Ammo_Bullet_Clip.staticmesh"
+    End_Component
+	Begin_Component "kexScriptComponent"
+		scriptClass           "RandoPickupObject"
+		triggerRadius         81.92
+	End_Component
+}
+
+BulletBox kActor_Item_AmmoBulletBox
+{
+    className                   "kexAmmoPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Ammo Pickup.ksnd"
+    pickup.ammo.amount          40
+    pickup.ammo.definition      "Ammo_Bullet"
+    pickup.pickupMessage        "$str_181"
+    
+    initialScale              "0.5 0.5 0.5"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+    Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Pickup_Ammo_Box_Of_Bullets.staticmesh"
+    End_Component
+	Begin_Component "kexScriptComponent"
+		scriptClass           "RandoPickupObject"
+		triggerRadius         81.92
+	End_Component
+}
+
+TranqDarts kActor_Item_AmmoTranqDarts
+{
+    className                   "kexAmmoPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Ammo Pickup.ksnd"
+    pickup.ammo.amount          1
+    pickup.ammo.definition      "Ammo_Dart"
+    pickup.pickupMessage        "$str_182"
+    
+    initialScale              "0.5 0.5 0.5"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+    Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Pickup_Ammo_Tranquilzer_Darts.staticmesh"
+    End_Component
+	Begin_Component "kexScriptComponent"
+		scriptClass           "RandoPickupObject"
+		triggerRadius         81.92
+	End_Component
+}
+
+TranqPack kActor_Item_AmmoTranqPack
+{
+    className                   "kexAmmoPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Ammo Pickup.ksnd"
+    pickup.ammo.amount          5
+    pickup.ammo.definition      "Ammo_Dart"
+    pickup.pickupMessage        "$str_183"
+    
+    initialScale              "0.5 0.5 0.5"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+    Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Pickup_Ammo_Tranquilzer_Darts_Pak.staticmesh"
+    End_Component
+	Begin_Component "kexScriptComponent"
+		scriptClass           "RandoPickupObject"
+		triggerRadius         81.92
+	End_Component
+}
+
+Charge kActor_Item_AmmoCharge
+{
+    className                   "kexAmmoPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Ammo Pickup.ksnd"
+    pickup.ammo.amount          5
+    pickup.ammo.definition      "Ammo_ChargeDart"
+    pickup.pickupMessage        "$str_184"
+    
+    initialScale              "0.5 0.5 0.5"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+    Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Pickup_Ammo_Charge_Darts.staticmesh"
+    End_Component
+	Begin_Component "kexScriptComponent"
+		scriptClass           "RandoPickupObject"
+		triggerRadius         81.92
+	End_Component
+}
+
+ChargePack kActor_Item_AmmoChargePack
+{
+    className                   "kexAmmoPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Ammo Pickup.ksnd"
+    pickup.ammo.amount          20
+    pickup.ammo.definition      "Ammo_ChargeDart"
+    pickup.pickupMessage        "$str_185"
+    
+    initialScale              "0.5 0.5 0.5"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+    Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Pickup_Ammo_Charge_Darts_Pak.staticmesh"
+    End_Component
+	Begin_Component "kexScriptComponent"
+		scriptClass           "RandoPickupObject"
+		triggerRadius         81.92
+	End_Component
+}
+
+Shells kActor_Item_AmmoShells
+{
+    className                   "kexAmmoPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Ammo Pickup.ksnd"
+    pickup.ammo.amount          3
+    pickup.ammo.definition      "Ammo_Shell"
+    pickup.pickupMessage        "$str_186"
+    
+    initialScale              "0.5 0.5 0.5"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+    Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Pickup_Ammo_Shotgun_Shells.staticmesh"
+    End_Component
+	Begin_Component "kexScriptComponent"
+		scriptClass           "RandoPickupObject"
+		triggerRadius         81.92
+	End_Component
+}
+
+ShellBox kActor_Item_AmmoShellBox
+{
+    className                   "kexAmmoPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Ammo Pickup.ksnd"
+    pickup.ammo.amount          10
+    pickup.ammo.definition      "Ammo_Shell"
+    pickup.pickupMessage        "$str_187"
+    
+    initialScale              "0.5 0.5 0.5"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+    Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Pickup_Ammo_Box_Of_Shotgun_Shells.staticmesh"
+    End_Component
+	Begin_Component "kexScriptComponent"
+		scriptClass           "RandoPickupObject"
+		triggerRadius         81.92
+	End_Component
+}
+
+ExpShells kActor_Item_AmmoExpShells
+{
+    className                   "kexAmmoPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Ammo Pickup.ksnd"
+    pickup.ammo.amount          3
+    pickup.ammo.definition      "Ammo_ExpShells"
+    pickup.pickupMessage        "$str_188"
+    
+    initialScale              "0.5 0.5 0.5"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+    Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Pickup_Ammo_Explosive_Shotgun_Shells.staticmesh"
+    End_Component
+	Begin_Component "kexScriptComponent"
+		scriptClass           "RandoPickupObject"
+		triggerRadius         81.92
+	End_Component
+}
+
+Plasma kActor_Item_AmmoPlasma
+{
+    className                   "kexAmmoPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Ammo Pickup.ksnd"
+    pickup.ammo.amount          30
+    pickup.ammo.definition      "Ammo_Plasma"
+    pickup.pickupMessage        "$str_189"
+    
+    initialScale              "0.5 0.5 0.5"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+    Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Pickup_Ammo_Plasma_Rounds.staticmesh"
+    End_Component
+	Begin_Component "kexScriptComponent"
+		scriptClass           "RandoPickupObject"
+		triggerRadius         81.92
+	End_Component
+}
+
+PlasmaPack kActor_Item_AmmoPlasmaPack
+{
+    className                   "kexAmmoPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Ammo Pickup.ksnd"
+    pickup.ammo.amount          150
+    pickup.ammo.definition      "Ammo_Plasma"
+    pickup.pickupMessage        "$str_190"
+    
+    initialScale              "0.5 0.5 0.5"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+    Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Pickup_Ammo_Plasma_Pak.staticmesh"
+    End_Component
+	Begin_Component "kexScriptComponent"
+		scriptClass           "RandoPickupObject"
+		triggerRadius         81.92
+	End_Component
+}
+
+SunfirePods kActor_Item_AmmoSunfirePods
+{
+    className                   "kexWeaponPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Ammo Pickup.ksnd"
+    pickup.weapon.definition    kWpn_SunfirePod
+    pickup.weapon.giveAmmo      3
+    pickup.ammo.amount          3
+    pickup.ammo.definition      "Ammo_SunfirePod"
+    pickup.pickupMessage        "$str_191"
+    
+    initialScale                "0.5 0.5 0.5"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+    End_Component
+    Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Pickup_Sunfire_Pod.staticmesh"
+    End_Component
+	Begin_Component "kexScriptComponent"
+		scriptClass           "RandoPickupObject"
+		triggerRadius         81.92
+	End_Component
+}
+
+Bores kActor_Item_AmmoBores
+{
+    className                   "kexAmmoPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Ammo Pickup.ksnd"
+    pickup.ammo.amount          2
+    pickup.ammo.definition      "Ammo_Bore"
+    pickup.pickupMessage        "$str_192"
+    
+    initialScale              "0.5 0.5 0.5"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+    Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Pickup_Ammo_Bores.staticmesh"
+    End_Component
+	Begin_Component "kexScriptComponent"
+		scriptClass           "RandoPickupObject"
+		triggerRadius         81.92
+	End_Component
+}
+
+Grenade kActor_Item_AmmoGrenade
+{
+    className                   "kexAmmoPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Ammo Pickup.ksnd"
+    pickup.ammo.amount          1
+    pickup.ammo.definition      "Ammo_Grenades"
+    pickup.pickupMessage        "$str_194"
+    
+    initialScale              "0.5 0.5 0.5"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+    Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Pickup_Ammo_Grenade.staticmesh"
+    End_Component
+	Begin_Component "kexScriptComponent"
+		scriptClass           "RandoPickupObject"
+		triggerRadius         81.92
+	End_Component
+}
+
+PFM kActor_Item_AmmoPFM
+{
+    className                   "kexAmmoPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Ammo Pickup.ksnd"
+    pickup.ammo.amount          1
+    pickup.ammo.definition      "Ammo_Mine"
+    pickup.pickupMessage        "$str_193"
+    
+    initialScale              "0.5 0.5 0.5"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+    Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Pickup_Ammo_PFM.staticmesh"
+    End_Component
+	Begin_Component "kexScriptComponent"
+		scriptClass           "RandoPickupObject"
+		triggerRadius         81.92
+	End_Component
+}
+
+GrenadeBox kActor_Item_AmmoGrenadeBox
+{
+    className                   "kexAmmoPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Ammo Pickup.ksnd"
+    pickup.ammo.amount          5
+    pickup.ammo.definition      "Ammo_Grenades"
+    pickup.pickupMessage        "$str_195"
+    
+    initialScale              "0.5 0.5 0.5"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+    Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Pickup_Ammo_Box_Of_Grenades.staticmesh"
+    End_Component
+	Begin_Component "kexScriptComponent"
+		scriptClass           "RandoPickupObject"
+		triggerRadius         81.92
+	End_Component
+}
+
+Missiles kActor_Item_AmmoMissiles
+{
+    className                   "kexAmmoPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Ammo Pickup.ksnd"
+    pickup.ammo.amount          4
+    pickup.ammo.definition      "Ammo_Rockets"
+    pickup.pickupMessage        "$str_196"
+    
+    initialScale              "0.5 0.5 0.5"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+    Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Pickup_Ammo_Scorpion_Missiles.staticmesh"
+    End_Component
+	Begin_Component "kexScriptComponent"
+		scriptClass           "RandoPickupObject"
+		triggerRadius         81.92
+	End_Component
+}
+
+Spears kActor_Item_AmmoSpears
+{
+    className                   "kexAmmoPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Ammo Pickup.ksnd"
+    pickup.ammo.amount          3
+    pickup.ammo.definition      "Ammo_Spears"
+    pickup.pickupMessage        "$str_198"
+    
+    initialScale              "0.5 0.5 0.5"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+    Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Pickup_Ammo_Spears.staticmesh"
+    End_Component
+	Begin_Component "kexScriptComponent"
+		scriptClass           "RandoPickupObject"
+		triggerRadius         81.92
+	End_Component
+}
+
+Torpedo kActor_Item_AmmoTorpedo
+{
+    className                   "kexAmmoPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Ammo Pickup.ksnd"
+    pickup.ammo.amount          1
+    pickup.ammo.definition      "Ammo_Torpedos"
+    pickup.pickupMessage        "$str_199"
+    
+    initialScale              "0.5 0.5 0.5"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+    Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Pickup_Ammo_Torpedo.staticmesh"
+    End_Component
+	Begin_Component "kexScriptComponent"
+		scriptClass           "RandoPickupObject"
+		triggerRadius         81.92
+	End_Component
+}
+
+GasTank kActor_Item_AmmoGasTank
+{
+    className                   "kexAmmoPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Ammo Pickup.ksnd"
+    pickup.ammo.amount          50
+    pickup.ammo.definition      "Ammo_Fuel"
+    pickup.pickupMessage        "$str_203"
+    
+    initialScale              "0.5 0.5 0.5"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+    Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Pickup_Ammo_Flame_thrower_tanks.staticmesh"
+    End_Component
+	Begin_Component "kexScriptComponent"
+		scriptClass           "RandoPickupObject"
+		triggerRadius         81.92
+	End_Component
+}
+
+Nuke kActor_Item_AmmoNuke
+{
+    className                   "kexAmmoPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Ammo Pickup.ksnd"
+    pickup.ammo.amount          2
+    pickup.ammo.definition      "Ammo_Nuke"
+    pickup.pickupMessage        "$str_204"
+    
+    initialScale              "0.5 0.5 0.5"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+    Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Pickup_Ammo_Nuke_Ammo.staticmesh"
+    End_Component
+	Begin_Component "kexScriptComponent"
+		scriptClass           "RandoPickupObject"
+		triggerRadius         81.92
+	End_Component
+}

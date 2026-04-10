@@ -1,1 +1,0 @@
-// Eventually, this will have settings for macros!

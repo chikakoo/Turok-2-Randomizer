@@ -1,0 +1,28 @@
+# Whitelisting directories - start by ignoring all
+*
+
+# Except these two
+!.gitignore
+!README.md
+
+# And these directories
+!defs/
+!defs/**
+
+!gfx/
+!gfx/**
+
+!materials/
+!materials/**
+
+!models/
+!models/**
+
+!rando/
+!rando/**
+
+!scripts/
+!scripts/**
+
+!textures/
+!textures/**
