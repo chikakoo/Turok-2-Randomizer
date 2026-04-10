@@ -664,9 +664,11 @@ bool IsActorToTrigger(
 				tagId == 200004 ||
 				tagId == 200005;
 
-		// Level Key Trap 1
+		// First 2 = worm trap; others = Level Key Trap 1
 		case kLevel_BlindLair_3:
-			return tagId == 200009 ||
+			return tagId == 200006 ||
+				tagId == 200007 ||
+				tagId == 200009 ||
 				tagId == 200010 ||
 				tagId == 200011 ||
 				tagId == 200012 ||
@@ -749,11 +751,17 @@ void TryTriggerActors(const kStr &in position)
 			}
 			break;
 			
-		// Level Key Traps 1/2/3
+		// Worm + Level Key Traps 1/2/3
 		case kLevel_BlindLair_3:
-			if (position == "100_1074_3630_-2437")
+			// Worm trap
+			if (position == "100_-3206_7525_-3066")
 			{
-				TriggerActors();
+				TriggerActors(0, 2); // First two actors
+			}
+			// Level Key trap 1
+			else if (position == "100_1074_3630_-2437")
+			{
+				TriggerActors(2); // Everything after the first two actors
 			}
 			break;
 		case kLevel_BlindLair_8:
