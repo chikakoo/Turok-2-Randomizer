@@ -1,0 +1,458 @@
+//
+// Copyright(C) 2014-2015 Samuel Villarreal
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either version 2
+// of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// DESCRIPTION:
+//      Energy Totem behavior logic
+//
+
+const uint8 TOTEM_STATUS_INCOMPLETE     = 0;
+const uint8 TOTEM_STATUS_SUCCESSFUL     = 1;
+const uint8 TOTEM_STATUS_UNSUCCESSFUL   = 2;
+const uint8 TOTEM_STATUS_DONE           = 3;
+
+#define TOTEM_TIME              120
+#define TOTEM_TOTAL_ENEMIES     8
+
+#define TOTEM_MODEL_DAMAGED     1
+#define TOTEM_MODEL_DESTROYED   2
+
+#define TOTEM_ANIM_DAMAGED      ANIM_DESTRUCTIBLE_IDLE2
+#define TOTEM_ANIM_DESTROYED    ANIM_DESTRUCTIBLE_IDLE3
+#define TOTEM_ANIM_ACTIVATED    ANIM_DESTRUCTIBLE_IDLE4
+
+/*
+==============================================================
+TurokTotem
+==============================================================
+*/
+
+class TurokTotem : ScriptObject
+{
+    kActor@     self;
+    uint32      m_dwRemainingEnemies;
+    uint32      m_dwTime;
+    uint8       m_enemiesGoingAfterPlayer;
+    float       m_fTime;
+    uint8       m_status;
+    
+    TurokTotem(kActor@ actor)
+    {
+        @self = actor;
+        m_dwTime = TOTEM_TIME;
+        m_dwRemainingEnemies = 8;
+        m_enemiesGoingAfterPlayer = 1;
+        m_fTime = 0.0f;
+        m_status = TOTEM_STATUS_INCOMPLETE;
+    }
+    
+    // ------------------------------------------
+    void OnSpawn(void)
+    {
+        Hud.SetBar(0, 50, 255, 50, 255, TOTEM_TIME);
+        Hud.SetBar(1, 255, 50, 50, 255, TOTEM_TOTAL_ENEMIES);
+        
+        if(!self.Deserialized())
+        {
+            Game.PlayMusic(kVoice_SaveTotem);
+        }
+        
+        self.Flags() |= AF_NODAMAGE;
+        
+        // set flag so that they won't get in the way of projectiles
+        if(!(self.RenderMeshComponent() is null))
+        {
+            self.RenderMeshComponent().Flags() |= RMCF_NOEXPANDJOINTS;
+        }
+    }
+    
+    // ------------------------------------------
+    void OnSerialize(kDict& out dict)
+    {
+        SERIALIZE(m_dwRemainingEnemies);
+        SERIALIZE(m_dwTime);
+        SERIALIZE(m_enemiesGoingAfterPlayer);
+        SERIALIZE(m_fTime);
+        SERIALIZE(m_status);
+    }
+    
+    // ------------------------------------------
+    void OnDeserialize(kDict& in dict)
+    {
+        DESERIALIZE_INT(m_dwRemainingEnemies);
+        DESERIALIZE_INT(m_dwTime);
+        DESERIALIZE_INT(m_enemiesGoingAfterPlayer);
+        DESERIALIZE_FLOAT(m_fTime);
+        DESERIALIZE_INT(m_status);
+    }
+    
+    // ------------------------------------------
+    bool ActorTypeValid(kActor@ pActor)
+    {
+        switch(pActor.Type())
+        {
+        case kActor_AI_Raptoid:
+        case kActor_AI_Endtrail:
+        case kActor_AI_SpiderHatchling:
+        case kActor_AI_Sentinel:
+        case kActor_AI_Guardian:
+        case kActor_AI_Gunner:
+        case kActor_AI_Juggernaut:
+        case kActor_AI_Worker:
+        case kActor_AI_Drone:
+            return true;
+            
+        // seems unnecessary but I am really paranoid...
+        case kActor_Player:
+        case kActor_SPStart:
+        case kActor_DeathmatchStart:
+            return false;
+        }
+        
+        return false;
+    }
+    
+    // ------------------------------------------
+    void WarpTimerUpdate(void)
+    {
+        // update timer and then proceed to warp
+        m_fTime += GAME_DELTA_TIME;
+        if(m_fTime >= 6.0f)
+        {
+            switch(Game.ActiveMapID())
+            {
+            case kLevel_PortOfAdia_Totem:
+                DoPlayerWarp(0, 11999, kLevel_Hub, true);
+                break;
+                
+            case kLevel_RiverOfSouls_Totem:
+                DoPlayerWarp(0, 12999, kLevel_Hub, true);
+                break;
+                
+            case kLevel_DeathMarsh_Totem:
+                DoPlayerWarp(0, 13999, kLevel_Hub, true);
+                break;
+                
+            case kLevel_BlindLair_Totem:
+                DoPlayerWarp(0, 17401, kLevel_BlindOneBoss, true);
+                break;
+                
+            case kLevel_Hive_Totem:
+                DoPlayerWarp(0, 17501, kLevel_QueenBoss, true);
+                break;
+                
+            default:
+                break;
+            }
+            
+            m_status = TOTEM_STATUS_DONE;
+        }
+    }
+    
+    // ------------------------------------------
+    void SetMissionSucessful(void)
+    {
+        self.AnimTrackComponent().Set(TOTEM_ANIM_ACTIVATED, 4, 0);
+        m_status = TOTEM_STATUS_SUCCESSFUL;
+        m_fTime = 0.0f;
+        Hud.DisableBar(0);
+        Hud.DisableBar(1);
+        
+        // give the player a cookie for doing a good job
+        LocalPlayer.Inventory().Give(kActor_Misc_TotemInventory);
+    }
+    
+    // ------------------------------------------
+    void SetMissionUnSucessful(void)
+    {
+        self.RenderMeshComponent().SwapOutMesh(TOTEM_MODEL_DESTROYED);
+        self.AnimTrackComponent().Set(TOTEM_ANIM_DESTROYED, 4, 0);
+        m_status = TOTEM_STATUS_UNSUCCESSFUL;
+        m_fTime = 0.0f;
+        Hud.DisableBar(0);
+        Hud.DisableBar(1);
+        
+        // have remaining enemies target player
+        kActorIterator cIterator;
+        kActor@ pActor;
+        
+        // ------------------------------------------
+        // iterate enemies
+        while(!((@pActor = cIterator.GetNext()) is null))
+        {
+            if(!ActorTypeValid(pActor))
+            {
+                continue;
+            }
+            
+            // dead?
+            if((pActor.Flags() & AF_DEAD) != 0)
+            {
+                continue;
+            }
+            
+            kEnemyAIComponent@ pEAIC = pActor.EnemyAIComponent();
+            if(pEAIC is null)
+            {
+                continue;
+            }
+            
+            pEAIC.SetNoUpdateTarget(false, false);
+        }
+    }
+    
+    // ------------------------------------------
+    void IncompleteTick(void)
+    {
+        if(m_dwRemainingEnemies <= 0)
+        {
+            SetMissionSucessful();
+            return;
+        }
+        else
+        {
+            kActorIterator cIterator;
+            kActor@ pActor;
+            uint8 nEnemiesAfterPlayer = 0;
+            
+            // ------------------------------------------
+            // update timer
+            m_fTime += GAME_DELTA_TIME;
+            if(m_fTime > 1.0f)
+            {
+                m_fTime -= 1.0f;
+                m_dwTime--;
+                if(m_dwTime <= 0)
+                {
+                    m_dwTime = 0;
+                    SetMissionUnSucessful();
+                    return;
+                }
+                else if(m_dwTime == (TOTEM_TIME/2))
+                {
+                    // about half-way into the countdown, swap out the damage mesh
+                    self.RenderMeshComponent().SwapOutMesh(TOTEM_MODEL_DAMAGED);
+                    self.AnimTrackComponent().Set(TOTEM_ANIM_DAMAGED, 4, 0);
+                }
+            }
+            
+            Hud.UpdateBar(0, m_dwTime);
+            
+            // ------------------------------------------
+            // iterate enemies
+            while(!((@pActor = cIterator.GetNext()) is null))
+            {
+                if(!ActorTypeValid(pActor))
+                {
+                    continue;
+                }
+                
+                // must be dead
+                if((pActor.Flags() & AF_DEAD) != 0 && !(pActor.ModeStateComponent() is null))
+                {
+                    // been dead for a while?
+                    if(pActor.ModeStateComponent().ModeTime() >= 10.0f)
+                    {
+                        if(pActor.TID() != -666)
+                        {
+                            // hack TID to a value so we don't set the fading to this actor again
+                            pActor.TID() = -666;
+                            pActor.RunFxEvent("Hostage_Fade");
+                        }
+                    }
+                    // just killed?
+                    else if(pActor.TID() != -667 && m_dwRemainingEnemies > 0)
+                    {
+                        // hack TID to a value so we don't recheck this actor again
+                        pActor.TID() = -667;
+                        m_dwRemainingEnemies--;
+                        
+                        Hud.UpdateBar(1, m_dwRemainingEnemies);
+                    }
+                }
+                
+                // assign a target if not got one
+                kEnemyAIComponent@ pEAIC = pActor.EnemyAIComponent();
+                if(!(pEAIC is null))
+                {
+                    if(Game.ActiveMapID() == kLevel_PortOfAdia_Totem)
+                    {
+                        pEAIC.SpawnFlags() &= ~EAIGF_DROPOFF;
+                    }
+                    else if(pActor.Type() != kActor_AI_Drone)
+                    {
+                        // allow it to walk off of cliffs
+                        pEAIC.SpawnFlags() |= EAIGF_DROPOFF;
+                    }
+                    
+                    if(!pEAIC.HasOverrideTarget())
+                    {
+                        // ------------------------------------------
+                        // assign targets
+                        if(nEnemiesAfterPlayer < m_enemiesGoingAfterPlayer)
+                        {
+                            nEnemiesAfterPlayer++;
+                        }
+                        else
+                        {
+                            pEAIC.PathTarget().SetTarget(self);
+                            pEAIC.SightTarget().SetTarget(self);
+                            pEAIC.SetNoUpdateTarget(true, true);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    // ------------------------------------------
+    void SuccessfulTick(void)
+    {
+        // call down the wraith of the totem on a random enemy
+        if((self.GameTicks() & 0x7) == 0 && Math::RandFloat() > 0.25f)
+        {
+            kActorIterator cIterator;
+            kActor@ pActor;
+            
+            // ------------------------------------------
+            // iterate enemies
+            while(!((@pActor = cIterator.GetNext()) is null))
+            {
+                if(!ActorTypeValid(pActor))
+                {
+                    continue;
+                }
+                
+                // dead?
+                if((pActor.Flags() & AF_DEAD) != 0)
+                {
+                    continue;
+                }
+                
+                kEnemyAIComponent@ pEAIC = pActor.EnemyAIComponent();
+                if(pEAIC is null)
+                {
+                    continue;
+                }
+                
+                kDamageInfo cDamageInfo;
+        
+                cDamageInfo.radius = 5*GAME_SCALE;
+                cDamageInfo.flags = DF_NORMAL;
+                @cDamageInfo.inflictor = @self;
+                @cDamageInfo.source = @self;
+                @cDamageInfo.target = @pActor;
+                @cDamageInfo.particle = null;
+                cDamageInfo.hits = 255.0f * 128.0f;
+                
+                ParticleFactory.Spawn(kParticle_TotemBeam, pActor, pActor.Origin(), kQuat(0, 0, 0), Math::vecZero);
+                pActor.InflictDamage(cDamageInfo);
+                break;
+            }
+        }
+        
+        WarpTimerUpdate();
+    }
+    
+    // ------------------------------------------
+	// RANDO EDIT: If there's a level goal, instead of failing, restart the fight to force the 
+	// player to complete the mission
+    void UnSuccessfulTick(void)
+    {
+        bool bAllDead = true;
+        kActorIterator cIterator;
+        kActor@ pActor;
+        
+        // ------------------------------------------
+        // iterate enemies
+        while(!((@pActor = cIterator.GetNext()) is null))
+        {
+            if(!ActorTypeValid(pActor))
+            {
+                continue;
+            }
+            
+            kEnemyAIComponent@ pEAIC = pActor.EnemyAIComponent();
+            if(pEAIC is null)
+            {
+                continue;
+            }
+            
+            // dead?
+            if((pActor.Flags() & AF_DEAD) == 0)
+            {
+                bAllDead = false;
+                break;
+            }
+        }
+        
+        if(bAllDead)
+        {
+			//---------------------
+			// Rando block
+			if (OPTION_GOAL_LEVELS > 0)
+			{
+				switch(Game.ActiveMapID())
+				{
+					case kLevel_PortOfAdia_Totem:
+						DoPlayerWarp(0, 17100, kLevel_PortOfAdia_Totem, true);
+						return;
+						
+					case kLevel_RiverOfSouls_Totem:
+						DoPlayerWarp(0, 17200, kLevel_RiverOfSouls_Totem, true);
+						return;
+						
+					case kLevel_DeathMarsh_Totem:
+						DoPlayerWarp(0, 17300, kLevel_DeathMarsh_Totem, true);
+						return;
+						
+					case kLevel_BlindLair_Totem:
+						DoPlayerWarp(0, 17400, kLevel_BlindLair_Totem, true);
+						return;
+						
+					case kLevel_Hive_Totem:
+						DoPlayerWarp(0, 17500, kLevel_Hive_Totem, true);
+						return;
+						
+					// This is bad, do the default code to prevent softlocks!
+					default:
+						break;
+				}
+			}
+			//---------------------
+			
+            WarpTimerUpdate();
+        }
+    }
+    
+    // ------------------------------------------
+    void OnTick(void)
+    {
+        switch(m_status)
+        {
+        case TOTEM_STATUS_INCOMPLETE:
+            IncompleteTick();
+            break;
+            
+        case TOTEM_STATUS_SUCCESSFUL:
+            SuccessfulTick();
+            break;
+            
+        case TOTEM_STATUS_UNSUCCESSFUL:
+            UnSuccessfulTick();
+            break;
+            
+        default:
+            break;
+        }
+    }
+};
