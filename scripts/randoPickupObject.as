@@ -90,7 +90,15 @@ class RandoPickupObject : ScriptObject
 			kVec3 delta = self.Origin() - player.Origin();
 			float distSq = delta.UnitSq(); // Squared distance
 			float triggerDistance = self.WorldComponent().Radius() + player.WorldComponent().Radius();
+			if ((player.MovementComponent().Flags() & MCF_NO_GRAVITY) != 0)
+			{
+				// Force a bigger radius during Leap of Faith because things can be missed otherwise
+				// The extra radius in other places causes issues, so only do it here
+				triggerDistance += 50;
+			}
 			float triggerDistSq = triggerDistance * triggerDistance;
+			
+			
 			if (distSq > triggerDistSq)
 			{
 				return;
@@ -124,6 +132,12 @@ class RandoPickupObject : ScriptObject
 			
 		if (m_id != 0)
 		{
+			// In case we trigger this before our OnTick detection...
+			if (!m_wasSentToAP)
+			{
+				DisplayCollectedLocationsForCurrentMap();
+			}
+		
 			CollectLocation(m_id, Game.ActiveMapID());
 			SendCheckToAP(m_id);
 			m_wasSentToAP = true;

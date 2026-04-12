@@ -44,20 +44,31 @@ bool TryTriggerTrap(const int &in trapId)
 void HandleEnemyTrap()
 {
 	Hud.AddMessage("It's a trap!");
-
-	array<int> possibleEnemies = {
-		kActor_AI_Raptoid,
-		kActor_AI_Endtrail,
-		kActor_AI_Raptor,
-		kActor_AI_SwampWasp,
-		kActor_AI_CaveWorm,
-		kActor_AI_Grub,
-		kActor_AI_Drone,
-		kActor_AI_Leaper
-	};
 	
-	int selectedActor = RandomInt(possibleEnemies);
 	int numberToSpawn = RandomInt(1, 3);
+	int selectedActor;
+	
+	// If the player is using the Leap of Faith or Whispers, spawn a non-blocking enemy
+	// to prevent softlocking from falling somewhere they shouldn't be able to fall from
+	if ((LocalPlayer.Actor().MovementComponent().Flags() & MCF_NO_GRAVITY) != 0)
+	{
+		selectedActor = kActor_AI_SwampWasp;
+	}
+	else 
+	{
+		array<int> possibleEnemies = {
+			kActor_AI_Raptoid,
+			kActor_AI_Endtrail,
+			kActor_AI_Raptor,
+			kActor_AI_SwampWasp,
+			kActor_AI_CaveWorm,
+			kActor_AI_Grub,
+			kActor_AI_Drone,
+			kActor_AI_Leaper
+		};
+		selectedActor = RandomInt(possibleEnemies);
+	}
+
 	for (int i = 0; i < numberToSpawn; i++)
 	{
 		SpawnActorNearPlayer(selectedActor);
