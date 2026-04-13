@@ -116,6 +116,33 @@ HubWarpFrame kActor_Portal_HubWarpFrame
 }
 
 //------------------------------
+// Warp Barrier - used to block warps for progressive warps
+// The radius is the standard size for warp portals - adjust as needed
+//------------------------------
+WarpBarrier kActor_ProgressionBlocker_WarpBarrier
+{
+	className				  "kexActor"
+	placeable                 TRUE
+	flags.noDamage            TRUE
+	flags.allowTracking       FALSE
+	
+    Begin_Component "kexWorldComponent"
+        radius                140.0
+		touchRadius			  150.0
+        height                1000.0
+		bNonSolid             FALSE
+    End_Component
+	Begin_Component "kexScriptComponent"
+        scriptClass           "RandoWarpBarrier"
+    End_Component
+	
+	// Temporary for visibility
+	Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Pickup_Health_2.staticmesh"
+    End_Component
+}
+
+//------------------------------
 // Primagen Key Trigger - used to display a message if you didn't yet meet the level goal
 //------------------------------
 PrimagenKeyTrigger kActor_Hub_PrimagenKeyTrigger

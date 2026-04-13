@@ -8,6 +8,7 @@
 #define kActor_Portal_HubWarp 200000
 #define kActor_Portal_HubWarpFrame 200001
 #define kActor_Hub_PrimagenKeyTrigger 200002
+#define kActor_ProgressionBlocker_WarpBarrier 200100
 #define kActor_Item_RandomAmmo 30000 // Limited to int16 for generators
 #define kActor_Generator_RandomAmmo 30100
 

@@ -20,6 +20,21 @@ void DoActorReplacementsOnPlayerSpawn()
 	// Replace all the actors that should be replaced
 	ReplaceAllActors(mapId);
 	DoHubModifications(mapId);
+	
+	//TODO: make this better
+	if (mapId == 51)
+	{
+		kVec3 origin;
+		origin.x = 3840;
+		origin.y = 614;
+		origin.z = 307;
+		ActorFactory.Spawn(
+			kActor_ProgressionBlocker_WarpBarrier,
+			origin,
+			0,
+			0,
+			0);
+	}
 }
 
 //----------------------------------
