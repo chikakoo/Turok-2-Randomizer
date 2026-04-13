@@ -132,14 +132,14 @@ class RandoPickupObject : ScriptObject
 			
 		if (m_id != 0)
 		{
-			// In case we trigger this before our OnTick detection...
+			CollectLocation(m_id, Game.ActiveMapID());
+			SendCheckToAP(m_id);
+			
+			// In case we triggered this before our OnTick detection...
 			if (!m_wasSentToAP)
 			{
 				DisplayCollectedLocationsForCurrentMap();
 			}
-		
-			CollectLocation(m_id, Game.ActiveMapID());
-			SendCheckToAP(m_id);
 			m_wasSentToAP = true;
 			
 			// If this item is marked with rando.give2, do this to give the second one
