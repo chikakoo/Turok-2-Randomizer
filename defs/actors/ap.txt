@@ -165,6 +165,26 @@ PrimagenKeyTrigger kActor_Hub_PrimagenKeyTrigger
 }
 
 //------------------------------
+// UI actors - for our fake UI
+// TODO - the meshes
+//------------------------------
+UIElement kActor_UI_Element
+{
+	className 					"kexActor"
+	flags.noDamage 				TRUE
+	flags.allowTracking			FALSE
+	placeable					FALSE
+	
+	Begin_Component "kexRenderMeshComponent"
+		mesh "char/ui.skinnedmesh"
+		anim "anims/none.anim"
+	End_Component
+	Begin_Component "kexScriptComponent"
+		scriptClass "RandoUIElement"
+	End_Component
+}
+
+//------------------------------
 // Traps - each type can have any of the health pickup models.
 //------------------------------
 

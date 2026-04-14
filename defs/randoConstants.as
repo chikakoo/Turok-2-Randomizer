@@ -1,7 +1,11 @@
-#define AF_EASY 1 << 10
-#define AF_NORMAL 1 << 11
-#define AF_HARD 1 << 12
-#define AF_HARDCORE 1 << 13
+// Undefined in the API, but should be
+#define PF_FLOATCAM 1 << 11
+#define PF_NOWEAPON 1 << 21
+
+// Called in UserEvent to get the script object back
+#define RANDO_MSG_GET_SCRIPT 100
+
+#define kActor_UI_Element 300000
 
 #define kActor_Item_APItemProgression 100000
 #define kActor_Item_APItemNonProgression 100001

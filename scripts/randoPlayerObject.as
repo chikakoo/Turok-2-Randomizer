@@ -24,6 +24,11 @@ class RandoPlayerObject : ScriptObject
 	// Also handles actor replacements.
 	void OnSpawn(void)
 	{
+		if (g_ui !is null)
+		{
+			g_ui.Deactivate();
+		}
+	
 		int16 mapId = Game.ActiveMapID();
 	
 		// If the map is the intro map, it's a new game, so reset everything
@@ -154,6 +159,11 @@ class RandoPlayerObject : ScriptObject
 	// - Clears out any incoming/outgoing data because it's invalid at this point
 	void OnDeserialize(kDict &in dict)
     {
+		if (g_ui !is null)
+		{
+			g_ui.Deactivate();
+		}
+		
 		ResetCollectedStatuses();
 		g_AP.IsGoalReached = 0;
 		
@@ -250,6 +260,7 @@ class RandoPlayerObject : ScriptObject
 			ProcessOutgoingMessages();
 		}
 		
+		g_ui.OnTick();
 		TryDisplayProgressMenu();
 	}
 

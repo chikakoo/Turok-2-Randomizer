@@ -67,7 +67,13 @@ bool DeserializeBool(kDict& in dict, const kStr& in key)
 #include "scripts/netcallbacks.txt"
 
 #include "scripts/weaponInfoCache.as"
+
+#include "scripts/scriptActor.as"
+#include "scripts/userEvent.as"
+
 #include "scripts/ui.as"
+#include "scripts/uiElement.as"
+
 #include "scripts/utils.as"
 #include "scripts/actorUtils.as"
 #include "scripts/locations.as"
