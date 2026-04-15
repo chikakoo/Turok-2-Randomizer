@@ -122,7 +122,7 @@ const float UI_MOUSE_SIZE = 0.025f;
 const float UI_BACKGROUND_WIDTH = 0.636364f;
 const float UI_BACKGROUND_HEIGHT = 0.70f;
 
-const int UI_ICON_SIZE = 22;
+const int UI_ICON_SIZE = 28;
 
 const int UI_OFFSET_HEADER = 44;
 const int UI_OFFSET_ROW_HEIGHT = 77;
@@ -261,10 +261,21 @@ class RandoUI
 		int level1HeightOffset = GetLevelRowHeightOffset(1);
 		int level2HeightOffset = GetLevelRowHeightOffset(2);
 		int level3HeightOffset = GetLevelRowHeightOffset(3);
+		
+		kPlayerInventory@ inventory = LocalPlayer.Inventory();
 
-		AddNumberImage(2, PositionPixelToUI(UI_OFFSET_LEVEL_KEY, level3HeightOffset));
-		AddNumberImage(123, PositionPixelToUI(UI_OFFSET_FEATHER, level3HeightOffset));
-		AddImage(RANDO_UI_TEXTURE_COMPLETE, PositionPixelToUI(UI_OFFSET_LEVEL_KEY, level2HeightOffset, 0.01f));
+		int level2Keys = inventory.GetCount(kActor_InventoryItem_Level2Key);
+		if (level2Keys < 3)
+		{
+			AddNumberImage(level2Keys, PositionPixelToUI(UI_OFFSET_LEVEL_KEY, level2HeightOffset));
+		}
+		else 
+		{
+			AddImage(RANDO_UI_TEXTURE_COMPLETE, PositionPixelToUI(UI_OFFSET_LEVEL_KEY, level2HeightOffset));
+		}
+
+		//AddNumberImage(123, PositionPixelToUI(UI_OFFSET_FEATHER, level3HeightOffset));
+		//AddImage(RANDO_UI_TEXTURE_COMPLETE, PositionPixelToUI(UI_OFFSET_LEVEL_KEY, level2HeightOffset, 0.01f));
 	}
 	
 	// --------------------------
@@ -483,7 +494,7 @@ class RandoUI
 		}
 		
 		// Make sure the player doesn't move
-		// TODO: set the player mesh to none so it
+		// TODO: set the player mesh to none
 		owner.Yaw() = uiYaw;
 		owner.Pitch() = 0.0f;
 		owner.Roll() = 0.0f;

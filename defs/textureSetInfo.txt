@@ -9,8 +9,8 @@
 
     texture_1 "gfx/cursor.png"
 	texture_2 "textures/ui/background.png"
-	texture_3 "gfx/hud/h_objective_checkmark_complete.png"
-	texture_4 "textures/ui/incomplete.png"
+	texture_3 "textures/ui/incomplete.png"
+	texture_4 "gfx/hud/h_objective_checkmark_complete.png"
 	texture_5 "textures/ui/text_0.png"
 	texture_6 "textures/ui/text_1.png"
 	texture_7 "textures/ui/text_2.png"
