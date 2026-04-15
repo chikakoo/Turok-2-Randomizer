@@ -130,6 +130,11 @@ const int UI_OFFSET_ROW_BOTTOM = 22;
 
 const int UI_OFFSET_LEVEL_KEY = 70;
 const int UI_OFFSET_FEATHER = 122;
+const int UI_OFFSET_PRIMAGEN_KEY = 171;
+const int UI_OFFSET_TALISMAN = 226;
+
+const int UI_OFFSET_NUKE_X = 468;
+const int UI_OFFSET_NUKE_Y = 539;
 	
 class RandoUI
 {
@@ -180,9 +185,16 @@ class RandoUI
 	{
 		@owner = LocalPlayer.Actor().CastToActor();
 		kPuppet@ puppet = owner.CastToPuppet();
+		kVec3 velocity = owner.MovementComponent().Velocity();
 		
-		//TODO: check if player is in warp spot
-		// If not, return false and print a message
+		if ((owner.WorldComponent().Flags() & WCF_ON_PLATFORM) != 0 ||
+			velocity.x != 0 ||
+			velocity.y != 0 ||
+			velocity.z != 0)
+		{
+			Hud.AddMessage("Stand still to show the UI.");
+			return false;
+		}
 		
 		lastFov = 0.0f;
 		mouse.SetPosition(Math::vecZero);
@@ -198,13 +210,11 @@ class RandoUI
 		uiOrigin = owner.Origin();
 		uiRegion = owner.WorldComponent().RegionIndex();
 		uiYaw = owner.Yaw();
+		owner.Pitch() = 0;
+		owner.Roll() = 0;
 		puppet.PlayerFlags() &= ~PF_FLOATCAM;
 		puppet.PlayerFlags() |= PF_NOWEAPON;
 		floatCamWait = 2;
-		
-		// Needed because for some reason they aren't actually initialized otherwise
-		float dummy1 = owner.Pitch();
-		float dummy2 = owner.Roll();
 		
 		kQuat ownerRot(0.0f, 0.0f, -uiYaw);
 		forwardDir = kVec3(0.0f, 1.0f, 0.0f) * ownerRot;
@@ -258,24 +268,75 @@ class RandoUI
 	{
 		AddBackgroundImage(RANDO_UI_TEXTURE_BACKGROUND);
 		
-		int level1HeightOffset = GetLevelRowHeightOffset(1);
-		int level2HeightOffset = GetLevelRowHeightOffset(2);
-		int level3HeightOffset = GetLevelRowHeightOffset(3);
+		DisplayLevel(1, 0, -1, -1, kActor_PrimagenKey_1, -1);
+		DisplayLevel(2, 3, kActor_InventoryItem_Level2Key, kActor_Feather_2, kActor_PrimagenKey_2, kActor_Talisman_LeapOfFaith);
+		DisplayLevel(3, 3, kActor_InventoryItem_Level3Key, kActor_Feather_3, kActor_PrimagenKey_3, kActor_Talisman_BreathOfLife);
+		DisplayLevel(4, 3, kActor_InventoryItem_Level4Key, kActor_Feather_4, kActor_PrimagenKey_4, kActor_Talisman_HeartOfFire);
+		DisplayLevel(5, 3, kActor_InventoryItem_Level5Key, kActor_Feather_5, kActor_PrimagenKey_5, kActor_Talisman_Whispers);
+		DisplayLevel(6, 6, kActor_InventoryItem_Level6Key, kActor_Feather_6, kActor_PrimagenKey_6, kActor_Talisman_EyeOfTruth);
 		
-		kPlayerInventory@ inventory = LocalPlayer.Inventory();
-
-		int level2Keys = inventory.GetCount(kActor_InventoryItem_Level2Key);
-		if (level2Keys < 3)
+		int nukeParts = LocalPlayer.Inventory().GetCount(kActor_InventoryItem_NukePart);
+		kVec3 nukePosition = PositionPixelToUI(UI_OFFSET_NUKE_X, UI_OFFSET_NUKE_Y);
+		if (nukeParts < 6)
 		{
-			AddNumberImage(level2Keys, PositionPixelToUI(UI_OFFSET_LEVEL_KEY, level2HeightOffset));
+			AddNumberImage(nukeParts, nukePosition);
 		}
 		else 
 		{
-			AddImage(RANDO_UI_TEXTURE_COMPLETE, PositionPixelToUI(UI_OFFSET_LEVEL_KEY, level2HeightOffset));
+			AddImage(RANDO_UI_TEXTURE_COMPLETE, nukePosition);
 		}
+	}
+	
+	// --------------------------
+	// Displays the status for the given Level
+	// Level 1 only has primagen keys and mission items, so it returns early
+	void DisplayLevel(
+		const int &in level, 
+		const int &in maxKeys,
+		const int &in levelKeyActor,
+		const int &in featherActor,
+		const int &in primagenKeyActor,
+		const int &in talismanActor)
+	{
+		kPlayerInventory@ inventory = LocalPlayer.Inventory();
+		int levelHeightOffset = GetLevelRowHeightOffset(level);
 
-		//AddNumberImage(123, PositionPixelToUI(UI_OFFSET_FEATHER, level3HeightOffset));
-		//AddImage(RANDO_UI_TEXTURE_COMPLETE, PositionPixelToUI(UI_OFFSET_LEVEL_KEY, level2HeightOffset, 0.01f));
+		// Primagen Keys
+		int primagenKeyTexture = inventory.GetCount(primagenKeyActor) > 0
+			? RANDO_UI_TEXTURE_COMPLETE
+			: RANDO_UI_TEXTURE_INCOMPLETE;
+		AddImage(primagenKeyTexture, PositionPixelToUI(UI_OFFSET_PRIMAGEN_KEY, levelHeightOffset));
+		
+		// Mission items (TODO)
+		
+		// Special case for level 1, as it doesn't have any more to show
+		if (level == 1)
+		{
+			return;
+		}
+		
+		// Level Keys
+		int levelKeys = inventory.GetCount(levelKeyActor);
+		if (levelKeys < maxKeys)
+		{
+			AddNumberImage(levelKeys, PositionPixelToUI(UI_OFFSET_LEVEL_KEY, levelHeightOffset));
+		}
+		else 
+		{
+			AddImage(RANDO_UI_TEXTURE_COMPLETE, PositionPixelToUI(UI_OFFSET_LEVEL_KEY, levelHeightOffset));
+		}
+		
+		// Feathers
+		int featherTexture = inventory.GetCount(featherActor) > 0
+			? RANDO_UI_TEXTURE_COMPLETE
+			: RANDO_UI_TEXTURE_INCOMPLETE;
+		AddImage(featherTexture, PositionPixelToUI(UI_OFFSET_FEATHER, levelHeightOffset));
+		
+		// Talismans
+		int talismanTexture = inventory.GetCount(talismanActor) > 0
+			? RANDO_UI_TEXTURE_COMPLETE
+			: RANDO_UI_TEXTURE_INCOMPLETE;
+		AddImage(talismanTexture, PositionPixelToUI(UI_OFFSET_TALISMAN, levelHeightOffset));
 	}
 	
 	// --------------------------
@@ -500,10 +561,6 @@ class RandoUI
 		owner.Roll() = 0.0f;
 		owner.Origin() = uiOrigin;
 		owner.WorldComponent().SetRegion(uiRegion);
-		
-		// TODO: instead of this, don't show the UI if the player is moving
-		// AND/OR if the player has velocity, hide the UI
-		owner.MovementComponent().Velocity() = Math::vecZero;
 		
 		kPuppet@ puppet = owner.CastToPuppet();
 		puppet.PlayerFlags() |= PF_HASJUMPED | PF_NOWEAPON;
