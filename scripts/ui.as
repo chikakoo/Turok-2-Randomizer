@@ -189,6 +189,10 @@ class RandoUI
 		puppet.PlayerFlags() |= PF_NOWEAPON;
 		floatCamWait = 2;
 		
+		// Needed because for some reason they aren't actually initialized otherwise
+		float dummy1 = owner.Pitch();
+		float dummy2 = owner.Roll();
+		
 		kQuat ownerRot(0.0f, 0.0f, -uiYaw);
 		forwardDir = kVec3(0.0f, 1.0f, 0.0f) * ownerRot;
 		rightDir = kVec3(1.0f, 0.0f, 0.0f) * ownerRot;
@@ -393,8 +397,7 @@ class RandoUI
 			mouseDY = -(lastMouseY - mouseRealY);
 		}
 		
-		// Move the elements relative to the mouse
-		kPuppet@ puppet = owner.CastToPuppet();
+		// Make sure the player doesn't move
 		// TODO: set the player mesh to none
 		owner.Yaw() = uiYaw;
 		owner.Pitch() = 0.0f;
@@ -406,6 +409,7 @@ class RandoUI
 		// AND/OR if the player has velocity, hide the UI
 		owner.MovementComponent().Velocity() = Math::vecZero;
 		
+		kPuppet@ puppet = owner.CastToPuppet();
 		puppet.PlayerFlags() |= PF_HASJUMPED | PF_NOWEAPON;
 		floatCamWait = MAX(floatCamWait - 1, 0);
 		if (floatCamWait == 0)
