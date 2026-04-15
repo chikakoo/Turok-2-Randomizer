@@ -176,7 +176,7 @@ UIElement kActor_UI_Element
 	placeable					FALSE
 	
 	Begin_Component "kexRenderMeshComponent"
-		mesh "char/ui.skinnedmesh"
+		mesh "char/ui/ui.skinnedmesh"
 		anim "anims/none.anim"
 	End_Component
 	Begin_Component "kexScriptComponent"

@@ -18,6 +18,12 @@
 !models/
 !models/**
 
+!char/
+!char/**
+
+!anims/
+!anims/**
+
 !rando/
 !rando/**
 
