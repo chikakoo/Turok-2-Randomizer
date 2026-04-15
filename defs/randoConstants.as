@@ -1,7 +1,3 @@
-// Undefined in the API, but should be
-#define PF_FLOATCAM 1 << 11
-#define PF_NOWEAPON 1 << 21
-
 // Called in UserEvent to get the script object back
 #define RANDO_MSG_GET_SCRIPT 100
 

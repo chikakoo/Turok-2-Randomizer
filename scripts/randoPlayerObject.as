@@ -1,6 +1,13 @@
+enum RandoUndefinedPlayerFlags
+{
+	PF_FLOATCAM = 1 << 11,
+	PF_NOWEAPON = 1 << 21
+};
+
 class RandoPlayerObject : ScriptObject
 {
     kActor@ self;
+	RandoUI@ ui;
 	
 	// An array of ascii characters so we can get the index easily
 	array<kStr> m_asciiChars = {
@@ -20,13 +27,46 @@ class RandoPlayerObject : ScriptObject
     }
 	
 	//---------------------------
+	// Displays a progress menu for the player depending on what buttons are held for the
+	// set number of frames.
+	//
+	// Warp to Hub: Zoom in, out, up, down, left, right
+	// Current level progress: Zoom in and out
+	// Current game progress: Zoom in, out, and jump
+	void TryDisplayProgressMenu()
+	{
+		if (g_messageCooldown > 0) 
+		{
+			g_messageCooldown--;
+			return;
+		}
+
+		if (LocalPlayer.ButtonHeldTime(8) > g_menuButtonHeldTime && 
+			LocalPlayer.ButtonHeldTime(9) > g_menuButtonHeldTime)
+		{
+			if (LocalPlayer.ButtonHeldTime(1) > g_menuButtonHeldTime)
+			{
+				DisplayGameProgress();
+			}
+			
+			else
+			{
+				//DisplayLevelProgress();
+				ui.Activate();
+			}
+			
+			g_messageCooldown = g_progressMenuDisplayTime + 30;
+		}
+	}
+	
+	//---------------------------
 	// Resets the state of the globals on a save load.
 	// Also handles actor replacements.
 	void OnSpawn(void)
 	{
-		if (g_ui !is null)
+		if (ui !is null)
 		{
-			g_ui.Deactivate();
+			ui.Deactivate();
 		}
 	
 		int16 mapId = Game.ActiveMapID();
@@ -159,9 +199,9 @@ class RandoPlayerObject : ScriptObject
 	// - Clears out any incoming/outgoing data because it's invalid at this point
 	void OnDeserialize(kDict &in dict)
     {
-		if (g_ui !is null)
+		if (ui !is null)
 		{
-			g_ui.Deactivate();
+			ui.Deactivate();
 		}
 		
 		ResetCollectedStatuses();
@@ -260,7 +300,12 @@ class RandoPlayerObject : ScriptObject
 			ProcessOutgoingMessages();
 		}
 		
-		g_ui.OnTick();
+		if (ui is null)
+        {
+            @ui = RandoUI();
+        }
+		ui.OnTick();
+		
 		TryDisplayProgressMenu();
 	}
 

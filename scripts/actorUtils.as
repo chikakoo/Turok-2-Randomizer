@@ -277,27 +277,6 @@ void TriggerActors(const int &in startIndex = 0, const int &in count = 1000)
 }
 
 //---------------------------
-// The forward direction of the actor
-kVec3 GetForwardVector(kActor@ actor)
-{
-	return kVec3(0.0f, 1.0f, 0.0f) * kQuat(actor.Pitch(), 0.0f, actor.Yaw());
-}
-
-//---------------------------
-// The right direction of the actor
-kVec3 GetRightVector(kActor@ actor)
-{
-	return kVec3(1.0f, 0.0f, 0.0f) * kQuat(actor.Pitch(), 0.0f, actor.Yaw());
-}
-
-//---------------------------
-// The up direction of the actor
-kVec3 GetUpVector(kActor@ actor)
-{
-	return kVec3(0.0f, 0.0f, 1.0f) * kQuat(actor.Pitch(), 0.0f, actor.Yaw());
-}
-
-//---------------------------
 // Gets a friendly name given the actor type, for debugging
 // actorType: The type of actor to get a name for
 kStr GetFriendlyActorName(const int &in actorType)

@@ -113,7 +113,7 @@ class RandoUIElement : ScriptActor
 	}
 	
 	// --------------------------
-	// Moves the element according to the cursor movement to simulate the mouse moving
+	// Updates the element's position
 	void Update(kActor@ player, kVec3 &in position)
 	{
 		self.Origin() = position + (

@@ -4,41 +4,6 @@
 uint16 g_menuButtonHeldTime = 5;
 int g_messageCooldown = 0;
 int g_progressMenuDisplayTime = 330;
-RandoUI g_ui;
-
-//---------------------------
-// Displays a progress menu for the player depending on what buttons are held for the
-// set number of frames.
-//
-// Warp to Hub: Zoom in, out, up, down, left, right
-// Current level progress: Zoom in and out
-// Current game progress: Zoom in, out, and jump
-void TryDisplayProgressMenu()
-{
-	if (g_messageCooldown > 0) 
-	{
-		g_messageCooldown--;
-		return;
-	}
-
-	if (LocalPlayer.ButtonHeldTime(8) > g_menuButtonHeldTime && 
-		LocalPlayer.ButtonHeldTime(9) > g_menuButtonHeldTime)
-	{
-		if (LocalPlayer.ButtonHeldTime(1) > g_menuButtonHeldTime)
-		{
-			DisplayGameProgress();
-		}
-		
-		else
-		{
-			//DisplayLevelProgress();
-			g_ui.Activate();
-			
-		}
-		
-		g_messageCooldown = g_progressMenuDisplayTime + 30;
-	}
-}
 
 //---------------------------
 // Displays level-specific progress, including:
@@ -152,7 +117,6 @@ const float UI_SCREEN_WIDTH = 1.0f;
 const float UI_SCREEN_HEIGHT = 0.75f;
 const float UI_MOUSE_SPEED = 0.75f;
 const float UI_MOUSE_SIZE = 0.05f;
-const float UI_MOUSE_LERP_TIME = 0.25f;
 	
 class RandoUI
 {
@@ -163,13 +127,11 @@ class RandoUI
 	bool isActive;
 	int lastOverIndex;
 	
-	// Player Properties
-	kVec3 lastOwnerOrigin;
-	int lastOwnerRegion;
-	float lastOwnerYaw;
-	float lastOwnerPitch;
-	
 	// UI Properties
+	kVec3 uiOrigin;
+	int uiRegion;
+	float uiYaw;
+	
 	float lastFov;
 	float fovRatio;
 	float fovRatioInverse;
@@ -195,15 +157,14 @@ class RandoUI
 		isActive = false;
 		lastOverIndex = -1;
 		fovRatio = 1.0f;
+		fovRatioInverse = 1.0f;
+		@mouse = CreateMouse();
 	}
 
 	// --------------------------
 	// Turns on the UI menu
 	bool Activate()
 	{
-		@mouse = CreateMouse();
-		mouse.SetPosition(Math::vecZero);
-
 		@owner = LocalPlayer.Actor().CastToActor();
 		kPuppet@ puppet = owner.CastToPuppet();
 		
@@ -221,21 +182,20 @@ class RandoUI
 		closeTime = 0.0f;
 		
 		isActive = true;
-		lastOwnerOrigin = owner.Origin();
-		lastOwnerRegion = owner.WorldComponent().RegionIndex();
-		lastOwnerYaw = owner.Yaw();
-		lastOwnerPitch = owner.Pitch();
+		uiOrigin = owner.Origin();
+		uiRegion = owner.WorldComponent().RegionIndex();
+		uiYaw = owner.Yaw();
 		puppet.PlayerFlags() &= ~PF_FLOATCAM;
 		puppet.PlayerFlags() |= PF_NOWEAPON;
 		floatCamWait = 2;
 		
-		kQuat ownerRot(lastOwnerPitch, 0.0f, lastOwnerYaw);
+		kQuat ownerRot(0.0f, 0.0f, -uiYaw);
 		forwardDir = kVec3(0.0f, 1.0f, 0.0f) * ownerRot;
 		rightDir = kVec3(1.0f, 0.0f, 0.0f) * ownerRot;
 		upDir = kVec3(0.0f, 0.0f, 1.0f) * ownerRot;
-		
+
 		SetUpUIScreen();
-			
+		
 		return true;
 	}
 	
@@ -245,12 +205,6 @@ class RandoUI
 	{
 		isActive = false;
 		Clear();
-		
-		if (mouse !is null)
-		{
-			mouse.Remove();
-			@mouse = null;
-		}
 
 		if (owner !is null)
 		{
@@ -266,11 +220,6 @@ class RandoUI
 	// Removes all elements
 	void Clear()
 	{
-		if (elements is null)
-		{
-			return;
-		}
-		
 		int elementsLength = int(elements.length());
 		for (int i = elementsLength - 1; i >= 0; i--)
 		{
@@ -348,7 +297,7 @@ class RandoUI
 	// Create a mouse, using the mouse texture
 	RandoUIElement@ CreateMouse()
 	{
-		const int cursorIndex = 0; //TODO: how does this work
+		const int cursorIndex = 1; // From textureSetInfo
 	
 		kActor@ actor = ActorFactory.Spawn(
 			kActor_UI_Element, 
@@ -389,8 +338,11 @@ class RandoUI
 		// Do nothing if not active
 		if (!isActive)
 		{
+			mouse.self.Flags() |= AF_HIDDEN;
 			return;
 		}
+		
+		mouse.self.Flags() &= ~AF_HIDDEN;
 		
 		// Check Fov change
 		kStr fovStr;
@@ -410,9 +362,8 @@ class RandoUI
 			}
 		}
 		
-		// Move the mouse by computing where it should go, and moving
-		// The elements relative to it
-		float mouseDX = owner.Yaw().Diff(lastOwnerYaw) * UI_MOUSE_SPEED;
+		// Move the mouse
+		float mouseDX = owner.Yaw().Diff(uiYaw) * UI_MOUSE_SPEED;
 		float mouseDY = -owner.Pitch() * UI_MOUSE_SPEED;
 		
 		lastMouseX = mouseRealX;
@@ -444,12 +395,17 @@ class RandoUI
 		
 		// Move the elements relative to the mouse
 		kPuppet@ puppet = owner.CastToPuppet();
-		owner.Yaw() = lastOwnerYaw;
+		// TODO: set the player mesh to none
+		owner.Yaw() = uiYaw;
 		owner.Pitch() = 0.0f;
 		owner.Roll() = 0.0f;
-		owner.Origin() = lastOwnerOrigin;
-		owner.WorldComponent().SetRegion(lastOwnerRegion);
+		owner.Origin() = uiOrigin;
+		owner.WorldComponent().SetRegion(uiRegion);
+		
+		// TODO: instead of this, don't show the UI if the player is moving
+		// AND/OR if the player has velocity, hide the UI
 		owner.MovementComponent().Velocity() = Math::vecZero;
+		
 		puppet.PlayerFlags() |= PF_HASJUMPED | PF_NOWEAPON;
 		floatCamWait = MAX(floatCamWait - 1, 0);
 		if (floatCamWait == 0)
@@ -459,12 +415,9 @@ class RandoUI
 		
 		float playerHeight = 100.0f;
 		kVec3 playerPos = puppet.Origin() + kVec3(0, 0, playerHeight);
-		//kVec3 forwardDir = GetForwardVector(owner);
-		//kVec3 rightDir = GetRightVector(owner);
-		//kVec3 upDir = GetUpVector(owner);
-		kVec3 elementPos = playerPos + GetForwardVector(owner);
+		kVec3 elementPos = playerPos + forwardDir;
 
-		// Go through elements and position based on player position
+		// Go through elements and position based on the ui position
 		int elementsLength = int(elements.length());
 		for (int i = elementsLength - 1; i >= 0; i--)
 		{
