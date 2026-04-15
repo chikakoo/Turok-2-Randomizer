@@ -1,5 +1,5 @@
 // --------------------------
-// UI functions (well, held button functions)
+// UI constants for opening menus
 //---------------------------
 uint16 g_menuButtonHeldTime = 5;
 int g_messageCooldown = 0;
@@ -169,7 +169,6 @@ class RandoUI
 		uiYaw = owner.Yaw();
 		owner.Pitch() = 0;
 		owner.Roll() = 0;
-		puppet.PlayerFlags() &= ~PF_FLOATCAM;
 		puppet.PlayerFlags() |= PF_NOWEAPON;
 		floatCamWait = 2;
 		
@@ -193,7 +192,6 @@ class RandoUI
 		if (owner !is null)
 		{
 			kPuppet@ puppet = owner.CastToPuppet();
-			puppet.PlayerFlags() &= ~(PF_FLOATCAM);
 			
 			// TODO: check if player is dead, and don't do this otherwise
 			puppet.PlayerFlags() &= ~(PF_NOWEAPON);
@@ -578,11 +576,6 @@ class RandoUI
 		
 		kPuppet@ puppet = owner.CastToPuppet();
 		puppet.PlayerFlags() |= PF_HASJUMPED | PF_NOWEAPON;
-		floatCamWait = MAX(floatCamWait - 1, 0);
-		if (floatCamWait == 0)
-		{
-			puppet.PlayerFlags() |= PF_FLOATCAM;
-		}
 		
 		float playerHeight = 100.0f;
 		kVec3 playerPos = puppet.Origin() + kVec3(0, 0, playerHeight);
