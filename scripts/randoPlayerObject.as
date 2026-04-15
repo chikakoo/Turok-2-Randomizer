@@ -44,14 +44,12 @@ class RandoPlayerObject : ScriptObject
 		if (LocalPlayer.ButtonHeldTime(8) > g_menuButtonHeldTime && 
 			LocalPlayer.ButtonHeldTime(9) > g_menuButtonHeldTime)
 		{
-			if (LocalPlayer.ButtonHeldTime(1) > g_menuButtonHeldTime)
+			if (LocalPlayer.ButtonHeldTime(2) > g_menuButtonHeldTime)
 			{
-				DisplayGameProgress();
+				ui.DisplayLevelProgress();
 			}
-			
 			else
 			{
-				//DisplayLevelProgress();
 				ui.Activate();
 			}
 			

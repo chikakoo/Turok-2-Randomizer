@@ -5,106 +5,6 @@ uint16 g_menuButtonHeldTime = 5;
 int g_messageCooldown = 0;
 int g_progressMenuDisplayTime = 330;
 
-//---------------------------
-// Displays level-specific progress, including:
-// - Location collection progress for the current map
-// - Location collection progress for the entire Level
-// - Special items that don't show up correctly in the pause menu
-void DisplayLevelProgress()
-{
-	kPlayerInventory@ inventory = LocalPlayer.Inventory();
-	int16 mapId = Game.ActiveMapID();
-	switch(GetLevelNumberFromMapId(mapId))
-	{
-		case LEVEL_PORT_OF_ADIA:
-			Hud.AddMessage(
-				"Power Cells: " + inventory.GetCount(kActor_MissionItem_BeaconPowerCell),
-				g_progressMenuDisplayTime);
-			break;
-		case LEVEL_RIVER_OF_SOULS:
-			Hud.AddMessage(
-				"Gate Keys: " + inventory.GetCount(kActor_MissionItem_GateKey) +
-				"  -  Graveyard Keys: " + inventory.GetCount(kActor_MissionItem_GraveyardKey),
-				g_progressMenuDisplayTime);
-			break;
-		case LEVEL_DEATH_MARSHES:
-			Hud.AddMessage(
-				"Satchel Charges: " + inventory.GetCount(kActor_MissionItem_L3SatchelCharge),
-				g_progressMenuDisplayTime);
-			break;
-		case LEVEL_LAIR_OF_THE_BLIND_ONES:
-			Hud.AddMessage(
-				"Satchel Charges: " + inventory.GetCount(kActor_MissionItem_L4SatchelCharge) +
-				"  -  Cave Door Keys: " + inventory.GetCount(kActor_MissionItem_CaveDoorKey),
-				g_progressMenuDisplayTime);
-			break;
-		case LEVEL_HIVE_OF_THE_MANTIDS:
-			Hud.AddMessage(
-				"Satchel Charges: " + inventory.GetCount(kActor_MissionItem_L5SatchelCharge),
-				g_progressMenuDisplayTime);
-			break;
-		case LEVEL_PRIMAGENS_LIGHTSHIP:
-			Hud.AddMessage(
-				"Ion Capacitors: " + inventory.GetCount(kActor_MissionItem_IonCapacitor) + 
-				"  -  Blue Laser Cells: " + inventory.GetCount(kActor_MissionItem_BlueLaserCell) + 
-				"  -  Red Laser Cells: " + inventory.GetCount(kActor_MissionItem_RedLaserCell),
-				g_progressMenuDisplayTime);
-			break;
-		default:
-			Hud.AddMessage("Unmapped map id!");
-			return;
-	}
-	
-	DisplayCollectedLocationsForLevel(mapId, "Level Checks", g_progressMenuDisplayTime);
-	DisplayCollectedLocationsForCurrentMap(g_progressMenuDisplayTime);
-}
-
-//---------------------------
-// Displays progress for the entire game, including:
-// - Location collection progress
-// - Special items that don't show up correctly in the pause menu
-void DisplayGameProgress()
-{
-	kPlayerInventory@ inventory = LocalPlayer.Inventory();
-	Hud.AddMessage(
-		"Nuke Parts: " + inventory.GetCount(kActor_InventoryItem_NukePart) + "/6",
-		g_progressMenuDisplayTime);
-		
-	Hud.AddMessage(
-		"Keys 2-6: " +
-		int(Math::Min(inventory.GetCount(kActor_InventoryItem_Level2Key), 3)) +
-		int(Math::Min(inventory.GetCount(kActor_InventoryItem_Level3Key), 3)) +
-		int(Math::Min(inventory.GetCount(kActor_InventoryItem_Level4Key), 3)) +
-		int(Math::Min(inventory.GetCount(kActor_InventoryItem_Level5Key), 3)) +
-		int(Math::Min(inventory.GetCount(kActor_InventoryItem_Level6Key), 6)) +
-		
-		" - Feathers 2-6: " +
-		(inventory.GetCount(kActor_Feather_2) > 0 ? "2" : "X") +
-		(inventory.GetCount(kActor_Feather_3) > 0 ? "3" : "X") +
-		(inventory.GetCount(kActor_Feather_4) > 0 ? "4" : "X") +
-		(inventory.GetCount(kActor_Feather_5) > 0 ? "5" : "X") +
-		(inventory.GetCount(kActor_Feather_6) > 0 ? "6" : "X") +
-		
-		" - Prim Keys 1-6: " +
-		(inventory.GetCount(kActor_PrimagenKey_1) > 0 ? "1" : "X") + 
-		(inventory.GetCount(kActor_PrimagenKey_2) > 0 ? "2" : "X") + 
-		(inventory.GetCount(kActor_PrimagenKey_3) > 0 ? "3" : "X") + 
-		(inventory.GetCount(kActor_PrimagenKey_4) > 0 ? "4" : "X") + 
-		(inventory.GetCount(kActor_PrimagenKey_5) > 0 ? "5" : "X") + 
-		(inventory.GetCount(kActor_PrimagenKey_6) > 0 ? "6" : "X"),
-		g_progressMenuDisplayTime);
-		
-	Hud.AddMessage(
-		(inventory.GetCount(kActor_Talisman_LeapOfFaith) > 0 ? "[Leap] " : "") +
-		(inventory.GetCount(kActor_Talisman_BreathOfLife) > 0 ? "[Breath] " : "") +
-		(inventory.GetCount(kActor_Talisman_HeartOfFire) > 0 ? "[Fire] " : "") +
-		(inventory.GetCount(kActor_Talisman_Whispers) > 0 ? "[Whispers] " : "") +
-		(inventory.GetCount(kActor_Talisman_EyeOfTruth) > 0 ? "[Eye] " : ""),
-		g_progressMenuDisplayTime);
-		
-	DisplayCollectedLocationsForGame(g_progressMenuDisplayTime);
-}
-
 // --------------------------
 // UI class - we will create a "fake" UI using actors.
 // This is based off of BP's Turok 2 Co-op Mod and borrows its design from it.
@@ -132,6 +32,10 @@ const int UI_OFFSET_LEVEL_KEY = 70;
 const int UI_OFFSET_FEATHER = 122;
 const int UI_OFFSET_PRIMAGEN_KEY = 171;
 const int UI_OFFSET_TALISMAN = 226;
+
+const int UI_OFFSET_MISSION_ITEM_1 = 453;
+const int UI_OFFSET_MISSION_ITEM_2 = 397;
+const int UI_OFFSET_MISSION_ITEM_3 = 352;
 
 const int UI_OFFSET_NUKE_X = 468;
 const int UI_OFFSET_NUKE_Y = 539;
@@ -177,6 +81,59 @@ class RandoUI
 		fovRatio = 1.0f;
 		fovRatioInverse = 1.0f;
 		@mouse = CreateMouse();
+	}
+	
+	//---------------------------
+	// Displays level-specific progress, including:
+	// - Location collection progress for the current map
+	// - Location collection progress for the entire Level
+	void DisplayLevelProgress()
+	{
+		kPlayerInventory@ inventory = LocalPlayer.Inventory();
+		int16 mapId = Game.ActiveMapID();
+		switch(GetLevelNumberFromMapId(mapId))
+		{
+			case LEVEL_PORT_OF_ADIA:
+				Hud.AddMessage(
+					"Power Cells: " + inventory.GetCount(kActor_MissionItem_BeaconPowerCell),
+					g_progressMenuDisplayTime);
+				break;
+			case LEVEL_RIVER_OF_SOULS:
+				Hud.AddMessage(
+					"Gate Keys: " + inventory.GetCount(kActor_MissionItem_GateKey) +
+					"  -  Graveyard Keys: " + inventory.GetCount(kActor_MissionItem_GraveyardKey),
+					g_progressMenuDisplayTime);
+				break;
+			case LEVEL_DEATH_MARSHES:
+				Hud.AddMessage(
+					"Satchel Charges: " + inventory.GetCount(kActor_MissionItem_L3SatchelCharge),
+					g_progressMenuDisplayTime);
+				break;
+			case LEVEL_LAIR_OF_THE_BLIND_ONES:
+				Hud.AddMessage(
+					"Satchel Charges: " + inventory.GetCount(kActor_MissionItem_L4SatchelCharge) +
+					"  -  Cave Door Keys: " + inventory.GetCount(kActor_MissionItem_CaveDoorKey),
+					g_progressMenuDisplayTime);
+				break;
+			case LEVEL_HIVE_OF_THE_MANTIDS:
+				Hud.AddMessage(
+					"Satchel Charges: " + inventory.GetCount(kActor_MissionItem_L5SatchelCharge),
+					g_progressMenuDisplayTime);
+				break;
+			case LEVEL_PRIMAGENS_LIGHTSHIP:
+				Hud.AddMessage(
+					"Ion Capacitors: " + inventory.GetCount(kActor_MissionItem_IonCapacitor) + 
+					"  -  Blue Laser Cells: " + inventory.GetCount(kActor_MissionItem_BlueLaserCell) + 
+					"  -  Red Laser Cells: " + inventory.GetCount(kActor_MissionItem_RedLaserCell),
+					g_progressMenuDisplayTime);
+				break;
+			default:
+				Hud.AddMessage("Unmapped map id!");
+				return;
+		}
+		
+		DisplayCollectedLocationsForLevel(mapId, "Level Checks", g_progressMenuDisplayTime);
+		DisplayCollectedLocationsForCurrentMap(g_progressMenuDisplayTime);
 	}
 
 	// --------------------------
@@ -269,11 +226,16 @@ class RandoUI
 		AddBackgroundImage(RANDO_UI_TEXTURE_BACKGROUND);
 		
 		DisplayLevel(1, 0, -1, -1, kActor_PrimagenKey_1, -1);
-		DisplayLevel(2, 3, kActor_InventoryItem_Level2Key, kActor_Feather_2, kActor_PrimagenKey_2, kActor_Talisman_LeapOfFaith);
-		DisplayLevel(3, 3, kActor_InventoryItem_Level3Key, kActor_Feather_3, kActor_PrimagenKey_3, kActor_Talisman_BreathOfLife);
-		DisplayLevel(4, 3, kActor_InventoryItem_Level4Key, kActor_Feather_4, kActor_PrimagenKey_4, kActor_Talisman_HeartOfFire);
-		DisplayLevel(5, 3, kActor_InventoryItem_Level5Key, kActor_Feather_5, kActor_PrimagenKey_5, kActor_Talisman_Whispers);
-		DisplayLevel(6, 6, kActor_InventoryItem_Level6Key, kActor_Feather_6, kActor_PrimagenKey_6, kActor_Talisman_EyeOfTruth);
+		DisplayLevel(2, 3, 
+			kActor_InventoryItem_Level2Key, kActor_Feather_2, kActor_PrimagenKey_2, kActor_Talisman_LeapOfFaith);
+		DisplayLevel(3, 3, 
+			kActor_InventoryItem_Level3Key, kActor_Feather_3, kActor_PrimagenKey_3, kActor_Talisman_BreathOfLife);
+		DisplayLevel(4, 3, 
+			kActor_InventoryItem_Level4Key, kActor_Feather_4, kActor_PrimagenKey_4, kActor_Talisman_HeartOfFire);
+		DisplayLevel(5, 3, 
+			kActor_InventoryItem_Level5Key, kActor_Feather_5, kActor_PrimagenKey_5, kActor_Talisman_Whispers);
+		DisplayLevel(6, 6, 
+			kActor_InventoryItem_Level6Key, kActor_Feather_6, kActor_PrimagenKey_6, kActor_Talisman_EyeOfTruth);
 		
 		int nukeParts = LocalPlayer.Inventory().GetCount(kActor_InventoryItem_NukePart);
 		kVec3 nukePosition = PositionPixelToUI(UI_OFFSET_NUKE_X, UI_OFFSET_NUKE_Y);
@@ -307,7 +269,8 @@ class RandoUI
 			: RANDO_UI_TEXTURE_INCOMPLETE;
 		AddImage(primagenKeyTexture, PositionPixelToUI(UI_OFFSET_PRIMAGEN_KEY, levelHeightOffset));
 		
-		// Mission items (TODO)
+		// Mission items
+		DisplayMissionItems(level, levelHeightOffset);
 		
 		// Special case for level 1, as it doesn't have any more to show
 		if (level == 1)
@@ -337,6 +300,57 @@ class RandoUI
 			? RANDO_UI_TEXTURE_COMPLETE
 			: RANDO_UI_TEXTURE_INCOMPLETE;
 		AddImage(talismanTexture, PositionPixelToUI(UI_OFFSET_TALISMAN, levelHeightOffset));
+	}
+	
+	void DisplayMissionItems(
+		const int &in level,
+		const int &in levelHeightOffset)
+	{
+		switch(level)
+		{
+			case 1:
+				DisplayMissionItem(levelHeightOffset, UI_OFFSET_MISSION_ITEM_1, kActor_MissionItem_BeaconPowerCell, 3);
+				break;
+			case 2:
+				DisplayMissionItem(levelHeightOffset, UI_OFFSET_MISSION_ITEM_2, kActor_MissionItem_GateKey, 2);
+				DisplayMissionItem(levelHeightOffset, UI_OFFSET_MISSION_ITEM_1, kActor_MissionItem_GraveyardKey, 2);
+				break;
+			case 3:
+				DisplayMissionItem(levelHeightOffset, UI_OFFSET_MISSION_ITEM_1, kActor_MissionItem_L3SatchelCharge, 3);
+				break;
+			case 4:
+				DisplayMissionItem(levelHeightOffset, UI_OFFSET_MISSION_ITEM_2, kActor_MissionItem_CaveDoorKey, 7);
+				DisplayMissionItem(levelHeightOffset, UI_OFFSET_MISSION_ITEM_1, kActor_MissionItem_L4SatchelCharge, 3);
+				break;
+			case 5:
+				DisplayMissionItem(levelHeightOffset, UI_OFFSET_MISSION_ITEM_1, kActor_MissionItem_L5SatchelCharge, 4);
+				break;
+			case 6:
+				DisplayMissionItem(levelHeightOffset, UI_OFFSET_MISSION_ITEM_3, kActor_MissionItem_IonCapacitor, 16);
+				DisplayMissionItem(levelHeightOffset, UI_OFFSET_MISSION_ITEM_2, kActor_MissionItem_BlueLaserCell, 2);
+				DisplayMissionItem(levelHeightOffset, UI_OFFSET_MISSION_ITEM_1, kActor_MissionItem_RedLaserCell, 2);
+				break;
+			default:
+				return;
+		}
+	}
+	
+	void DisplayMissionItem(
+		const int &in levelHeightOffset,
+		const int &in widthOffset,
+		const int &in missionItemActor,
+		const int &in maxCount)
+	{
+		int missionItemCount = LocalPlayer.Inventory().GetCount(missionItemActor);
+		kVec3 missionItemPosition = PositionPixelToUI(widthOffset, levelHeightOffset);
+		if (missionItemCount < maxCount)
+		{
+			AddNumberImage(missionItemCount, missionItemPosition);
+		}
+		else 
+		{
+			AddImage(RANDO_UI_TEXTURE_COMPLETE, missionItemPosition);
+		}
 	}
 	
 	// --------------------------
