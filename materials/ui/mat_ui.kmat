@@ -10,7 +10,7 @@ material ui_default {
     surface_type default
     depthtest
     color_environment "0.000000 0.000000 0.000000 1.000000"
-    color_diffuse "1.000000 1.000000 1.000000 1.000000"
+    color_diffuse "0.600000 0.600000 0.600000 1.000000"
     sampler "diffuse" 0 "textures/ui/white.png" {
         filter      nearest //nearest, linear, linear_anisotropic
         wrap        clamp

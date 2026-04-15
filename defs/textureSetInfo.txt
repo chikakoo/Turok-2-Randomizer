@@ -7,7 +7,20 @@
     speed 1
     animated 0
 
-    texture_1 "textures/ui/cursor.png"
+    texture_1 "gfx/cursor.png"
+	texture_2 "textures/ui/background.png"
+	texture_3 "gfx/hud/h_objective_checkmark_complete.png"
+	texture_4 "textures/ui/incomplete.png"
+	texture_5 "textures/ui/text_0.png"
+	texture_6 "textures/ui/text_1.png"
+	texture_7 "textures/ui/text_2.png"
+	texture_8 "textures/ui/text_3.png"
+	texture_9 "textures/ui/text_4.png"
+	texture_10 "textures/ui/text_5.png"
+	texture_11 "textures/ui/text_6.png"
+	texture_12 "textures/ui/text_7.png"
+	texture_13 "textures/ui/text_8.png"
+	texture_14 "textures/ui/text_9.png"
 }
 
 // ------------------------------

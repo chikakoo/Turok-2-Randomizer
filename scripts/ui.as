@@ -116,7 +116,20 @@ const float UI_SCALE = 0.7075f;
 const float UI_SCREEN_WIDTH = 1.0f;
 const float UI_SCREEN_HEIGHT = 0.75f;
 const float UI_MOUSE_SPEED = 0.75f;
-const float UI_MOUSE_SIZE = 0.05f;
+const float UI_MOUSE_SIZE = 0.025f;
+
+// Background image placements
+const float UI_BACKGROUND_WIDTH = 0.636364f;
+const float UI_BACKGROUND_HEIGHT = 0.70f;
+
+const int UI_ICON_SIZE = 22;
+
+const int UI_OFFSET_HEADER = 44;
+const int UI_OFFSET_ROW_HEIGHT = 77;
+const int UI_OFFSET_ROW_BOTTOM = 22;
+
+const int UI_OFFSET_LEVEL_KEY = 70;
+const int UI_OFFSET_FEATHER = 122;
 	
 class RandoUI
 {
@@ -243,34 +256,112 @@ class RandoUI
 	// Sets up the main UI screen
 	void SetUpUIScreen()
 	{
-		//TODO: add elements
+		AddBackgroundImage(RANDO_UI_TEXTURE_BACKGROUND);
+		
+		int level1HeightOffset = GetLevelRowHeightOffset(1);
+		int level2HeightOffset = GetLevelRowHeightOffset(2);
+		int level3HeightOffset = GetLevelRowHeightOffset(3);
+
+		AddNumberImage(2, PositionPixelToUI(UI_OFFSET_LEVEL_KEY, level3HeightOffset));
+		AddNumberImage(123, PositionPixelToUI(UI_OFFSET_FEATHER, level3HeightOffset));
+		AddImage(RANDO_UI_TEXTURE_COMPLETE, PositionPixelToUI(UI_OFFSET_LEVEL_KEY, level2HeightOffset, 0.01f));
+	}
+	
+	// --------------------------
+	// Gets the height that UI Elements can be placed for a given level (in pixels)
+	int GetLevelRowHeightOffset(const int &in level)
+	{
+		return UI_OFFSET_HEADER + (UI_OFFSET_ROW_HEIGHT * level) - UI_OFFSET_ROW_BOTTOM;
+	}
+	
+	// --------------------------
+	// Adds the background image to the ui
+	void AddBackgroundImage(
+		const int textureIndex, 
+		const kVec3& in pos = Math::vecZero)
+	{
+		CreateUIElement(textureIndex, UI_BACKGROUND_WIDTH, UI_BACKGROUND_HEIGHT,  kVec3(0.0f, 0.0f, 0.01f));
 	}
 	
 	// --------------------------
 	// Adds an image to the UI
-	RandoUIElement@ AddImage(
-		const int windowId, 
-		const kStr& in key, 
+	// Takes the width/height in pixels
+	void AddImage(
 		const int textureIndex, 
-		const float width, 
-		const float height, 
-		const kVec3& in pos = Math::vecZero)
+		const kVec3& in pos = Math::vecZero,
+		const int width = UI_ICON_SIZE, 
+		const int height = UI_ICON_SIZE)
 	{
-		RandoUIElement@ element = CreateUIElement(
-			windowId,
-			key,
-			textureIndex, 
-			width,
-			height,
-			pos);
-		return element;
+		kVec3 size = SizePixelToUI(width, height);
+		CreateUIElement(textureIndex, size.x, size.y, pos);
+	}
+	
+	// --------------------------
+	// Adds a number image to the UI
+	// Takes the width/height in pixels
+	void AddNumberImage(
+		const int number, 
+		const kVec3& in pos = Math::vecZero,
+		const int width = UI_ICON_SIZE, 
+		const int height = UI_ICON_SIZE)
+	{
+		int num = number;
+		array<int> digits;
+		
+		if (num == 0)
+		{
+			digits.insertLast(0);
+		}
+
+		while (num > 0)
+		{
+			digits.insertLast(num % 10);
+			num /= 10;
+		}
+		digits.reverse();
+		
+		kVec3 size = SizePixelToUI(width, height);
+		for (uint i = 0; i < digits.length(); i++)
+		{
+			int textureIndex = RANDO_UI_TEXTURE_TEXT_START + digits[i];
+			kVec3 newPos = kVec3(
+				pos.x + (i * size.x), 
+				pos.y,
+				pos.z
+			);
+			AddImage(textureIndex, newPos);
+		}
+	}
+	
+	// --------------------------
+	// Converts the given x and y into a size that will fit into the ui
+	kVec3 SizePixelToUI(float px, float py, float pz = 0.0f)
+	{
+		return kVec3(
+			(px / 500.0f) * UI_BACKGROUND_WIDTH,
+			(py / 550.0f) * UI_BACKGROUND_HEIGHT,
+			pz
+		);
+	}
+	
+	// --------------------------
+	// Converts the given x and y into a position that will fit into the ui
+	// Icons will be centered
+	kVec3 PositionPixelToUI(float px, float py, float pz = 0.0f)
+	{
+		float centeredX = px - 250.0f;
+		float centeredY = 275.0f - py;
+
+		return kVec3(
+			(centeredX / 250.0f) * UI_BACKGROUND_WIDTH,
+			(centeredY / 275.0f) * UI_BACKGROUND_HEIGHT,
+			pz
+		);
 	}
 	
 	// --------------------------
 	// Create a UI element
 	RandoUIElement@ CreateUIElement(
-		const int windowId,
-		const kStr& in key,
 		const int textureIndex,
 		const float width,
 		const float height,
@@ -285,9 +376,6 @@ class RandoUI
 		if (element !is null)
 		{
 			elements.insertLast(element);
-			element.windowId = windowId;
-			element.key = key;
-			element.textureIndex = textureIndex;
 			element.SetTexture(textureIndex);
 			element.SetSize(width, height);
 			element.SetPosition(pos);
@@ -301,8 +389,6 @@ class RandoUI
 	// Create a mouse, using the mouse texture
 	RandoUIElement@ CreateMouse()
 	{
-		const int cursorIndex = 1; // From textureSetInfo
-	
 		kActor@ actor = ActorFactory.Spawn(
 			kActor_UI_Element, 
 			Math::vecZero,
@@ -310,8 +396,7 @@ class RandoUI
 		RandoUIElement@ element = cast<RandoUIElement@>(GetScript(actor));
 		if (element !is null)
 		{
-			element.textureIndex = cursorIndex;
-			element.SetTexture(cursorIndex);
+			element.SetTexture(RANDO_UI_TEXTURE_CURSOR);
 			element.SetSize(UI_MOUSE_SIZE, UI_MOUSE_SIZE);
 			element.SetPosition(Math::vecZero);
 			element.fovRatio = fovRatio;
@@ -398,7 +483,7 @@ class RandoUI
 		}
 		
 		// Make sure the player doesn't move
-		// TODO: set the player mesh to none
+		// TODO: set the player mesh to none so it
 		owner.Yaw() = uiYaw;
 		owner.Pitch() = 0.0f;
 		owner.Roll() = 0.0f;
@@ -458,7 +543,7 @@ class RandoUI
 			}
 		}
 		
-		// Click handler (if this fails, see if lastButtons mattered)
+		// Click handler
 		if ((LocalPlayer.Buttons() & BC_ATTACK) != 0 && overIndex >= 0)
 		{
 			elements[overIndex].OnSelect(mouseX, mouseY);

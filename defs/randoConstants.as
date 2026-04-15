@@ -1,8 +1,6 @@
 // Called in UserEvent to get the script object back
 #define RANDO_MSG_GET_SCRIPT 100
 
-#define kActor_UI_Element 300000
-
 #define kActor_Item_APItemProgression 100000
 #define kActor_Item_APItemNonProgression 100001
 #define kActor_Portal_HubWarp 200000
@@ -70,3 +68,12 @@
 #define kActor_PrimagenKey_4 4363
 #define kActor_PrimagenKey_5 4364
 #define kActor_PrimagenKey_6 4365
+
+// ---------
+// UI
+#define kActor_UI_Element 300000
+#define RANDO_UI_TEXTURE_CURSOR 1
+#define RANDO_UI_TEXTURE_BACKGROUND 2
+#define RANDO_UI_TEXTURE_INCOMPLETE 3
+#define RANDO_UI_TEXTURE_COMPLETE 4
+#define RANDO_UI_TEXTURE_TEXT_START 5 // Ends at 12

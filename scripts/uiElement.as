@@ -17,9 +17,6 @@ class RandoUIElement : ScriptActor
 	float height;
 	
 	UIElementSelectCallBack @onSelect;
-	int windowId;
-	kStr key;
-	int textureIndex;
 	
 	kRenderMeshComponent@ renderMesh;
 	
@@ -81,7 +78,6 @@ class RandoUIElement : ScriptActor
 		if (disabled != isDisabled)
 		{
 			isDisabled = disabled;
-			SetTexture(textureIndex);
 		}
 	}
 	
