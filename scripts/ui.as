@@ -29,9 +29,10 @@ const int UI_OFFSET_ROW_HEIGHT = 77;
 const int UI_OFFSET_ROW_BOTTOM = 22;
 
 const int UI_OFFSET_LEVEL_KEY = 70;
-const int UI_OFFSET_FEATHER = 122;
-const int UI_OFFSET_PRIMAGEN_KEY = 171;
-const int UI_OFFSET_TALISMAN = 226;
+const int UI_OFFSET_PROGRESSIVE_WARP = 125;
+const int UI_OFFSET_FEATHER = 176;
+const int UI_OFFSET_PRIMAGEN_KEY = 227;
+const int UI_OFFSET_TALISMAN = 278;
 
 const int UI_OFFSET_MISSION_ITEM_1 = 453;
 const int UI_OFFSET_MISSION_ITEM_2 = 397;
@@ -250,17 +251,42 @@ class RandoUI
 	{
 		AddBackgroundImage(RANDO_UI_TEXTURE_BACKGROUND);
 		
-		DisplayLevel(1, 0, -1, -1, kActor_PrimagenKey_1, -1);
-		DisplayLevel(2, 3, 
-			kActor_InventoryItem_Level2Key, kActor_Feather_2, kActor_PrimagenKey_2, kActor_Talisman_LeapOfFaith);
-		DisplayLevel(3, 3, 
-			kActor_InventoryItem_Level3Key, kActor_Feather_3, kActor_PrimagenKey_3, kActor_Talisman_BreathOfLife);
-		DisplayLevel(4, 3, 
-			kActor_InventoryItem_Level4Key, kActor_Feather_4, kActor_PrimagenKey_4, kActor_Talisman_HeartOfFire);
-		DisplayLevel(5, 3, 
-			kActor_InventoryItem_Level5Key, kActor_Feather_5, kActor_PrimagenKey_5, kActor_Talisman_Whispers);
-		DisplayLevel(6, 6, 
-			kActor_InventoryItem_Level6Key, kActor_Feather_6, kActor_PrimagenKey_6, kActor_Talisman_EyeOfTruth);
+		DisplayLevel(1, 
+			-1, 0,
+			kActor_InventoryItem_ProgressiveWarpL1, 20,
+			-1, 
+			kActor_PrimagenKey_1, -
+			1);
+		DisplayLevel(2, 
+			kActor_InventoryItem_Level2Key, 3,
+			kActor_InventoryItem_ProgressiveWarpL2, 20,
+			kActor_Feather_2, 
+			kActor_PrimagenKey_2, 
+			kActor_Talisman_LeapOfFaith);
+		DisplayLevel(3,
+			kActor_InventoryItem_Level3Key, 3,
+			kActor_InventoryItem_ProgressiveWarpL3, 20,
+			kActor_Feather_3, 
+			kActor_PrimagenKey_3,
+			kActor_Talisman_BreathOfLife);
+		DisplayLevel(4,
+			kActor_InventoryItem_Level4Key, 3,
+			kActor_InventoryItem_ProgressiveWarpL4, 20,
+			kActor_Feather_4, 
+			kActor_PrimagenKey_4, 
+			kActor_Talisman_HeartOfFire);
+		DisplayLevel(5,
+			kActor_InventoryItem_Level5Key, 3,
+			kActor_InventoryItem_ProgressiveWarpL5, 20,
+			kActor_Feather_5, 
+			kActor_PrimagenKey_5,
+			kActor_Talisman_Whispers);
+		DisplayLevel(6,
+			kActor_InventoryItem_Level6Key, 6,
+			kActor_InventoryItem_ProgressiveWarpL6, 20,
+			kActor_Feather_6, 
+			kActor_PrimagenKey_6, 
+			kActor_Talisman_EyeOfTruth);
 		
 		int nukeParts = GetInventoryItemCurrentTotal(kActor_InventoryItem_NukePart);
 		kVec3 nukePosition = PositionPixelToUI(UI_OFFSET_NUKE_X, UI_OFFSET_NUKE_Y);
@@ -304,8 +330,8 @@ class RandoUI
 	// Level 1 only has primagen keys and mission items, so it returns early
 	void DisplayLevel(
 		const int &in level, 
-		const int &in maxKeys,
-		const int &in levelKeyActor,
+		const int &in levelKeyActor, const int &in maxKeys,
+		const int &in progressiveWarpActor, const int &in maxProgressiveWarps,
 		const int &in featherActor,
 		const int &in primagenKeyActor,
 		const int &in talismanActor)
@@ -329,11 +355,19 @@ class RandoUI
 		
 		// Level Keys
 		int levelKeys = GetInventoryItemCollectedTotal(levelKeyActor);
-		bool useGreenText = levelKeys >= maxKeys;
+		bool useGreenLevelKeyText = levelKeys >= maxKeys;
 		AddNumberImage(
 			levelKeys, 
 			PositionPixelToUI(UI_OFFSET_LEVEL_KEY, levelHeightOffset),
-			useGreenText);
+			useGreenLevelKeyText);
+			
+		// Progressive Warps
+		int progressiveWarps = GetInventoryItemCollectedTotal(progressiveWarpActor);
+		bool useGreenProgressiveWarpText = progressiveWarps >= maxProgressiveWarps;
+		AddNumberImage(
+			progressiveWarps, 
+			PositionPixelToUI(UI_OFFSET_PROGRESSIVE_WARP, levelHeightOffset),
+			useGreenProgressiveWarpText);
 		
 		// Feathers
 		int featherTexture = GetInventoryItemCollectedTotal(featherActor) > 0

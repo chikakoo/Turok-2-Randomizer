@@ -1,0 +1,35 @@
+// model 0565, section 00
+material surf_565_00_00 {
+    fullbright
+    cull back
+    param "uLimitAlpha" 0 "0"
+    param "uReflective" 0 "0"
+    param "uPseduoColor" 0 "0"
+    sort default
+    surface_type default
+    depthtest
+    color_environment "0.000000 0.000000 0.000000 1.000000"
+    color_diffuse "0.000000 0.000000 1.000000 1.000000"
+    sampler "diffuse" 0 "textures/hubkey06.png" {
+        filter      linear_anisotropic
+        wrap        repeat
+    }
+}
+
+// model 0565, section 01
+material surf_565_00_01 {
+    cull back
+    param "uLimitAlpha" 0 "0"
+    param "uReflective" 0 "0"
+    param "uPseduoColor" 0 "0"
+    sort default
+    surface_type default
+    depthtest
+    color_environment "0.000000 0.000000 0.000000 1.000000"
+    color_diffuse "0.000000 0.000000 1.000000 1.000000"
+    sampler "diffuse" 0 "textures/hbtxtr02.png" {
+        filter      linear_anisotropic
+        wrap        repeat
+    }
+}
+
