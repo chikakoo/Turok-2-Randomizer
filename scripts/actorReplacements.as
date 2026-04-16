@@ -33,20 +33,51 @@ void AddWarpBarriers(const int16 &in mapId)
 		return;
 	}
 
-	kActor@ barrier;
-	RandoWarpBarrier@ barrierScript;
 	switch(mapId)
 	{
-		case kLevel_PortOfAdia_1:
-			@barrier = ActorFactory.Spawn(
-				kActor_ProgressionBlocker_WarpBarrier,
-				kVec3(3840, 614, 307),
-				0, 0, 0
-			);
-			@barrierScript = cast<RandoWarpBarrier@>(GetScript(barrier));
-			barrierScript.SetBarrierInfo(kActor_InventoryItem_ProgressiveWarpL1, 5);
+		// Port of Adia
+		case kLevel_PortOfAdia_1: // Start
+			AddWarpBarrier(kVec3(3840, 614.4, 307.2), kActor_InventoryItem_ProgressiveWarpL1, 1);
+			break;
+		case kLevel_PortOfAdia_2: // Water hub (to ships and talisman portal)
+			AddWarpBarrier(kVec3(-3184.67, 295.964, 0), kActor_InventoryItem_ProgressiveWarpL1, 2);
+			AddWarpBarrier(kVec3(3184.67, 318.436, 614.4), kActor_InventoryItem_ProgressiveWarpL1, 4);
+			break;
+		case kLevel_PortOfAdia_3: // Ships
+			AddWarpBarrier(kVec3(1536, 1863.68, 307.2), kActor_InventoryItem_ProgressiveWarpL1, 3);
+			break;
+		case kLevel_PortOfAdia_5: // Talisman portal - not in the order the numbers suggest
+			AddWarpBarrier(kVec3(-2867.2, 1382.4, 614.4), kActor_InventoryItem_ProgressiveWarpL1, 5);
+			break;
+		case kLevel_PortOfAdia_4: // Child 3
+			AddWarpBarrier(kVec3(1843.23, 4179.359, 632.264), kActor_InventoryItem_ProgressiveWarpL1, 6);
+			break;
+		case kLevel_PortOfAdia_6: // Archery
+			AddWarpBarrier(kVec3(-1638.4, 3379.2, 307.2), kActor_InventoryItem_ProgressiveWarpL1, 7);
+			break;
+		case kLevel_PortOfAdia_7: // Child 4
+			AddWarpBarrier(kVec3(5222.4, 1331.2, 0), kActor_InventoryItem_ProgressiveWarpL1, 8);
+			break;
+		case kLevel_PortOfAdia_8: // Gated City
+			AddWarpBarrier(kVec3(1843.2, 102.4, 0), kActor_InventoryItem_ProgressiveWarpL1, 9);
 			break;
 	}
+}
+
+//---------------------------
+// Adds a warp barrier at the given position, warp actor id, requiring the given number of warps
+void AddWarpBarrier(
+	const kVec3 &in pos, 
+	const int &in progressiveWarpActorId,
+	const int &in progressiveWarpsNeeded)
+{
+	kActor@ barrier = ActorFactory.Spawn(
+		kActor_ProgressionBlocker_WarpBarrier,
+		pos,
+		0, 0, 0
+	);
+	RandoWarpBarrier@ barrierScript = cast<RandoWarpBarrier@>(GetScript(barrier));
+	barrierScript.SetBarrierInfo(progressiveWarpActorId, progressiveWarpsNeeded);
 }
 
 //----------------------------------

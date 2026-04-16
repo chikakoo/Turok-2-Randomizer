@@ -227,7 +227,7 @@ WarpBarrier kActor_ProgressionBlocker_WarpBarrier
     Begin_Component "kexWorldComponent"
         radius                140.0
 		touchRadius			  150.0
-        height                1000.0
+		height				  300.0
 		bNonSolid             FALSE
     End_Component
 	Begin_Component "kexScriptComponent"

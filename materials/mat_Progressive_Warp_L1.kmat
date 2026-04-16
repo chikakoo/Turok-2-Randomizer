@@ -9,8 +9,8 @@ material surf_565_00_00 {
     surface_type default
     depthtest
     color_environment "0.000000 0.000000 0.000000 1.000000"
-    color_diffuse "0.000000 0.000000 1.000000 1.000000"
-    sampler "diffuse" 0 "textures/hubkey06.png" {
+    color_diffuse "1.000000 1.000000 1.000000 1.000000"
+    sampler "diffuse" 0 "textures/Progression_Warp_Level_1.png" {
         filter      linear_anisotropic
         wrap        repeat
     }
@@ -26,8 +26,8 @@ material surf_565_00_01 {
     surface_type default
     depthtest
     color_environment "0.000000 0.000000 0.000000 1.000000"
-    color_diffuse "0.000000 0.000000 1.000000 1.000000"
-    sampler "diffuse" 0 "textures/hbtxtr02.png" {
+    color_diffuse "1.000000 1.000000 1.000000 1.000000"
+    sampler "diffuse" 0 "textures/Progression_Warp_Back.png" {
         filter      linear_anisotropic
         wrap        repeat
     }

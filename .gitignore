@@ -32,3 +32,6 @@
 
 !textures/
 !textures/**
+
+!layeredImages/
+!layeredImages/**
