@@ -100,7 +100,7 @@ class RandoUIElement : ScriptActor
 	
 	// --------------------------
 	// Performs an action if selected while not disabled
-	void OnSelect(const float x, const float y)
+	void OnSelect()
 	{
 		if (!isDisabled)
 		{

@@ -39,7 +39,14 @@ const int UI_OFFSET_MISSION_ITEM_3 = 352;
 
 const int UI_OFFSET_NUKE_X = 468;
 const int UI_OFFSET_NUKE_Y = 539;
-	
+
+const int UI_WARP_BUTTON_WIDTH = 157;
+const int UI_WARP_BUTTON_HEIGHT = 28;
+
+const int UI_OFFSET_WARP_HOME_X_ = 130;
+const int UI_OFFSET_WARP_HUB_X = 336;
+const int UI_OFFSET_WARP_BUTTON_Y = 528;
+
 class RandoUI
 {
 	// TODO: track the player's HP and if it's ever lower, close out
@@ -245,6 +252,39 @@ class RandoUI
 		{
 			AddImage(RANDO_UI_TEXTURE_COMPLETE, nukePosition);
 		}
+		
+		RandoUIElement@ homeButton = AddImage(
+			RANDO_UI_TEXTURE_WARP_HOME, 
+			PositionPixelToUI(UI_OFFSET_WARP_HOME_X_, UI_OFFSET_WARP_BUTTON_Y),
+			UI_WARP_BUTTON_WIDTH,
+			UI_WARP_BUTTON_HEIGHT);
+		@homeButton.onSelect = UIElementSelectCallBack(OnWarpHomeClicked);
+			
+		RandoUIElement@ hubButton = AddImage(
+			RANDO_UI_TEXTURE_WARP_HUB, 
+			PositionPixelToUI(UI_OFFSET_WARP_HUB_X, UI_OFFSET_WARP_BUTTON_Y),
+			UI_WARP_BUTTON_WIDTH,
+			UI_WARP_BUTTON_HEIGHT);
+		@hubButton.onSelect = UIElementSelectCallBack(OnWarpHubClicked);
+	}
+	
+	// --------------------------
+	// Handle warping home
+	// TODO: don't allow this if in a totem/boss level
+	void OnWarpHomeClicked()
+	{
+		Deactivate();
+		DoPlayerWarp(0, 11111, kLevel_PortOfAdia_1, true);
+	}
+
+	// --------------------------
+	// Handle warping to the HUB
+	// TODO: don't allow this if in a totem/boss level
+	// TODO: don't allow this if the hub isn't "unlocked"
+	void OnWarpHubClicked()
+	{
+		Deactivate();
+		DoPlayerWarp(0, 11999, kLevel_Hub, true);
 	}
 	
 	// --------------------------
@@ -370,14 +410,14 @@ class RandoUI
 	// --------------------------
 	// Adds an image to the UI
 	// Takes the width/height in pixels
-	void AddImage(
+	RandoUIElement@ AddImage(
 		const int textureIndex, 
 		const kVec3& in pos = Math::vecZero,
 		const int width = UI_ICON_SIZE, 
 		const int height = UI_ICON_SIZE)
 	{
 		kVec3 size = SizePixelToUI(width, height);
-		CreateUIElement(textureIndex, size.x, size.y, pos);
+		return CreateUIElement(textureIndex, size.x, size.y, pos);
 	}
 	
 	// --------------------------
@@ -607,7 +647,10 @@ class RandoUI
 		kVec3 mousePos(mouseX, mouseY, 0.0f);
 		for (int i = elementsLength - 1; i >= 0; i--)
 		{
-			if (elements[i].IsMousedOver(mouseX, mouseY) && elements[i].onSelect !is null)
+			if (elements[i].IsMousedOver(
+					mouseX - mouse.width, 
+					mouseY + (mouse.height * 0.5f)) && 
+				elements[i].onSelect !is null)
 			{
 				float distance = elements[i].positionOffset.Distance(mousePos);
 				if (distance < closestDist)
@@ -619,9 +662,9 @@ class RandoUI
 		}
 		
 		// Click handler
-		if ((LocalPlayer.Buttons() & BC_ATTACK) != 0 && overIndex >= 0)
+		if (LocalPlayer.ButtonHeldTime(0) > 0 && overIndex >= 0)
 		{
-			elements[overIndex].OnSelect(mouseX, mouseY);
+			elements[overIndex].OnSelect();
 		}
 	}
 }

@@ -74,48 +74,6 @@ RandomAmmo kActor_Item_RandomAmmo
 }
 
 //------------------------------
-// Portal - warp back to the hub even if mission objectives aren't complete.
-//------------------------------
-HubWarpPortal kActor_Portal_HubWarp
-{
-	className				  "kexActor"
-	placeable                 TRUE
-	flags.noDamage            TRUE
-	flags.allowTracking       FALSE
-	
-	initialScale              "0.25 0.25 0.25"
-    Begin_Component "kexWorldComponent"
-		touchRadius           30.00
-        height                81.92
-        bNonSolid             TRUE
-    End_Component
-    Begin_Component "kexStaticMeshComponent"
-        mesh                  "models/model0498.staticmesh"
-    End_Component
-    Begin_Component "kexScriptComponent"
-        scriptClass           "RandoHubWarp"
-        triggerRadius         81.92
-    End_Component
-}
-
-HubWarpFrame kActor_Portal_HubWarpFrame
-{
-	className				  "kexActor"
-	placeable                 TRUE
-	flags.noDamage            TRUE
-	flags.allowTracking       FALSE
-	
-	initialScale              "0.25 0.25 0.25"
-    Begin_Component "kexWorldComponent"
-        radius                0
-        height                0
-    End_Component
-    Begin_Component "kexStaticMeshComponent"
-        mesh                  "models/model2278.staticmesh"
-    End_Component
-}
-
-//------------------------------
 // Warp Barrier - used to block warps for progressive warps
 // The radius is the standard size for warp portals - adjust as needed
 //------------------------------

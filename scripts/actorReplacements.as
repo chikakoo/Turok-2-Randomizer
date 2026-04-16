@@ -299,85 +299,20 @@ void RemoveAllGenerators(void)
 
 //---------------------------
 // Modifies the Primagen Key turn-ins so they aren't active if level requirements aren't met.
-// Places the hub warps in the level so the player can always go back.
 void DoHubModifications(const int16 &in mapId)
 {
 	kVec3 origin;
-	switch(mapId)
+	if (mapId == kLevel_Hub &&
+		AreLevelRequirementsUsed() &&
+		!AreLevelRequirementsUsedAndMet())
 	{
-		// Primagen Key turn-ins - only modified if level requirements are used and not met
-		case kLevel_Hub:
-			if (!AreLevelRequirementsUsed() ||
-				AreLevelRequirementsUsedAndMet())
-			{
-				break;
-			}
-			
-			origin.x = -30.72;
-			origin.y = 51.2;
-			origin.z = 0;
-			ActorFactory.Spawn(
-				kActor_Hub_PrimagenKeyTrigger,
-				origin,
-				0, 0, 0);
-			break;
-			
-		// Add hub warps to each level
-		case kLevel_RiverOfSouls_1:
-			origin.x = -2887.68;
-			origin.y = -10629.12;
-			origin.z = 0;
-			ActorFactory.Spawn(
-				kActor_Portal_HubWarp,
-				origin,
-				-1.5708,
-				0,
-				0);
-			break;
-		case kLevel_DeathMarsh_1:
-			origin.x = -1658.88;
-			origin.y = -6205.44;
-			origin.z = 614.39996;
-			ActorFactory.Spawn(
-				kActor_Portal_HubWarp,
-				origin,
-				-1.5708,
-				0,
-				0);
-			break;
-		case kLevel_BlindLair_1:
-			origin.x = 337.91998;
-			origin.y = -2600.96;
-			origin.z = -624.64;
-			ActorFactory.Spawn(
-				kActor_Portal_HubWarp,
-				origin,
-				-1.09626003056,
-				0,
-				0);
-			break;
-		case kLevel_HiveTop:
-			origin.x = -1566.72;
-			origin.y = 2826.24;
-			origin.z = 0;
-			ActorFactory.Spawn(
-				kActor_Portal_HubWarp,
-				origin,
-				-0.560292001832,
-				0,
-				0);
-			break;
-		case kLevel_Lightship_1:
-			origin.x = 1341.44;
-			origin.y = -4444.1597;
-			origin.z = 0;
-			ActorFactory.Spawn(
-				kActor_Portal_HubWarp,
-				origin,
-				1.5584278067,
-				0,
-				0);
-			break;
+		origin.x = -30.72;
+		origin.y = 51.2;
+		origin.z = 0;
+		ActorFactory.Spawn(
+			kActor_Hub_PrimagenKeyTrigger,
+			origin,
+			0, 0, 0);
 	}
 }
 

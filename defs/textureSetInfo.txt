@@ -21,6 +21,8 @@
 	texture_12 "textures/ui/text_7.png"
 	texture_13 "textures/ui/text_8.png"
 	texture_14 "textures/ui/text_9.png"
+	texture_15 "textures/ui/warp_home.png"
+	texture_16 "textures/ui/warp_hub.png"
 }
 
 // ------------------------------
