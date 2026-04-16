@@ -95,7 +95,7 @@ class RandoPlayerObject : ScriptObject
 		if (mapId == kLevel_Hub &&
 			OPTION_GOAL_LEVELS_GIVE_PRIMAGEN_KEYS &&
 			AreLevelRequirementsUsedAndMet() &&
-			LocalPlayer.Inventory().GetCount(kActor_PrimagenKey_1) == 0)
+			GetInventoryItemCollectedTotal(kActor_PrimagenKey_1) == 0)
 		{
 			AllPrimagenKeys();
 		}

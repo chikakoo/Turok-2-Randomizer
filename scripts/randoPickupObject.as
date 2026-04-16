@@ -142,9 +142,8 @@ class RandoPickupObject : ScriptObject
 			}
 			m_wasSentToAP = true;
 			
-			// If this item is marked with rando.give2, do this to give the second one
-			// This is true for primagen keys currently
-			HandleGiveSecondItem(self.Type());
+			// If this item is an inventory item, do this to track the total you've ever received
+			HandleTrackInventoryItems(self.Type());
 			
 			// Try to trigger it if it is a trap.
 			// If it isn't, this doesn't do anything.

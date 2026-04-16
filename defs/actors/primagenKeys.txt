@@ -16,7 +16,6 @@ PrimKey1 kActor_PrimagenKey_1
     pickup.pickupSound      "sounds/shaders/Ammo Pickup.ksnd" 
     pickup.pickupMessage    "$str_119"
     pickup.callout          384
-	rando.give2				TRUE
 	
 	initialScale              "0.3 0.3 0.3"
 	Begin_Component "kexStaticMeshComponent"
@@ -37,7 +36,6 @@ PrimKey2 kActor_PrimagenKey_2
     pickup.pickupSound      "sounds/shaders/Ammo Pickup.ksnd"
     pickup.pickupMessage    "$str_120" 
     pickup.callout          384
-	rando.give2				TRUE
 	
 	initialScale              "0.3 0.3 0.3"
 	Begin_Component "kexStaticMeshComponent"
@@ -58,7 +56,6 @@ PrimKey3 kActor_PrimagenKey_3
     pickup.pickupSound      "sounds/shaders/Ammo Pickup.ksnd"
     pickup.pickupMessage    "$str_121" 
     pickup.callout          384
-	rando.give2				TRUE
 	
 	initialScale              "0.3 0.3 0.3"
 	Begin_Component "kexStaticMeshComponent"
@@ -79,7 +76,6 @@ PrimKey4 kActor_PrimagenKey_4
     pickup.pickupSound      "sounds/shaders/Ammo Pickup.ksnd"
     pickup.pickupMessage    "$str_122" 
     pickup.callout          384
-	rando.give2				TRUE
 	
 	initialScale              "0.3 0.3 0.3"
 	Begin_Component "kexStaticMeshComponent"
@@ -100,7 +96,6 @@ PrimKey5 kActor_PrimagenKey_5
     pickup.pickupSound      "sounds/shaders/Ammo Pickup.ksnd"
     pickup.pickupMessage    "$str_123"
     pickup.callout          384
-	rando.give2				TRUE
 	
 	initialScale              "0.3 0.3 0.3"
 	Begin_Component "kexStaticMeshComponent"
@@ -121,7 +116,6 @@ PrimKey6 kActor_PrimagenKey_6
     pickup.pickupSound      "sounds/shaders/Ammo Pickup.ksnd"
     pickup.pickupMessage    "$str_124"
     pickup.callout          384
-	rando.give2				TRUE
 	
 	initialScale              "0.3 0.3 0.3"
 	Begin_Component "kexStaticMeshComponent"

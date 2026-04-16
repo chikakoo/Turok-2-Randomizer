@@ -322,7 +322,7 @@ void DoHubModifications(const int16 &in mapId)
 bool AreLevelRequirementsUsedAndMet()
 {
 	return AreLevelRequirementsUsed() &&
-		(LocalPlayer.Inventory().GetCount(kActor_Misc_TotemInventory) >= OPTION_GOAL_LEVELS);
+		(GetInventoryItemCurrentTotal(kActor_Misc_TotemInventory) >= OPTION_GOAL_LEVELS);
 }
 
 //---------------------------

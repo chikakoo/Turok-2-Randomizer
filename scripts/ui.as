@@ -27,6 +27,7 @@ const int UI_ICON_SIZE = 28;
 const int UI_OFFSET_HEADER = 44;
 const int UI_OFFSET_ROW_HEIGHT = 77;
 const int UI_OFFSET_ROW_BOTTOM = 22;
+const int UI_OFFSET_MISSION_COUNT = UI_ICON_SIZE + 1;
 
 const int UI_OFFSET_LEVEL_KEY = 70;
 const int UI_OFFSET_FEATHER = 122;
@@ -49,8 +50,6 @@ const int UI_OFFSET_WARP_BUTTON_Y = 528;
 
 class RandoUI
 {
-	// TODO: track the player's HP and if it's ever lower, close out
-	
 	// General Properties
 	kActor@ owner;
 	bool isActive;
@@ -97,42 +96,41 @@ class RandoUI
 	// - Location collection progress for the entire Level
 	void DisplayLevelProgress()
 	{
-		kPlayerInventory@ inventory = LocalPlayer.Inventory();
 		int16 mapId = Game.ActiveMapID();
 		switch(GetLevelNumberFromMapId(mapId))
 		{
 			case LEVEL_PORT_OF_ADIA:
 				Hud.AddMessage(
-					"Power Cells: " + inventory.GetCount(kActor_MissionItem_BeaconPowerCell),
+					"Power Cells: " + GetInventoryMessage(kActor_MissionItem_BeaconPowerCell),
 					g_progressMenuDisplayTime);
 				break;
 			case LEVEL_RIVER_OF_SOULS:
 				Hud.AddMessage(
-					"Gate Keys: " + inventory.GetCount(kActor_MissionItem_GateKey) +
-					"  -  Graveyard Keys: " + inventory.GetCount(kActor_MissionItem_GraveyardKey),
+					"Gate Keys: " + GetInventoryMessage(kActor_MissionItem_GateKey) +
+					"  -  Graveyard Keys: " + GetInventoryMessage(kActor_MissionItem_GraveyardKey),
 					g_progressMenuDisplayTime);
 				break;
 			case LEVEL_DEATH_MARSHES:
 				Hud.AddMessage(
-					"Satchel Charges: " + inventory.GetCount(kActor_MissionItem_L3SatchelCharge),
+					"Satchel Charges: " + GetInventoryMessage(kActor_MissionItem_L3SatchelCharge),
 					g_progressMenuDisplayTime);
 				break;
 			case LEVEL_LAIR_OF_THE_BLIND_ONES:
 				Hud.AddMessage(
-					"Satchel Charges: " + inventory.GetCount(kActor_MissionItem_L4SatchelCharge) +
-					"  -  Cave Door Keys: " + inventory.GetCount(kActor_MissionItem_CaveDoorKey),
+					"Satchel Charges: " + GetInventoryMessage(kActor_MissionItem_L4SatchelCharge) +
+					"  -  Cave Door Keys: " + GetInventoryMessage(kActor_MissionItem_CaveDoorKey),
 					g_progressMenuDisplayTime);
 				break;
 			case LEVEL_HIVE_OF_THE_MANTIDS:
 				Hud.AddMessage(
-					"Satchel Charges: " + inventory.GetCount(kActor_MissionItem_L5SatchelCharge),
+					"Satchel Charges: " + GetInventoryMessage(kActor_MissionItem_L5SatchelCharge),
 					g_progressMenuDisplayTime);
 				break;
 			case LEVEL_PRIMAGENS_LIGHTSHIP:
 				Hud.AddMessage(
-					"Ion Capacitors: " + inventory.GetCount(kActor_MissionItem_IonCapacitor) + 
-					"  -  Blue Laser Cells: " + inventory.GetCount(kActor_MissionItem_BlueLaserCell) + 
-					"  -  Red Laser Cells: " + inventory.GetCount(kActor_MissionItem_RedLaserCell),
+					"Ion Caps: " + GetInventoryMessage(kActor_MissionItem_IonCapacitor) + 
+					"  -  Blue Laser Cells: " + GetInventoryMessage(kActor_MissionItem_BlueLaserCell) + 
+					"  -  Red Laser Cells: " + GetInventoryMessage(kActor_MissionItem_RedLaserCell),
 					g_progressMenuDisplayTime);
 				break;
 			default:
@@ -142,6 +140,16 @@ class RandoUI
 		
 		DisplayCollectedLocationsForLevel(mapId, "Level Checks", g_progressMenuDisplayTime);
 		DisplayCollectedLocationsForCurrentMap(g_progressMenuDisplayTime);
+	}
+	
+	// --------------------------
+	// Gets a message for how many inventory items you've collected and how many you have now:
+	// <collected> (<current>)
+	kStr GetInventoryMessage(const int &in actorId)
+	{
+		int collectedTotal = GetInventoryItemCollectedTotal(actorId);
+		int currentTotal = GetInventoryItemCurrentTotal(actorId);
+		return "" + collectedTotal + " (" + currentTotal + ")";
 	}
 
 	// --------------------------
@@ -255,16 +263,10 @@ class RandoUI
 		DisplayLevel(6, 6, 
 			kActor_InventoryItem_Level6Key, kActor_Feather_6, kActor_PrimagenKey_6, kActor_Talisman_EyeOfTruth);
 		
-		int nukeParts = LocalPlayer.Inventory().GetCount(kActor_InventoryItem_NukePart);
+		int nukeParts = GetInventoryItemCurrentTotal(kActor_InventoryItem_NukePart);
 		kVec3 nukePosition = PositionPixelToUI(UI_OFFSET_NUKE_X, UI_OFFSET_NUKE_Y);
-		if (nukeParts < 6)
-		{
-			AddNumberImage(nukeParts, nukePosition);
-		}
-		else 
-		{
-			AddImage(RANDO_UI_TEXTURE_COMPLETE, nukePosition);
-		}
+		bool useGreenText = nukeParts >= 6;
+		AddNumberImage(nukeParts, nukePosition, useGreenText);
 		
 		RandoUIElement@ homeButton = AddImage(
 			RANDO_UI_TEXTURE_WARP_HOME, 
@@ -309,11 +311,10 @@ class RandoUI
 		const int &in primagenKeyActor,
 		const int &in talismanActor)
 	{
-		kPlayerInventory@ inventory = LocalPlayer.Inventory();
 		int levelHeightOffset = GetLevelRowHeightOffset(level);
 
 		// Primagen Keys
-		int primagenKeyTexture = inventory.GetCount(primagenKeyActor) > 0
+		int primagenKeyTexture = GetInventoryItemCollectedTotal(primagenKeyActor) > 0
 			? RANDO_UI_TEXTURE_COMPLETE
 			: RANDO_UI_TEXTURE_INCOMPLETE;
 		AddImage(primagenKeyTexture, PositionPixelToUI(UI_OFFSET_PRIMAGEN_KEY, levelHeightOffset));
@@ -328,24 +329,21 @@ class RandoUI
 		}
 		
 		// Level Keys
-		int levelKeys = inventory.GetCount(levelKeyActor);
-		if (levelKeys < maxKeys)
-		{
-			AddNumberImage(levelKeys, PositionPixelToUI(UI_OFFSET_LEVEL_KEY, levelHeightOffset));
-		}
-		else 
-		{
-			AddImage(RANDO_UI_TEXTURE_COMPLETE, PositionPixelToUI(UI_OFFSET_LEVEL_KEY, levelHeightOffset));
-		}
+		int levelKeys = GetInventoryItemCollectedTotal(levelKeyActor);
+		bool useGreenText = levelKeys >= maxKeys;
+		AddNumberImage(
+			levelKeys, 
+			PositionPixelToUI(UI_OFFSET_LEVEL_KEY, levelHeightOffset),
+			useGreenText);
 		
 		// Feathers
-		int featherTexture = inventory.GetCount(featherActor) > 0
+		int featherTexture = GetInventoryItemCollectedTotal(featherActor) > 0
 			? RANDO_UI_TEXTURE_COMPLETE
 			: RANDO_UI_TEXTURE_INCOMPLETE;
 		AddImage(featherTexture, PositionPixelToUI(UI_OFFSET_FEATHER, levelHeightOffset));
 		
 		// Talismans
-		int talismanTexture = inventory.GetCount(talismanActor) > 0
+		int talismanTexture = GetInventoryItemCurrentTotal(talismanActor) > 0
 			? RANDO_UI_TEXTURE_COMPLETE
 			: RANDO_UI_TEXTURE_INCOMPLETE;
 		AddImage(talismanTexture, PositionPixelToUI(UI_OFFSET_TALISMAN, levelHeightOffset));
@@ -390,15 +388,23 @@ class RandoUI
 		const int &in missionItemActor,
 		const int &in maxCount)
 	{
-		int missionItemCount = LocalPlayer.Inventory().GetCount(missionItemActor);
-		kVec3 missionItemPosition = PositionPixelToUI(widthOffset, levelHeightOffset);
-		if (missionItemCount < maxCount)
+		int missionItemCollected = GetInventoryItemCollectedTotal(missionItemActor);
+		if (missionItemCollected > maxCount)
 		{
-			AddNumberImage(missionItemCount, missionItemPosition);
+			missionItemCollected = maxCount;
 		}
-		else 
+		
+		kVec3 missionItemPosition = PositionPixelToUI(widthOffset, levelHeightOffset);
+		bool useGreenText = missionItemCollected >= maxCount;
+		AddNumberImage(missionItemCollected, missionItemPosition, useGreenText);
+		
+		// Only show the total you have if you have any, to reduce UI noise
+		int missionItemCurrent = GetInventoryItemCurrentTotal(missionItemActor);
+		if (missionItemCurrent > 0)
 		{
-			AddImage(RANDO_UI_TEXTURE_COMPLETE, missionItemPosition);
+			AddNumberImage(
+				missionItemCurrent,
+				PositionPixelToUI(widthOffset, levelHeightOffset - UI_OFFSET_MISSION_COUNT));
 		}
 	}
 	
@@ -433,12 +439,24 @@ class RandoUI
 	
 	// --------------------------
 	// Adds a number image to the UI
+	// Uses the default UI icon size
+	void AddNumberImage(
+		const int number, 
+		const kVec3& in pos,
+		bool useGreenText)
+	{
+		AddNumberImage(number, pos, UI_ICON_SIZE, UI_ICON_SIZE, useGreenText);
+	}
+	
+	// --------------------------
+	// Adds a number image to the UI
 	// Takes the width/height in pixels
 	void AddNumberImage(
 		const int number, 
 		const kVec3& in pos = Math::vecZero,
 		const int width = UI_ICON_SIZE, 
-		const int height = UI_ICON_SIZE)
+		const int height = UI_ICON_SIZE,
+		bool useGreenText = false)
 	{
 		int num = number;
 		array<int> digits;
@@ -455,10 +473,13 @@ class RandoUI
 		}
 		digits.reverse();
 		
+		int textureIndexStart = useGreenText 
+			? RANDO_UI_TEXTURE_TEXT_GREEN_START
+			: RANDO_UI_TEXTURE_TEXT_START;
 		kVec3 size = SizePixelToUI(width, height);
 		for (uint i = 0; i < digits.length(); i++)
 		{
-			int textureIndex = RANDO_UI_TEXTURE_TEXT_START + digits[i];
+			int textureIndex = textureIndexStart + digits[i];
 			kVec3 newPos = kVec3(
 				pos.x + (i * size.x), 
 				pos.y,
@@ -620,7 +641,6 @@ class RandoUI
 		}
 		
 		// Make sure the player doesn't move
-		// TODO: set the player mesh to none
 		owner.Yaw() = uiYaw;
 		owner.Pitch() = 0.0f;
 		owner.Roll() = 0.0f;

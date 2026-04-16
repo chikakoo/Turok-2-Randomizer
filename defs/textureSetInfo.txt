@@ -21,8 +21,18 @@
 	texture_12 "textures/ui/text_7.png"
 	texture_13 "textures/ui/text_8.png"
 	texture_14 "textures/ui/text_9.png"
-	texture_15 "textures/ui/warp_home.png"
-	texture_16 "textures/ui/warp_hub.png"
+	texture_15 "textures/ui/text_green_0.png"
+	texture_16 "textures/ui/text_green_1.png"
+	texture_17 "textures/ui/text_green_2.png"
+	texture_18 "textures/ui/text_green_3.png"
+	texture_19 "textures/ui/text_green_4.png"
+	texture_20 "textures/ui/text_green_5.png"
+	texture_21 "textures/ui/text_green_6.png"
+	texture_22 "textures/ui/text_green_7.png"
+	texture_23 "textures/ui/text_green_8.png"
+	texture_24 "textures/ui/text_green_9.png"
+	texture_25 "textures/ui/warp_home.png"
+	texture_26 "textures/ui/warp_hub.png"
 }
 
 // ------------------------------

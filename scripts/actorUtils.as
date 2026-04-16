@@ -167,6 +167,7 @@ bool TryGivePlayerHealth(int &in actorId)
 
 //---------------------------
 // Gets the given item and adds it to your inventory.
+// Will add the item AND the inventory offset.
 bool TryGetInventoryItem(int &in actorId)
 {
 	kDictMem@ missionItemDef = TryGetActorDefWithClass(actorId, "kexInventoryPickup");
@@ -177,7 +178,7 @@ bool TryGetInventoryItem(int &in actorId)
 	
 	LocalPlayer.Inventory().Give(actorId);
 	PlayPickupNotification(missionItemDef);
-	HandleGiveSecondItem(actorId, missionItemDef);
+	HandleTrackInventoryItems(actorId, missionItemDef);
 	
 	return true;
 }
@@ -185,7 +186,7 @@ bool TryGetInventoryItem(int &in actorId)
 //---------------------------
 // Some items (primagen keys) will disappear when you use them.
 // We want to track these still, so give a second one of them.
-void HandleGiveSecondItem(int &in actorId, kDictMem@ missionItemDef = null)
+void HandleTrackInventoryItems(int &in actorId, kDictMem@ missionItemDef = null)
 {
 	if (missionItemDef is null)
 	{
@@ -196,12 +197,27 @@ void HandleGiveSecondItem(int &in actorId, kDictMem@ missionItemDef = null)
 		}
 	}
 	
-	bool give2;
-	missionItemDef.GetBool("rando.give2", give2, false);
-	if (give2)
+	// A (probably unnecessary) guard against overflowing counts
+	// To protect against a ton of items in the pool
+	if (GetInventoryItemCurrentTotal(actorId) >= 99)
 	{
-		LocalPlayer.Inventory().Give(actorId);
+		return;
 	}
+	LocalPlayer.Inventory().Give(actorId + RANDO_INVENTORY_ITEM_OFFSET);
+}
+
+//---------------------------
+// Gets the current count of the given inventory item
+int GetInventoryItemCurrentTotal(int &in actorId)
+{
+	return LocalPlayer.Inventory().GetCount(actorId);
+}
+
+//---------------------------
+// Gets the count of the given inventory item that you've every collected
+int GetInventoryItemCollectedTotal(int &in actorId)
+{
+	return LocalPlayer.Inventory().GetCount(actorId + RANDO_INVENTORY_ITEM_OFFSET);
 }
 
 //---------------------------

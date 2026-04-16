@@ -31,7 +31,7 @@ class RandoPrimagenKeyTrigger : ScriptObject
 	{
 		if (m_messageCooldown <= 0)
 		{
-			int levelsCompleted = LocalPlayer.Inventory().GetCount(kActor_Misc_TotemInventory);
+			int levelsCompleted = GetInventoryItemCurrentTotal(kActor_Misc_TotemInventory);
 			Hud.AddMessage(
 				"Level goal not met: " + levelsCompleted + "/" + OPTION_GOAL_LEVELS,
 				240);

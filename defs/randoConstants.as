@@ -1,3 +1,7 @@
+// Inventory items add 400000 to the existing id to get
+// the "how many have I ever collected" value
+#define RANDO_INVENTORY_ITEM_OFFSET 400000
+
 // Called in UserEvent to get the script object back
 #define RANDO_MSG_GET_SCRIPT 100
 
@@ -76,6 +80,7 @@
 #define RANDO_UI_TEXTURE_BACKGROUND 2
 #define RANDO_UI_TEXTURE_INCOMPLETE 3
 #define RANDO_UI_TEXTURE_COMPLETE 4
-#define RANDO_UI_TEXTURE_TEXT_START 5 // Ends at 14
-#define RANDO_UI_TEXTURE_WARP_HOME 15
-#define RANDO_UI_TEXTURE_WARP_HUB 16
+#define RANDO_UI_TEXTURE_TEXT_START 5 // 14 is the last
+#define RANDO_UI_TEXTURE_TEXT_GREEN_START 15 // 24 is the last
+#define RANDO_UI_TEXTURE_WARP_HOME 25
+#define RANDO_UI_TEXTURE_WARP_HUB 26
