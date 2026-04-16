@@ -95,6 +95,34 @@ void AddWarpBarriers(const int16 &in mapId)
 			AddWarpBarrier(kVec3(745.576, -1540.403, 716.8), kActor_InventoryItem_ProgressiveWarpL2, 11);
 			break;
 		// Graveyard 2/3 are the other maps, and they don't lead anywhere
+		
+		// Death Marshes
+		case kLevel_DeathMarsh_1: // Start (ammo storage and level progression)
+			AddWarpBarrier(kVec3(-445.089, -4813.84, 921.6), kActor_InventoryItem_ProgressiveWarpL3, 1);
+			AddWarpBarrier(kVec3(30.72, -4782.08, 921.6), kActor_InventoryItem_ProgressiveWarpL3, 1);
+			break;
+		case kLevel_DeathMarsh_2: // Checkpoint 1
+			AddWarpBarrier(kVec3(-2225.035, 4691.924, 0), kActor_InventoryItem_ProgressiveWarpL3, 2);
+			break;
+		case kLevel_DeathMarsh_3: // Oblivion
+			AddWarpBarrier(kVec3(1228.8, 3850, 0), kActor_InventoryItem_ProgressiveWarpL3, 3);
+			break;
+		case kLevel_DeathMarsh_4: // Ammo 2, Bridge Bottom, Bridge Top
+			AddWarpBarrier(kVec3(-1559.966, 2460.242, 614.4), kActor_InventoryItem_ProgressiveWarpL3, 4);
+			AddWarpBarrier(kVec3(842.321, -5330.751, 307.2), kActor_InventoryItem_ProgressiveWarpL3, 4);
+			AddWarpBarrier(kVec3(3686.4, 4157.44, 1228.8), kActor_InventoryItem_ProgressiveWarpL3, 5);
+			break;
+		case kLevel_DeathMarsh_5: // Long Bridge
+			AddWarpBarrier(kVec3(768, -8755.2, 921.6), kActor_InventoryItem_ProgressiveWarpL3, 6);
+			break;
+		case kLevel_DeathMarsh_6: // Talisman
+			AddWarpBarrier(kVec3(3225.6, -307.2, -614.4), kActor_InventoryItem_ProgressiveWarpL3, 7);
+			break;
+		case kLevel_DeathMarsh_7: // Ammo 3 and Exit
+			AddWarpBarrier(kVec3(-2319.356, 3483.491, 0), kActor_InventoryItem_ProgressiveWarpL3, 8);
+			AddWarpBarrier(kVec3(-3440.40, 829.756, 0), kActor_InventoryItem_ProgressiveWarpL3, 8);
+			break;
+		// Other maps are the ammo maps and the end Raptor battle
 	}
 }
 

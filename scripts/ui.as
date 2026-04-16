@@ -265,7 +265,7 @@ class RandoUI
 			kActor_Talisman_LeapOfFaith);
 		DisplayLevel(3,
 			kActor_InventoryItem_Level3Key, 3,
-			kActor_InventoryItem_ProgressiveWarpL3, 20,
+			kActor_InventoryItem_ProgressiveWarpL3, 8,
 			kActor_Feather_3, 
 			kActor_PrimagenKey_3,
 			kActor_Talisman_BreathOfLife);
