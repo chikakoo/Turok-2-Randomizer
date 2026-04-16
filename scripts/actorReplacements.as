@@ -61,6 +61,40 @@ void AddWarpBarriers(const int16 &in mapId)
 		case kLevel_PortOfAdia_8: // Gated City
 			AddWarpBarrier(kVec3(1843.2, 102.4, 0), kActor_InventoryItem_ProgressiveWarpL1, 9);
 			break;
+		// Catwalks is the last map
+			
+		// River of Souls
+		case kLevel_RiverOfSouls_1: // Start
+			AddWarpBarrier(kVec3(3686.4, 7987.2, 921.6), kActor_InventoryItem_ProgressiveWarpL2, 1);
+			break;
+		case kLevel_RiverOfSouls_2: // Bridge Switch 1
+			AddWarpBarrier(kVec3(-4454.467, -297.377, 460.8), kActor_InventoryItem_ProgressiveWarpL2, 2);
+			break;
+		case kLevel_RiverOfSouls_3: // River Bridge 1
+			AddWarpBarrier(kVec3(-4147.2, -307.2, -614.4), kActor_InventoryItem_ProgressiveWarpL2, 3);
+			break;
+		case kLevel_RiverOfSouls_4: // Gate Key Door
+			AddWarpBarrier(kVec3(1945.6, 5120, 716.8), kActor_InventoryItem_ProgressiveWarpL2, 4);
+			break;
+		case kLevel_RiverOfSouls_5: // Soul Gate 1
+			AddWarpBarrier(kVec3(-6758.399, 5529.6, -153.6), kActor_InventoryItem_ProgressiveWarpL2, 5);
+			break;
+		case kLevel_RiverOfSouls_6: // Long Path, Water Maze, Big Cylinder
+			AddWarpBarrier(kVec3(-102.4, 870.4, 614.4), kActor_InventoryItem_ProgressiveWarpL2, 6);
+			AddWarpBarrier(kVec3(-2913.747, 6870.931, -4761.6), kActor_InventoryItem_ProgressiveWarpL2, 7);
+			AddWarpBarrier(kVec3(6092.8, -1689.6, -3532.8), kActor_InventoryItem_ProgressiveWarpL2, 9);
+			break;
+		case kLevel_RiverOfSouls_9: // Graveyard 1 (between last 2 of map 6)
+			AddWarpBarrier(kVec3(-1684.48, -337.92, -4761.6), kActor_InventoryItem_ProgressiveWarpL2, 8);
+			break;
+		case kLevel_RiverOfSouls_7: // LF Jump Pads (2 warps on same level)
+			AddWarpBarrier(kVec3(-4044.035, 7276.109, -51.2), kActor_InventoryItem_ProgressiveWarpL2, 10);
+			AddWarpBarrier(kVec3(3072, -3635.2, 716.8), kActor_InventoryItem_ProgressiveWarpL2, 10);
+			break;
+		case kLevel_RiverOfSouls_8: // Last Map
+			AddWarpBarrier(kVec3(745.576, -1540.403, 716.8), kActor_InventoryItem_ProgressiveWarpL2, 11);
+			break;
+		// Graveyard 2/3 are the other maps, and they don't lead anywhere
 	}
 }
 

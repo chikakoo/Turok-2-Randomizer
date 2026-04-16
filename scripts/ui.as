@@ -257,9 +257,9 @@ class RandoUI
 			-1, 
 			kActor_PrimagenKey_1, 
 			-1);
-		DisplayLevel(2, 
+		DisplayLevel(2,
 			kActor_InventoryItem_Level2Key, 3,
-			kActor_InventoryItem_ProgressiveWarpL2, 20,
+			kActor_InventoryItem_ProgressiveWarpL2, 11,
 			kActor_Feather_2, 
 			kActor_PrimagenKey_2, 
 			kActor_Talisman_LeapOfFaith);
