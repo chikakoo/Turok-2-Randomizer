@@ -4,12 +4,14 @@
 //---------------------------
 class RandoPrimagenKeyTrigger : ScriptObject
 {
+	kActor@ self;
 	int16 m_messageCooldown;
 
 	//---------------------------
 	// Constructor
 	RandoPrimagenKeyTrigger(kActor @actor)
 	{
+		@self = actor;
 		actor.WorldComponent().Flags() |= WCF_NONSOLID;
 		actor.WorldComponent().Flags() |= WCF_INVOKE_COLLIDE_CALLBACK;
 		m_messageCooldown = 0;
@@ -37,5 +39,19 @@ class RandoPrimagenKeyTrigger : ScriptObject
 				240);
 			m_messageCooldown = 360;
 		}
+	}
+	
+	// --------------------------
+	// Needs to exist with OnDeserialize to prevent errors
+	void OnSerialize(kDict& out dict)
+	{
+	}
+	
+	// --------------------------
+	// Remove on a deserialize, as they are created on spawn
+	// This prevents multiple of these from existing at a time
+	void OnDeserialize(kDict& in dict)
+	{			
+		self.Remove();
 	}
 }

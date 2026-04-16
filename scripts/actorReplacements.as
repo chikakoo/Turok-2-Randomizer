@@ -17,23 +17,35 @@ void DoActorReplacementsOnPlayerSpawn()
 	// Reset the actors to trigger BEFORE replacing actors
 	g_actorsToTrigger.resize(0);
 	
-	// Replace all the actors that should be replaced
+	// Modify actors
 	ReplaceAllActors(mapId);
 	DoHubModifications(mapId);
-	
-	//TODO: make this better
-	if (mapId == 51)
+	AddWarpBarriers(mapId);
+}
+
+//---------------------------
+// Add the warp barriers to the map
+// If the setting is 0, it isn't used, so just return early
+void AddWarpBarriers(const int16 &in mapId)
+{
+	if (OPTION_PROGRESSIVE_WARPS <= 0)
 	{
-		kVec3 origin;
-		origin.x = 3840;
-		origin.y = 614;
-		origin.z = 307;
-		ActorFactory.Spawn(
-			kActor_ProgressionBlocker_WarpBarrier,
-			origin,
-			0,
-			0,
-			0);
+		return;
+	}
+
+	kActor@ barrier;
+	RandoWarpBarrier@ barrierScript;
+	switch(mapId)
+	{
+		case kLevel_PortOfAdia_1:
+			@barrier = ActorFactory.Spawn(
+				kActor_ProgressionBlocker_WarpBarrier,
+				kVec3(3840, 614, 307),
+				0, 0, 0
+			);
+			@barrierScript = cast<RandoWarpBarrier@>(GetScript(barrier));
+			barrierScript.SetBarrierInfo(kActor_InventoryItem_ProgressiveWarpL1, 5);
+			break;
 	}
 }
 

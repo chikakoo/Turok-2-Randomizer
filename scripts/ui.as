@@ -27,7 +27,6 @@ const int UI_ICON_SIZE = 28;
 const int UI_OFFSET_HEADER = 44;
 const int UI_OFFSET_ROW_HEIGHT = 77;
 const int UI_OFFSET_ROW_BOTTOM = 22;
-const int UI_OFFSET_MISSION_COUNT = UI_ICON_SIZE + 1;
 
 const int UI_OFFSET_LEVEL_KEY = 70;
 const int UI_OFFSET_FEATHER = 122;
@@ -382,6 +381,10 @@ class RandoUI
 		}
 	}
 	
+	// --------------------------
+	// Displays the mission item on the UI
+	// This will display the current count you have in your inventory
+	// It will be in green if you have all of the items required
 	void DisplayMissionItem(
 		const int &in levelHeightOffset,
 		const int &in widthOffset,
@@ -389,23 +392,11 @@ class RandoUI
 		const int &in maxCount)
 	{
 		int missionItemCollected = GetInventoryItemCollectedTotal(missionItemActor);
-		if (missionItemCollected > maxCount)
-		{
-			missionItemCollected = maxCount;
-		}
+		int missionItemCurrent = GetInventoryItemCurrentTotal(missionItemActor);
 		
 		kVec3 missionItemPosition = PositionPixelToUI(widthOffset, levelHeightOffset);
 		bool useGreenText = missionItemCollected >= maxCount;
-		AddNumberImage(missionItemCollected, missionItemPosition, useGreenText);
-		
-		// Only show the total you have if you have any, to reduce UI noise
-		int missionItemCurrent = GetInventoryItemCurrentTotal(missionItemActor);
-		if (missionItemCurrent > 0)
-		{
-			AddNumberImage(
-				missionItemCurrent,
-				PositionPixelToUI(widthOffset, levelHeightOffset - UI_OFFSET_MISSION_COUNT));
-		}
+		AddNumberImage(missionItemCurrent, missionItemPosition, useGreenText);
 	}
 	
 	// --------------------------

@@ -7,10 +7,16 @@
 
 #define kActor_Item_APItemProgression 100000
 #define kActor_Item_APItemNonProgression 100001
-#define kActor_Portal_HubWarp 200000
-#define kActor_Portal_HubWarpFrame 200001
-#define kActor_Hub_PrimagenKeyTrigger 200002
+#define kActor_Hub_PrimagenKeyTrigger 200000
+
 #define kActor_ProgressionBlocker_WarpBarrier 200100
+#define kActor_InventoryItem_ProgressiveWarpL1 200101
+#define kActor_InventoryItem_ProgressiveWarpL2 200102
+#define kActor_InventoryItem_ProgressiveWarpL3 200103
+#define kActor_InventoryItem_ProgressiveWarpL4 200104
+#define kActor_InventoryItem_ProgressiveWarpL5 200105
+#define kActor_InventoryItem_ProgressiveWarpL6 200106
+
 #define kActor_Item_RandomAmmo 30000 // Limited to int16 for generators
 #define kActor_Generator_RandomAmmo 30100
 

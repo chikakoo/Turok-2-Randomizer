@@ -123,6 +123,15 @@ void Help(void)
 	Sys.Print("HandleEnemyTrap");
 	Sys.Print("HandleDamageTrap");
 	Sys.Print("HandleSpamTrap");
+	Sys.Print("");
+	Sys.Print("-----------------");
+	Sys.Print("AP Specific Items");
+	Sys.Print("ProgressiveWarpL1");
+	Sys.Print("ProgressiveWarpL2");
+	Sys.Print("ProgressiveWarpL3");
+	Sys.Print("ProgressiveWarpL4");
+	Sys.Print("ProgressiveWarpL5");
+	Sys.Print("ProgressiveWarpL6");
 }
 
 // --------------------------
@@ -451,4 +460,36 @@ void BlueLaserCell(void)
 void RedLaserCell(void)
 {
 	TryGetInventoryItem(kActor_MissionItem_RedLaserCell);
+}
+
+//---------------------------
+// AP Items
+void ProgressiveWarpL1(void)
+{
+	TryGetInventoryItem(kActor_InventoryItem_ProgressiveWarpL1);
+}
+
+void ProgressiveWarpL2(void)
+{
+	TryGetInventoryItem(kActor_InventoryItem_ProgressiveWarpL2);
+}
+
+void ProgressiveWarpL3(void)
+{
+	TryGetInventoryItem(kActor_InventoryItem_ProgressiveWarpL3);
+}
+
+void ProgressiveWarpL4(void)
+{
+	TryGetInventoryItem(kActor_InventoryItem_ProgressiveWarpL4);
+}
+
+void ProgressiveWarpL5(void)
+{
+	TryGetInventoryItem(kActor_InventoryItem_ProgressiveWarpL5);
+}
+
+void ProgressiveWarpL6(void)
+{
+	TryGetInventoryItem(kActor_InventoryItem_ProgressiveWarpL6);
 }

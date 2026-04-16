@@ -49,6 +49,164 @@ APItemNonProgression kActor_Item_APItemNonProgression
 }
 
 //------------------------------
+// AP Progressive warps
+APProgressiveWarpL1 kActor_InventoryItem_ProgressiveWarpL1
+{
+    className                   "kexInventoryPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Ammo Pickup.ksnd"
+	pickup.pickupMessage 		"Progressive Warp Level 1"
+    
+    initialScale              "0.5 0.5 0.5"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+	
+	// Temporary until we have a model of some kind
+	Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Pickup_Health_2.staticmesh"
+    End_Component
+	
+    Begin_Component "kexScriptComponent"
+        scriptClass           "RandoPickupObject"
+        triggerRadius         81.92
+    End_Component
+}
+
+APProgressiveWarpL2 kActor_InventoryItem_ProgressiveWarpL2
+{
+    className                   "kexInventoryPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Ammo Pickup.ksnd"
+	pickup.pickupMessage 		"Progressive Warp Level 2"
+    
+    initialScale              "0.5 0.5 0.5"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+	
+	// Temporary until we have a model of some kind
+	Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Pickup_Health_2.staticmesh"
+    End_Component
+	
+    Begin_Component "kexScriptComponent"
+        scriptClass           "RandoPickupObject"
+        triggerRadius         81.92
+    End_Component
+}
+
+APProgressiveWarpL3 kActor_InventoryItem_ProgressiveWarpL3
+{
+    className                   "kexInventoryPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Ammo Pickup.ksnd"
+	pickup.pickupMessage 		"Progressive Warp Level 3"
+    
+    initialScale              "0.5 0.5 0.5"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+	
+	// Temporary until we have a model of some kind
+	Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Pickup_Health_2.staticmesh"
+    End_Component
+	
+    Begin_Component "kexScriptComponent"
+        scriptClass           "RandoPickupObject"
+        triggerRadius         81.92
+    End_Component
+}
+
+APProgressiveWarpL4 kActor_InventoryItem_ProgressiveWarpL4
+{
+    className                   "kexInventoryPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Ammo Pickup.ksnd"
+	pickup.pickupMessage 		"Progressive Warp Level 4"
+    
+    initialScale              "0.5 0.5 0.5"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+	
+	// Temporary until we have a model of some kind
+	Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Pickup_Health_2.staticmesh"
+    End_Component
+	
+    Begin_Component "kexScriptComponent"
+        scriptClass           "RandoPickupObject"
+        triggerRadius         81.92
+    End_Component
+}
+
+APProgressiveWarpL5 kActor_InventoryItem_ProgressiveWarpL5
+{
+    className                   "kexInventoryPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Ammo Pickup.ksnd"
+	pickup.pickupMessage 		"Progressive Warp Level 5"
+    
+    initialScale              "0.5 0.5 0.5"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+	
+	// Temporary until we have a model of some kind
+	Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Pickup_Health_2.staticmesh"
+    End_Component
+	
+    Begin_Component "kexScriptComponent"
+        scriptClass           "RandoPickupObject"
+        triggerRadius         81.92
+    End_Component
+}
+
+APProgressiveWarpL6 kActor_InventoryItem_ProgressiveWarpL6
+{
+    className                   "kexInventoryPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Ammo Pickup.ksnd"
+	pickup.pickupMessage 		"Progressive Warp Level 6"
+    
+    initialScale              "0.5 0.5 0.5"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+	
+	// Temporary until we have a model of some kind
+	Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Pickup_Health_2.staticmesh"
+    End_Component
+	
+    Begin_Component "kexScriptComponent"
+        scriptClass           "RandoPickupObject"
+        triggerRadius         81.92
+    End_Component
+}
+
+//------------------------------
 // Random ammo pickup for AP - see GetAmmoInRandomWeapon
 RandomAmmo kActor_Item_RandomAmmo
 {
