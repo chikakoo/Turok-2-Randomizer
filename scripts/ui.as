@@ -55,6 +55,7 @@ class RandoUI
 	kActor@ owner;
 	bool isActive;
 	int lastOverIndex;
+	float lastPlayerHealth;
 	
 	// UI Properties
 	kVec3 uiOrigin;
@@ -147,19 +148,32 @@ class RandoUI
 	// Turns on the UI menu
 	bool Activate()
 	{
+		if (isActive)
+		{
+			return false;
+		}
+	
+		if (IsInTotemOrBossLevel())
+		{
+			Hud.AddMessage("You can't open the UI here!");
+			return false;
+		}
+	
 		@owner = LocalPlayer.Actor().CastToActor();
 		kPuppet@ puppet = owner.CastToPuppet();
 		kVec3 velocity = owner.MovementComponent().Velocity();
 		
+		const float velocityTolerance = 0.001f;
 		if ((owner.WorldComponent().Flags() & WCF_ON_PLATFORM) != 0 ||
-			velocity.x != 0 ||
-			velocity.y != 0 ||
-			velocity.z != 0)
+			Math::Fabs(velocity.x) > velocityTolerance ||
+			Math::Fabs(velocity.y) > velocityTolerance ||
+			Math::Fabs(velocity.z) > velocityTolerance)
 		{
 			Hud.AddMessage("Stand still to show the UI.");
 			return false;
 		}
 		
+		lastPlayerHealth = owner.Health();
 		lastFov = 0.0f;
 		mouse.SetPosition(Math::vecZero);
 		mouseX = 0.0f;
@@ -194,13 +208,12 @@ class RandoUI
 	void Deactivate()
 	{
 		isActive = false;
+		mouse.self.Flags() |= AF_HIDDEN;
 		Clear();
 
 		if (owner !is null)
 		{
 			kPuppet@ puppet = owner.CastToPuppet();
-			
-			// TODO: check if player is dead, and don't do this otherwise
 			puppet.PlayerFlags() &= ~(PF_NOWEAPON);
 		}
 	}
@@ -270,7 +283,6 @@ class RandoUI
 	
 	// --------------------------
 	// Handle warping home
-	// TODO: don't allow this if in a totem/boss level
 	void OnWarpHomeClicked()
 	{
 		Deactivate();
@@ -279,7 +291,6 @@ class RandoUI
 
 	// --------------------------
 	// Handle warping to the HUB
-	// TODO: don't allow this if in a totem/boss level
 	// TODO: don't allow this if the hub isn't "unlocked"
 	void OnWarpHubClicked()
 	{
@@ -543,7 +554,8 @@ class RandoUI
 			}
 		}
 		
-		if ((LocalPlayer.Buttons() & BC_JUMP) != 0)
+		if ((LocalPlayer.Buttons() & BC_JUMP) != 0 ||
+			(owner !is null && (owner.Health() < lastPlayerHealth)))
 		{
 			Deactivate();
 		}
@@ -554,7 +566,8 @@ class RandoUI
 			mouse.self.Flags() |= AF_HIDDEN;
 			return;
 		}
-		
+
+		lastPlayerHealth = owner.Health();
 		mouse.self.Flags() &= ~AF_HIDDEN;
 		
 		// Check Fov change

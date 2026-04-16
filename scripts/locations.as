@@ -259,6 +259,28 @@ int GetLevelNumberFromMapId(const int &in mapId)
 }
 
 //------------------------------
+// Whether the player is in a totem or boss level.
+// These can't be teleported out of via the UI menu.
+bool IsInTotemOrBossLevel()
+{
+	switch(Game.ActiveMapID())
+	{
+		case kLevel_PortOfAdia_Totem:
+		case kLevel_RiverOfSouls_Totem:
+		case kLevel_DeathMarsh_Totem:
+		case kLevel_BlindLair_Totem:
+		case kLevel_Hive_Totem:
+		case kLevel_BlindOneBoss:
+		case kLevel_QueenBoss:
+		case kLevel_MotherBoss:
+		case kLevel_PrimagenBoss:
+			return true;
+	}
+	
+	return false;
+}
+
+//------------------------------
 // Add to the map for a local item.
 // - name: The friendly name of the actor
 // - apId: The AP id of the location

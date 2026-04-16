@@ -47,13 +47,12 @@ class RandoPlayerObject : ScriptObject
 			if (LocalPlayer.ButtonHeldTime(2) > g_menuButtonHeldTime)
 			{
 				ui.DisplayLevelProgress();
+				g_messageCooldown = g_progressMenuDisplayTime + 30;
 			}
-			else
+			else if (!ui.Activate())
 			{
-				ui.Activate();
+				g_messageCooldown = 30;
 			}
-			
-			g_messageCooldown = g_progressMenuDisplayTime + 30;
 		}
 	}
 	
@@ -144,6 +143,12 @@ class RandoPlayerObject : ScriptObject
 	// e.g. "51001|51002" for two locations
 	void OnSerialize(kDict &out dict)
     {
+		// We never want to save the UI, so close it out on a save
+		if (ui !is null)
+		{
+			ui.Deactivate();
+		}
+		
 		// Collected locations/sent to AP locations
 		kStr collectedLocations;
 		kStr sentToAPLocations;
