@@ -169,6 +169,42 @@ void AddWarpBarriers(const int16 &in mapId)
 			AddWarpBarrier(kVec3(0, -4761.6, -2457.6), kActor_InventoryItem_ProgressiveWarpL4, 9);
 			break;
 		// Others are the other two vents
+		
+		// Hive of the Mantids
+		case kLevel_HiveTop: // Start - 402
+			AddWarpBarrier(kVec3(10.24, 465.92, -230.4), kActor_InventoryItem_ProgressiveWarpL5, 1);
+			break;
+		case kLevel_Hive_1: // Force Fields
+			AddWarpBarrier(kVec3(4761.6, 1075.2, -307.2), kActor_InventoryItem_ProgressiveWarpL5, 2);
+			break;
+		case kLevel_Hive_2: // Pit 1
+			AddWarpBarrier(kVec3(-2150.4, -5836.8, -1228.8), kActor_InventoryItem_ProgressiveWarpL5, 3);
+			break;
+		case kLevel_Hive_3: // Switch Loop
+			AddWarpBarrier(kVec3(5990.4, 307.2, -1843.2), kActor_InventoryItem_ProgressiveWarpL5, 4);
+			break;
+		case kLevel_Hive_4: // Pit 2
+			AddWarpBarrier(kVec3(-2457.6, 2764.8, -2764.8), kActor_InventoryItem_ProgressiveWarpL5, 5);
+			break;
+		case kLevel_Hive_5: // Pit 3
+			AddWarpBarrier(kVec3(-307.2, -4761.6, -614.4), kActor_InventoryItem_ProgressiveWarpL5, 6);
+			break;
+		case kLevel_Hive_6: // Water
+			AddWarpBarrier(kVec3(2457.6, -10147.84, -614.4), kActor_InventoryItem_ProgressiveWarpL5, 7);
+			break;
+		case kLevel_Hive_7: // Inner Hive
+			AddWarpBarrier(kVec3(-4454.4, 3686.4, 614.4), kActor_InventoryItem_ProgressiveWarpL5, 8);
+			break;
+		case kLevel_Hive_10: // Embryo 1
+			AddWarpBarrier(kVec3(-3686.4, -2764.8, 0), kActor_InventoryItem_ProgressiveWarpL5, 9);
+			break;
+		case kLevel_Hive_8: // Exit Map (embryo 2, 3, master computer, prim key)
+			AddWarpBarrier(kVec3(-152.6, 4454.4, 0), kActor_InventoryItem_ProgressiveWarpL5, 10);
+			AddWarpBarrier(kVec3(3532.8, -3840, 614.4), kActor_InventoryItem_ProgressiveWarpL5, 10);
+			AddWarpBarrier(kVec3(-614.4, -1382.4, 614.4), kActor_InventoryItem_ProgressiveWarpL5, 10);
+			AddWarpBarrier(kVec3(3993.6, 0, 614.4), kActor_InventoryItem_ProgressiveWarpL5, 10);
+			break;
+		// The rest are maps that lead back to existing ones, or are dead ends
 	}
 }
 

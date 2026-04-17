@@ -57,9 +57,18 @@ class RandoWarpBarrier : ScriptActor
 	// Warps to the appropriate level's warp point.
 	void OnTouch(kActor@ pInstigator)
 	{	
+		// The actor can die from explosive shells for some reason...
+		self.Flags() &= ~AF_DEAD;
+		
 		if (m_messageCooldown <= 0 && pInstigator.InstanceOf("kexPuppet"))
 		{
 			TryPrintWarpMessage();
+			
+			// Just in case collide is borked somehow
+			if (hasWarpBack)
+			{
+				LocalPlayer.Actor().CastToActor().WorldComponent().SetRegion(warpBackRegion);
+			}
 		}
 	}
 	

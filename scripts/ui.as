@@ -277,7 +277,7 @@ class RandoUI
 			kActor_Talisman_HeartOfFire);
 		DisplayLevel(5,
 			kActor_InventoryItem_Level5Key, 3,
-			kActor_InventoryItem_ProgressiveWarpL5, 20,
+			kActor_InventoryItem_ProgressiveWarpL5, 10,
 			kActor_Feather_5, 
 			kActor_PrimagenKey_5,
 			kActor_Talisman_Whispers);
