@@ -271,7 +271,7 @@ class RandoUI
 			kActor_Talisman_BreathOfLife);
 		DisplayLevel(4,
 			kActor_InventoryItem_Level4Key, 3,
-			kActor_InventoryItem_ProgressiveWarpL4, 20,
+			kActor_InventoryItem_ProgressiveWarpL4, 10,
 			kActor_Feather_4, 
 			kActor_PrimagenKey_4, 
 			kActor_Talisman_HeartOfFire);

@@ -134,7 +134,11 @@ void AddWarpBarriers(const int16 &in mapId)
 				1251);
 			break;
 		case kLevel_BlindLair_2: // Water Rooms
-			AddWarpBarrier(kVec3(5478.4, -3276.8, -3645), kActor_InventoryItem_ProgressiveWarpL4, 2);
+			AddWarpBarrier(
+				kVec3(5478.4, -3276.8, -4100), 
+				kActor_InventoryItem_ProgressiveWarpL4, 
+				2,
+				130);
 			break;
 		case kLevel_BlindLair_3:  // Falling Rocks
 			AddWarpBarrier(kVec3(2600.96, -5273.6, -1863.68), kActor_InventoryItem_ProgressiveWarpL4, 3);
@@ -148,16 +152,23 @@ void AddWarpBarriers(const int16 &in mapId)
 			AddWarpBarrier(kVec3(2355.2, -3891.2, -3072), kActor_InventoryItem_ProgressiveWarpL4, 5);
 			break;
 		case kLevel_BlindLair_6:  // Small Lava
-			AddWarpBarrier(kVec3(2304, -716.8, -3338.24), kActor_InventoryItem_ProgressiveWarpL4, 6);
+			AddWarpBarrier(kVec3(2354, -800, -3338.24), kActor_InventoryItem_ProgressiveWarpL4, 6);
 			break;
 		case kLevel_BlindLair_7:  // Big Lava
-			AddWarpBarrier(kVec3(-1187, -5335.04, -4628.48), kActor_InventoryItem_ProgressiveWarpL4, 7);
+			AddWarpBarrier(kVec3(-1187, -5435.04, -4628.48), kActor_InventoryItem_ProgressiveWarpL4, 7);
 			break;
-		case kLevel_BlindLair_8:  // Blue Room
-			AddWarpBarrier(kVec3(-6625.676, 3666.933, -2089.874), kActor_InventoryItem_ProgressiveWarpL4, 8);
+		case kLevel_BlindLair_8:  // Blue Cave (Lower and Post Vent 3)
+			AddWarpBarrier(
+				kVec3(-6585, 3595, -2489.874),
+				kActor_InventoryItem_ProgressiveWarpL4, 
+				8,
+				1297);
+			AddWarpBarrier(kVec3(2928.64, 2355.2, -2539.52), kActor_InventoryItem_ProgressiveWarpL4, 10);
 			break;
-			
-		//TODO: the rest!
+		case kLevel_BlindLair_11: // Vent 3
+			AddWarpBarrier(kVec3(0, -4761.6, -2457.6), kActor_InventoryItem_ProgressiveWarpL4, 9);
+			break;
+		// Others are the other two vents
 	}
 }
 
