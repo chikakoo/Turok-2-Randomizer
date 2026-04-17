@@ -493,3 +493,10 @@ void ProgressiveWarpL6(void)
 {
 	TryGetInventoryItem(kActor_InventoryItem_ProgressiveWarpL6);
 }
+
+void PrintPlayerPosition(void)
+{
+	kVec3 origin = LocalPlayer.Actor().Origin();
+	Sys.Print("" + origin.x + "," + origin.y + "," + origin.z);
+	Sys.Print("REGION: " + LocalPlayer.Actor().WorldComponent().RegionIndex());
+}

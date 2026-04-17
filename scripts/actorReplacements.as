@@ -123,12 +123,47 @@ void AddWarpBarriers(const int16 &in mapId)
 			AddWarpBarrier(kVec3(-3440.40, 829.756, 0), kActor_InventoryItem_ProgressiveWarpL3, 8);
 			break;
 		// Other maps are the ammo maps and the end Raptor battle
+		
+		// Lair of the Blind Ones
+		case kLevel_BlindLair_1: // Start (Prim key + progress)
+			AddWarpBarrier(kVec3(-2969.6, -5683.2, -1536), kActor_InventoryItem_ProgressiveWarpL4, 1);
+			AddWarpBarrier(
+				kVec3(3174.4, 3330.4, -2250), 
+				kActor_InventoryItem_ProgressiveWarpL4,
+				1,
+				1251);
+			break;
+		case kLevel_BlindLair_2: // Water Rooms
+			AddWarpBarrier(kVec3(5478.4, -3276.8, -3645), kActor_InventoryItem_ProgressiveWarpL4, 2);
+			break;
+		case kLevel_BlindLair_3:  // Falling Rocks
+			AddWarpBarrier(kVec3(2600.96, -5273.6, -1863.68), kActor_InventoryItem_ProgressiveWarpL4, 3);
+			break;
+		case kLevel_BlindLair_4:  // Waterfall (Vent 1 + Progress)
+			AddWarpBarrier(kVec3(3112.96, 3287.04, -2457.6), kActor_InventoryItem_ProgressiveWarpL4, 4);
+			AddWarpBarrier(kVec3(-1105.92, -4423.68, -2488.32), kActor_InventoryItem_ProgressiveWarpL4, 4);
+			break;
+		case kLevel_BlindLair_5:  // Water Maze (Vent 2 + Progress)
+			AddWarpBarrier(kVec3(3891.2, 3328, -3379.2), kActor_InventoryItem_ProgressiveWarpL4, 5);
+			AddWarpBarrier(kVec3(2355.2, -3891.2, -3072), kActor_InventoryItem_ProgressiveWarpL4, 5);
+			break;
+		case kLevel_BlindLair_6:  // Small Lava
+			AddWarpBarrier(kVec3(2304, -716.8, -3338.24), kActor_InventoryItem_ProgressiveWarpL4, 6);
+			break;
+		case kLevel_BlindLair_7:  // Big Lava
+			AddWarpBarrier(kVec3(-1187, -5335.04, -4628.48), kActor_InventoryItem_ProgressiveWarpL4, 7);
+			break;
+		case kLevel_BlindLair_8:  // Blue Room
+			AddWarpBarrier(kVec3(-6625.676, 3666.933, -2089.874), kActor_InventoryItem_ProgressiveWarpL4, 8);
+			break;
+			
+		//TODO: the rest!
 	}
 }
 
 //---------------------------
 // Adds a warp barrier at the given position, warp actor id, requiring the given number of warps
-void AddWarpBarrier(
+RandoWarpBarrier@ AddWarpBarrier(
 	const kVec3 &in pos, 
 	const int &in progressiveWarpActorId,
 	const int &in progressiveWarpsNeeded)
@@ -140,6 +175,19 @@ void AddWarpBarrier(
 	);
 	RandoWarpBarrier@ barrierScript = cast<RandoWarpBarrier@>(GetScript(barrier));
 	barrierScript.SetBarrierInfo(progressiveWarpActorId, progressiveWarpsNeeded);
+	return barrierScript;
+}
+
+//---------------------------
+// Adds a warp barrier, setting the warp back position as well
+void AddWarpBarrier(
+	const kVec3 &in pos, 
+	const int &in progressiveWarpActorId,
+	const int &in progressiveWarpsNeeded,
+	const int &in warpBackRegion)
+{
+	RandoWarpBarrier@ barrierScript = AddWarpBarrier(pos, progressiveWarpActorId, progressiveWarpsNeeded);
+	barrierScript.SetWarpBack(warpBackRegion);
 }
 
 //----------------------------------

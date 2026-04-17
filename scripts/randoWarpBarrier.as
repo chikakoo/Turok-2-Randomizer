@@ -9,6 +9,9 @@ class RandoWarpBarrier : ScriptActor
 	int progressiveWarpItemId = -1;
 	int progressiveWarpsNeeded = 99;
 	
+	bool hasWarpBack = false;
+	int warpBackRegion;
+	
 	//---------------------------
 	// Constructor
 	// Creates the warp frame under the warp itself.
@@ -24,6 +27,15 @@ class RandoWarpBarrier : ScriptActor
 	{
 		progressiveWarpItemId = itemId;
 		progressiveWarpsNeeded = needed;
+	}
+	
+	//---------------------------
+	// Sets a region that the player will be warped back to after touching the barrier.
+	// Used for when the player will fall onto the barrier and needs to be placed back on the ledge.
+	void SetWarpBack(const int &in warpBackRegion)
+	{
+		hasWarpBack = true;
+		this.warpBackRegion = warpBackRegion;
 	}
 	
 	//---------------------------
@@ -44,6 +56,29 @@ class RandoWarpBarrier : ScriptActor
 	//---------------------------
 	// Warps to the appropriate level's warp point.
 	void OnTouch(kActor@ pInstigator)
+	{	
+		if (m_messageCooldown <= 0 && pInstigator.InstanceOf("kexPuppet"))
+		{
+			TryPrintWarpMessage();
+		}
+	}
+	
+	//---------------------------
+	// Will warp the player to the appropriate position if there is a warp back.
+	// This works better than OnTouch, which is really janky if the player falls on the warp.
+	void OnCollide(kActor@ pCollider)
+	{
+		if (hasWarpBack && pCollider.InstanceOf("kexPuppet"))
+		{
+			TryPrintWarpMessage();
+			LocalPlayer.Actor().CastToActor().WorldComponent().SetRegion(warpBackRegion);
+		}
+	}
+	
+	//---------------------------
+	// Tries printing the progressive warp message.
+	// Resets the cooldown timer if it does print it.
+	void TryPrintWarpMessage()
 	{
 		if (m_messageCooldown <= 0)
 		{
