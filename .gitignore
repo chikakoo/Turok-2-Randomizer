@@ -33,5 +33,8 @@
 !textures/
 !textures/**
 
+!particles/
+!particles/**
+
 !layeredImages/
 !layeredImages/**

@@ -189,6 +189,31 @@ APProgressiveWarpL6 kActor_InventoryItem_ProgressiveWarpL6
 }
 
 //------------------------------
+// Warp Barrier - used to block warps for progressive warps
+// The radius is the standard size for warp portals - adjust as needed
+WarpBarrier kActor_ProgressionBlocker_WarpBarrier
+{
+	className				  "kexActor"
+	placeable                 TRUE
+	flags.noDamage            TRUE
+	flags.allowTracking       FALSE
+	
+    Begin_Component "kexWorldComponent"
+        radius                140.0
+		touchRadius			  150.0
+		height				  300.0
+		bNonSolid             FALSE
+    End_Component
+	Begin_Component "kexParticleEmitterComponent"
+        particle                "particles/rando_progression_barrier.particle"
+        offset                  "0.0 0.0 0.0"
+    End_Component
+	Begin_Component "kexScriptComponent"
+        scriptClass           "RandoWarpBarrier"
+    End_Component
+}
+
+//------------------------------
 // Random ammo pickup for AP - see GetAmmoInRandomWeapon
 RandomAmmo kActor_Item_RandomAmmo
 {
@@ -210,33 +235,6 @@ RandomAmmo kActor_Item_RandomAmmo
     Begin_Component "kexScriptComponent"
         scriptClass           "RandoPickupObject"
         triggerRadius         81.92
-    End_Component
-}
-
-//------------------------------
-// Warp Barrier - used to block warps for progressive warps
-// The radius is the standard size for warp portals - adjust as needed
-//------------------------------
-WarpBarrier kActor_ProgressionBlocker_WarpBarrier
-{
-	className				  "kexActor"
-	placeable                 TRUE
-	flags.noDamage            TRUE
-	flags.allowTracking       FALSE
-	
-    Begin_Component "kexWorldComponent"
-        radius                140.0
-		touchRadius			  150.0
-		height				  300.0
-		bNonSolid             FALSE
-    End_Component
-	Begin_Component "kexScriptComponent"
-        scriptClass           "RandoWarpBarrier"
-    End_Component
-	
-	// Temporary for visibility
-	Begin_Component "kexStaticMeshComponent"
-        mesh                  "models/Pickup_Health_2.staticmesh"
     End_Component
 }
 
