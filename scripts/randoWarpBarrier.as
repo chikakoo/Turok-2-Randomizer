@@ -19,9 +19,6 @@ class RandoWarpBarrier : ScriptActor
 		super(@actor);
 		self.WorldComponent().Flags() |= WCF_INVOKE_COLLIDE_CALLBACK;
 		self.Flags() |= AF_NODAMAGE;
-		
-		self.WorldComponent().Radius() = 300.0f;
-		self.WorldComponent().TouchRadius() = 310.0f;
 	}
 	
 	//---------------------------
