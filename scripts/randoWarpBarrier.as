@@ -13,12 +13,12 @@ class RandoWarpBarrier : ScriptActor
 	int warpBackRegion;
 	
 	//---------------------------
-	// Constructor
-	// Creates the warp frame under the warp itself.
+	// Constructor - turns on the collision callback and turns off damage
 	RandoWarpBarrier(kActor @actor) 
 	{ 
 		super(@actor);
 		self.WorldComponent().Flags() |= WCF_INVOKE_COLLIDE_CALLBACK;
+		self.Flags() |= AF_NODAMAGE;
 	}
 	
 	//---------------------------
@@ -57,9 +57,6 @@ class RandoWarpBarrier : ScriptActor
 	// Warps to the appropriate level's warp point.
 	void OnTouch(kActor@ pInstigator)
 	{	
-		// The actor can die from explosive shells for some reason...
-		self.Flags() &= ~AF_DEAD;
-		
 		if (m_messageCooldown <= 0 && pInstigator.InstanceOf("kexPuppet"))
 		{
 			TryPrintWarpMessage();
