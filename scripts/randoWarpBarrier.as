@@ -19,6 +19,9 @@ class RandoWarpBarrier : ScriptActor
 		super(@actor);
 		self.WorldComponent().Flags() |= WCF_INVOKE_COLLIDE_CALLBACK;
 		self.Flags() |= AF_NODAMAGE;
+		
+		self.WorldComponent().Radius() = 300.0f;
+		self.WorldComponent().TouchRadius() = 310.0f;
 	}
 	
 	//---------------------------
@@ -36,6 +39,15 @@ class RandoWarpBarrier : ScriptActor
 	{
 		hasWarpBack = true;
 		this.warpBackRegion = warpBackRegion;
+	}
+	
+	//---------------------------
+	// Sets the radius and touch radius
+	// The touch radius will be 10 units more than the radius
+	void SetRadii(const int &in radius)
+	{
+		self.WorldComponent().Radius() = radius;
+		self.WorldComponent().TouchRadius() = radius + 10.0f;
 	}
 	
 	//---------------------------

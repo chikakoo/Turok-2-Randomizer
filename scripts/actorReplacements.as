@@ -205,6 +205,41 @@ void AddWarpBarriers(const int16 &in mapId)
 			AddWarpBarrier(kVec3(3993.6, 0, 614.4), kActor_InventoryItem_ProgressiveWarpL5, 10);
 			break;
 		// The rest are maps that lead back to existing ones, or are dead ends
+		
+		// Primagen's Lightship
+		case kLevel_Lightship_1: // Hub (all 4 wings)
+			AddWarpBarrierForL6(kVec3(-3020, -3532.8, 0), 1);
+			AddWarpBarrierForL6(kVec3(-3948.333, 3229.040, 0), 3);
+			AddWarpBarrierForL6(kVec3(2609.031, 4532.526, 0), 6);
+			AddWarpBarrierForL6(kVec3(4217.492, -2917.491, 0), 9);
+			break;
+		case kLevel_Lightship_2: // Wing 1 Start
+			AddWarpBarrierForL6(kVec3(6239.653, -459.862, 0), 2);
+			break;
+		case kLevel_Lightship_3: // Wing 2 Start
+			AddWarpBarrierForL6(kVec3(-767.074, 5036.014, -1228.8), 4);
+			break;
+		case kLevel_Lightship_4: // Wing 2 Generator
+			AddWarpBarrierForL6(kVec3(3991.330, 3168.541, 0), 5);
+			break;
+		case kLevel_Lightship_5: // Wing 3 Start
+			AddWarpBarrierForL6(kVec3(-3005.715, 3071.414, 1382.402), 7);
+			break;
+		case kLevel_Lightship_6: // Wing 3 Generator
+			AddWarpBarrierForL6(kVec3(-611.706, -3768.962, -153.604), 8);
+			break;
+		case kLevel_Lightship_7: // Wing 4 Start
+			AddWarpBarrierForL6(kVec3(3754.658, 2.79, 0), 10);
+			break;
+		case kLevel_Lightship_8: // Assembly 1
+			AddWarpBarrierForL6(kVec3(-155.676, -4078.439, 307.207), 11);
+			break;
+		case kLevel_Lightship_9: // Assembly 2
+			AddWarpBarrierForL6(kVec3(-614.715, -3302.234, 307.207), 12);
+			break;
+		case kLevel_Lightship_10: // Assembly 3
+			AddWarpBarrierForL6(kVec3(-1616.721, -767.995, 6.814), 13);
+			break;
 	}
 }
 
@@ -235,6 +270,20 @@ void AddWarpBarrier(
 {
 	RandoWarpBarrier@ barrierScript = AddWarpBarrier(pos, progressiveWarpActorId, progressiveWarpsNeeded);
 	barrierScript.SetWarpBack(warpBackRegion);
+}
+
+//---------------------------
+// Adds a warp barrier for level 6
+// Level 6 warps need a larger radius
+void AddWarpBarrierForL6(
+	const kVec3 &in pos, 
+	const int &in progressiveWarpsNeeded)
+{
+	RandoWarpBarrier@ barrierScript = AddWarpBarrier(
+		pos,
+		kActor_InventoryItem_ProgressiveWarpL6, 
+		progressiveWarpsNeeded);
+	barrierScript.SetRadii(280.0f);
 }
 
 //----------------------------------

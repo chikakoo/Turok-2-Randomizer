@@ -283,7 +283,7 @@ class RandoUI
 			kActor_Talisman_Whispers);
 		DisplayLevel(6,
 			kActor_InventoryItem_Level6Key, 6,
-			kActor_InventoryItem_ProgressiveWarpL6, 20,
+			kActor_InventoryItem_ProgressiveWarpL6, 13,
 			kActor_Feather_6, 
 			kActor_PrimagenKey_6, 
 			kActor_Talisman_EyeOfTruth);
