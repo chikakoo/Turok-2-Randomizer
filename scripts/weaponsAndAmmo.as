@@ -96,7 +96,7 @@ void GetAmmoInRandomWeapon()
 	}
 	
 	// Get the ammo!
-	float ammoPercent = RandomInt(20, 75) / 100.0;
+	float ammoPercent = RandomInt(OPTION_RANDOM_AMMO_MIN, OPTION_RANDOM_AMMO_MAX) / 100.0;
 	int standardAmmoAmount = int(Math::Ceil(weaponToGetAmmoFor.maxAmmo * ammoPercent));
 	TryGivePlayerWeapon(weaponToGetAmmoFor.pickupId, standardAmmoAmount);
 	

@@ -5,9 +5,21 @@
 
 //------------------------------
 // Generates a random int, between the min and max, inclusive.
-int RandomInt(int min, int max)
+int RandomInt(int &in min, int &in max)
 {
-    return min + Math::RandMax(max - min + 1);
+	int minValue, maxValue;
+	if (min <= max)
+	{
+		minValue = min;
+		maxValue = max;
+	}
+    else
+	{
+		minValue = max;
+		maxValue = min;
+	}
+	
+	return minValue + Math::RandMax(maxValue - minValue + 1);
 }
 
 //------------------------------
