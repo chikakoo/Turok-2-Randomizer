@@ -350,7 +350,9 @@ class RandoUI
 		
 		// Progressive Warps
 		int progressiveWarps = GetInventoryItemCollectedTotal(progressiveWarpActor);
-		bool useGreenProgressiveWarpText = progressiveWarps >= maxProgressiveWarps;
+		bool useGreenProgressiveWarpText = OPTION_PROGRESSIVE_WARPS == 0
+			? true
+			: progressiveWarps >= maxProgressiveWarps;
 		AddNumberImage(
 			progressiveWarps, 
 			PositionPixelToUI(UI_OFFSET_PROGRESSIVE_WARP, levelHeightOffset),
