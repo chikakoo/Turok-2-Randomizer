@@ -47,6 +47,11 @@ const int UI_OFFSET_WARP_HOME_X_ = 130;
 const int UI_OFFSET_WARP_HUB_X = 336;
 const int UI_OFFSET_WARP_BUTTON_Y = 528;
 
+const int UI_LEFT_NUMBER_SIZE = 16;
+const int UI_LEFT_TEXT_WIDTH = 28;
+const int UI_LEFT_TEXT_HEIGHT = 14;
+const int UI_OFFSET_LEFT_HEIGHT = 45;
+
 class RandoUI
 {
 	// General Properties
@@ -350,6 +355,14 @@ class RandoUI
 			progressiveWarps, 
 			PositionPixelToUI(UI_OFFSET_PROGRESSIVE_WARP, levelHeightOffset),
 			useGreenProgressiveWarpText);
+			
+		if (!useGreenProgressiveWarpText)
+		{
+			DisplayItemsLeftText(
+				UI_OFFSET_PROGRESSIVE_WARP, 
+				levelHeightOffset,
+				maxProgressiveWarps - progressiveWarps);
+		}
 		
 		// Mission items
 		DisplayMissionItems(level, levelHeightOffset);
@@ -430,6 +443,40 @@ class RandoUI
 		kVec3 missionItemPosition = PositionPixelToUI(widthOffset, levelHeightOffset);
 		bool useGreenText = missionItemCollected >= maxCount;
 		AddNumberImage(missionItemCurrent, missionItemPosition, useGreenText);
+		
+		// If we don't have all the items, display the amount left
+		if (!useGreenText)
+		{
+			DisplayItemsLeftText(
+				widthOffset, 
+				levelHeightOffset,
+				maxCount - missionItemCollected);
+		}
+	}
+	
+	// --------------------------
+	// Displays the items reamining to collect text above the item
+	void DisplayItemsLeftText(
+		const int &in widthOffset,
+		const int &in heightOffset,
+		const int &in itemsLeft)
+	{
+		int itemsLeftY = heightOffset - UI_OFFSET_LEFT_HEIGHT;
+	
+		AddNumberImage(
+			itemsLeft,
+			PositionPixelToUI(widthOffset - 5, itemsLeftY),
+			UI_LEFT_NUMBER_SIZE,
+			UI_LEFT_NUMBER_SIZE);
+		
+		int secondDigitOffset = itemsLeft > 9 ? UI_LEFT_NUMBER_SIZE / 2 - 1 : 0;
+		AddImage(
+			RANDO_UI_TEXTURE_TEXT_LEFT, 
+			PositionPixelToUI(
+				widthOffset + UI_LEFT_NUMBER_SIZE + secondDigitOffset, 
+				itemsLeftY),
+			UI_LEFT_TEXT_WIDTH,
+			UI_LEFT_TEXT_HEIGHT);
 	}
 	
 	// --------------------------
@@ -465,9 +512,9 @@ class RandoUI
 	// Adds a number image to the UI
 	// Uses the default UI icon size
 	void AddNumberImage(
-		const int number, 
-		const kVec3& in pos,
-		bool useGreenText)
+		const int &in number, 
+		const kVec3 &in pos,
+		const bool &in useGreenText)
 	{
 		AddNumberImage(number, pos, UI_ICON_SIZE, UI_ICON_SIZE, useGreenText);
 	}
@@ -477,10 +524,10 @@ class RandoUI
 	// Takes the width/height in pixels
 	void AddNumberImage(
 		const int number, 
-		const kVec3& in pos = Math::vecZero,
-		const int width = UI_ICON_SIZE, 
-		const int height = UI_ICON_SIZE,
-		bool useGreenText = false)
+		const kVec3 &in pos = Math::vecZero,
+		const int &in width = UI_ICON_SIZE, 
+		const int &in height = UI_ICON_SIZE,
+		const bool &in useGreenText = false)
 	{
 		int num = number;
 		array<int> digits;
@@ -509,7 +556,7 @@ class RandoUI
 				pos.y,
 				pos.z
 			);
-			AddImage(textureIndex, newPos);
+			AddImage(textureIndex, newPos, width, height);
 		}
 	}
 	
