@@ -335,7 +335,7 @@ class RandoUI
 	void DisplayLevel(
 		const int &in level, 
 		const int &in levelKeyActor, const int &in maxKeys,
-		const int &in progressiveWarpActor, const int &in maxProgressiveWarps,
+		const int &in progressiveWarpActor, const int &in baseMaxProgressiveWarps,
 		const int &in featherActor,
 		const int &in primagenKeyActor,
 		const int &in talismanActor)
@@ -350,6 +350,7 @@ class RandoUI
 		
 		// Progressive Warps
 		int progressiveWarps = GetInventoryItemCollectedTotal(progressiveWarpActor);
+		int maxProgressiveWarps = int(Math::Ceil(float(baseMaxProgressiveWarps) / float(OPTION_PROGRESSIVE_WARPS)));
 		bool useGreenProgressiveWarpText = OPTION_PROGRESSIVE_WARPS == 0
 			? true
 			: progressiveWarps >= maxProgressiveWarps;
