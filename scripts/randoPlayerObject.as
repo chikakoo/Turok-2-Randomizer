@@ -27,12 +27,9 @@ class RandoPlayerObject : ScriptObject
     }
 	
 	//---------------------------
-	// Displays a progress menu for the player depending on what buttons are held for the
-	// set number of frames.
-	//
-	// Warp to Hub: Zoom in, out, up, down, left, right
-	// Current level progress: Zoom in and out
-	// Current game progress: Zoom in, out, and jump
+	// If the player isn't scoped...
+	// ZOOM IN: Show game status UI
+	// ZOOM OUT: Display level progress message
 	void TryDisplayProgressMenu()
 	{
 		if (g_messageCooldown > 0) 
@@ -40,16 +37,20 @@ class RandoPlayerObject : ScriptObject
 			g_messageCooldown--;
 			return;
 		}
-
-		if (LocalPlayer.ButtonHeldTime(8) > g_menuButtonHeldTime && 
-			LocalPlayer.ButtonHeldTime(9) > g_menuButtonHeldTime)
+		
+		if (LocalPlayer.WeaponActor() !is null && LocalPlayer.WeaponActor().ScopeReady())
 		{
-			if (LocalPlayer.ButtonHeldTime(2) > g_menuButtonHeldTime)
-			{
-				ui.DisplayLevelProgress();
-				g_messageCooldown = g_progressMenuDisplayTime + 30;
-			}
-			else if (!ui.Activate())
+			return;
+		}
+		
+		if ((LocalPlayer.Buttons() & BC_SCOPEZOOMIN) != 0)
+		{
+			ui.DisplayLevelProgress();
+			g_messageCooldown = g_progressMenuDisplayTime + 30;
+		}
+		else if ((LocalPlayer.Buttons() & BC_SCOPEZOOMOUT) != 0)
+		{
+			if (!ui.Activate())
 			{
 				g_messageCooldown = 30;
 			}

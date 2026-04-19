@@ -1,7 +1,6 @@
 // --------------------------
 // UI constants for opening menus
 //---------------------------
-uint16 g_menuButtonHeldTime = 5;
 int g_messageCooldown = 0;
 int g_progressMenuDisplayTime = 330;
 
