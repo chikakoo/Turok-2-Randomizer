@@ -35,26 +35,31 @@ class RandoPlayerObject : ScriptObject
 		if (g_messageCooldown > 0) 
 		{
 			g_messageCooldown--;
-			return;
 		}
-		
-		if (LocalPlayer.WeaponActor() !is null && LocalPlayer.WeaponActor().ScopeReady())
-		{
-			return;
-		}
-		
-		if ((LocalPlayer.Buttons() & BC_SCOPEZOOMIN) != 0)
+		else if ((LocalPlayer.Buttons() & BC_SCOPEZOOMOUT) != 0 && !IsScoped())
 		{
 			ui.DisplayLevelProgress();
 			g_messageCooldown = g_progressMenuDisplayTime + 30;
 		}
-		else if ((LocalPlayer.Buttons() & BC_SCOPEZOOMOUT) != 0)
+		
+		if (g_uiCooldown > 0)
+		{
+			g_uiCooldown--;
+		}
+		else if ((LocalPlayer.Buttons() & BC_SCOPEZOOMIN) != 0 && !IsScoped())
 		{
 			if (!ui.Activate())
 			{
-				g_messageCooldown = 30;
+				g_uiCooldown = 30;
 			}
 		}
+	}
+	
+	//---------------------------
+	// Checks if the player is using their scope
+	bool IsScoped(void)
+	{
+		return LocalPlayer.WeaponActor() !is null && LocalPlayer.WeaponActor().ScopeReady();
 	}
 	
 	//---------------------------
