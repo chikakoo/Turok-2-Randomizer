@@ -8,8 +8,7 @@ void DoActorReplacementsOnPlayerSpawn()
 {
 	int16 mapId = Game.ActiveMapID();
 	
-	//RemoveAllGenerators(); //TODO: disable this, enable the next
-	if (OPTION_INCLUDE_WEAPONS_AND_AMMO)
+	if (OPTION_WEAPON_SANITY)
 	{
 		UseRandomAmmoGenerators();
 	}
@@ -326,12 +325,6 @@ void ReplaceAllActors(const int16 &in mapId)
 				
 				ReplaceActor(actor, replacement);
 			}
-			//else 
-			//{
-				// TODO: remove this after mapping stuff
-				//Sys.Print("NOT MAPPED: " + posStr + " (" + GetFriendlyActorName(actor.Type()) + ")"); 
-				//actor.Flags() |= AF_IMPORTANT;
-			//}
 		}
 		
 		if (IsActorToTrigger(mapId, actor.TID()))
@@ -391,9 +384,9 @@ void ReplaceActor(kActor@ initialActor, ReplacementEntry@ replacement)
 	
 	// Flag the actor as important so it can be found easier
 	// If it was already sent to AP, do not do this since it was "collected" already
-	if (!replacement.isSentToAP)
+	if (!replacement.isSentToAP && replacement.apId > 0)
 	{
-		replacedActor.Flags() |= AF_IMPORTANT; // TODO: enable this when done adding items
+		replacedActor.Flags() |= AF_IMPORTANT;
 	}
 	
 	initialActor.Remove();

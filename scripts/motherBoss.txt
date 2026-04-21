@@ -501,10 +501,10 @@ final class CMotherBossController
 		
 		//------------------
 		// Added by Rando
-		// If we're randomizing weapons/ammo, make all ammo spawns into random ammo.
+		// If we're randomizing weapons, make all ammo spawns into random ammo.
 		//------------------
 		int typeToSpawn = nType;
-		if (OPTION_INCLUDE_WEAPONS_AND_AMMO)
+		if (OPTION_WEAPON_SANITY)
 		{
 			kDictMem@ actorDef = TryGetActorDefWithClass(typeToSpawn, "kexAmmoPickup");
 			if (actorDef !is null)

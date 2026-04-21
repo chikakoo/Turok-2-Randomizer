@@ -78,7 +78,7 @@ class RandoPickupObject : ScriptObject
 	// so that it knows you could have received it.
 	void OnTick()
 	{	
-		if (m_id != 0 && !m_wasSentToAP)
+		if (m_id > 0 && !m_wasSentToAP)
 		{
 			kPuppet@ player = LocalPlayer.Actor();
 			if (player is null)
@@ -128,9 +128,15 @@ class RandoPickupObject : ScriptObject
 		if (self.Type() == kActor_Item_RandomAmmo)
 		{
 			GetAmmoInRandomWeapon();
+			
+			// This is a non-AP item ammo replacement, so we should still mark it as collected
+			if (m_id < 0)
+			{
+				CollectLocation(m_id, Game.ActiveMapID());
+			}
 		}
 			
-		if (m_id != 0)
+		if (m_id > 0)
 		{
 			CollectLocation(m_id, Game.ActiveMapID());
 			SendCheckToAP(m_id);
