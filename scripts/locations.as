@@ -513,8 +513,15 @@ void DisplayCollectedLocationsForCurrentMap(const int &in visibleTime = 120)
 	array<ReplacementEntry@>@ locations = 
 		g_mapReplacements[Game.ActiveMapID()];
 	int totalCollected = 0;
+	int totalLocations = 0;
 	for (uint i = 0; i < locations.length(); i++)
 	{
+		if (locations[i].apId <= 0)
+		{
+			continue;
+		}
+			
+		totalLocations++;
 		if (locations[i].isCollected || locations[i].isSentToAP)
 		{
 			totalCollected++;
@@ -522,7 +529,7 @@ void DisplayCollectedLocationsForCurrentMap(const int &in visibleTime = 120)
 	}
 	
 	Hud.AddMessage(
-		mapDisplayName + ": " + totalCollected + "/" + locations.length(),
+		mapDisplayName + ": " + totalCollected + "/" + totalLocations,
 		visibleTime);
 }
 
@@ -563,10 +570,14 @@ void CalculateTotalLocationsCheckedForLevel(
 		array<ReplacementEntry@>@ locations = 
 			g_mapReplacements[mapIds[i]];
 		
-		totalLocations += locations.length();
-		
 		for (uint j = 0; j < locations.length(); j++)
 		{
+			if (locations[j].apId <= 0)
+			{
+				continue;
+			}
+			
+			totalLocations++;
 			if (locations[j].isCollected || locations[j].isSentToAP)
 			{
 				totalCollected++;
