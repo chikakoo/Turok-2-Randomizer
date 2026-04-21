@@ -139,11 +139,10 @@ class RandoUI
 					g_progressMenuDisplayTime);
 				break;
 			default:
-				Hud.AddMessage("Unmapped map id!");
 				return;
 		}
 		
-		DisplayCollectedLocationsForLevel(mapId, "Level Checks", g_progressMenuDisplayTime);
+		DisplayCollectedLocationsForLevel(mapId, g_progressMenuDisplayTime);
 		DisplayCollectedLocationsForCurrentMap(g_progressMenuDisplayTime);
 	}
 	

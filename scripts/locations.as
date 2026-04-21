@@ -259,6 +259,109 @@ int GetLevelNumberFromMapId(const int &in mapId)
 }
 
 //------------------------------
+// Gets the map display name from the given map id.
+// TODO: finish this
+kStr GetMapDisplayName(const int &in mapId)
+{
+	switch(mapId)
+	{
+		case kLevel_PortOfAdia_1: return "[1-1]";
+		case kLevel_PortOfAdia_2: return "[1-2]";
+		case kLevel_PortOfAdia_3: return "[1-3]";
+		case kLevel_PortOfAdia_4: return "[1-4]";
+		case kLevel_PortOfAdia_5: return "[1-5]";
+		case kLevel_PortOfAdia_6: return "[1-6]";
+		case kLevel_PortOfAdia_7: return "[1-7]";
+		case kLevel_PortOfAdia_8: return "[1-8]";
+		case kLevel_PortOfAdia_9: return "[1-9]";
+		case kLevel_PortOfAdia_T: return "[1-Talisman]";
+		case kLevel_PortOfAdia_OBL: return "[1-Oblivion]";
+
+		case kLevel_RiverOfSouls_1:
+		case kLevel_RiverOfSouls_2:
+		case kLevel_RiverOfSouls_3:
+		case kLevel_RiverOfSouls_4:
+		case kLevel_RiverOfSouls_5:
+		case kLevel_RiverOfSouls_6:
+		case kLevel_RiverOfSouls_7:
+		case kLevel_RiverOfSouls_8:
+		case kLevel_RiverOfSouls_9:
+		case kLevel_RiverOfSouls_10:
+		case kLevel_RiverOfSouls_11:
+		case kLevel_RiverOfSouls_T:
+		case kLevel_RiverOfSouls_OBL:
+		case kLevel_RiverOfSouls_Totem:
+
+		case kLevel_DeathMarsh_1:
+		case kLevel_DeathMarsh_2:
+		case kLevel_DeathMarsh_3:
+		case kLevel_DeathMarsh_4:
+		case kLevel_DeathMarsh_5:
+		case kLevel_DeathMarsh_6:
+		case kLevel_DeathMarsh_7:
+		case kLevel_DeathMarsh_8:
+		case kLevel_DeathMarsh_9:
+		case kLevel_DeathMarsh_10:
+		case kLevel_DeathMarsh_11:
+		case kLevel_DeathMarsh_T:
+		case kLevel_DeathMarsh_OBL:
+		case kLevel_DeathMarsh_Totem:
+
+		case kLevel_BlindLair_1:
+		case kLevel_BlindLair_2:
+		case kLevel_BlindLair_3:
+		case kLevel_BlindLair_4:
+		case kLevel_BlindLair_5:
+		case kLevel_BlindLair_6:
+		case kLevel_BlindLair_7:
+		case kLevel_BlindLair_8:
+		case kLevel_BlindLair_9:
+		case kLevel_BlindLair_10:
+		case kLevel_BlindLair_11:
+		case kLevel_BlindLair_T:
+		case kLevel_BlindLair_OBL:
+		case kLevel_BlindLair_Totem:
+		case kLevel_BlindOneBoss:
+
+		case kLevel_HiveTop:
+		case kLevel_Hive_1:
+		case kLevel_Hive_2:
+		case kLevel_Hive_3:
+		case kLevel_Hive_4:
+		case kLevel_Hive_5:
+		case kLevel_Hive_6:
+		case kLevel_Hive_7:
+		case kLevel_Hive_8:
+		case kLevel_Hive_9:
+		case kLevel_Hive_10:
+		case kLevel_Hive_11:
+		case kLevel_Hive_12:
+		case kLevel_Hive_13:
+		case kLevel_Hive_T:
+		case kLevel_Hive_OBL:
+		case kLevel_Hive_Totem:
+		case kLevel_QueenBoss:
+
+		case kLevel_Lightship_1:
+		case kLevel_Lightship_2:
+		case kLevel_Lightship_3:
+		case kLevel_Lightship_4:
+		case kLevel_Lightship_5:
+		case kLevel_Lightship_6:
+		case kLevel_Lightship_7:
+		case kLevel_Lightship_8:
+		case kLevel_Lightship_9:
+		case kLevel_Lightship_10:
+		case kLevel_LightShip_T:
+		case kLevel_LightShip_OBL:
+		case kLevel_MotherBoss:
+			return "[Map " + mapId + "]";
+	}
+	
+	return "";
+}
+
+//------------------------------
 // Whether the player is in a totem or boss level.
 // These can't be teleported out of via the UI menu.
 bool IsInTotemOrBossLevel()
@@ -431,9 +534,14 @@ void DisplayCollectedLocationsForCurrentMap(const int &in visibleTime = 120)
 // locations checked / total locations.
 void DisplayCollectedLocationsForLevel(
 	const int &in mapId,
-	const kStr &in prefix,
 	const int &in visibleTime = 120)
 {
+	kStr mapDisplayName = GetMapDisplayName(mapId);
+	if (mapDisplayName == "")
+	{
+		return;
+	}
+
 	int totalCollected;
 	int totalLocations;
 	CalculateTotalLocationsCheckedForLevelFromMap(
@@ -442,7 +550,7 @@ void DisplayCollectedLocationsForLevel(
 		totalLocations);
 
 	Hud.AddMessage(
-		prefix + ": " + totalCollected + "/" + totalLocations,
+		mapDisplayName + ": " + totalCollected + "/" + totalLocations,
 		visibleTime);
 }
 
