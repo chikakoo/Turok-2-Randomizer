@@ -260,7 +260,6 @@ int GetLevelNumberFromMapId(const int &in mapId)
 
 //------------------------------
 // Gets the map display name from the given map id.
-// TODO: finish this
 kStr GetMapDisplayName(const int &in mapId)
 {
 	switch(mapId)
@@ -268,8 +267,8 @@ kStr GetMapDisplayName(const int &in mapId)
 		case kLevel_PortOfAdia_1: return "[1-1]";
 		case kLevel_PortOfAdia_2: return "[1-2]";
 		case kLevel_PortOfAdia_3: return "[1-3]";
-		case kLevel_PortOfAdia_4: return "[1-4]";
-		case kLevel_PortOfAdia_5: return "[1-5]";
+		case kLevel_PortOfAdia_4: return "[1-5]";
+		case kLevel_PortOfAdia_5: return "[1-4]";
 		case kLevel_PortOfAdia_6: return "[1-6]";
 		case kLevel_PortOfAdia_7: return "[1-7]";
 		case kLevel_PortOfAdia_8: return "[1-8]";
@@ -277,85 +276,77 @@ kStr GetMapDisplayName(const int &in mapId)
 		case kLevel_PortOfAdia_T: return "[1-Talisman]";
 		case kLevel_PortOfAdia_OBL: return "[1-Oblivion]";
 
-		case kLevel_RiverOfSouls_1:
-		case kLevel_RiverOfSouls_2:
-		case kLevel_RiverOfSouls_3:
-		case kLevel_RiverOfSouls_4:
-		case kLevel_RiverOfSouls_5:
-		case kLevel_RiverOfSouls_6:
-		case kLevel_RiverOfSouls_7:
-		case kLevel_RiverOfSouls_8:
-		case kLevel_RiverOfSouls_9:
-		case kLevel_RiverOfSouls_10:
-		case kLevel_RiverOfSouls_11:
-		case kLevel_RiverOfSouls_T:
-		case kLevel_RiverOfSouls_OBL:
-		case kLevel_RiverOfSouls_Totem:
+		case kLevel_RiverOfSouls_1: return "[2-1]";
+		case kLevel_RiverOfSouls_2: return "[2-2]";
+		case kLevel_RiverOfSouls_3: return "[2-3]";
+		case kLevel_RiverOfSouls_4: return "[2-4]";
+		case kLevel_RiverOfSouls_5: return "[2-5]";
+		case kLevel_RiverOfSouls_6: return "[2-6]";
+		case kLevel_RiverOfSouls_7: return "[2-7]";
+		case kLevel_RiverOfSouls_8: return "[2-8]";
+		case kLevel_RiverOfSouls_9: return "[2-GY1]";
+		case kLevel_RiverOfSouls_10: return "[2-GY2]";
+		case kLevel_RiverOfSouls_11: return "[2-GY3]";
+		case kLevel_RiverOfSouls_T: return "[2-Talisman]";
+		case kLevel_RiverOfSouls_OBL: return "[2-Oblivion]";
 
-		case kLevel_DeathMarsh_1:
-		case kLevel_DeathMarsh_2:
-		case kLevel_DeathMarsh_3:
-		case kLevel_DeathMarsh_4:
-		case kLevel_DeathMarsh_5:
-		case kLevel_DeathMarsh_6:
-		case kLevel_DeathMarsh_7:
-		case kLevel_DeathMarsh_8:
-		case kLevel_DeathMarsh_9:
-		case kLevel_DeathMarsh_10:
-		case kLevel_DeathMarsh_11:
-		case kLevel_DeathMarsh_T:
-		case kLevel_DeathMarsh_OBL:
-		case kLevel_DeathMarsh_Totem:
+		case kLevel_DeathMarsh_1: return "[3-1]";
+		case kLevel_DeathMarsh_2: return "[3-2]";
+		case kLevel_DeathMarsh_3: return "[3-3]";
+		case kLevel_DeathMarsh_4: return "[3-4]";
+		case kLevel_DeathMarsh_5: return "[3-5]";
+		case kLevel_DeathMarsh_6: return "[3-6]";
+		case kLevel_DeathMarsh_7: return "[3-7]";
+		case kLevel_DeathMarsh_8: return "[3-8]";
+		case kLevel_DeathMarsh_9: return "[3-A1]";
+		case kLevel_DeathMarsh_10: return "[3-A2]";
+		case kLevel_DeathMarsh_11: return "[3-A3]";
+		case kLevel_DeathMarsh_T: return "[3-Talisman]";
+		case kLevel_DeathMarsh_OBL: return "[3-Oblivion]";
 
-		case kLevel_BlindLair_1:
-		case kLevel_BlindLair_2:
-		case kLevel_BlindLair_3:
-		case kLevel_BlindLair_4:
-		case kLevel_BlindLair_5:
-		case kLevel_BlindLair_6:
-		case kLevel_BlindLair_7:
-		case kLevel_BlindLair_8:
-		case kLevel_BlindLair_9:
-		case kLevel_BlindLair_10:
-		case kLevel_BlindLair_11:
-		case kLevel_BlindLair_T:
-		case kLevel_BlindLair_OBL:
-		case kLevel_BlindLair_Totem:
-		case kLevel_BlindOneBoss:
+		case kLevel_BlindLair_1: return "[4-1]";
+		case kLevel_BlindLair_2: return "[4-2]";
+		case kLevel_BlindLair_3: return "[4-3]";
+		case kLevel_BlindLair_4: return "[4-4]";
+		case kLevel_BlindLair_5: return "[4-5]";
+		case kLevel_BlindLair_6: return "[4-6]";
+		case kLevel_BlindLair_7: return "[4-7]";
+		case kLevel_BlindLair_8: return "[4-8]";
+		case kLevel_BlindLair_9: return "[4-V1]";
+		case kLevel_BlindLair_10: return "[4-V2]";
+		case kLevel_BlindLair_11: return "[4-V3]";
+		case kLevel_BlindLair_T: return "[4-Talisman]";
+		case kLevel_BlindLair_OBL: return "[4-Oblivion]";
 
-		case kLevel_HiveTop:
-		case kLevel_Hive_1:
-		case kLevel_Hive_2:
-		case kLevel_Hive_3:
-		case kLevel_Hive_4:
-		case kLevel_Hive_5:
-		case kLevel_Hive_6:
-		case kLevel_Hive_7:
-		case kLevel_Hive_8:
-		case kLevel_Hive_9:
-		case kLevel_Hive_10:
-		case kLevel_Hive_11:
-		case kLevel_Hive_12:
-		case kLevel_Hive_13:
-		case kLevel_Hive_T:
-		case kLevel_Hive_OBL:
-		case kLevel_Hive_Totem:
-		case kLevel_QueenBoss:
+		case kLevel_HiveTop: return "[5-1]";
+		case kLevel_Hive_1: return "[5-2]";
+		case kLevel_Hive_2: return "[5-3]";
+		case kLevel_Hive_3: return "[5-4]";
+		case kLevel_Hive_4: return "[5-5]";
+		case kLevel_Hive_5: return "[5-6]";
+		case kLevel_Hive_6: return "[5-7]";
+		case kLevel_Hive_7: return "[5-8]";
+		case kLevel_Hive_8: return "[5-9]";
+		case kLevel_Hive_9: return "[5-MC]";
+		case kLevel_Hive_10: return "[5-E1]";
+		case kLevel_Hive_11: return "[5-E2]";
+		case kLevel_Hive_12: return "[5-E3]";
+		case kLevel_Hive_13: return "[5-10]";
+		case kLevel_Hive_T: return "[5-Talisman]";
+		case kLevel_Hive_OBL: return "[5-Oblivion]";
 
-		case kLevel_Lightship_1:
-		case kLevel_Lightship_2:
-		case kLevel_Lightship_3:
-		case kLevel_Lightship_4:
-		case kLevel_Lightship_5:
-		case kLevel_Lightship_6:
-		case kLevel_Lightship_7:
-		case kLevel_Lightship_8:
-		case kLevel_Lightship_9:
-		case kLevel_Lightship_10:
-		case kLevel_LightShip_T:
-		case kLevel_LightShip_OBL:
-		case kLevel_MotherBoss:
-			return "[Map " + mapId + "]";
+		case kLevel_Lightship_1: return "[6-Hub]";
+		case kLevel_Lightship_2: return "[6-1]";
+		case kLevel_Lightship_3: return "[6-2a]";
+		case kLevel_Lightship_4: return "[6-2b]";
+		case kLevel_Lightship_5: return "[6-3a]";
+		case kLevel_Lightship_6: return "[6-3b]";
+		case kLevel_Lightship_7: return "[6-4a]";
+		case kLevel_Lightship_8: return "[6-4b]";
+		case kLevel_Lightship_9: return "[6-4c]";
+		case kLevel_Lightship_10: return "[6-4d]";
+		case kLevel_LightShip_T: return "[6-Talisman]";
+		case kLevel_LightShip_OBL: return "[6-Oblivion]";
 	}
 	
 	return "";
@@ -513,6 +504,12 @@ void ResetCollectedStatuses()
 // locations checked / total locations.
 void DisplayCollectedLocationsForCurrentMap(const int &in visibleTime = 120)
 {
+	kStr mapDisplayName = GetMapDisplayName(Game.ActiveMapID());
+	if (mapDisplayName == "")
+	{
+		return;
+	}
+	
 	array<ReplacementEntry@>@ locations = 
 		g_mapReplacements[Game.ActiveMapID()];
 	int totalCollected = 0;
@@ -525,7 +522,7 @@ void DisplayCollectedLocationsForCurrentMap(const int &in visibleTime = 120)
 	}
 	
 	Hud.AddMessage(
-		"Map progress: " + totalCollected + "/" + locations.length(),
+		mapDisplayName + ": " + totalCollected + "/" + locations.length(),
 		visibleTime);
 }
 
@@ -534,14 +531,9 @@ void DisplayCollectedLocationsForCurrentMap(const int &in visibleTime = 120)
 // locations checked / total locations.
 void DisplayCollectedLocationsForLevel(
 	const int &in mapId,
+	const kStr &in prefix,
 	const int &in visibleTime = 120)
 {
-	kStr mapDisplayName = GetMapDisplayName(mapId);
-	if (mapDisplayName == "")
-	{
-		return;
-	}
-
 	int totalCollected;
 	int totalLocations;
 	CalculateTotalLocationsCheckedForLevelFromMap(
@@ -550,7 +542,7 @@ void DisplayCollectedLocationsForLevel(
 		totalLocations);
 
 	Hud.AddMessage(
-		mapDisplayName + ": " + totalCollected + "/" + totalLocations,
+		prefix + ": " + totalCollected + "/" + totalLocations,
 		visibleTime);
 }
 

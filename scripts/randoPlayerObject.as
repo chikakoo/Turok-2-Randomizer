@@ -144,7 +144,7 @@ class RandoPlayerObject : ScriptObject
 		}
 		
 		// Show level progress on spawn as a convenience
-		DisplayCollectedLocationsForLevel(mapId);
+		DisplayCollectedLocationsForCurrentMap();
 	}
 	
 	//---------------------------

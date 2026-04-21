@@ -142,7 +142,7 @@ class RandoUI
 				return;
 		}
 		
-		DisplayCollectedLocationsForLevel(mapId, g_progressMenuDisplayTime);
+		DisplayCollectedLocationsForLevel(mapId, "Level Checks", g_progressMenuDisplayTime);
 		DisplayCollectedLocationsForCurrentMap(g_progressMenuDisplayTime);
 	}
 	
@@ -182,6 +182,18 @@ class RandoUI
 			Math::Fabs(velocity.z) > velocityTolerance)
 		{
 			Hud.AddMessage("Stand still to show the UI.");
+			return false;
+		}
+		
+		if (LocalPlayer.CurrentWeaponID() == kWpn_RidingGun)
+		{
+			Hud.AddMessage("Cannot show the UI while on the mount.");
+			return false;
+		}
+		
+		if ((puppet.PlayerFlags() & PF_CRAWLING) != 0)
+		{
+			Hud.AddMessage("Stand up straight to show the UI.");
 			return false;
 		}
 		
@@ -350,8 +362,11 @@ class RandoUI
 		
 		// Progressive Warps
 		int progressiveWarps = GetInventoryItemCollectedTotal(progressiveWarpActor);
-		int maxProgressiveWarps = int(Math::Ceil(float(baseMaxProgressiveWarps) / float(OPTION_PROGRESSIVE_WARPS)));
-		bool useGreenProgressiveWarpText = OPTION_PROGRESSIVE_WARPS == 0
+		int progressiveWarpStrength = OPTION_PROGRESSIVE_WARPS;
+		int maxProgressiveWarps = progressiveWarpStrength == 0
+			? 0
+			: int(Math::Ceil(float(baseMaxProgressiveWarps) / float(progressiveWarpStrength)));
+		bool useGreenProgressiveWarpText = progressiveWarpStrength == 0
 			? true
 			: progressiveWarps >= maxProgressiveWarps;
 		AddNumberImage(
