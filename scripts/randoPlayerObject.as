@@ -71,7 +71,7 @@ class RandoPlayerObject : ScriptObject
 		{
 			ui.Deactivate();
 		}
-	
+		
 		int16 mapId = Game.ActiveMapID();
 	
 		// If the map is the intro map, it's a new game, so reset everything
@@ -91,7 +91,20 @@ class RandoPlayerObject : ScriptObject
 			// Give max explosive shells to allow the Flare Gun to be 
 			// used and to prevent depots from spawning it prematurely
 			LocalPlayer.GiveWeapon(kWpn_Flare, 1000);
-		}		
+			
+			// Give the starting inventory
+			array<int> startingInventoryItems = { OPTION_STARTING_INVENTORY_ITEMS };
+			for (uint i = 0; i < startingInventoryItems.length(); i++)
+			{
+				TryGetInventoryItem(startingInventoryItems[i]);
+			}
+			
+			array<int> startingWeapons = { OPTION_STARTING_WEAPONS };
+			for (uint i = 0; i < startingWeapons.length(); i++)
+			{
+				TryGivePlayerWeapon(startingWeapons[i], 1000, true);
+			}
+		}
 		
 		//-------------------------
 		// Goals!
@@ -307,7 +320,7 @@ class RandoPlayerObject : ScriptObject
 	void OnTick(void)
 	{
 		if (!CinemaPlayer.Playing())
-		{
+		{		
 			ProcessIncomingMessages();
 			ProcessOutgoingMessages();
 		}

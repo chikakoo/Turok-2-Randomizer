@@ -5,7 +5,10 @@
 //---------------------------
 // Given the actor id, simulates the player picking up a weapon.
 // They are given the ammo amount even if they own the weapon.
-bool TryGivePlayerWeapon(int &in actorId, int &in ammoAmount = 1000)
+bool TryGivePlayerWeapon(
+	int &in actorId, 
+	int &in ammoAmount = 1000,
+	bool &in skipNotifications = false)
 {
 	WeaponInfo@ weaponInfo = GetWeaponInfo(actorId);
 	if (weaponInfo is null)
@@ -16,6 +19,12 @@ bool TryGivePlayerWeapon(int &in actorId, int &in ammoAmount = 1000)
 	
 	bool ownsWeapon = LocalPlayer.HasWeapon(weaponInfo.weaponDef);
 	LocalPlayer.GiveWeapon(weaponInfo.weaponDef, ammoAmount);
+	
+	if (skipNotifications)
+	{
+		return true;
+	}
+	
 	if (ownsWeapon)
 	{
 		PlayPickupNotificationSoundAndMessage(weaponInfo);
