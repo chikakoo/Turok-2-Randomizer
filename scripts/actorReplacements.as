@@ -557,7 +557,7 @@ void DoHubModifications(const int16 &in mapId)
 			0, 0, 0);
 	}
 	
-	if (OPTION_RANDOM_STARTING_LEVELS)
+	if (OPTION_STARTING_AT_HUB)
 	{
 		ActorFactory.Spawn(
 			kActor_ProgressionBlocker_Level1Barrier,

@@ -105,7 +105,7 @@ class RandoPlayerObject : ScriptObject
 				TryGivePlayerWeapon(startingWeapons[i], 1000, true);
 			}
 			
-			if (OPTION_RANDOM_STARTING_LEVELS)
+			if (OPTION_STARTING_AT_HUB)
 			{
 				CinemaPlayer.StopCinema();
 				DoPlayerWarp(0, 10099, kLevel_Hub, false);

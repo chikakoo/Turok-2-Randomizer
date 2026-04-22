@@ -268,7 +268,7 @@ class RandoUI
 		AddBackgroundImage(RANDO_UI_TEXTURE_BACKGROUND);
 		
 		DisplayLevel(1,
-			kActor_InventoryItem_Level1Key, OPTION_RANDOM_STARTING_LEVELS ? 3 : 0,
+			kActor_InventoryItem_Level1Key, OPTION_STARTING_AT_HUB ? 3 : 0,
 			kActor_InventoryItem_ProgressiveWarpL1, 9,
 			-1, 
 			kActor_PrimagenKey_1, 
