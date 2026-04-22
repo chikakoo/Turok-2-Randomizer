@@ -32,8 +32,7 @@
 	texture_23 "textures/ui/text_green_8.png"
 	texture_24 "textures/ui/text_green_9.png"
 	texture_25 "textures/ui/text_left.png"
-	texture_26 "textures/ui/warp_home.png"
-	texture_27 "textures/ui/warp_hub.png"
+	texture_26 "textures/ui/warp_hub.png"
 }
 
 // ------------------------------

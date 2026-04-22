@@ -44,8 +44,7 @@ const int UI_OFFSET_NUKE_Y = 539;
 const int UI_WARP_BUTTON_WIDTH = 157;
 const int UI_WARP_BUTTON_HEIGHT = 28;
 
-const int UI_OFFSET_WARP_HOME_X_ = 130;
-const int UI_OFFSET_WARP_HUB_X = 336;
+const int UI_OFFSET_WARP_HUB_X = 250;
 const int UI_OFFSET_WARP_BUTTON_Y = 528;
 
 const int UI_LEFT_NUMBER_SIZE = 16;
@@ -268,7 +267,7 @@ class RandoUI
 		AddBackgroundImage(RANDO_UI_TEXTURE_BACKGROUND);
 		
 		DisplayLevel(1,
-			kActor_InventoryItem_Level1Key, OPTION_STARTING_AT_HUB ? 3 : 0,
+			kActor_InventoryItem_Level1Key, 3,
 			kActor_InventoryItem_ProgressiveWarpL1, 9,
 			-1, 
 			kActor_PrimagenKey_1, 
@@ -308,14 +307,7 @@ class RandoUI
 		kVec3 nukePosition = PositionPixelToUI(UI_OFFSET_NUKE_X, UI_OFFSET_NUKE_Y);
 		bool useGreenText = nukeParts >= 6;
 		AddNumberImage(nukeParts, nukePosition, useGreenText);
-		
-		RandoUIElement@ homeButton = AddImage(
-			RANDO_UI_TEXTURE_WARP_HOME, 
-			PositionPixelToUI(UI_OFFSET_WARP_HOME_X_, UI_OFFSET_WARP_BUTTON_Y),
-			UI_WARP_BUTTON_WIDTH,
-			UI_WARP_BUTTON_HEIGHT);
-		@homeButton.onSelect = UIElementSelectCallBack(OnWarpHomeClicked);
-			
+
 		RandoUIElement@ hubButton = AddImage(
 			RANDO_UI_TEXTURE_WARP_HUB, 
 			PositionPixelToUI(UI_OFFSET_WARP_HUB_X, UI_OFFSET_WARP_BUTTON_Y),
@@ -323,18 +315,9 @@ class RandoUI
 			UI_WARP_BUTTON_HEIGHT);
 		@hubButton.onSelect = UIElementSelectCallBack(OnWarpHubClicked);
 	}
-	
-	// --------------------------
-	// Handle warping home
-	void OnWarpHomeClicked()
-	{
-		Deactivate();
-		DoPlayerWarp(0, 11111, kLevel_PortOfAdia_1, true);
-	}
 
 	// --------------------------
 	// Handle warping to the HUB
-	// TODO: don't allow this if the hub isn't "unlocked"
 	void OnWarpHubClicked()
 	{
 		Deactivate();

@@ -417,15 +417,7 @@ bool DoMapSpecificEdits(kActor@ actor, const int &in mapId)
 					actor.WorldComponent().TouchRadius() = 0;
 				}
 			break;
-	
-		// Open the door to the hub if the setting is on
-		case kLevel_PortOfAdia_1:
-			if (OPTION_OPEN_HUB && actor.TID() == 450)
-			{
-				actor.ModeStateComponent().SetMode(DOOR_MODE_OPEN);
-			}
-			break;
-			
+
 		// Open the door to the last graveyard gate so the player can't get stuck there
 		// Afterwards, disable the component so it can't be closed
 		case kLevel_RiverOfSouls_11:
@@ -557,13 +549,11 @@ void DoHubModifications(const int16 &in mapId)
 			0, 0, 0);
 	}
 	
-	if (OPTION_STARTING_AT_HUB)
-	{
-		ActorFactory.Spawn(
-			kActor_ProgressionBlocker_Level1Barrier,
-			kVec3(-111.983, -2232.514, -256),
-			0, 0, 0);
-	}
+
+	ActorFactory.Spawn(
+		kActor_ProgressionBlocker_Level1Barrier,
+		kVec3(-111.983, -2232.514, -256),
+		0, 0, 0);
 }
 
 //---------------------------
