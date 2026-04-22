@@ -170,28 +170,47 @@ bool TryGivePlayerHealth(int &in actorId)
 // Will add the item AND the inventory offset.
 bool TryGetInventoryItem(int &in actorId)
 {
-	kDictMem@ missionItemDef = TryGetActorDefWithClass(actorId, "kexInventoryPickup");
-	if (missionItemDef is null)
+	kDictMem@ itemDef = TryGetActorDefWithClass(actorId, "kexInventoryPickup");
+	if (itemDef is null)
 	{
 		return false;
 	}
 	
 	LocalPlayer.Inventory().Give(actorId);
-	PlayPickupNotification(missionItemDef);
-	HandleTrackInventoryItems(actorId, missionItemDef);
+	PlayPickupNotification(itemDef);
+	HandleTrackInventoryItems(actorId, itemDef);
 	
 	return true;
 }
 
 //---------------------------
+// Gets the given items and adds them to your inventory.
+// Will add the item AND the inventory offset.
+// Intended to be used on a new game, so no sound will be played.
+void TryGetInventoryItems(int &in actorId, int &in count)
+{
+	kDictMem@ itemDef = TryGetActorDefWithClass(actorId, "kexInventoryPickup");
+	if (itemDef is null)
+	{
+		return;
+	}
+	
+	for (int i = 0; i < count; i++)
+	{
+		LocalPlayer.Inventory().Give(actorId);
+		HandleTrackInventoryItems(actorId, itemDef);
+	}
+}
+
+//---------------------------
 // Some items (primagen keys) will disappear when you use them.
 // We want to track these still, so give a second one of them.
-void HandleTrackInventoryItems(int &in actorId, kDictMem@ missionItemDef = null)
+void HandleTrackInventoryItems(int &in actorId, kDictMem@ itemDef = null)
 {
-	if (missionItemDef is null)
+	if (itemDef is null)
 	{
-		@missionItemDef = TryGetActorDefWithClass(actorId, "kexInventoryPickup", true);
-		if (missionItemDef is null)
+		@itemDef = TryGetActorDefWithClass(actorId, "kexInventoryPickup", true);
+		if (itemDef is null)
 		{
 			return;
 		}

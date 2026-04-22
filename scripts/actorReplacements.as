@@ -541,19 +541,27 @@ void RemoveAllGenerators(void)
 
 //---------------------------
 // Modifies the Primagen Key turn-ins so they aren't active if level requirements aren't met.
+// Places the Level 1 barrier if appropriate.
 void DoHubModifications(const int16 &in mapId)
 {
-	kVec3 origin;
-	if (mapId == kLevel_Hub &&
-		AreLevelRequirementsUsed() &&
-		!AreLevelRequirementsUsedAndMet())
+	if (mapId != kLevel_Hub)
 	{
-		origin.x = -30.72;
-		origin.y = 51.2;
-		origin.z = 0;
+		return;
+	}
+
+	if (AreLevelRequirementsUsed() && !AreLevelRequirementsUsedAndMet())
+	{
 		ActorFactory.Spawn(
 			kActor_Hub_PrimagenKeyTrigger,
-			origin,
+			kVec3(-30.72, 51.2, 0),
+			0, 0, 0);
+	}
+	
+	if (OPTION_RANDOM_STARTING_LEVELS)
+	{
+		ActorFactory.Spawn(
+			kActor_ProgressionBlocker_Level1Barrier,
+			kVec3(-111.983, -2232.514, -256),
 			0, 0, 0);
 	}
 }

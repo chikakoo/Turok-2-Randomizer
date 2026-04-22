@@ -10,6 +10,7 @@
 #define kActor_Hub_PrimagenKeyTrigger 200000
 
 #define kActor_ProgressionBlocker_WarpBarrier 200100
+#define kActor_ProgressionBlocker_Level1Barrier 200200
 #define kActor_InventoryItem_ProgressiveWarpL1 201001
 #define kActor_InventoryItem_ProgressiveWarpL2 201002
 #define kActor_InventoryItem_ProgressiveWarpL3 201003

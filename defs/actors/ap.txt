@@ -214,6 +214,31 @@ WarpBarrier kActor_ProgressionBlocker_WarpBarrier
 }
 
 //------------------------------
+// Level 1 Barrier - used if not starting in level 1
+// Will be there until the player has all their Level 1 keys
+WarpBarrier kActor_ProgressionBlocker_Level1Barrier
+{
+	className				  "kexActor"
+	placeable                 TRUE
+	flags.noDamage            TRUE
+	flags.allowTracking       FALSE
+	
+    Begin_Component "kexWorldComponent"
+        radius                140.0
+		touchRadius			  150.0
+		height				  300.0
+		bNonSolid             FALSE
+    End_Component
+	Begin_Component "kexParticleEmitterComponent"
+        particle                "particles/rando_level1_barrier.particle"
+        offset                  "0.0 0.0 0.0"
+    End_Component
+	Begin_Component "kexScriptComponent"
+        scriptClass           "RandoLevel1Barrier"
+    End_Component
+}
+
+//------------------------------
 // Random ammo pickup for AP - see GetAmmoInRandomWeapon
 RandomAmmo kActor_Item_RandomAmmo
 {

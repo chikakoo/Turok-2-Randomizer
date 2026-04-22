@@ -33,6 +33,7 @@ void Help(void)
 	Sys.Print("-----------------");
 	Sys.Print("Level Keys");
 	Sys.Print("-----------------");
+	Sys.Print("Level1Key");
 	Sys.Print("Level2Key");
 	Sys.Print("Level3Key");
 	Sys.Print("Level4Key");
@@ -175,6 +176,11 @@ void LowHealth(void)
 
 // --------------------------
 // Level keys
+void Level1Key(void)
+{
+	TryGetInventoryItem(kActor_InventoryItem_Level1Key);
+}
+
 void Level2Key(void)
 {
 	TryGetInventoryItem(kActor_InventoryItem_Level2Key);

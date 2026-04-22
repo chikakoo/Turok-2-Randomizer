@@ -1,0 +1,35 @@
+material surf_565_00_00 {
+	cull back
+	param "uLimitAlpha" 0 "0"
+	param "uReflective" 0 "0"
+	param "uPseduoColor" 0 "0"
+	fullbright
+	sort default
+	surface_type default
+	depthtest
+	color_environment "0.000000 0.000000 0.000000 1.000000"
+	color_diffuse "1.000000 1.000000 1.000000 1.000000"
+
+	sampler "diffuse" 0 "textures/hubkey06.png" {
+		filter		linear_anisotropic
+		wrap		repeat
+	}
+}
+
+material surf_565_00_01 {
+	cull back
+	param "uLimitAlpha" 0 "0"
+	param "uReflective" 0 "0"
+	param "uPseduoColor" 0 "0"
+	sort default
+	surface_type default
+	depthtest
+	color_environment "0.000000 0.000000 0.000000 1.000000"
+	color_diffuse "1.000000 1.000000 1.000000 1.000000"
+
+	sampler "diffuse" 0 "textures/Rando_Level_1_Key.png" {
+		filter		linear_anisotropic
+		wrap		repeat
+	}
+}
+

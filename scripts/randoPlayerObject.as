@@ -104,6 +104,13 @@ class RandoPlayerObject : ScriptObject
 			{
 				TryGivePlayerWeapon(startingWeapons[i], 1000, true);
 			}
+			
+			if (OPTION_RANDOM_STARTING_LEVELS)
+			{
+				CinemaPlayer.StopCinema();
+				DoPlayerWarp(0, 10099, kLevel_Hub, false);
+				GiveStartingLevelKeys();
+			}
 		}
 		
 		//-------------------------
@@ -158,6 +165,37 @@ class RandoPlayerObject : ScriptObject
 		
 		// Show level progress on spawn as a convenience
 		DisplayCollectedLocationsForCurrentMap();
+	}
+	
+	//---------------------------
+	// Gives the level keys for all starting levels.
+	void GiveStartingLevelKeys(void)
+	{
+		array<int> startingLevels = { OPTION_STARTING_LEVELS };
+		for (uint i = 0; i < startingLevels.length(); i++)
+		{
+			switch(startingLevels[i])
+			{
+				case 1:
+					TryGetInventoryItems(kActor_InventoryItem_Level1Key, 3);
+					break;
+				case 2:
+					TryGetInventoryItems(kActor_InventoryItem_Level2Key, 3);
+					break;
+				case 3:
+					TryGetInventoryItems(kActor_InventoryItem_Level3Key, 3);
+					break;
+				case 4:
+					TryGetInventoryItems(kActor_InventoryItem_Level4Key, 3);
+					break;
+				case 5:
+					TryGetInventoryItems(kActor_InventoryItem_Level5Key, 3);
+					break;
+				case 6:
+					TryGetInventoryItems(kActor_InventoryItem_Level6Key, 6);
+					break;
+			}
+		}
 	}
 	
 	//---------------------------
@@ -314,7 +352,7 @@ class RandoPlayerObject : ScriptObject
 			}
 		}
 	}
-	
+
 	//---------------------------
 	// Checks for incoming and outgoing messages
 	void OnTick(void)

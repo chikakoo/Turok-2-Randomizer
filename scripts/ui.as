@@ -267,8 +267,8 @@ class RandoUI
 	{
 		AddBackgroundImage(RANDO_UI_TEXTURE_BACKGROUND);
 		
-		DisplayLevel(1, 
-			-1, 0,
+		DisplayLevel(1,
+			kActor_InventoryItem_Level1Key, OPTION_RANDOM_STARTING_LEVELS ? 3 : 0,
 			kActor_InventoryItem_ProgressiveWarpL1, 9,
 			-1, 
 			kActor_PrimagenKey_1, 
@@ -360,6 +360,14 @@ class RandoUI
 			: RANDO_UI_TEXTURE_INCOMPLETE;
 		AddImage(primagenKeyTexture, PositionPixelToUI(UI_OFFSET_PRIMAGEN_KEY, levelHeightOffset));
 		
+		// Level Keys
+		int levelKeys = GetInventoryItemCollectedTotal(levelKeyActor);
+		bool useGreenLevelKeyText = levelKeys >= maxKeys;
+		AddNumberImage(
+			levelKeys, 
+			PositionPixelToUI(UI_OFFSET_LEVEL_KEY, levelHeightOffset),
+			useGreenLevelKeyText);
+			
 		// Progressive Warps
 		int progressiveWarps = GetInventoryItemCollectedTotal(progressiveWarpActor);
 		int progressiveWarpStrength = OPTION_PROGRESSIVE_WARPS;
@@ -390,14 +398,6 @@ class RandoUI
 		{
 			return;
 		}
-		
-		// Level Keys
-		int levelKeys = GetInventoryItemCollectedTotal(levelKeyActor);
-		bool useGreenLevelKeyText = levelKeys >= maxKeys;
-		AddNumberImage(
-			levelKeys, 
-			PositionPixelToUI(UI_OFFSET_LEVEL_KEY, levelHeightOffset),
-			useGreenLevelKeyText);
 		
 		// Feathers
 		int featherTexture = GetInventoryItemCollectedTotal(featherActor) > 0
