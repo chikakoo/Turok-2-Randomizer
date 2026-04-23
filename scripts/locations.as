@@ -464,6 +464,15 @@ void ResetCollectedStatuses()
 			locations[j].isSentToAP = false;
 		}
 	}
+	
+	for (uint i = 0; i < g_actionObjectEntries.length(); i++)
+	{
+		array<ActionObjectEntry@>@ locations = g_actionObjectEntries[i];
+		for (uint j = 0; j < locations.length(); j++)
+		{
+			locations[j].isSentToAP = false;
+		}
+	}
 }
 
 //------------------------------

@@ -56,7 +56,6 @@ class ActionObjectEntry
 	// Handles processing the message as well so you get the item from the check.
 	void SendCheckToAP()
 	{
-		Sys.Print("OUTSIDE");
 		if (!this.isSentToAP)
 		{
 			this.isSentToAP = true;
@@ -121,7 +120,7 @@ bool TryGetActionObjectEntryForCurrentMap(
 {
 	int mapId = Game.ActiveMapID();
 	array<ActionObjectEntry@>@ locations;
-	if (!TryGetReplacementArray(mapId, locations))
+	if (!TryGetActionObjectArray(mapId, locations))
 	{
 		return false;
 	}
@@ -139,10 +138,10 @@ bool TryGetActionObjectEntryForCurrentMap(
 }
 
 //------------------------------
-// Tries to get the replacement array for the given map id.
+// Tries to get the action object array for the given map id.
 // If not found, locations is null and returns false.
 // If found, locations is the found location and returns true.
-bool TryGetReplacementArray(
+bool TryGetActionObjectArray(
 	const int16 &in mapId, 
 	array<ActionObjectEntry@>@ &out locations)
 {
@@ -154,4 +153,41 @@ bool TryGetReplacementArray(
 	
 	@locations = g_actionObjectEntries[mapId];
 	return locations !is null;
+}
+
+//------------------------------
+// Gets the action object entry on the given map with the given AP id.
+// Returns null if not found.
+ActionObjectEntry@ GetActionObjectWithApId(
+	const int &in apId, const int &in mapId)
+{
+	array<ActionObjectEntry@>@ locations;
+	if (!TryGetActionObjectArray(mapId, locations))
+	{
+		return null;
+	}
+	
+    for (uint i = 0; i < locations.length(); i++)
+    {
+        if (locations[i].apId == apId)
+		{
+			return @locations[i];
+		}
+    }
+	
+	return null;
+}
+
+//------------------------------
+// Marks the action object as sent to AP.
+// Used when loading a save with objects already sent to AP.
+// - apId: The AP id to mark as sent to AP
+// - mapId: The map the object is on
+void MarkActionObjectSentToAP(const int &in apId, const int &in mapId)
+{
+	ActionObjectEntry@ location = GetActionObjectWithApId(apId, mapId);
+	if (location !is null)
+	{
+		location.isSentToAP = true;
+	}
 }

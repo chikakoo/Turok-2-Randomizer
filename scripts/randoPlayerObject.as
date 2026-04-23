@@ -256,9 +256,7 @@ class RandoPlayerObject : ScriptObject
 		
 		DeserializeLocationFlags(dict, "collectedLocations");
 		DeserializeLocationFlags(dict, "sentToAPLocations");
-		
-		//TODO: we need a version that works with this object
-		//DeserializeLocationFlags(dict, "sentToAPActionObjects");
+		DeserializeActionObjectFlags(dict);
 		
 		// Reset the messages in flight and unset the queue
 		g_outgoingMessageInFlight = false;
@@ -302,6 +300,37 @@ class RandoPlayerObject : ScriptObject
 				{
 					MarkSentToAP(apId, mapId);
 				}
+				
+				current = "";
+			}
+			else
+			{
+				current += m_asciiChars[c];
+			}
+		}
+	}
+	
+	//---------------------------
+	// Deserializes the saved location data on the player object:
+	// - Reads the collected locations by converting the trailing pipe string
+	//   and setting the flags on the replacement objects.
+	void DeserializeActionObjectFlags(kDict &in dict)
+	{
+		kStr data;
+		if (!dict.GetString("sentToAPActionObjects", data))
+		{
+			return;
+		}
+	
+		kStr current = "";
+		for (uint i = 0; i < data.Length(); i++)
+		{
+			int8 c = data[i];
+			if (c == "|"[0])
+			{		
+				int apId = current.Atoi();
+				int mapId = ConvertMapIdFromApId(apId);
+				MarkActionObjectSentToAP(apId, mapId);
 				
 				current = "";
 			}
