@@ -38,3 +38,5 @@
 
 !layeredImages/
 !layeredImages/**
+
+!package-mod.bat
