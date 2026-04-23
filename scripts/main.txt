@@ -81,11 +81,13 @@ bool DeserializeBool(kDict& in dict, const kStr& in key)
 #include "scripts/traps.as"
 #include "scripts/randoPrimagenKeyTrigger.as"
 #include "scripts/actorReplacements.as"
+#include "scripts/apProcessing.as"
 #include "scripts/randoPickupObject.as"
 #include "scripts/randoWarpBarrier.as"
 #include "scripts/randoLevel1Barrier.as"
 #include "scripts/randoPlayerObject.as"
 #include "scripts/replacementEntry.as"
+#include "scripts/actionObjectEntry.as"
 #include "scripts/consoleCommands.as"
 
 /*

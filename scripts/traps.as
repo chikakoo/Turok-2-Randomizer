@@ -14,7 +14,7 @@ bool TryTriggerTrap(const int &in trapId)
 	kDictMem@ actorDef = g_indexDefManager.GetEntry(trapId);
 	if (actorDef is null)
 	{
-		return false ;
+		return false;
 	}
 	
 	int trapType;

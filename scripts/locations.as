@@ -5,9 +5,11 @@
 // Thankfully, we only usually need the data from a single map,
 // so this class will make use of an array of arrays, keyed by the map id.
 //
-// So, this is an array<array<ReplacementEntry@>>.
+// So, this is an array<array<T@>>, 
+// where T is ReplacementEntry or ActionObjectEntry.
 //------------------------------
 array<array<ReplacementEntry@>> g_mapReplacements;
+array<array<ActionObjectEntry@>> g_actionObjectEntries;
 array<array<int>> g_mapLevelNumberToMapIds; // To get all maps for a level
 
 enum LevelNumber
@@ -31,9 +33,11 @@ enum LevelNumber
 void InitMapReplacements(void)
 {
     g_mapReplacements.resize(136); // 0–135 inclusive
+	g_actionObjectEntries.resize(136);
     for (uint i = 0; i < g_mapReplacements.length(); i++)
     {
         g_mapReplacements[i] = array<ReplacementEntry@>();
+		g_actionObjectEntries[i] = array<ActionObjectEntry@>();
     }
 	
 	g_mapLevelNumberToMapIds.resize(LEVEL_UNMAPPED + 1);
@@ -375,43 +379,6 @@ bool IsInTotemOrBossLevel()
 }
 
 //------------------------------
-// Add to the map for a local item.
-// - name: The friendly name of the actor
-// - apId: The AP id of the location
-// - position: The position of the actor, to identify it on the map
-//  - This is in the format: <map-id>_x_y_z, so Atoi will get the map id
-// - replacementActorId: The actor id to replace this with
-void AddReplacement(
-	const kStr &in name, 
-	const int &in apId, 
-	const kStr &in position,
-	const int &in replacementActorId)
-{
-	ReplacementEntry @entry = ReplacementEntry(
-		name, apId, position, replacementActorId);
-    g_mapReplacements[entry.mapId].insertLast(entry);
-}
-
-//------------------------------
-// Add to the array for an off-world AP item.
-// - name: The friendly name of the actor
-// - apId: The AP id of the location
-// - position: The position of the actor, to identify it on the map
-// - displayString: What text to display when picking up the item
-// - isProgression: Affects whether we use the gold or gray outined model
-void AddReplacement(
-	const kStr &in name,
-	const int &in apId, 
-	const kStr &in position,
-	const kStr &in displayString,
-	const bool &in isProgression = false)
-{
-	ReplacementEntry @entry = ReplacementEntry(
-		name, apId, position, displayString, isProgression);
-    g_mapReplacements[entry.mapId].insertLast(entry);
-}
-
-//------------------------------
 // Tries to get the replacement array for the given map id.
 // If not found, locations is null and returns false.
 // If found, locations is the found location and returns true.
@@ -694,6 +661,18 @@ void Resync()
 	for (uint i = 0; i < g_mapReplacements.length(); i++)
 	{
 		array<ReplacementEntry@>@ locations = g_mapReplacements[i];
+		for (uint j = 0; j < locations.length(); j++)
+		{
+			if (locations[j] !is null && locations[j].isSentToAP)
+			{
+				g_outgoingMessageQueue.insertLast(locations[j].apId);
+			}
+		}
+	}
+	
+	for (uint i = 0; i < g_actionObjectEntries.length(); i++)
+	{
+		array<ActionObjectEntry@>@ locations = g_actionObjectEntries[i];
 		for (uint j = 0; j < locations.length(); j++)
 		{
 			if (locations[j] !is null && locations[j].isSentToAP)

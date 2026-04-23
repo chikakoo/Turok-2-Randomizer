@@ -68,6 +68,9 @@ enum APStatus
 
 enum APMessageType
 {
+	// Local - not used by AP
+	AP_IN_MSGTYPE_LOCAL = -1,
+
 	// Default, should be ignored on both ends
 	AP_MSGTYPE_NONE = 0,
 	

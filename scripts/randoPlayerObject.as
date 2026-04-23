@@ -174,7 +174,7 @@ class RandoPlayerObject : ScriptObject
 			ui.Deactivate();
 		}
 		
-		// Collected locations/sent to AP locations
+		// Collected locations/sent to AP locations (pickups)
 		kStr collectedLocations;
 		kStr sentToAPLocations;
 		for (uint i = 0; i < g_mapReplacements.length(); i++)
@@ -194,6 +194,20 @@ class RandoPlayerObject : ScriptObject
 			}
 		}
 		
+		// Action objects sent to AP
+		kStr sentToAPActionObjects;
+		for (uint i = 0; i < g_actionObjectEntries.length(); i++)
+		{
+			array<ActionObjectEntry@>@ locations = g_actionObjectEntries[i];
+			for (uint j = 0; j < locations.length(); j++)
+			{
+				if (locations[j].isSentToAP)
+				{
+					sentToAPActionObjects += "" + locations[j].apId + "|";
+				}
+			}
+		}
+		
 		if (collectedLocations.Length() > 0)
 		{
 			SERIALIZE(collectedLocations);
@@ -202,6 +216,11 @@ class RandoPlayerObject : ScriptObject
 		if (sentToAPLocations.Length() > 0)
 		{
 			SERIALIZE(sentToAPLocations);
+		}
+		
+		if (sentToAPActionObjects.Length() > 0)
+		{
+			SERIALIZE(sentToAPActionObjects);
 		}
 		
 		// Outgoing message queue
@@ -237,6 +256,9 @@ class RandoPlayerObject : ScriptObject
 		
 		DeserializeLocationFlags(dict, "collectedLocations");
 		DeserializeLocationFlags(dict, "sentToAPLocations");
+		
+		//TODO: we need a version that works with this object
+		//DeserializeLocationFlags(dict, "sentToAPActionObjects");
 		
 		// Reset the messages in flight and unset the queue
 		g_outgoingMessageInFlight = false;
@@ -335,123 +357,5 @@ class RandoPlayerObject : ScriptObject
 		ui.OnTick();
 		
 		TryDisplayProgressMenu();
-	}
-
-	//----------------------------------
-	// Process incoming messages if we aren't processing a message already.
-	void ProcessIncomingMessages(void)
-	{
-		if (g_AP.IncomingStatus != AP_PROCESSING)
-		{
-			return;
-		}
-		
-		int data = g_AP.IncomingMessageData;
-		switch(g_AP.IncomingMessageType)
-		{
-			case AP_MSGTYPE_NONE:
-				// Do nothing if there's no message type!
-				break;
-			case AP_IN_MSGTYPE_GET_PICKUP:
-				HandleGetPickup(data);
-				break;
-			case AP_IN_MSGTYPE_GET_WEAPON:
-				TryGivePlayerWeapon(data);
-				break;
-			case AP_IN_MSGTYPE_GET_AMMO:
-				GetAmmoInRandomWeapon();
-				break;
-			case AP_IN_MSGTYPE_GET_INVENTORY_ITEM:
-				TryGetInventoryItem(data);
-				break;
-			case AP_IN_MSGTYPE_GET_TRAP:
-				TryTriggerTrap(data);
-				break;
-			default:
-				Sys.Print("Did not handle incoming message: " + g_AP.IncomingMessageType + ". Data: " + data);
-		}
-		
-		// Set this back to ready so AP knows it can send more
-		g_AP.IncomingMessageType = AP_MSGTYPE_NONE;
-		g_AP.IncomingMessageData = 0;
-		
-		// Set the index so we know what was processed last
-		g_AP.OutgoingLastProcessedItemIdx = g_AP.IncomingLastProcessedItemIdx;
-		g_AP.IncomingStatus = AP_READY;
-		
-		//Sys.Print("Updated last processed index: " + g_AP.OutgoingLastProcessedItemIdx);
-	}
-	
-	//----------------------------------
-	// This includes health and life forces.
-	// Health will be given directly.
-	// Life forces have no way of being given, so they will be spawned in.
-	void HandleGetPickup(int &in data)
-	{
-		kDictMem@ entry = g_indexDefManager.GetEntry(data);
-		
-		// ALL actors will have an entry here
-		if (entry is null)
-		{
-			Sys.Print("Tried to use non-existant actor: " + data);
-			return;
-		}
-		
-		kStr className;
-		entry.GetString("className", className);
-		
-		if (TryGivePlayerHealth(data))
-		{
-			return;
-		}
-		
-		if (className == "kexLifeForcePickup")
-		{
-			SpawnActorOnPlayer(data);
-		}
-	}
-	
-	//----------------------------------
-	// Process messages to send to AP.
-	//
-	// We keep track of whether we're currently waiting for the server to process a message.
-	// Once it's processed, we remove it from the queue and unset that flag.
-	//
-	// Once the server is ready (and we aren't waiting for it anymore), we grab the
-	// next message from the queue and set it to the message data and type and set the
-	// flags so the client knows there's a new message.
-	//
-	// This is done this way so we can seriaize the outgoing message queue and reload it if
-	// not everything was synced before saving.
-	void ProcessOutgoingMessages(void)
-	{
-		// If something is sent but not confirmed, wait
-		if (g_outgoingMessageInFlight)
-		{
-			// If the client finished processing it, remove the message
-			if (g_AP.OutgoingStatus == AP_READY)
-			{
-				g_outgoingMessageQueue.removeAt(0);
-				g_outgoingMessageInFlight = false;
-			}
-		}
-		
-		// Do not process if AP is still processing the last message
-		if (g_outgoingMessageInFlight ||
-			g_AP.OutgoingStatus != AP_READY || 
-			g_outgoingMessageQueue.length() == 0)
-		{
-			return;
-		}
-		
-		int apId = g_outgoingMessageQueue[0];
-		g_AP.OutgoingMessageData = apId;
-		//Sys.Print("Sent check to AP: " + apId);
-		
-		// Now the python script knows it can read the data we set
-		g_AP.OutgoingStatus = AP_PROCESSING;
-		
-		// Mark as in-flight, but don't remove yet
-		g_outgoingMessageInFlight = true;
 	}
 }

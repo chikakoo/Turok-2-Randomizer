@@ -1,0 +1,884 @@
+//
+// Copyright(C) 2014-2015 Samuel Villarreal
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either version 2
+// of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// DESCRIPTION:
+//      Interactive Action Object Class
+//
+
+//-----------------------------------------------------------------------------
+//
+// Flags
+//
+//-----------------------------------------------------------------------------
+
+const int8 ACTIONOBJECT_FLAG_HAS_COLLISION                  = (1 << 0);
+const int8 ACTIONOBJECT_FLAG_VANISH_AT_END_OF_TRIG_ANIM     = (1 << 1);
+const int8 ACTIONOBJECT_FLAG_AUTO_TRIGGER_PLAYER            = (1 << 2);
+const int8 ACTIONOBJECT_FLAG_AUTO_TRIGGER_ACTOR             = (1 << 3);
+
+//-----------------------------------------------------------------------------
+//
+// Modes
+//
+//-----------------------------------------------------------------------------
+
+enum actionObjectModes
+{
+    ACTIONOBJECT_MODE_IDLE  = 0,
+    ACTIONOBJECT_MODE_TRIGGER,
+    ACTIONOBJECT_MODE_VANISH,
+    NUMACTIONOBJECTMODES
+}
+
+//-----------------------------------------------------------------------------
+//
+// Messages
+//
+//-----------------------------------------------------------------------------
+
+const int8 ACTIONOBJECT_MSG_START           = 1;
+const int8 ACTIONOBJECT_MSG_IDLE            = 2;
+const int8 ACTIONOBJECT_MSG_INVISIBLE       = 4;
+const int8 ACTIONOBJECT_MSG_SOUND           = 5;
+const int8 ACTIONOBJECT_MSG_MUSIC           = 6;
+const int8 ACTIONOBJECT_MSG_AMBIENCE        = 7;
+const int8 ACTIONOBJECT_MSG_COLLISION_OFF   = 8;
+const int8 ACTIONOBJECT_MSG_COLLISION_ON    = 9;
+const int8 ACTIONOBJECT_MSG_VISIBLE         = 10;
+
+/*
+==============================================================
+InitActionObjectModeTable
+==============================================================
+*/
+
+void InitActionObjectModeTable(void)
+{
+    DefineMode("ActionObjectModeTable", ACTIONOBJECT_MODE_IDLE,     "void MODE_IdleSetup(void)",    "",                             CF_STATIC, 0, "int MODE_IdleAnim(void)",    0, 0, 0, MF_NOROOTMOTION);
+    DefineMode("ActionObjectModeTable", ACTIONOBJECT_MODE_TRIGGER,  "void MODE_TriggerSetup(void)", "void MODE_TriggerTick(void)",  CF_STATIC, 0, "int MODE_TriggerAnim(void)", 0, 0, 0, MF_NOROOTMOTION);
+    DefineMode("ActionObjectModeTable", ACTIONOBJECT_MODE_VANISH,   "void MODE_VanishSetup(void)",  "void MODE_VanishTick(void)",   CF_STATIC, 0, "",                           0, 0, 0, MF_NOROOTMOTION);
+}
+
+/*
+==============================================================
+TurokActionObject
+==============================================================
+*/
+
+class TurokActionObject : ScriptObject
+{
+    kActor@     self;
+    uint        m_dwFlags;
+    
+    int         m_idleAnim;
+    int8        m_idleModel;
+    int8        m_idleAltTexture;
+    
+    float       m_fTriggerRadius;
+    
+    int         m_triggerAnim;
+    int8        m_triggerModel;
+    int8        m_triggerAltTexture;    
+    
+    int         m_requiredPickup;
+    int         m_requiredPickupText;
+    
+    bool        m_bTriggered;
+    bool        m_bHasOnCollideListener;
+    bool        m_bHasInitialAutoPlayerTrigger;
+    bool        m_bHasInitialAutoActorTrigger;
+    
+    int         m_timeToShowMessage;
+    
+    float       m_fResetDelay;
+    
+    bool        m_bFading;
+    bool        m_bScheduleLateCall;    
+    
+    TurokActionObject(kActor @actor)
+    {
+        @self = actor;
+        m_bTriggered = false;
+        m_bFading = false;
+        m_bScheduleLateCall = false;
+        m_bHasOnCollideListener = false;
+        m_bHasInitialAutoPlayerTrigger = false;
+        m_bHasInitialAutoActorTrigger = false;
+        m_timeToShowMessage = 0;
+        m_fResetDelay = 0;
+    }
+    
+    /*
+    ==============================================================
+    OnLevelLoad
+    ==============================================================
+    */
+    
+    void OnLevelLoad(kDictMem@ pDict)
+    {
+        pDict.GetInt("flags", m_dwFlags);
+        pDict.GetInt("idleAnim", m_idleAnim);
+        pDict.GetInt("idleModel", m_idleModel);
+        pDict.GetInt("idleAltTexture", m_idleAltTexture);
+        pDict.GetFloat("triggerRadius", m_fTriggerRadius);
+        pDict.GetInt("triggerAnim", m_triggerAnim);
+        pDict.GetInt("requiredPickup", m_requiredPickup);
+        pDict.GetInt("requiredPickupText", m_requiredPickupText);
+        pDict.GetInt("triggerModel", m_triggerModel);
+        pDict.GetInt("triggerAltTexture", m_triggerAltTexture);
+    }
+    
+    /*
+    ==============================================================
+    OnSerialize
+    ==============================================================
+    */
+    
+    void OnSerialize(kDict& out dict)
+    {
+        SERIALIZE(m_dwFlags);
+        SERIALIZE(m_idleAnim);
+        SERIALIZE(m_idleModel);
+        SERIALIZE(m_idleAltTexture);
+        SERIALIZE(m_fTriggerRadius);
+        SERIALIZE(m_triggerAnim);
+        SERIALIZE(m_triggerModel);
+        SERIALIZE(m_triggerAltTexture);    
+        SERIALIZE(m_requiredPickup);
+        SERIALIZE(m_requiredPickupText);
+        SERIALIZE(m_bTriggered);
+        SERIALIZE(m_timeToShowMessage);
+        SERIALIZE(m_bFading);
+        SERIALIZE(m_bScheduleLateCall);
+        SERIALIZE(m_bHasOnCollideListener);
+        SERIALIZE(m_bHasInitialAutoPlayerTrigger);
+        SERIALIZE(m_bHasInitialAutoActorTrigger);
+        SERIALIZE(m_fResetDelay);
+    }
+    
+    /*
+    ==============================================================
+    OnSerialize
+    ==============================================================
+    */
+    
+    void OnDeserialize(kDict& in dict)
+    {
+        DESERIALIZE_INT(m_dwFlags);
+        DESERIALIZE_INT(m_idleAnim);
+        DESERIALIZE_INT(m_idleModel);
+        DESERIALIZE_INT(m_idleAltTexture);
+        DESERIALIZE_FLOAT(m_fTriggerRadius);
+        DESERIALIZE_INT(m_triggerAnim);
+        DESERIALIZE_INT(m_triggerModel);
+        DESERIALIZE_INT(m_triggerAltTexture);    
+        DESERIALIZE_INT(m_requiredPickup);
+        DESERIALIZE_INT(m_requiredPickupText);
+        DESERIALIZE_BOOL(m_bTriggered);
+        DESERIALIZE_INT(m_timeToShowMessage);
+        DESERIALIZE_BOOL(m_bFading);
+        DESERIALIZE_BOOL(m_bScheduleLateCall);
+        DESERIALIZE_BOOL(m_bHasOnCollideListener);
+        DESERIALIZE_BOOL(m_bHasInitialAutoPlayerTrigger);
+        DESERIALIZE_BOOL(m_bHasInitialAutoActorTrigger);
+        DESERIALIZE_FLOAT(m_fResetDelay);
+    }
+    
+    /*
+    ==============================================================
+    CheckRequiredPickupAndCollideCallback
+    ==============================================================
+    */
+    
+    void CheckRequiredPickupAndCollideCallback(void)
+    {
+        // disable OnCollide callback since there's no way to abort it if the player
+        // doesn't have the required inventory. We'll handle this in OnTouch instead.
+        if((self.WorldComponent().Flags() & WCF_INVOKE_COLLIDE_CALLBACK) != 0)
+        {
+            self.WorldComponent().TouchRadius() = (self.WorldComponent().Radius() + GAME_SCALE);
+            self.WorldComponent().LinkArea();
+            self.WorldComponent().Flags() &= ~WCF_INVOKE_COLLIDE_CALLBACK;
+            
+            m_dwFlags |= ACTIONOBJECT_FLAG_AUTO_TRIGGER_PLAYER;
+        }
+    }
+    
+    /*
+    ==============================================================
+    OnSpawn
+    ==============================================================
+    */
+    
+    void OnSpawn(void)
+    {
+        if(!self.Deserialized())
+        {
+            //----------------------------------------------------------------
+            // first see if this thing is already flagged to auto-trigger
+            if((m_dwFlags & ACTIONOBJECT_FLAG_AUTO_TRIGGER_PLAYER) != 0)
+            {
+                m_bHasInitialAutoPlayerTrigger = true;
+            }
+            
+            if((m_dwFlags & ACTIONOBJECT_FLAG_AUTO_TRIGGER_ACTOR) != 0)
+            {
+                m_bHasInitialAutoActorTrigger = true;
+            }
+            
+            //----------------------------------------------------------------
+            // see if this thing is set to trigger when colliding
+            if(!(self.WorldComponent() is null))
+            {
+                if((self.WorldComponent().Flags() & WCF_INVOKE_COLLIDE_CALLBACK) != 0)
+                {
+                    m_bHasOnCollideListener = true;
+                    
+                    // special case check
+                    if((self.Flags() & AF_HIDDEN) != 0)
+                    {
+                        self.Flags() &= ~AF_IMPORTANT;
+                    }
+                }
+            }
+        }
+        
+        // set flag so that they won't get in the way of projectiles
+        if(!(self.RenderMeshComponent() is null))
+        {
+            self.RenderMeshComponent().Flags() |= RMCF_NOEXPANDJOINTS;
+        }
+        
+        //----------------------------------------------------------------
+        // add mode state component if it doesn't have one already
+        self.AddComponent("kexModeStateComponent", true);
+        
+        if(!(self.ModeStateComponent() is null))
+        {
+            self.ModeStateComponent().AssignModeTable("ActionObjectModeTable");
+        }
+        
+        //----------------------------------------------------------------
+        // make it important if quest or mission-objective based
+        if(m_requiredPickup > 0 || self.Type() == kActor_ActionObject_Hostage)
+        {
+            if(!self.Deserialized())
+            {
+                // stupid hack check
+                if(self.Type() != kActor_ActionObject_MTentacle)
+                {
+                    self.Flags() |= AF_IMPORTANT;
+                }
+            }
+        }
+        
+        //----------------------------------------------------------------
+        // if marked in the persistent data
+        if(self.IsMarked())
+        {
+            if(!self.Deserialized())
+            {
+                // clear important flag. its already been activated
+                m_bScheduleLateCall = true;
+                self.Flags() &= ~AF_IMPORTANT;
+            }
+            
+            if(!self.Deserialized())
+            {
+                if(!(self.RenderMeshComponent() is null))
+                {
+                    self.RenderMeshComponent().AltTexture() = m_triggerAltTexture;
+                    self.RenderMeshComponent().SwapOutMesh(m_triggerModel);
+                }
+                
+                self.AnimTrackComponent().Set(MODE_TriggerAnim(), 0, ANF_LOOP);
+                self.AnimTrackComponent().SetLastFrame(true);
+            }
+            
+            // if this was flagged to be removed, then do so now
+            if((m_dwFlags & ACTIONOBJECT_FLAG_VANISH_AT_END_OF_TRIG_ANIM) != 0)
+            {
+                self.Remove();
+                return;
+            }
+            
+            if(self.Type() == kActor_ActionObject_Hostage)
+            {
+                self.Remove();
+                return;
+            }
+            
+            if(!self.Deserialized())
+            {
+                if((m_dwFlags & ACTIONOBJECT_FLAG_HAS_COLLISION) == 0)
+                {
+                    self.WorldComponent().Flags() |= WCF_NONSOLID;
+                }
+                else
+                {
+                    self.WorldComponent().Flags() &= ~WCF_NONSOLID;
+                }
+            }
+            
+            return;
+        }
+        
+        //----------------------------------------------------------------
+        // do nothing if loaded from a save game
+        if(self.Deserialized())
+        {
+            return;
+        }
+        
+        //----------------------------------------------------------------
+        // setup initial animation
+        if(!(self.AnimTrackComponent() is null))
+        {
+            if(m_idleAnim <= 0)
+            {
+                self.AnimTrackComponent().Toggle(false);
+            }
+            
+            self.AnimTrackComponent().Stop();
+        }
+        
+        //----------------------------------------------------------------
+        // setup initial mode
+        if(!(self.ModeStateComponent() is null))
+        {
+            self.ModeStateComponent().SetMode(ACTIONOBJECT_MODE_IDLE);
+        }
+        
+        //----------------------------------------------------------------
+        // setup initial model and texture
+        if(!(self.RenderMeshComponent() is null))
+        {
+            self.RenderMeshComponent().AltTexture() = m_idleAltTexture;
+            self.RenderMeshComponent().SwapOutMesh(m_idleModel);
+        }
+        
+        //----------------------------------------------------------------
+        // setup world component stuff
+        if(!(self.WorldComponent() is null))
+        {
+            self.WorldComponent().TouchRadius() = m_fTriggerRadius;
+            self.WorldComponent().LinkArea();
+            
+            if((m_dwFlags & ACTIONOBJECT_FLAG_HAS_COLLISION) == 0)
+            {
+                self.WorldComponent().Flags() |= WCF_NONSOLID;
+            }
+            else
+            {
+                self.WorldComponent().Flags() &= ~WCF_NONSOLID;
+                
+                // stupid hack check
+                if(self.Type() != kActor_ActionObject_MTentacle)
+                {
+                    self.Flags() |= AF_IMPORTANT;
+                }
+            }
+            
+            CheckRequiredPickupAndCollideCallback();
+        }
+        
+        if(!m_bHasInitialAutoPlayerTrigger && (self.Flags() & AF_HASCOLLIDELISTENER) == 0 &&
+            (self.Flags() & AF_HASSHOTLISTENER) == 0)
+        {
+            self.Flags() &= ~AF_IMPORTANT;
+        }
+    }
+    
+    /*
+    ==============================================================
+    OnPreTrigger
+    ==============================================================
+    */
+    
+    bool OnPreTrigger(kActor@ pInstigator)
+    {
+        if(m_requiredPickup > 0 && !(pInstigator is null))
+        {
+            if(pInstigator.InstanceOf("kexPuppet"))
+            {
+                kPuppet@ pPuppet = pInstigator.CastToPuppet();
+                kPlayerInventory@ pInventory = pPuppet.PlayerOwner().Inventory();
+                
+                if(pInventory.GetCount(m_requiredPickup) <= 0)
+                {
+                    if(m_timeToShowMessage == 0)
+                    {
+                        Hud.AddMessage(m_requiredPickupText);
+                        m_timeToShowMessage = 120;
+                    }
+                    return false;
+                }
+                else
+                {
+                    pInventory.Take(m_requiredPickup);
+                    self.Flags() &= ~AF_IMPORTANT;
+                    
+                    // clear to 0 so that we can't potentially re-trigger it again on the same frame
+                    m_requiredPickup = 0;
+                    
+                    // Must trigger force invoke OnCollide or it could take the inventory item and
+                    // the player may never Collide with it which triggers it, which then softlocks
+                    // the player.
+                    if(m_bHasOnCollideListener)
+                    {
+                        self.WorldComponent().Flags() |= WCF_INVOKE_COLLIDE_CALLBACK;
+                        self.InvokeOnCollide(pInstigator);
+                    }
+                }
+            }
+        }
+        
+        return true;
+    }
+    
+    /*
+    ==============================================================
+    OnTrigger
+    ==============================================================
+    */
+    
+    void OnTrigger(kActor@ pInstigator, const int msg)
+    {
+        if(self.Type() == kActor_ActionObject_QueenGen)
+        {
+            return;
+        }
+        
+        self.StopSound();
+        self.StopLoopingSounds();
+        
+        if(m_bTriggered)
+        {
+            return;
+        }
+        
+        switch(self.TriggerMessageID())
+        {
+        case ACTIONOBJECT_MSG_START:
+            if(!self.IsMarked())
+            {
+                if(!(self.RenderMeshComponent() is null))
+                {
+                    self.RenderMeshComponent().AltTexture() = m_triggerAltTexture;
+                    self.RenderMeshComponent().SwapOutMesh(m_triggerModel);
+                }
+				
+				//--------------------
+				// Rando code
+				ActionObjectEntry@ actionObjectEntry;
+				if (TryGetActionObjectEntryForCurrentMap(self.TID(), actionObjectEntry))
+				{
+					actionObjectEntry.SendCheckToAP();
+				}
+				Hud.AddMessage("" + Game.ActiveMapID() + ", " + self.TID());
+				//--------------------
+                
+                self.ModeStateComponent().SetMode(ACTIONOBJECT_MODE_TRIGGER);
+                self.SignalOn();
+                self.Flags() &= ~AF_IMPORTANT;
+                self.Mark(true);
+                //m_bTriggered = true;
+            }
+            break;
+            
+        case ACTIONOBJECT_MSG_IDLE:
+            if(!(self.RenderMeshComponent() is null))
+            {
+                self.RenderMeshComponent().AltTexture() = m_idleAltTexture;
+                self.RenderMeshComponent().SwapOutMesh(m_idleModel);
+            }
+            
+            self.ModeStateComponent().SetMode(ACTIONOBJECT_MODE_IDLE);
+            
+            self.SignalOff();
+            m_fResetDelay = 0.5f;
+            
+            if(m_requiredPickup > 0 ||
+                self.Type() == kActor_ActionObject_Hostage ||
+                (m_dwFlags & ACTIONOBJECT_FLAG_AUTO_TRIGGER_PLAYER) != 0)
+            {
+                self.Flags() |= AF_IMPORTANT;
+            }
+            
+            if(m_bHasOnCollideListener)
+            {
+                self.WorldComponent().Flags() &= ~WCF_INVOKE_COLLIDE_CALLBACK;
+                m_dwFlags |= ACTIONOBJECT_FLAG_AUTO_TRIGGER_PLAYER;
+                self.Flags() |= AF_IMPORTANT;
+            }
+            
+            self.Mark(false);
+            return;
+            
+        case ACTIONOBJECT_MSG_INVISIBLE:
+            self.Flags() |= AF_HIDDEN;
+            if(!(self.AnimTrackComponent() is null))
+            {
+                self.AnimTrackComponent().Toggle(false);
+            }
+            break;
+            
+        case ACTIONOBJECT_MSG_SOUND:
+            self.PlaySound(self.TriggerData());
+            break;
+            
+        case ACTIONOBJECT_MSG_MUSIC:
+            Game.PlayMusic(self.TriggerData());
+            break;
+            
+        case ACTIONOBJECT_MSG_AMBIENCE:
+            World.SetGlobalAmbience(self.TriggerData());
+            break;
+            
+        case ACTIONOBJECT_MSG_COLLISION_OFF:
+            if(!(self.WorldComponent() is null))
+            {
+                self.WorldComponent().Flags() |= WCF_NONSOLID;
+            }
+            break;
+            
+        case ACTIONOBJECT_MSG_COLLISION_ON:
+            if(!(self.WorldComponent() is null))
+            {
+                self.WorldComponent().Flags() &= ~WCF_NONSOLID;
+            }
+            break;
+            
+        case ACTIONOBJECT_MSG_VISIBLE:
+            self.Flags() &= ~AF_HIDDEN;
+            if(!(self.AnimTrackComponent() is null))
+            {
+                self.AnimTrackComponent().Toggle(true);
+            }
+            break;
+        }
+        
+        /*DEBUG_PRINT("Action obj (" + self.TID() + ") recieved MSG: " +
+            self.TriggerMessageID() + " with data: " + self.TriggerData());*/
+    }
+    
+    /*
+    ==============================================================
+    OnDeath
+    ==============================================================
+    */
+    
+    void OnDeath(kDamageInfo& in dmgInfo)
+    {
+        self.TriggerMessageID() = ACTIONOBJECT_MSG_START;
+        self.Trigger(null);
+    }
+    
+    /*
+    ==============================================================
+    OnTouch
+    ==============================================================
+    */
+    
+    void OnTouch(kActor@ pInstigator)
+    {
+        if(pInstigator is null)
+        {
+            return;
+        }
+        
+        if(self.AnimTrackComponent() is null)
+        {
+            return;
+        }
+        
+        if(!self.AnimTrackComponent().Stopped())
+        {
+            if(!self.AnimTrackComponent().CycleCompleted())
+            {
+                return;
+            }
+        }
+        
+        //----------------------------------------------------------------
+        // player entered its touch radius?
+        if(pInstigator.InstanceOf("kexPuppet"))
+        {
+            if((m_dwFlags & ACTIONOBJECT_FLAG_AUTO_TRIGGER_PLAYER) == 0)
+            {
+                return;
+            }
+            
+            //----------------------------------------------------------------
+            // verify for inventory requests
+            if(!OnPreTrigger(pInstigator))
+            {
+                return;
+            }
+        }
+        else if((m_dwFlags & ACTIONOBJECT_FLAG_AUTO_TRIGGER_ACTOR) == 0)
+        {
+            return;
+        }
+        
+        if(!(self.WorldComponent() is null))
+        {
+            //----------------------------------------------------------------
+            // the collide callback is turned off so we can first check for
+            // inventory requirements. if all is good, then re-enable the callback
+            // so it can trigger as the object is rubbing up against it
+            if(m_bHasOnCollideListener)
+            {
+                self.WorldComponent().Flags() |= WCF_INVOKE_COLLIDE_CALLBACK;
+                
+                // the boolean is here so we can tell whatever or not we added
+                // this flag ourselves or was originally set in the level
+                if(!m_bHasInitialAutoPlayerTrigger)
+                {
+                    m_dwFlags &= ~ACTIONOBJECT_FLAG_AUTO_TRIGGER_PLAYER;
+                    return;
+                }
+            }
+            
+            // trigger it
+            self.TriggerMessageID() = ACTIONOBJECT_MSG_START;
+            self.Trigger(null);
+            self.WorldComponent().TouchRadius() = 0.0f;
+            self.WorldComponent().LinkArea();
+        }
+    }
+    
+    /*
+    ==============================================================
+    OnTick
+    ==============================================================
+    */
+    
+    void OnTick(void)
+    {
+        if(m_fResetDelay > 0.0f)
+        {
+            m_fResetDelay -= GAME_DELTA_TIME;
+            if(m_fResetDelay <= 0)
+            {
+                m_fResetDelay = 0;
+                if(m_fTriggerRadius > 0.0f)
+                {
+                    self.WorldComponent().TouchRadius() = m_fTriggerRadius;
+                    self.WorldComponent().LinkArea();
+                }
+            }
+        }
+        
+        if(self.IsMarked() && m_bScheduleLateCall)
+        {
+            self.SignalOn();
+            m_bScheduleLateCall = false;
+        }
+        
+        if(m_bTriggered)
+        {
+            m_bTriggered = false;
+        }
+        
+        /*if(m_bTriggered && !self.IsMarked())
+        {
+            self.Mark(true);
+            m_bTriggered = false;
+        }*/
+        
+        if(m_timeToShowMessage > 0)
+        {
+            m_timeToShowMessage--;
+            if(m_timeToShowMessage < 0)
+            {
+                m_timeToShowMessage = 0;
+            }
+        }
+    }
+    
+    /*
+    ==============================================================
+    UserEvent
+    ==============================================================
+    */
+    
+    void UserEvent(const float x, const float y, const float z,
+                   const float f1, const float f2, const float f3, const float f4)
+    {
+        if(self.Type() == kActor_ActionObject_QueenGen)
+        {
+            kVec3 vPos = kVec3(x, y, z);
+            int16 nRegionIdx = self.WorldComponent().GetNearPositionAndRegionIndex(vPos, vPos);
+            kActor@ pMite = ActorFactory.Spawn(kActor_AI_Mite, vPos, self.Yaw(), 0, 0, true, nRegionIdx);
+            
+            if(!(pMite is null))
+            {
+                pMite.Scale() = kVec3(0.5f*2, 0.5f*2, 0.5f*2);
+            }
+        }
+    }
+    
+    /*
+    ==============================================================
+    MODE_IdleSetup
+    ==============================================================
+    */
+    
+    void MODE_IdleSetup(void)
+    {
+    }
+    
+    /*
+    ==============================================================
+    MODE_IdleAnim
+    ==============================================================
+    */
+    
+    int MODE_IdleAnim(void)
+    {
+        if(m_idleAnim > 0)
+        {
+            // make visible if anim is specified
+            self.Flags() &= ~AF_HIDDEN;
+            if(!(self.AnimTrackComponent() is null))
+            {
+                self.AnimTrackComponent().Toggle(true);
+            }
+        }
+        else
+        {
+            self.Flags() |= AF_HIDDEN;
+            if(!(self.AnimTrackComponent() is null))
+            {
+                self.AnimTrackComponent().Toggle(false);
+            }
+        }
+        
+        return m_idleAnim;
+    }
+    
+    /*
+    ==============================================================
+    MODE_TriggerSetup
+    ==============================================================
+    */
+    
+    void MODE_TriggerSetup(void)
+    {
+        if(self.Type() == kActor_ActionObject_Hostage)
+        {
+            if(!(self.WorldComponent() is null))
+            {
+                self.WorldComponent().TouchRadius() = 0.0f;
+                self.WorldComponent().LinkArea();
+            }
+        }
+    }
+    
+    /*
+    ==============================================================
+    MODE_TriggerTick
+    ==============================================================
+    */
+    
+    void MODE_TriggerTick(void)
+    {
+        if(self.AnimTrackComponent() is null)
+        {
+            return;
+        }
+        
+        if(!self.AnimTrackComponent().CycleCompleted())
+        {
+            return;
+        }
+        
+        if((m_dwFlags & ACTIONOBJECT_FLAG_VANISH_AT_END_OF_TRIG_ANIM) != 0)
+        {
+            self.Remove();
+        }
+        
+        // TODO: go back to idle for bosses
+        
+        if(self.Type() == kActor_ActionObject_Hostage)
+        {
+            self.ModeStateComponent().SetMode(ACTIONOBJECT_MODE_VANISH);
+        }
+    }
+    
+    /*
+    ==============================================================
+    MODE_TriggerAnim
+    ==============================================================
+    */
+    
+    int MODE_TriggerAnim(void)
+    {
+        if(m_triggerAnim > 0)
+        {
+            // make visible if anim is specified
+            self.Flags() &= ~AF_HIDDEN;
+            if(!(self.AnimTrackComponent() is null))
+            {
+                self.AnimTrackComponent().Toggle(true);
+            }
+        }
+        else
+        {
+            self.Flags() |= AF_HIDDEN;
+            if(!(self.AnimTrackComponent() is null))
+            {
+                self.AnimTrackComponent().Toggle(false);
+            }
+        }
+
+        return m_triggerAnim;
+    }
+    
+    /*
+    ==============================================================
+    MODE_VanishSetup
+    ==============================================================
+    */
+    
+    void MODE_VanishSetup(void)
+    {
+    }
+    
+    /*
+    ==============================================================
+    MODE_VanishTick
+    ==============================================================
+    */
+    
+    void MODE_VanishTick(void)
+    {
+        // TEMP
+        if(self.AnimTrackComponent() is null)
+        {
+            return;
+        }
+        
+        if(!self.AnimTrackComponent().CycleCompleted())
+        {
+            return;
+        }
+        
+        if(!m_bFading)
+        {
+            m_bFading = true;
+            self.RunFxEvent("Hostage_Fade");
+        }
+    }
+};

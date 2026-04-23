@@ -59,3 +59,39 @@ class ReplacementEntry
     }
 }
 
+//------------------------------
+// Add to the map for a local item.
+// - name: The friendly name of the actor
+// - apId: The AP id of the location
+// - position: The position of the actor, to identify it on the map
+//  - This is in the format: <map-id>_x_y_z, so Atoi will get the map id
+// - replacementActorId: The actor id to replace this with
+void AddReplacement(
+	const kStr &in name, 
+	const int &in apId, 
+	const kStr &in position,
+	const int &in replacementActorId)
+{
+	ReplacementEntry @entry = ReplacementEntry(
+		name, apId, position, replacementActorId);
+    g_mapReplacements[entry.mapId].insertLast(entry);
+}
+
+//------------------------------
+// Add to the array for an off-world AP item.
+// - name: The friendly name of the actor
+// - apId: The AP id of the location
+// - position: The position of the actor, to identify it on the map
+// - displayString: What text to display when picking up the item
+// - isProgression: Affects whether we use the gold or gray outined model
+void AddReplacement(
+	const kStr &in name,
+	const int &in apId, 
+	const kStr &in position,
+	const kStr &in displayString,
+	const bool &in isProgression = false)
+{
+	ReplacementEntry @entry = ReplacementEntry(
+		name, apId, position, displayString, isProgression);
+    g_mapReplacements[entry.mapId].insertLast(entry);
+}
