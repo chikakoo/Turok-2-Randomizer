@@ -96,7 +96,7 @@ class RandoPlayerObject : ScriptObject
 			array<int> startingInventoryItems = { OPTION_STARTING_INVENTORY_ITEMS };
 			for (uint i = 0; i < startingInventoryItems.length(); i++)
 			{
-				TryGetInventoryItem(startingInventoryItems[i]);
+				TryGetInventoryItem(startingInventoryItems[i], true);
 			}
 			
 			array<int> startingWeapons = { OPTION_STARTING_WEAPONS };

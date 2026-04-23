@@ -315,9 +315,25 @@ class RandoUI
 			UI_WARP_BUTTON_HEIGHT);
 		@hubButton.onSelect = UIElementSelectCallBack(OnWarpHubClicked);
 	}
+	
+	// --------------------------
+	// Checks whether the given level is excluded.
+	bool IsLevelExcluded(const int &in level)
+	{
+		array<int> excludedLevels = { OPTION_EXCLUDED_LEVELS };
+		for (uint i = 0; i < excludedLevels.length(); i++)
+		{
+			if (excludedLevels[i] == level)
+			{
+				return true;
+			}
+		}
+		
+		return false;
+	}
 
 	// --------------------------
-	// Handle warping to the HUB
+	// Handle warping to the hub
 	void OnWarpHubClicked()
 	{
 		Deactivate();
@@ -335,6 +351,7 @@ class RandoUI
 		const int &in primagenKeyActor,
 		const int &in talismanActor)
 	{
+		bool isExcluded = IsLevelExcluded(level);
 		int levelHeightOffset = GetLevelRowHeightOffset(level);
 
 		// Primagen Keys
@@ -349,7 +366,7 @@ class RandoUI
 		AddNumberImage(
 			levelKeys, 
 			PositionPixelToUI(UI_OFFSET_LEVEL_KEY, levelHeightOffset),
-			useGreenLevelKeyText);
+			isExcluded || useGreenLevelKeyText);
 			
 		// Progressive Warps
 		int progressiveWarps = GetInventoryItemCollectedTotal(progressiveWarpActor);
@@ -360,6 +377,7 @@ class RandoUI
 		bool useGreenProgressiveWarpText = progressiveWarpStrength == 0
 			? true
 			: progressiveWarps >= maxProgressiveWarps;
+		useGreenProgressiveWarpText = isExcluded || useGreenProgressiveWarpText;
 		AddNumberImage(
 			progressiveWarps, 
 			PositionPixelToUI(UI_OFFSET_PROGRESSIVE_WARP, levelHeightOffset),
@@ -374,7 +392,7 @@ class RandoUI
 		}
 		
 		// Mission items
-		DisplayMissionItems(level, levelHeightOffset);
+		DisplayMissionItems(level, isExcluded, levelHeightOffset);
 		
 		// Special case for level 1, as it doesn't have any more to show
 		if (level == 1)
@@ -397,31 +415,32 @@ class RandoUI
 	
 	void DisplayMissionItems(
 		const int &in level,
+		const bool &in isExcluded,
 		const int &in levelHeightOffset)
 	{
 		switch(level)
 		{
 			case 1:
-				DisplayMissionItem(levelHeightOffset, UI_OFFSET_MISSION_ITEM_1, kActor_MissionItem_BeaconPowerCell, 3);
+				DisplayMissionItem(isExcluded, levelHeightOffset, UI_OFFSET_MISSION_ITEM_1, kActor_MissionItem_BeaconPowerCell, 3);
 				break;
 			case 2:
-				DisplayMissionItem(levelHeightOffset, UI_OFFSET_MISSION_ITEM_2, kActor_MissionItem_GateKey, 2);
-				DisplayMissionItem(levelHeightOffset, UI_OFFSET_MISSION_ITEM_1, kActor_MissionItem_GraveyardKey, 2);
+				DisplayMissionItem(isExcluded, levelHeightOffset, UI_OFFSET_MISSION_ITEM_2, kActor_MissionItem_GateKey, 2);
+				DisplayMissionItem(isExcluded, levelHeightOffset, UI_OFFSET_MISSION_ITEM_1, kActor_MissionItem_GraveyardKey, 2);
 				break;
 			case 3:
-				DisplayMissionItem(levelHeightOffset, UI_OFFSET_MISSION_ITEM_1, kActor_MissionItem_L3SatchelCharge, 3);
+				DisplayMissionItem(isExcluded, levelHeightOffset, UI_OFFSET_MISSION_ITEM_1, kActor_MissionItem_L3SatchelCharge, 3);
 				break;
 			case 4:
-				DisplayMissionItem(levelHeightOffset, UI_OFFSET_MISSION_ITEM_2, kActor_MissionItem_CaveDoorKey, 7);
-				DisplayMissionItem(levelHeightOffset, UI_OFFSET_MISSION_ITEM_1, kActor_MissionItem_L4SatchelCharge, 3);
+				DisplayMissionItem(isExcluded, levelHeightOffset, UI_OFFSET_MISSION_ITEM_2, kActor_MissionItem_CaveDoorKey, 7);
+				DisplayMissionItem(isExcluded, levelHeightOffset, UI_OFFSET_MISSION_ITEM_1, kActor_MissionItem_L4SatchelCharge, 3);
 				break;
 			case 5:
-				DisplayMissionItem(levelHeightOffset, UI_OFFSET_MISSION_ITEM_1, kActor_MissionItem_L5SatchelCharge, 4);
+				DisplayMissionItem(isExcluded, levelHeightOffset, UI_OFFSET_MISSION_ITEM_1, kActor_MissionItem_L5SatchelCharge, 4);
 				break;
 			case 6:
-				DisplayMissionItem(levelHeightOffset, UI_OFFSET_MISSION_ITEM_3, kActor_MissionItem_IonCapacitor, 16);
-				DisplayMissionItem(levelHeightOffset, UI_OFFSET_MISSION_ITEM_2, kActor_MissionItem_BlueLaserCell, 2);
-				DisplayMissionItem(levelHeightOffset, UI_OFFSET_MISSION_ITEM_1, kActor_MissionItem_RedLaserCell, 2);
+				DisplayMissionItem(isExcluded, levelHeightOffset, UI_OFFSET_MISSION_ITEM_3, kActor_MissionItem_IonCapacitor, 16);
+				DisplayMissionItem(isExcluded, levelHeightOffset, UI_OFFSET_MISSION_ITEM_2, kActor_MissionItem_BlueLaserCell, 2);
+				DisplayMissionItem(isExcluded, levelHeightOffset, UI_OFFSET_MISSION_ITEM_1, kActor_MissionItem_RedLaserCell, 2);
 				break;
 			default:
 				return;
@@ -433,6 +452,7 @@ class RandoUI
 	// This will display the current count you have in your inventory
 	// It will be in green if you have all of the items required
 	void DisplayMissionItem(
+		const bool &in isExcluded,
 		const int &in levelHeightOffset,
 		const int &in widthOffset,
 		const int &in missionItemActor,
@@ -442,7 +462,7 @@ class RandoUI
 		int missionItemCurrent = GetInventoryItemCurrentTotal(missionItemActor);
 		
 		kVec3 missionItemPosition = PositionPixelToUI(widthOffset, levelHeightOffset);
-		bool useGreenText = missionItemCollected >= maxCount;
+		bool useGreenText = isExcluded || (missionItemCollected >= maxCount);
 		AddNumberImage(missionItemCurrent, missionItemPosition, useGreenText);
 		
 		// If we don't have all the items, display the amount left

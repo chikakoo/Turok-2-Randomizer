@@ -168,7 +168,7 @@ bool TryGivePlayerHealth(int &in actorId)
 //---------------------------
 // Gets the given item and adds it to your inventory.
 // Will add the item AND the inventory offset.
-bool TryGetInventoryItem(int &in actorId)
+bool TryGetInventoryItem(int &in actorId, bool &in skipNotifications = false)
 {
 	kDictMem@ itemDef = TryGetActorDefWithClass(actorId, "kexInventoryPickup");
 	if (itemDef is null)
@@ -176,8 +176,12 @@ bool TryGetInventoryItem(int &in actorId)
 		return false;
 	}
 	
+	if (!skipNotifications)
+	{
+		PlayPickupNotification(itemDef);
+	}
+	
 	LocalPlayer.Inventory().Give(actorId);
-	PlayPickupNotification(itemDef);
 	HandleTrackInventoryItems(actorId, itemDef);
 	
 	return true;
