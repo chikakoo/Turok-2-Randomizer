@@ -24,13 +24,28 @@ class ActionObjectEntry
 		const kStr &in name,
 		const int &in apId,
 		const int &in tagId,
-		const int &in givenActorId,
-		const kStr &in displayString = "")
+		const int &in givenActorId)
 	{
 		this.name = name;
 		this.apId = apId;
 		this.tagId = tagId;
 		this.givenActorId = givenActorId;
+		this.displayString = "";
+		this.mapId = ConvertMapIdFromApId(apId);
+		this.isSentToAP = false;
+	}
+	
+	ActionObjectEntry(
+		const kStr &in name,
+		const int &in apId,
+		const int &in tagId,
+		const kStr &in displayString,
+		const bool &in isProgression = false)
+	{
+		this.name = name;
+		this.apId = apId;
+		this.tagId = tagId;
+		this.givenActorId = 0;
 		this.displayString = displayString;
 		this.mapId = ConvertMapIdFromApId(apId);
 		this.isSentToAP = false;
@@ -64,18 +79,33 @@ class ActionObjectEntry
 // Add to the map for a local item.
 // - name: The friendly name of the actor
 // - apId: The AP id of the location
-// - position: The position of the actor, to identify it on the map
-//  - This is in the format: <map-id>_x_y_z, so Atoi will get the map id
-// - replacementActorId: The actor id to replace this with
+// - tagId: The tag of the actor to identify it on the map
+// - givenActorId: The actor id the player will receive
 void AddActionObject(
 	const kStr &in name, 
 	const int &in apId,
 	const int &in tagId,
-	const int &in givenActorId,
+	const int &in givenActorId)
+{
+	ActionObjectEntry @entry = ActionObjectEntry(
+		name, apId, tagId, givenActorId);
+    g_actionObjectEntries[entry.mapId].insertLast(entry);
+}
+
+//------------------------------
+// Add to the map for a remote item.
+// - name: The friendly name of the actor
+// - apId: The AP id of the location
+// - tagId: The tag of the actor to identify it on the map
+// - displayString: The string to display when the actor is triggered
+void AddActionObject(
+	const kStr &in name, 
+	const int &in apId,
+	const int &in tagId,
 	const kStr &in displayString = "")
 {
 	ActionObjectEntry @entry = ActionObjectEntry(
-		name, apId, tagId, givenActorId, displayString);
+		name, apId, tagId, displayString);
     g_actionObjectEntries[entry.mapId].insertLast(entry);
 }
 

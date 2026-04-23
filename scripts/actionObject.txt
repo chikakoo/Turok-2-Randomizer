@@ -485,7 +485,7 @@ class TurokActionObject : ScriptObject
 				{
 					actionObjectEntry.SendCheckToAP();
 				}
-				Hud.AddMessage("" + Game.ActiveMapID() + ", " + self.TID());
+				Hud.AddMessage("" + Game.ActiveMapID() + "_" + self.TID());
 				//--------------------
                 
                 self.ModeStateComponent().SetMode(ACTIONOBJECT_MODE_TRIGGER);
