@@ -168,6 +168,7 @@ bool TryGivePlayerHealth(int &in actorId)
 //---------------------------
 // Gets the given item and adds it to your inventory.
 // Will add the item AND the inventory offset.
+// Handles level key packs.
 bool TryGetInventoryItem(int &in actorId, bool &in skipNotifications = false)
 {
 	kDictMem@ itemDef = TryGetActorDefWithClass(actorId, "kexInventoryPickup");
@@ -181,16 +182,31 @@ bool TryGetInventoryItem(int &in actorId, bool &in skipNotifications = false)
 		PlayPickupNotification(itemDef);
 	}
 	
-	LocalPlayer.Inventory().Give(actorId);
-	HandleTrackInventoryItems(actorId, itemDef);
-	
+	if (OPTION_LEVEL_KEY_PACKS && (
+		actorId == kActor_InventoryItem_Level1Key ||
+		actorId == kActor_InventoryItem_Level2Key ||
+		actorId == kActor_InventoryItem_Level3Key ||
+		actorId == kActor_InventoryItem_Level4Key ||
+		actorId == kActor_InventoryItem_Level5Key ||
+		actorId == kActor_InventoryItem_Level6Key
+	))
+	{
+		int count = actorId == kActor_InventoryItem_Level6Key ? 6 : 3;
+		TryGetInventoryItems(actorId, count);
+	}
+	else
+	{
+		LocalPlayer.Inventory().Give(actorId);
+		HandleTrackInventoryItems(actorId, itemDef);
+	}
+
 	return true;
 }
 
 //---------------------------
 // Gets the given items and adds them to your inventory.
 // Will add the item AND the inventory offset.
-// Intended to be used on a new game, so no sound will be played.
+// Does not play the notification sound.
 void TryGetInventoryItems(int &in actorId, int &in count)
 {
 	kDictMem@ itemDef = TryGetActorDefWithClass(actorId, "kexInventoryPickup");
