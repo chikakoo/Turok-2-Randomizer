@@ -10,7 +10,7 @@ material surf_565_00_00 {
 	color_environment "0.000000 0.000000 0.000000 1.000000"
 	color_diffuse "1.000000 1.000000 1.000000 1.000000"
 
-	sampler "diffuse" 0 "textures/hubkey06.png" {
+	sampler "diffuse" 0 "textures/Rando_Level_1_Key.png" {
 		filter		linear_anisotropic
 		wrap		repeat
 	}
@@ -27,7 +27,7 @@ material surf_565_00_01 {
 	color_environment "0.000000 0.000000 0.000000 1.000000"
 	color_diffuse "1.000000 1.000000 1.000000 1.000000"
 
-	sampler "diffuse" 0 "textures/Rando_Level_1_Key.png" {
+	sampler "diffuse" 0 "textures/hbtxtr02.png" {
 		filter		linear_anisotropic
 		wrap		repeat
 	}
