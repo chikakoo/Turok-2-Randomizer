@@ -484,9 +484,15 @@ class TurokActionObject : ScriptObject
 				if (TryGetActionObjectEntryForCurrentMap(self.TID(), actionObjectEntry))
 				{
 					actionObjectEntry.SendCheckToAP();
+					Hud.AddMessage("" + actionObjectEntry.name);
+					Sys.Print("" + actionObjectEntry.name);
 				}
-				Hud.AddMessage("" + Game.ActiveMapID() + "_" + self.TID());
-				Sys.Print("" + Game.ActiveMapID() + "_" + self.TID());
+				else
+				{
+					Hud.AddMessage("" + Game.ActiveMapID() + "_" + self.TID());
+					Sys.Print("" + Game.ActiveMapID() + "_" + self.TID());
+				}
+				
 				//--------------------
                 
                 self.ModeStateComponent().SetMode(ACTIONOBJECT_MODE_TRIGGER);

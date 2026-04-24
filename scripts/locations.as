@@ -486,19 +486,37 @@ void DisplayCollectedLocationsForCurrentMap(const int &in visibleTime = 120)
 		return;
 	}
 	
-	array<ReplacementEntry@>@ locations = 
-		g_mapReplacements[Game.ActiveMapID()];
+	int16 mapId = Game.ActiveMapID();
+	array<ReplacementEntry@>@ replacementLocations = 
+		g_mapReplacements[mapId];
+	array<ActionObjectEntry@>@ actionObjectLocations = 
+		g_actionObjectEntries[mapId];
+		
 	int totalCollected = 0;
 	int totalLocations = 0;
-	for (uint i = 0; i < locations.length(); i++)
+	for (uint i = 0; i < replacementLocations.length(); i++)
 	{
-		if (locations[i].apId <= 0)
+		if (replacementLocations[i].apId <= 0)
 		{
 			continue;
 		}
 			
 		totalLocations++;
-		if (locations[i].isCollected || locations[i].isSentToAP)
+		if (replacementLocations[i].isCollected || replacementLocations[i].isSentToAP)
+		{
+			totalCollected++;
+		}
+	}
+	
+	for (uint i = 0; i < actionObjectLocations.length(); i++)
+	{
+		if (actionObjectLocations[i].apId <= 0)
+		{
+			continue;
+		}
+			
+		totalLocations++;
+		if (actionObjectLocations[i].isSentToAP)
 		{
 			totalCollected++;
 		}

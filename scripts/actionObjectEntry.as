@@ -60,6 +60,7 @@ class ActionObjectEntry
 		{
 			this.isSentToAP = true;
 			g_outgoingMessageQueue.insertLast(apId);
+			DisplayCollectedLocationsForCurrentMap();
 			
 			if (this.givenActorId > 0)
 			{
