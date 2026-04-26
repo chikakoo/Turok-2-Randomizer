@@ -130,9 +130,11 @@ class RandoPickupObject : ScriptObject
 			GetAmmoInRandomWeapon();
 			
 			// This is a non-AP item ammo replacement, so we should still mark it as collected
+			// We should also try to trigger actors in case it is a trap ammo
 			if (m_id < 0)
 			{
 				CollectLocation(m_id, Game.ActiveMapID());
+				TryTriggerActors(m_position);
 			}
 		}
 			

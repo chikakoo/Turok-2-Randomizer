@@ -66,7 +66,7 @@ void ProcessMessage(
 // Used for local rewards from ActionObjects.
 int GetAPInTypeFromData(const int &in data)
 {
-	if (data == kActor_Generator_RandomAmmo)
+	if (data == kActor_Item_RandomAmmo)
 	{
 		return AP_IN_MSGTYPE_GET_AMMO;
 	}
