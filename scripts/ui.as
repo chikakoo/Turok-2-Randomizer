@@ -673,13 +673,18 @@ class RandoUI
 			Deactivate();
 		}
 		
+		if (IsScoped())
+		{
+			Deactivate();
+		}
+		
 		// Do nothing if not active
 		if (!isActive)
 		{
 			mouse.self.Flags() |= AF_HIDDEN;
 			return;
 		}
-
+		
 		lastPlayerHealth = owner.Health();
 		mouse.self.Flags() &= ~AF_HIDDEN;
 		

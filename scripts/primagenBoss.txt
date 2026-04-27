@@ -1,0 +1,2910 @@
+//
+// Copyright(C) 2014-2015 Samuel Villarreal
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either version 2
+// of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// DESCRIPTION:
+//      Primagen Boss behavior logic
+//
+
+//-----------------------------------------------------------------------------
+//
+// Vars
+//
+//-----------------------------------------------------------------------------
+
+#define PRIMAGEN_TURN_SPEED         Math::Deg2Rad(15)      // Speed at which primagen turns
+#define PRIMAGEN_CLOSEST_DIST       (45*GAME_SCALE)
+
+// maximum velocity of the primagen during flying
+#define MAX_VEL                     (500)
+
+// the primagen's acceleration during flying
+#define MAX_ACCEL                   (100)
+
+#define DRONE_ID                    (7602)
+
+// how long the primagen will idle at the controls before looking like is actually doing something
+#define CONTROL_LOW_IDLE_TIME       (0.5f)
+#define CONTROL_HIGH_IDLE_TIME      (4.0f)
+
+// how close turok needs to be before a crab claw will do damage
+#define SMALL_CLAW_DIST             (40*GAME_SCALE)
+#define BIG_CLAW_DIST               (70*GAME_SCALE)
+
+//
+// kaiser's note: its so easy to hit things in Turok 2 EX now that we have proper mouse aim. Going to
+// expirement and give the Primagen a bit more health and see how this fares out.
+//
+#if 0 // original health values
+#define TENDRIL_HEALTH              (20)
+#define BIGCLAW_HEALTH              (80)
+#define SMALLCLAW_HEALTH            (50)
+#define BODY_HEALTH                 (200)
+#else // turok2 ex health values
+#define TENDRIL_HEALTH              (40)
+#define BIGCLAW_HEALTH              (150)
+#define SMALLCLAW_HEALTH            (100)
+#define BODY_HEALTH                 (400)
+#endif
+
+// the damage done to turok by the primagen's claws
+#define BIG_CLAW_DAMAGE             (8)
+#define SMALL_CLAW_DAMAGE           (4)
+
+// how much damage in how much time must be done to the primagen in order to stop
+// it from regenerating a limb, and how many drones are released when the primagen
+// tries to regen during stage 2
+#define REGEN_DAMAGE                75
+#define REGEN_TIME                  (6)
+#define NUM_DRONES_REGEN            (5)
+
+// the maximum number of enemies and the delay between creation of a new enemy
+#define MAX_ENEMIES                 (8)
+
+// how long the doors will stay open after releasing the drones
+#define DRONE_TIME                  (8)
+
+// drone entry point 1
+#define DRONE1X                     (163*GAME_SCALE)
+#define DRONE1Y                     (275*GAME_SCALE)
+#define DRONE1Z                     (104*GAME_SCALE)
+
+// drone entry point 2
+#define DRONE2X                     (-166*GAME_SCALE)
+#define DRONE2Y                     (281*GAME_SCALE)
+#define DRONE2Z                     (104*GAME_SCALE)
+
+#define FLY_HEIGHT                  (90.0*GAME_SCALE)
+
+// how much the flap attack blows turok away from the primagen
+#define FLAP_MAG                    (7 * 10 * GAME_SCALE)
+
+// how long to delay before applying the flap force
+#define FLAP_DELAY                  (1.0f)
+
+// ho long to apply the flap force
+#define FLAP_FORCE_DURATION         (0.75f)
+
+// the region where turok starts out. used to decide if turok has gone onto a ramp
+#define ARENA_REGION                (0)
+
+// the location of the primagen's control panel
+#define CONTROL_X                   (34.3f)
+#define CONTROL_Y                   (-2923.48f)
+#define CONTROL_Z                   (511.553f)
+
+// this is the primagen's acceleration vector when it jumps away from the control panel
+#define CONTROL_JUMP_X_ACCEL        (8.0f)
+#define CONTROL_JUMP_Y_ACCEL        (8.0f)
+#define CONTROL_JUMP_Z_ACCEL        (0.0001f)
+
+// the z acceleration of the primagen when it jumps into the air
+#define JUMP_Z_ACCEL                (7*GAME_SCALE)
+
+// how long to delay before accelerating into the jump
+#define JUMP_DELAY                  (1.25f)
+
+// joints of the limbs that will be blown off.  used for special fx.
+#define PRIMAGEN_BIGCLAW_JOINT      108
+#define PRIMAGEN_SMALLCLAW_JOINT    104
+#define PRIMAGEN_OLTENDRIL_JOINT    51
+#define PRIMAGEN_ORTENDRIL_JOINT    41
+#define PRIMAGEN_ILTENDRIL_JOINT    28
+#define PRIMAGEN_IRTENDRIL_JOINT    46
+
+#define MOVEMENT_TUROK              1    // move to turok
+#define MOVEMENT_LOC                3    // move to a certain point
+
+
+enum PrimagenAttacks_e
+{
+    PRIMAGEN_ATTACK_SWIPESLOW = 0,
+    PRIMAGEN_ATTACK_PSYCHICTRHOW,
+    PRIMAGEN_ATTACK_TELEPATHIC,
+    PRIMAGEN_ATTACK_FLAP,
+    PRIMAGEN_ATTACK_THROWFIRE,
+    PRIMAGEN_ATTACK_SWIPEFAST,
+    PRIMAGEN_ATTACK_LASER,
+    PRIMAGEN_ATTACK_SWOOP,
+    NUM_PRIMAGEN_ATTACKS
+};
+
+enum PrimagenStates
+{
+    STATE_RAGECONTROLS = 0,
+    STATE_CONTROLS,
+    STATE_GROUNDATTACK,
+    STATE_BACKTOCOM,
+    STATE_FLYATTACK,
+    STATE_IDLECONTROLS,
+    STATE_IDLEGROUNDATTACK,
+    STATE_JUMPTOCOM,
+    STATE_JUMPTOGROUND,
+    STATE_JUMPAWAY,
+    STATE_IDLENOTUROK,
+    STATE_CENTER
+};
+
+enum PrimagenModels
+{
+    PRIMAGEN_MODEL_PART_BIGCLAW = 0,
+    PRIMAGEN_MODEL_PART_HEAD,
+    PRIMAGEN_MODEL_PART_SMALLCLAW,
+    PRIMAGEN_MODEL_PART_LEFTTENDRIL,
+    PRIMAGEN_MODEL_PART_MIDLEFTTENDRIL,
+    PRIMAGEN_MODEL_PART_MIDRIGHTTENDRIL,
+    PRIMAGEN_MODEL_PART_RIGHTTENDRIL,
+    PRIMAGEN_MODEL_PART_BODY,
+    PRIMAGEN_MODEL_PARTS
+};
+
+#define PRIMAGEN_EXTREME_HEAD_MODEL_PART PRIMAGEN_MODEL_PARTS
+
+//-----------------------------------------------------------------------------
+//
+// Modes
+//
+//-----------------------------------------------------------------------------
+
+// modes 0 - 55 are already reserved by the enemy ai component
+enum primagenModes
+{
+    PRIMAGEN_MODE_SETUP = 1000,
+    PRIMAGEN_MODE_IDLE,
+    PRIMAGEN_MODE_RECHARGE,
+    PRIMAGEN_MODE_IDLE3,
+    PRIMAGEN_MODE_IDLE4,
+    PRIMAGEN_MODE_CONTROLS,
+    PRIMAGEN_MODE_RAGECONTROLS,
+    PRIMAGEN_MODE_RUN,
+    PRIMAGEN_MODE_HOP,
+    PRIMAGEN_MODE_ATTACK,
+    PRIMAGEN_MODE_PSIATTACK1,
+    PRIMAGEN_MODE_PSIATTACK2,
+    PRIMAGEN_MODE_EVADE_LEFT,
+    PRIMAGEN_MODE_EVADE_RIGHT,
+    PRIMAGEN_MODE_REACTION_EXPLOSION,
+    PRIMAGEN_MODE_DEATH,
+    PRIMAGEN_MODE_RAGE,
+    PRIMAGEN_MODE_DEATH_HEAD_BLOWN_OFF,
+    PRIMAGEN_MODE_TAKEOFF,
+    PRIMAGEN_MODE_FLY,
+    PRIMAGEN_MODE_FLAPATTACK,
+    PRIMAGEN_MODE_FIREATTACK,
+    PRIMAGEN_MODE_LASERATTACK,
+    PRIMAGEN_MODE_LAND,
+    PRIMAGEN_MODE_LANDGROUND,
+    PRIMAGEN_MODE_BLENDFLY,
+    PRIMAGEN_MODE_LANDCOM,
+    PRIMAGEN_MODE_SWOOPATTACK,
+    PRIMAGEN_MODE_INTROCIN,
+    PRIMAGEN_MODE_DEATHCIN,
+    PRIMAGEN_MODE_END
+};
+
+#define DEFINE_PRIMAGEN_MODE(mode, anim, flags) \
+    DefineMode("PrimagenModeTable", mode, "void MODE_Setup"#mode"(void)", "void MODE_Tick"#mode"(void)", CF_CHARACTER, anim, "", 0, 30, 0, flags);
+    
+void InitPrimagenBossModeTable(void)
+{
+    DEFINE_PRIMAGEN_MODE(PRIMAGEN_MODE_SETUP,               ANIM_GROUND_IDLE1,              0);
+    DEFINE_PRIMAGEN_MODE(PRIMAGEN_MODE_IDLE,                ANIM_GROUND_IDLE1,              0);
+    DEFINE_PRIMAGEN_MODE(PRIMAGEN_MODE_RECHARGE,            ANIM_GROUND_IDLE2,              0);
+    DEFINE_PRIMAGEN_MODE(PRIMAGEN_MODE_CONTROLS,            ANIM_GROUND_IDLE5,              MF_HEADTRACK);
+    DEFINE_PRIMAGEN_MODE(PRIMAGEN_MODE_RAGECONTROLS,        ANIM_GROUND_DEFEND_PUFFUP,      MF_HEADTRACK);
+    DEFINE_PRIMAGEN_MODE(PRIMAGEN_MODE_RUN,                 ANIM_GROUND_MOVE1,              MF_HEADTRACK);
+    DEFINE_PRIMAGEN_MODE(PRIMAGEN_MODE_ATTACK,              ANIM_GROUND_ATTACK_COMBAT1,     MF_HEADTRACK);
+    DEFINE_PRIMAGEN_MODE(PRIMAGEN_MODE_PSIATTACK1,          ANIM_GROUND_ATTACK_PROJECTILE1, MF_HEADTRACK);
+    DEFINE_PRIMAGEN_MODE(PRIMAGEN_MODE_PSIATTACK2,          ANIM_GROUND_ATTACK_PROJECTILE2, MF_HEADTRACK);
+    DEFINE_PRIMAGEN_MODE(PRIMAGEN_MODE_REACTION_EXPLOSION,  ANIM_GROUND_REACTION_EXPLOSION, 0);
+    DEFINE_PRIMAGEN_MODE(PRIMAGEN_MODE_DEATH,               ANIM_GROUND_DEATH_NORMAL1,      0);
+    DEFINE_PRIMAGEN_MODE(PRIMAGEN_MODE_RAGE,                ANIM_GROUND_REACTION_SHOCKED,   0);
+    DEFINE_PRIMAGEN_MODE(PRIMAGEN_MODE_TAKEOFF,             ANIM_GROUND_TO_AIR,             0);
+    DEFINE_PRIMAGEN_MODE(PRIMAGEN_MODE_FLY,                 ANIM_AIR_MOVE2,                 0);
+    DEFINE_PRIMAGEN_MODE(PRIMAGEN_MODE_FLAPATTACK,          ANIM_AIR_ATTACK_COMBAT1,        0);
+    DEFINE_PRIMAGEN_MODE(PRIMAGEN_MODE_FIREATTACK,          ANIM_AIR_ATTACK_COMBAT2,        0);
+    DEFINE_PRIMAGEN_MODE(PRIMAGEN_MODE_LASERATTACK,         ANIM_AIR_ATTACK_COMBAT3,        0);
+    DEFINE_PRIMAGEN_MODE(PRIMAGEN_MODE_SWOOPATTACK,         ANIM_AIR_ATTACK_COMBAT4,        0);
+    DEFINE_PRIMAGEN_MODE(PRIMAGEN_MODE_LAND,                ANIM_GROUND_JUMP2,              0);
+    DEFINE_PRIMAGEN_MODE(PRIMAGEN_MODE_LANDGROUND,          ANIM_GROUND_JUMP2,              0);
+    DEFINE_PRIMAGEN_MODE(PRIMAGEN_MODE_BLENDFLY,            ANIM_AIR_MOVE3,                 0);
+    DEFINE_PRIMAGEN_MODE(PRIMAGEN_MODE_LANDCOM,             ANIM_GROUND_JUMP3,              0);
+    DEFINE_PRIMAGEN_MODE(PRIMAGEN_MODE_INTROCIN,            0,                              0);
+    DEFINE_PRIMAGEN_MODE(PRIMAGEN_MODE_DEATHCIN,            0,                              0);
+}
+
+#undef DEFINE_PRIMAGEN_MODE
+
+#define PRIMAGEN_MODE_FUNCTION(mode, Setup, Tick) \
+    void MODE_Setup##mode(void) \
+    Setup   \
+    void MODE_Tick##mode(void)  \
+    Tick
+
+//-----------------------------------------------------------------------------
+//
+// Structs
+//
+//-----------------------------------------------------------------------------
+
+final class CPrimagenActionSeg
+{
+    int8 actionID;
+    int c1;
+    float fAnimSpeed;
+    float percChance;
+    float fDelay;
+    
+    CPrimagenActionSeg(const int8 _actionID, const int _c1, const float _fAnimSpeed, const float _percChance, const float _fDelay)
+    {
+        actionID = _actionID;
+        c1 = _c1;
+        fAnimSpeed = _fAnimSpeed;
+        percChance = _percChance;
+        fDelay = _fDelay;
+    }
+};
+
+final class CPrimagenControlScr
+{
+    int8 type;
+    int num;
+    int delayParm;
+    float fDelayBetweenRelease;
+    float percChance;
+    int waitParm;
+    float fDelay;
+    
+    CPrimagenControlScr(const int8 _type, const int _num, const int _delayParm, const float _fDelayBetweenRelease,
+                        const float _percChance, const int _waitParm, const float _fDelay)
+    {
+        type = _type;
+        num = _num;
+        delayParm = _delayParm;
+        fDelayBetweenRelease = _fDelayBetweenRelease;
+        percChance = _percChance;
+        waitParm = _waitParm;
+        fDelay = _fDelay;
+    }
+};
+
+final class CPrimagenSoundScr
+{
+    int8 type;
+    const array<int>@ pSounds;
+    const array<CPrimagenSoundScr@>@ pSoundScr;
+    int percChance;
+    float fBaseDelay;
+    float fDelayVariation;
+    
+    CPrimagenSoundScr(const int8 _type, const array<int>@ _pSounds, const array<CPrimagenSoundScr@>@ _pSoundScr,
+                      const int _percChance, const float _fBaseDelay, const float _fDelayVariation)
+    {
+        type = _type;
+        @pSounds = _pSounds;
+        @pSoundScr = _pSoundScr;
+        percChance = _percChance;
+        fBaseDelay = _fBaseDelay;
+        fDelayVariation = _fDelayVariation;
+    }
+};
+
+final class CPrimagenAttackInfo
+{
+    int attackMode;
+    float fMinDist;
+    float fMaxDist;
+    int attackArea;
+    
+    CPrimagenAttackInfo(const int _attackMode, const float _fMinDist, const float _fMaxDist, const int _attackArea)
+    {
+        attackMode = _attackMode;
+        fMinDist = _fMinDist;
+        fMaxDist = _fMaxDist;
+        attackArea = _attackArea;
+    }
+};
+
+//-----------------------------------------------------------------------------
+//
+// Attack Info
+//
+//-----------------------------------------------------------------------------
+
+#define ON_GROUND                   1
+#define IN_AIR                      2
+
+const array<CPrimagenAttackInfo@> g_cPrimagenAttacks =
+{
+    @CPrimagenAttackInfo(PRIMAGEN_MODE_ATTACK, 0, 45, ON_GROUND),           // PRIMAGEN_ATTACK_SWIPESLOW
+    @CPrimagenAttackInfo(PRIMAGEN_MODE_PSIATTACK1, 0, 400, ON_GROUND),      // PRIMAGEN_ATTACK_PSYCHICTRHOW
+    @CPrimagenAttackInfo(PRIMAGEN_MODE_PSIATTACK2, 0, 400, ON_GROUND),      // PRIMAGEN_ATTACK_TELEPATHIC
+    @CPrimagenAttackInfo(PRIMAGEN_MODE_FLAPATTACK, 0, 55, ON_GROUND),       // PRIMAGEN_ATTACK_FLAP
+    @CPrimagenAttackInfo(PRIMAGEN_MODE_FIREATTACK, 0, 400, IN_AIR),         // PRIMAGEN_ATTACK_THROWFIRE
+    @CPrimagenAttackInfo(PRIMAGEN_MODE_ATTACK, 0, 45, ON_GROUND),           // PRIMAGEN_ATTACK_SWIPEFAST
+    @CPrimagenAttackInfo(PRIMAGEN_MODE_LASERATTACK, 0, 400, IN_AIR),        // PRIMAGEN_ATTACK_LASER
+    @CPrimagenAttackInfo(PRIMAGEN_MODE_SWOOPATTACK, 0, 400, IN_AIR)         // PRIMAGEN_ATTACK_SWOOP
+};
+
+//-----------------------------------------------------------------------------
+//
+// Flight Patterns
+//
+//-----------------------------------------------------------------------------
+
+const array<kVec3> g_vPrimagenFlightPattern1 =
+{
+    kVec3(-100 * GAME_SCALE, -52 * GAME_SCALE,  77  * GAME_SCALE),
+    kVec3( 0   * GAME_SCALE,  80 * GAME_SCALE,  77  * GAME_SCALE),
+    kVec3( 100 * GAME_SCALE,  52 * GAME_SCALE,  77  * GAME_SCALE),
+    kVec3( 0   * GAME_SCALE,  0  * GAME_SCALE, -100 * GAME_SCALE)
+};
+
+const array<kVec3> g_vPrimagenFlightPattern2 =
+{
+    kVec3(-90 * GAME_SCALE,  60 * GAME_SCALE,  77  * GAME_SCALE),
+    kVec3( 90 * GAME_SCALE,  60 * GAME_SCALE,  77  * GAME_SCALE),
+    kVec3(-90 * GAME_SCALE,  0  * GAME_SCALE,  77  * GAME_SCALE),
+    kVec3( 0  * GAME_SCALE,  0  * GAME_SCALE, -100 * GAME_SCALE)
+};
+
+const array<kVec3> g_vPrimagenFlightPattern3 =
+{
+    kVec3( 0  * GAME_SCALE,  0  * GAME_SCALE, -100 * GAME_SCALE)
+};
+
+const array<const array<kVec3>@> g_vPrimagenFlightPatterns =
+{
+    @g_vPrimagenFlightPattern1,
+    @g_vPrimagenFlightPattern2,
+    @g_vPrimagenFlightPattern3
+};
+
+//-----------------------------------------------------------------------------
+//
+// Attack Patterns
+//
+//-----------------------------------------------------------------------------
+
+#define PRIMAGEN_JUMP_ACTION                (2)
+#define PRIMAGEN_ATTACK_ACTION              (3)
+#define PRIMAGEN_FLY_ACTION                 (4)
+#define PRIMAGEN_GROUND_ACTION              (5)
+#define PRIMAGEN_END_ACTION                 (6)
+
+#define JUMP_FORWARD                        (1)
+#define JUMP_RANDOM                         (2)
+#define JUMP_BACK                           (3)
+
+#define GROUND_SEG                          (1)
+#define FLY_SEG                             (2)
+
+#define cPrimagenActionSegList_t            array<CPrimagenActionSeg@>
+
+//stage 1 attack pattern
+const cPrimagenActionSegList_t g_cPrimagenAttackPat11 =
+{
+    @CPrimagenActionSeg(PRIMAGEN_ATTACK_ACTION,    PRIMAGEN_ATTACK_SWIPESLOW,       1.0f,   100,    0.0f),
+    @CPrimagenActionSeg(PRIMAGEN_JUMP_ACTION,      JUMP_FORWARD,                    1.0f,   50,     0.0f),
+    @CPrimagenActionSeg(PRIMAGEN_ATTACK_ACTION,    PRIMAGEN_ATTACK_SWIPESLOW,       1.0f,   100,    0.0f),
+    @CPrimagenActionSeg(PRIMAGEN_JUMP_ACTION,      JUMP_FORWARD,                    1.0f,   75,     0.0f),
+    @CPrimagenActionSeg(PRIMAGEN_ATTACK_ACTION,    PRIMAGEN_ATTACK_SWIPESLOW,       1.0f,   100,    0.0f),
+    @CPrimagenActionSeg(PRIMAGEN_JUMP_ACTION,      JUMP_FORWARD,                    1.0f,   100,    0.0f),
+    @CPrimagenActionSeg(PRIMAGEN_END_ACTION,       0,                               1.0f,   100,    0.0f),
+};
+const cPrimagenActionSegList_t g_cPrimagenAttackPat12 =
+{
+    @CPrimagenActionSeg(PRIMAGEN_ATTACK_ACTION,    PRIMAGEN_ATTACK_THROWFIRE,       1.0f,   100,    0.5f),
+    @CPrimagenActionSeg(PRIMAGEN_ATTACK_ACTION,    PRIMAGEN_ATTACK_THROWFIRE,       1.0f,   100,    0.5f),
+    @CPrimagenActionSeg(PRIMAGEN_ATTACK_ACTION,    PRIMAGEN_ATTACK_THROWFIRE,       1.0f,   100,    4.0f),
+    @CPrimagenActionSeg(PRIMAGEN_END_ACTION,       0,                               1.0f,   100,    0.0f),
+};
+
+//stage 2 attack pattern
+const cPrimagenActionSegList_t g_cPrimagenAttackPat21 =
+{
+    @CPrimagenActionSeg(PRIMAGEN_ATTACK_ACTION,    PRIMAGEN_ATTACK_SWIPEFAST,       1.5f,   100,    0.0f),
+    @CPrimagenActionSeg(PRIMAGEN_ATTACK_ACTION,    PRIMAGEN_ATTACK_SWIPEFAST,       1.5f,   100,    0.0f),
+    @CPrimagenActionSeg(PRIMAGEN_JUMP_ACTION,      JUMP_BACK,                       1.0f,   100,    0.0f),
+    @CPrimagenActionSeg(PRIMAGEN_ATTACK_ACTION,    PRIMAGEN_ATTACK_PSYCHICTRHOW,    1.0f,   100,    0.0f),
+    @CPrimagenActionSeg(PRIMAGEN_ATTACK_ACTION,    PRIMAGEN_ATTACK_PSYCHICTRHOW,    1.0f,   100,    0.0f),
+    @CPrimagenActionSeg(PRIMAGEN_ATTACK_ACTION,    PRIMAGEN_ATTACK_PSYCHICTRHOW,    1.0f,   50,     0.0f),
+    @CPrimagenActionSeg(PRIMAGEN_FLY_ACTION,       0,                               1.0f,   35,     0.0f),
+    @CPrimagenActionSeg(PRIMAGEN_JUMP_ACTION,      JUMP_FORWARD,                    1.0f,   40,     0.0f),
+    @CPrimagenActionSeg(PRIMAGEN_END_ACTION,       0,                               1.0f,   100,    0.0f),
+};
+const cPrimagenActionSegList_t g_cPrimagenAttackPat22 =
+{
+    @CPrimagenActionSeg(PRIMAGEN_ATTACK_ACTION,    PRIMAGEN_ATTACK_SWOOP,           1.0f,   75,     5.0f),
+    @CPrimagenActionSeg(PRIMAGEN_ATTACK_ACTION,    PRIMAGEN_ATTACK_THROWFIRE,       1.0f,   100,    0.0f),
+    @CPrimagenActionSeg(PRIMAGEN_ATTACK_ACTION,    PRIMAGEN_ATTACK_THROWFIRE,       1.0f,   100,    0.0f),
+    @CPrimagenActionSeg(PRIMAGEN_ATTACK_ACTION,    PRIMAGEN_ATTACK_THROWFIRE,       1.0f,   100,    0.5f),
+    @CPrimagenActionSeg(PRIMAGEN_ATTACK_ACTION,    PRIMAGEN_ATTACK_THROWFIRE,       1.0f,   100,    0.5f),
+    @CPrimagenActionSeg(PRIMAGEN_ATTACK_ACTION,    PRIMAGEN_ATTACK_THROWFIRE,       1.0f,   100,    1.0f),
+    @CPrimagenActionSeg(PRIMAGEN_GROUND_ACTION,    0,                               1.0f,   60,     0.0f),
+    @CPrimagenActionSeg(PRIMAGEN_END_ACTION,       0,                               1.0f,   100,    0.0f),
+};
+
+//stage 3 attack pattern
+const cPrimagenActionSegList_t g_cPrimagenAttackPat31 =
+{
+    @CPrimagenActionSeg(PRIMAGEN_ATTACK_ACTION,    PRIMAGEN_ATTACK_FLAP,            1.0f,   100,    0.0f),
+    // start of kaiser's pattern
+    @CPrimagenActionSeg(PRIMAGEN_ATTACK_ACTION,    PRIMAGEN_ATTACK_SWIPEFAST,       1.5f,   50,     0.0f),
+    @CPrimagenActionSeg(PRIMAGEN_ATTACK_ACTION,    PRIMAGEN_ATTACK_SWIPEFAST,       1.5f,   50,     0.0f),
+    // end of kaiser's pattern
+    @CPrimagenActionSeg(PRIMAGEN_ATTACK_ACTION,    PRIMAGEN_ATTACK_FLAP,            1.0f,   100,    0.0f),
+    @CPrimagenActionSeg(PRIMAGEN_JUMP_ACTION,      JUMP_RANDOM,                     1.0f,   100,    0.0f),
+    @CPrimagenActionSeg(PRIMAGEN_ATTACK_ACTION,    PRIMAGEN_ATTACK_PSYCHICTRHOW,    1.3f,   100,    0.0f),
+    @CPrimagenActionSeg(PRIMAGEN_ATTACK_ACTION,    PRIMAGEN_ATTACK_PSYCHICTRHOW,    1.3f,   100,    0.0f),
+    @CPrimagenActionSeg(PRIMAGEN_ATTACK_ACTION,    PRIMAGEN_ATTACK_PSYCHICTRHOW,    1.3f,   100,    0.0f),
+    @CPrimagenActionSeg(PRIMAGEN_ATTACK_ACTION,    PRIMAGEN_ATTACK_PSYCHICTRHOW,    1.3f,   40,     0.0f),
+    @CPrimagenActionSeg(PRIMAGEN_FLY_ACTION,       0,                               1.0f,   75,     0.0f),
+    @CPrimagenActionSeg(PRIMAGEN_JUMP_ACTION,      JUMP_FORWARD,                    1.0f,   100,    0.0f),
+    @CPrimagenActionSeg(PRIMAGEN_END_ACTION,       0,                               1.0f,   100,    0.0f),
+};
+const cPrimagenActionSegList_t g_cPrimagenAttackPat32 =
+{
+    @CPrimagenActionSeg(PRIMAGEN_ATTACK_ACTION,    PRIMAGEN_ATTACK_SWOOP,           1.0f,   100,    3.0f),
+    @CPrimagenActionSeg(PRIMAGEN_ATTACK_ACTION,    PRIMAGEN_ATTACK_THROWFIRE,       1.25f,  100,    0.0f),
+    @CPrimagenActionSeg(PRIMAGEN_ATTACK_ACTION,    PRIMAGEN_ATTACK_THROWFIRE,       1.25f,  100,    0.0f),
+    @CPrimagenActionSeg(PRIMAGEN_ATTACK_ACTION,    PRIMAGEN_ATTACK_SWOOP,           1.0f,   100,    3.0f),
+    @CPrimagenActionSeg(PRIMAGEN_ATTACK_ACTION,    PRIMAGEN_ATTACK_THROWFIRE,       1.25f,  100,    0.0f),
+    @CPrimagenActionSeg(PRIMAGEN_ATTACK_ACTION,    PRIMAGEN_ATTACK_LASER,           1.0f,   100,    0.5f),
+    @CPrimagenActionSeg(PRIMAGEN_ATTACK_ACTION,    PRIMAGEN_ATTACK_THROWFIRE,       1.25f,  100,    4.0f),
+    @CPrimagenActionSeg(PRIMAGEN_GROUND_ACTION,    0,                               1.0f,   50,     0.0f),
+    @CPrimagenActionSeg(PRIMAGEN_END_ACTION,       0,                               1.0f,   100,    0.0f),
+};
+
+//-----------------------------------------------------------------------------
+//
+// Control Panel Scripts
+//
+//-----------------------------------------------------------------------------
+
+#define PRIMAGEN_DROPDRONES_CONTSCR     (1)
+#define PRIMAGEN_DROPBOMBS_CONTSCR      (2)
+#define PRIMAGEN_DROPRAND_CONTSCR       (3)
+#define PRIMAGEN_DELAY_CONTSCR          (5)
+#define PRIMAGEN_END_CONTSCR            (4)
+
+#define WAIT_UNTIL_DEAD                 (1)
+#define WAIT_RAND                       (2)
+#define WAIT_CONST                      (3)
+#define WAIT_RAND1                      (4)
+#define WAIT_RAND2                      (5)
+#define WAIT_RAND3                      (6)
+#define WAIT_RAND4                      (7)
+
+#define STAGE1SCR                       (1)
+#define STAGE2SCR                       (2)
+#define STAGE3SCR                       (3)
+#define ONEDRONE                        (4)
+#define TWODRONES                       (5)
+
+#define cPrimagenControlScrList_t       array<CPrimagenControlScr@>
+
+const cPrimagenControlScrList_t g_cPrimagenControlScr1 =
+{
+    @CPrimagenControlScr(PRIMAGEN_DELAY_CONTSCR,        0,  0,              0,      100,    0,                  (10.0f)),
+    @CPrimagenControlScr(PRIMAGEN_DROPBOMBS_CONTSCR,    3,  WAIT_RAND2,     (8.0f), 100,    0,                  (10.0f)),
+    @CPrimagenControlScr(PRIMAGEN_DROPDRONES_CONTSCR,   4,  WAIT_CONST,     (0.5f), 100,    WAIT_UNTIL_DEAD,    (8.0f)),
+    @CPrimagenControlScr(PRIMAGEN_END_CONTSCR,          0,  0,              0,      100,    0,                  (0.0f)),
+};
+
+const cPrimagenControlScrList_t g_cPrimagenControlScr2 =
+{
+    @CPrimagenControlScr(PRIMAGEN_DROPBOMBS_CONTSCR,    2,  WAIT_RAND2,     (6.0f), 100,    0,                  (8.0f)),
+    @CPrimagenControlScr(PRIMAGEN_DROPDRONES_CONTSCR,   4,  WAIT_CONST,     (0.5f), 100,    WAIT_UNTIL_DEAD,    (8.0f)),
+    @CPrimagenControlScr(PRIMAGEN_DROPBOMBS_CONTSCR,    1,  WAIT_RAND2,     (6.0f), 50,     0,                  (5.0f)),
+    @CPrimagenControlScr(PRIMAGEN_DROPBOMBS_CONTSCR,    1,  WAIT_RAND2,     (6.0f), 50,     0,                  (5.0f)),
+    @CPrimagenControlScr(PRIMAGEN_DROPBOMBS_CONTSCR,    1,  WAIT_RAND2,     (6.0f), 50,     0,                  (6.0f)),
+    @CPrimagenControlScr(PRIMAGEN_END_CONTSCR,          0,  0,              0,      100,    0,                  (0.0f)),
+};
+
+const cPrimagenControlScrList_t g_cPrimagenControlScr3 =
+{
+    @CPrimagenControlScr(PRIMAGEN_DROPBOMBS_CONTSCR,    3,  WAIT_RAND2,     (5.0f), 100,    0,                  (6.0f)),
+    @CPrimagenControlScr(PRIMAGEN_DROPDRONES_CONTSCR,   4,  WAIT_CONST,     (0.5f), 100,    WAIT_UNTIL_DEAD,    (6.0f)),
+    @CPrimagenControlScr(PRIMAGEN_DROPBOMBS_CONTSCR,    3,  WAIT_RAND2,     (5.0f), 100,    0,                  (6.0f)),
+    @CPrimagenControlScr(PRIMAGEN_DROPDRONES_CONTSCR,   4,  WAIT_CONST,     (0.5f), 100,    WAIT_UNTIL_DEAD,    (6.0f)),
+    @CPrimagenControlScr(PRIMAGEN_END_CONTSCR,          0,  0,              0,      100,    0,                  (0.0f)),
+};
+
+const cPrimagenControlScrList_t g_cPrimagenOneDrone =
+{
+    @CPrimagenControlScr(PRIMAGEN_DROPDRONES_CONTSCR,   1,  WAIT_CONST,     (0.5f), 100,    0,                  (6.0f)),
+    @CPrimagenControlScr(PRIMAGEN_END_CONTSCR,          0,  0,              0,      100,    0,                  (0.0f)),
+};
+
+const cPrimagenControlScrList_t g_cPrimagenTwoDrones =
+{
+    @CPrimagenControlScr(PRIMAGEN_DROPDRONES_CONTSCR,   2,  WAIT_CONST,     (0.5f), 100,    0,                  (6.0f)),
+    @CPrimagenControlScr(PRIMAGEN_END_CONTSCR,          0,  0,              0,      100,    0,                  (0.0f)),
+};
+
+//-----------------------------------------------------------------------------
+//
+// Voices/Taunts
+//
+//-----------------------------------------------------------------------------
+
+#define LAUGHSOUNDS                 1
+#define TAUNTSOUNDS                 2
+#define INTROSOUNDS                 3
+#define REGENSOUNDS                 4
+
+#define PRIMAGEN_SFX_PLAY           1
+#define PRIMAGEN_SFX_PLAYLIST       2
+#define PRIMAGEN_SFX_SETSCR         3
+#define PRIMAGEN_SFX_END            4
+#define PRIMAGEN_SFX_DELAY          5
+#define PRIMAGEN_SFX_JUMP           6
+
+#define cPrimagenSoundScrList_t     array<CPrimagenSoundScr@>
+
+const array<int> g_primagenLaughSoundsList =
+{
+    kSfx_Primagen_Laugh1, 10,
+    kSfx_Primagen_Laugh2, 10,
+    kSfx_Primagen_Laugh3, 10,
+    kSfx_Primagen_Laugh4, 10,
+    -1, -1
+};
+
+const array<int> g_primagenTauntSoundsList =
+{
+    kSfx_Primagen_Taunt1, 10,
+    kSfx_Primagen_Taunt2, 10,
+    kSfx_Primagen_Taunt3, 10,
+    kSfx_Primagen_Taunt4, 10,
+    kSfx_Primagen_Taunt5, 10,
+    kSfx_Primagen_Taunt6, 10,
+    kSfx_Primagen_Taunt7, 10,
+    kSfx_Primagen_Taunt8, 10,
+    -1, -1
+};
+
+const array<int> g_primagenIntroSoundsList =
+{
+    kSfx_Primagen_Intro1, 10,
+    kSfx_Primagen_Intro2, 10,
+    -1, -1
+};
+
+const array<int> g_primagenAngrySoundsList =
+{
+    kSfx_Primagen_Angry1, 10,
+    kSfx_Primagen_Angry2, 10,
+    -1, -1
+};
+
+const cPrimagenSoundScrList_t g_cPrimagenTauntSounds =
+{
+    @CPrimagenSoundScr(PRIMAGEN_SFX_PLAYLIST,   @g_primagenTauntSoundsList, null,   100,    (15),   10),
+    @CPrimagenSoundScr(PRIMAGEN_SFX_JUMP,       null,                       null,   0,      (0),    0),
+    @CPrimagenSoundScr(PRIMAGEN_SFX_END,        null,                       null,   0,      (0),    0)
+};
+
+const cPrimagenSoundScrList_t g_cPrimagenLaughSounds =
+{
+    @CPrimagenSoundScr(PRIMAGEN_SFX_PLAYLIST,   @g_primagenLaughSoundsList, null,   100,    (15),   5),
+    @CPrimagenSoundScr(PRIMAGEN_SFX_SETSCR,     null, @g_cPrimagenTauntSounds,      100,    0,      0),
+    @CPrimagenSoundScr(PRIMAGEN_SFX_END,        null,                       null,   0,      0,      0)
+};
+
+const cPrimagenSoundScrList_t g_cPrimagenIntroSounds =
+{
+    @CPrimagenSoundScr(PRIMAGEN_SFX_DELAY,      null,                       null,   0,      (3),    0),
+    @CPrimagenSoundScr(PRIMAGEN_SFX_PLAYLIST,   @g_primagenIntroSoundsList, null,   100,    (90),   0),
+    @CPrimagenSoundScr(PRIMAGEN_SFX_SETSCR,     null, @g_cPrimagenTauntSounds,      100,    0,      0),
+    @CPrimagenSoundScr(PRIMAGEN_SFX_END,        null,                       null,   0,      0,      0)
+};
+
+const cPrimagenSoundScrList_t g_cPrimagenRegenSounds =
+{
+    @CPrimagenSoundScr(PRIMAGEN_SFX_PLAYLIST,   @g_primagenAngrySoundsList, null,   100,    (15),   5),
+    @CPrimagenSoundScr(PRIMAGEN_SFX_SETSCR,     null, @g_cPrimagenTauntSounds,      100,    0,      0),
+    @CPrimagenSoundScr(PRIMAGEN_SFX_END,        null,                       null,   0,      0,      0)
+};
+
+//-----------------------------------------------------------------------------
+//
+// Pickups
+//
+//-----------------------------------------------------------------------------
+
+const array<int> g_primagenRandomAmmo1 =
+{
+    kActor_Item_AmmoShells, 7,
+    kActor_Item_AmmoExpShells, 7,
+    kActor_Item_AmmoPlasma, 15,
+    kActor_Item_AmmoQuiverTek, 5,
+    kActor_Item_AmmoClip, 5,
+    kActor_Item_Health10, 5,
+    -1, -1
+};
+
+const array<int> g_primagenRandomAmmo2 =
+{
+    kActor_Item_AmmoShells, 7,
+    kActor_Item_AmmoExpShells, 7,
+    kActor_Item_AmmoPlasma, 15,
+    kActor_Item_AmmoQuiverTek, 5,
+    kActor_Item_AmmoClip, 5,
+    kActor_Item_Health10, 15,
+    -1, -1
+};
+
+const array<int> g_primagenRandomHealth1 =
+{
+    kActor_Item_Health10, 5,
+    -1, -1
+};
+
+const array<int> g_primagenRandomHealth2 =
+{
+    kActor_Item_Health10, 9,
+    -1, -1
+};
+
+/*
+==============================================================
+TurokPrimagenBoss
+==============================================================
+*/
+
+class TurokPrimagenBoss : ScriptObject
+{
+    kActor@                             self;
+    kEnemyAIComponent@                  m_pEAIC;
+    kModeStateComponent@                m_pMSC;
+    kAnimTrackComponent@                m_pATC;
+    kMovementComponent@                 m_pMC;
+    int                                 m_currentPattern;
+    int                                 m_currentNode;
+    int                                 m_stage;
+
+    float                               m_currentStageHealth;
+    array<float>                        m_totalStageHealth;
+    float                               m_fAccel;
+    float                               m_fRand1;
+    float                               m_fRand2;
+    int                                 m_notifyCount;
+    int                                 m_waveCount;
+    float                               m_fLastDeltaAngle;
+
+    // drone and bomb vars
+    int                                 m_nEnemyNum;
+    int                                 m_nBombNum;
+    int                                 m_nEnemiesAlive;
+    float                               m_fDroneDoorTimer;
+    int                                 m_nRegion;
+    bool                                m_bDroneDoorOpen;
+    float                               m_fDroneTimer;
+    float                               m_fBombTimer;
+
+    // device vars
+    kActor@                             m_pShieldDev;
+    kActor@                             m_pConsoleDev;
+    kActor@                             m_pLeftDroneDoorDev;
+    kActor@                             m_pRightDroneDoorDev;
+    kActor@                             m_pBombDoorDev;
+
+    // health vars
+    array<float>                        m_modelHealth;
+    array<float>                        m_maxModelHealth;
+    int                                 m_lastModelPartKilled;
+    int                                 m_modelActive;
+
+    // state vars
+    bool                                m_bRaging;
+    bool                                m_bRegenerating;
+    bool                                m_bFlying;
+    int                                 m_movementType;
+    int                                 m_state;
+    int                                 m_changeState;
+    bool                                m_bCanBeDamaged;
+    bool                                m_bWillAttack;
+
+    // some counters
+    float                               m_fCount;
+    float                               m_fTimer;
+    float                               m_fRageDamage;
+    float                               m_fRageTimer;
+    float                               m_fPickupTimer;
+
+    // attack scripts
+    float                               m_fNextSegTimer;
+    const cPrimagenActionSegList_t@     m_pPattern;
+    int                                 m_nSeg;
+    int                                 m_nNextSeg;
+
+    // bomb and drone scripts
+    float                               m_fContNextSegTimer;
+    const cPrimagenControlScrList_t@    m_pControlScr;
+    int                                 m_nContSeg;
+    int                                 m_nContNextSeg;
+    bool                                m_bEvent;
+
+    // sound scripts
+    float                               m_fSoundNextSegTimer;
+    const cPrimagenSoundScrList_t@      m_pSoundScr;
+    int                                 m_nSoundSeg;
+    int                                 m_nSoundNextSeg;
+
+    bool                                m_bGetInfo;
+
+    kVec3                               m_vMoveToPos;
+    kVec3                               m_vControl;
+    kVec3                               m_vJumpDir;
+    
+    array<kActor@>                      m_pPlayers;
+    
+    int                                 m_contType;
+    int                                 m_patType;
+    int                                 m_sndType;
+    
+    TurokPrimagenBoss(kActor@ actor)
+    {
+        @self = actor;
+        self.AddComponent("kexModeStateComponent", true);
+        
+        m_totalStageHealth.resize(3);
+        
+        m_totalStageHealth[0] = 0;
+        m_totalStageHealth[1] = 0;
+        m_totalStageHealth[2] = 0;
+        
+        m_contType = -1;
+        m_patType = -1;
+        m_sndType = -1;
+    }
+    
+    // ------------------------------------------
+    void OnSerialize(kDict& out dict)
+    {
+        SERIALIZE(m_stage);
+        SERIALIZE(m_contType);
+        SERIALIZE(m_patType);
+        SERIALIZE(m_sndType);
+        SERIALIZE(m_currentPattern);
+        SERIALIZE(m_currentNode);
+        SERIALIZE(m_currentStageHealth);
+        SERIALIZE(m_totalStageHealth[0]);
+        SERIALIZE(m_totalStageHealth[1]);
+        SERIALIZE(m_totalStageHealth[2]);
+        SERIALIZE(m_fAccel);
+        SERIALIZE(m_fRand1);
+        SERIALIZE(m_fRand2);
+        SERIALIZE(m_notifyCount);
+        SERIALIZE(m_waveCount);
+        SERIALIZE(m_fLastDeltaAngle);
+        SERIALIZE(m_nEnemyNum);
+        SERIALIZE(m_nBombNum);
+        SERIALIZE(m_nEnemiesAlive);
+        SERIALIZE(m_fDroneDoorTimer);
+        SERIALIZE(m_nRegion);
+        SERIALIZE(m_bDroneDoorOpen);
+        SERIALIZE(m_fDroneTimer);
+        SERIALIZE(m_fBombTimer);
+        SERIALIZE(m_modelHealth[PRIMAGEN_MODEL_PART_LEFTTENDRIL]);
+        SERIALIZE(m_modelHealth[PRIMAGEN_MODEL_PART_MIDLEFTTENDRIL]);
+        SERIALIZE(m_modelHealth[PRIMAGEN_MODEL_PART_RIGHTTENDRIL]);
+        SERIALIZE(m_modelHealth[PRIMAGEN_MODEL_PART_MIDRIGHTTENDRIL]);
+        SERIALIZE(m_modelHealth[PRIMAGEN_MODEL_PART_SMALLCLAW]);
+        SERIALIZE(m_modelHealth[PRIMAGEN_MODEL_PART_BIGCLAW]);
+        SERIALIZE(m_modelHealth[PRIMAGEN_MODEL_PART_HEAD]);
+        SERIALIZE(m_maxModelHealth[PRIMAGEN_MODEL_PART_LEFTTENDRIL]);
+        SERIALIZE(m_maxModelHealth[PRIMAGEN_MODEL_PART_MIDLEFTTENDRIL]);
+        SERIALIZE(m_maxModelHealth[PRIMAGEN_MODEL_PART_RIGHTTENDRIL]);
+        SERIALIZE(m_maxModelHealth[PRIMAGEN_MODEL_PART_MIDRIGHTTENDRIL]);
+        SERIALIZE(m_maxModelHealth[PRIMAGEN_MODEL_PART_SMALLCLAW]);
+        SERIALIZE(m_maxModelHealth[PRIMAGEN_MODEL_PART_BIGCLAW]);
+        SERIALIZE(m_maxModelHealth[PRIMAGEN_MODEL_PART_HEAD]);
+        SERIALIZE(m_lastModelPartKilled);
+        SERIALIZE(m_modelActive);
+        SERIALIZE(m_bRaging);
+        SERIALIZE(m_bRegenerating);
+        SERIALIZE(m_bFlying);
+        SERIALIZE(m_movementType);
+        SERIALIZE(m_state);
+        SERIALIZE(m_changeState);
+        SERIALIZE(m_bCanBeDamaged);
+        SERIALIZE(m_bWillAttack);
+        SERIALIZE(m_fCount);
+        SERIALIZE(m_fTimer);
+        SERIALIZE(m_fRageDamage);
+        SERIALIZE(m_fRageTimer);
+        SERIALIZE(m_fPickupTimer);
+        SERIALIZE(m_fNextSegTimer);
+        SERIALIZE(m_nSeg);
+        SERIALIZE(m_nNextSeg);
+        SERIALIZE(m_fContNextSegTimer);
+        SERIALIZE(m_nContSeg);
+        SERIALIZE(m_nContNextSeg);
+        SERIALIZE(m_bEvent);
+        SERIALIZE(m_fSoundNextSegTimer);
+        SERIALIZE(m_nSoundSeg);
+        SERIALIZE(m_nSoundNextSeg);
+        SERIALIZE(m_bGetInfo);
+        SERIALIZE(m_vMoveToPos.x);
+        SERIALIZE(m_vMoveToPos.y);
+        SERIALIZE(m_vMoveToPos.z);
+        SERIALIZE(m_vControl.x);
+        SERIALIZE(m_vControl.y);
+        SERIALIZE(m_vControl.z);
+        SERIALIZE(m_vJumpDir.x);
+        SERIALIZE(m_vJumpDir.y);
+        SERIALIZE(m_vJumpDir.z);
+    }
+    
+    // ------------------------------------------
+    void OnDeserialize(kDict& in dict)
+    {
+        m_modelHealth.resize(PRIMAGEN_MODEL_PARTS);
+        m_maxModelHealth.resize(PRIMAGEN_MODEL_PARTS);
+        
+        DESERIALIZE_INT(m_stage);
+        DESERIALIZE_INT(m_contType);
+        DESERIALIZE_INT(m_patType);
+        DESERIALIZE_INT(m_sndType);
+        
+        SetContScript(m_contType);
+        SetSeg(m_patType);
+        SoundSetScr(m_sndType);
+        
+        DESERIALIZE_INT(m_currentPattern);
+        DESERIALIZE_INT(m_currentNode);
+        DESERIALIZE_FLOAT(m_currentStageHealth);
+        DESERIALIZE_FLOAT(m_totalStageHealth[0]);
+        DESERIALIZE_FLOAT(m_totalStageHealth[1]);
+        DESERIALIZE_FLOAT(m_totalStageHealth[2]);
+        DESERIALIZE_FLOAT(m_fAccel);
+        DESERIALIZE_FLOAT(m_fRand1);
+        DESERIALIZE_FLOAT(m_fRand2);
+        DESERIALIZE_INT(m_notifyCount);
+        DESERIALIZE_INT(m_waveCount);
+        DESERIALIZE_FLOAT(m_fLastDeltaAngle);
+        DESERIALIZE_INT(m_nEnemyNum);
+        DESERIALIZE_INT(m_nBombNum);
+        DESERIALIZE_INT(m_nEnemiesAlive);
+        DESERIALIZE_FLOAT(m_fDroneDoorTimer);
+        DESERIALIZE_INT(m_nRegion);
+        DESERIALIZE_BOOL(m_bDroneDoorOpen);
+        DESERIALIZE_FLOAT(m_fDroneTimer);
+        DESERIALIZE_FLOAT(m_fBombTimer);
+        DESERIALIZE_FLOAT(m_modelHealth[PRIMAGEN_MODEL_PART_LEFTTENDRIL]);
+        DESERIALIZE_FLOAT(m_modelHealth[PRIMAGEN_MODEL_PART_MIDLEFTTENDRIL]);
+        DESERIALIZE_FLOAT(m_modelHealth[PRIMAGEN_MODEL_PART_RIGHTTENDRIL]);
+        DESERIALIZE_FLOAT(m_modelHealth[PRIMAGEN_MODEL_PART_MIDRIGHTTENDRIL]);
+        DESERIALIZE_FLOAT(m_modelHealth[PRIMAGEN_MODEL_PART_SMALLCLAW]);
+        DESERIALIZE_FLOAT(m_modelHealth[PRIMAGEN_MODEL_PART_BIGCLAW]);
+        DESERIALIZE_FLOAT(m_modelHealth[PRIMAGEN_MODEL_PART_HEAD]);
+        DESERIALIZE_FLOAT(m_maxModelHealth[PRIMAGEN_MODEL_PART_LEFTTENDRIL]);
+        DESERIALIZE_FLOAT(m_maxModelHealth[PRIMAGEN_MODEL_PART_MIDLEFTTENDRIL]);
+        DESERIALIZE_FLOAT(m_maxModelHealth[PRIMAGEN_MODEL_PART_RIGHTTENDRIL]);
+        DESERIALIZE_FLOAT(m_maxModelHealth[PRIMAGEN_MODEL_PART_MIDRIGHTTENDRIL]);
+        DESERIALIZE_FLOAT(m_maxModelHealth[PRIMAGEN_MODEL_PART_SMALLCLAW]);
+        DESERIALIZE_FLOAT(m_maxModelHealth[PRIMAGEN_MODEL_PART_BIGCLAW]);
+        DESERIALIZE_FLOAT(m_maxModelHealth[PRIMAGEN_MODEL_PART_HEAD]);
+        DESERIALIZE_INT(m_lastModelPartKilled);
+        DESERIALIZE_INT(m_modelActive);
+        DESERIALIZE_BOOL(m_bRaging);
+        DESERIALIZE_BOOL(m_bRegenerating);
+        DESERIALIZE_BOOL(m_bFlying);
+        DESERIALIZE_INT(m_movementType);
+        DESERIALIZE_INT(m_state);
+        DESERIALIZE_INT(m_changeState);
+        DESERIALIZE_BOOL(m_bCanBeDamaged);
+        DESERIALIZE_BOOL(m_bWillAttack);
+        DESERIALIZE_FLOAT(m_fCount);
+        DESERIALIZE_FLOAT(m_fTimer);
+        DESERIALIZE_FLOAT(m_fRageDamage);
+        DESERIALIZE_FLOAT(m_fRageTimer);
+        DESERIALIZE_FLOAT(m_fPickupTimer);
+        DESERIALIZE_FLOAT(m_fNextSegTimer);
+        DESERIALIZE_INT(m_nSeg);
+        DESERIALIZE_INT(m_nNextSeg);
+        DESERIALIZE_FLOAT(m_fContNextSegTimer);
+        DESERIALIZE_INT(m_nContSeg);
+        DESERIALIZE_INT(m_nContNextSeg);
+        DESERIALIZE_BOOL(m_bEvent);
+        DESERIALIZE_FLOAT(m_fSoundNextSegTimer);
+        DESERIALIZE_INT(m_nSoundSeg);
+        DESERIALIZE_INT(m_nSoundNextSeg);
+        DESERIALIZE_BOOL(m_bGetInfo);
+        DESERIALIZE_FLOAT(m_vMoveToPos.x);
+        DESERIALIZE_FLOAT(m_vMoveToPos.y);
+        DESERIALIZE_FLOAT(m_vMoveToPos.z);
+        DESERIALIZE_FLOAT(m_vControl.x);
+        DESERIALIZE_FLOAT(m_vControl.y);
+        DESERIALIZE_FLOAT(m_vControl.z);
+        DESERIALIZE_FLOAT(m_vJumpDir.x);
+        DESERIALIZE_FLOAT(m_vJumpDir.y);
+        DESERIALIZE_FLOAT(m_vJumpDir.z);
+        
+        if( m_stage == 1 ||
+            m_stage == 2 ||
+            m_stage == 3)
+        {
+            Hud.SetBar(0, 50, 255, 50, 255, 100);
+        }
+    }
+    
+    //--------------------------------------------------
+    kActor@ GetClosestPlayer(const kVec3&in vOrigin)
+    {
+        float fClosestDist = 1000000.0f;
+        kActor@ pPlayer = null;
+        
+        for(uint i = 0; i < m_pPlayers.length(); ++i)
+        {
+            float fDist = vOrigin.Distance(m_pPlayers[i].Origin());
+            if(fDist < fClosestDist)
+            {
+                fClosestDist = fDist;
+                @pPlayer = @m_pPlayers[i];
+            }
+        }
+        
+        return pPlayer;
+    }
+    
+    //--------------------------------------------------
+    void SetContScript(const int scrType)
+    {
+        m_nContSeg = -1;
+        m_nContNextSeg = -1;
+        m_bEvent = true;
+        
+        m_contType = scrType;
+        
+        switch(scrType)
+        {
+        case STAGE1SCR: @m_pControlScr = g_cPrimagenControlScr1; break;
+        case STAGE2SCR: @m_pControlScr = g_cPrimagenControlScr2; break;
+        case STAGE3SCR: @m_pControlScr = g_cPrimagenControlScr3; break;
+        case ONEDRONE:  @m_pControlScr = g_cPrimagenOneDrone;    break;
+        case TWODRONES: @m_pControlScr = g_cPrimagenTwoDrones;   break;
+        default:
+            break;
+        }
+    }
+    
+    //--------------------------------------------------
+    void GetContSeg(void)
+    {
+        if(m_pControlScr is null)
+        {
+            return;
+        }
+        
+        m_fContNextSegTimer = (m_nContSeg != -1) ? m_pControlScr[m_nContSeg].fDelay : 0;
+        
+        do
+        {
+            m_nContSeg++;
+            if(m_pControlScr[m_nContSeg].type == PRIMAGEN_END_CONTSCR)
+            {
+                m_nContSeg = -1;
+                m_nContNextSeg = -1;
+                m_bEvent = false;
+                @m_pControlScr = null;
+                return;
+            }
+            
+            m_nContNextSeg = m_nContSeg;
+        } while(m_pControlScr[m_nContSeg].percChance <= Math::RandRange(0.0f, 100.0f));
+    }
+    
+    //--------------------------------------------------
+    int ContRunSeg(const float fDist)
+    {
+        // dont do anything until it is time
+        if(m_fContNextSegTimer > 0 || !m_bEvent)
+        {
+            return 0;
+        }
+
+        // no script to run
+        if(m_pControlScr is null)
+        {
+            return 0;
+        }
+
+        switch(m_pControlScr[m_nContNextSeg].type)
+        {
+        case PRIMAGEN_DROPDRONES_CONTSCR:
+            if(m_nEnemiesAlive <= MAX_ENEMIES)
+            {
+                m_nEnemyNum = MIN(m_pControlScr[m_nContNextSeg].num, MAX_ENEMIES - m_nEnemiesAlive);
+            }
+            m_bEvent = false;
+            return 1;
+
+        case PRIMAGEN_DROPBOMBS_CONTSCR:
+            m_nBombNum = m_pControlScr[m_nContNextSeg].num;
+            m_bEvent = false;
+            return 1;
+
+        case PRIMAGEN_DELAY_CONTSCR:
+            m_nContNextSeg = -1;
+            return 1;
+
+        case PRIMAGEN_DROPRAND_CONTSCR:
+            if(Math::RandRange(0, 100) < 50.0f)
+            {
+                if(m_nEnemiesAlive <= MAX_ENEMIES)
+                {
+                    m_nEnemyNum = MIN(m_pControlScr[m_nContNextSeg].num, MAX_ENEMIES - m_nEnemiesAlive);
+                }
+            }
+            else
+            {
+                m_nBombNum = m_pControlScr[m_nContNextSeg].num;
+            }
+            m_bEvent = false;
+            return 1;
+
+        case PRIMAGEN_END_CONTSCR:
+            // should not get here!
+            break;
+        }
+        
+        return 0;
+    }
+    
+    //--------------------------------------------------
+    void SetSeg(const int segType)
+    {
+        m_patType = segType;
+        
+        if(segType == FLY_SEG)
+        {
+            if(m_stage==1) @m_pPattern = g_cPrimagenAttackPat12;
+            if(m_stage==2) @m_pPattern = g_cPrimagenAttackPat22;
+            if(m_stage==3) @m_pPattern = g_cPrimagenAttackPat32;
+        }
+        
+        if(segType == GROUND_SEG)
+        {
+            if(m_stage==1) @m_pPattern = g_cPrimagenAttackPat11;
+            if(m_stage==2) @m_pPattern = g_cPrimagenAttackPat21;
+            if(m_stage==3) @m_pPattern = g_cPrimagenAttackPat31;
+        }
+        
+        m_nSeg = -1;
+        m_nNextSeg = -1;
+    }
+    
+    //--------------------------------------------------
+    void GetSeg(void)
+    {
+        if(m_pPattern is null)
+        {
+            return;
+        }
+        
+        m_fNextSegTimer = (m_nSeg != -1) ? m_pPattern[m_nSeg].fDelay : 0;
+        
+        do
+        {
+            m_nSeg++;
+            if(m_pPattern[m_nSeg].actionID >= PRIMAGEN_END_ACTION)
+            {
+                m_nSeg = 0;
+            }
+            
+            m_nNextSeg = m_nSeg;
+        } while(m_pPattern[m_nSeg].percChance <= Math::RandRange(0.0f, 100.0f));
+        
+        m_pATC.ChangeSpeed(GAME_FRAME_UNIT / m_pPattern[m_nNextSeg].fAnimSpeed);
+    }
+    
+    //--------------------------------------------------
+    int RunSeg(const float fDist)
+    {
+        // dont do anything until it is time
+        if(m_fNextSegTimer > 0)
+        {
+            return 0;
+        }
+
+        switch(m_pPattern[m_nNextSeg].actionID)
+        {
+        case PRIMAGEN_JUMP_ACTION:
+            if(m_pPattern[m_nNextSeg].c1 == JUMP_FORWARD)
+            {
+                m_fRand2 = 2.5f;  // how far to jump
+                m_fRand1 = 0.0f;  // dir
+            }
+
+            if(m_pPattern[m_nNextSeg].c1 == JUMP_RANDOM)
+            {
+                m_fRand1 = Math::RandRange(0, 2);
+                m_fRand2 = Math::RandRange(3, 4.5f);
+            }
+
+            if(m_pPattern[m_nNextSeg].c1 == JUMP_BACK)
+            {
+                m_fRand2 = 4;           // how far to jump
+                m_fRand1 = Math::pi;    // dir
+            }
+            m_changeState = STATE_JUMPAWAY;
+            m_pMSC.SetMode(PRIMAGEN_MODE_TAKEOFF);
+            return 1;
+
+        case PRIMAGEN_ATTACK_ACTION:
+            if( fDist >= g_cPrimagenAttacks[m_pPattern[m_nNextSeg].c1].fMinDist * GAME_SCALE   &&
+                fDist <= g_cPrimagenAttacks[m_pPattern[m_nNextSeg].c1].fMaxDist * GAME_SCALE)
+            {
+                m_pMSC.SetMode(g_cPrimagenAttacks[m_pPattern[m_nNextSeg].c1].attackMode);
+                m_pATC.ChangeSpeed(m_pPattern[m_nNextSeg].fAnimSpeed * GAME_FRAME_UNIT);
+                return 1;
+            }
+            break;
+
+        case PRIMAGEN_FLY_ACTION:
+            SetSeg(FLY_SEG);
+            m_nNextSeg = -1;
+            m_changeState = STATE_FLYATTACK;
+            m_pMSC.SetMode(PRIMAGEN_MODE_TAKEOFF);
+            return 1;
+
+        case PRIMAGEN_GROUND_ACTION:
+            SetSeg(GROUND_SEG);
+            m_nNextSeg = -1;
+            m_changeState = STATE_GROUNDATTACK;
+            m_pMSC.SetMode(PRIMAGEN_MODE_LANDGROUND);
+            return 1;
+
+        case PRIMAGEN_END_ACTION:
+            // should not get here!
+            break;
+        }
+        return 0;
+    }
+    
+    //--------------------------------------------------
+    void SoundGetSeg(void)
+    {
+        // no script then exit
+        if(m_pSoundScr is null)
+        {
+            return;
+        }
+        
+        m_fSoundNextSegTimer = (m_nSoundSeg != -1) ?
+            m_pSoundScr[m_nSoundSeg].fBaseDelay + Math::RandRange(0, m_pSoundScr[m_nSoundSeg].fDelayVariation) :
+            0;
+            
+        do
+        {
+            m_nSoundSeg++;
+            if(m_pSoundScr[m_nSoundSeg].type == PRIMAGEN_SFX_END)
+            {
+                m_nSoundSeg = -1;
+                m_nSoundNextSeg = -1;
+                @m_pSoundScr = null;
+                return;
+            }
+            
+            m_nSoundNextSeg = m_nSoundSeg;
+        } while(m_pSoundScr[m_nSoundSeg].percChance <= Math::RandRange(0.0f, 100.0f));
+    }
+
+    //--------------------------------------------------
+    void SoundSetScr(int scrType)
+    {
+        m_nSoundSeg = -1;
+        m_nSoundNextSeg = -1;
+        
+        m_sndType = scrType;
+        
+        if(scrType == 0)
+        {
+            @m_pSoundScr = null;
+        }
+        if(scrType == LAUGHSOUNDS)
+        {
+            @m_pSoundScr = g_cPrimagenLaughSounds;
+        }
+        if(scrType == REGENSOUNDS)
+        {
+            @m_pSoundScr = g_cPrimagenRegenSounds;
+        }
+        if(scrType == TAUNTSOUNDS)
+        {
+            @m_pSoundScr = g_cPrimagenTauntSounds;
+        }
+        if(scrType == INTROSOUNDS)
+        {
+            @m_pSoundScr = g_cPrimagenIntroSounds;
+        }
+    }
+
+    //--------------------------------------------------
+    int SoundRunSeg(float fDist)
+    {
+        // dont do anything until it is time
+        if(m_fSoundNextSegTimer > 0)
+        {
+            return 0;
+        }
+
+        // no script to run
+        if(m_pSoundScr is null)
+        {
+            return 0;
+        }
+
+        switch(m_pSoundScr[m_nSoundNextSeg].type)
+        {
+        case PRIMAGEN_SFX_PLAY:
+            return 1;
+
+        case PRIMAGEN_SFX_PLAYLIST:
+        {
+            kSelectionListInt cSounds;
+            const array<int>@ pSnd = m_pSoundScr[m_nSoundNextSeg].pSounds;
+            
+            for(uint i = 0; i < pSnd.length() && pSnd[i] != -1; i += 2)
+            {
+                cSounds.AddItem(pSnd[i+0], pSnd[i+1]);
+            }
+            
+            if(cSounds.GetNumEntries() > 0)
+            {
+                int nSound = cSounds.Select(true);
+            
+                if(nSound != -1 )
+                {
+                    self.PlaySound(nSound);
+                }
+            }
+            
+            m_nSoundNextSeg=-1;
+        }
+            return 1;
+
+        case PRIMAGEN_SFX_SETSCR:
+            @m_pSoundScr = m_pSoundScr[m_nSoundNextSeg].pSoundScr;
+            m_nSoundSeg = -1;
+            m_nSoundNextSeg = -1;
+            return 1;
+
+        case PRIMAGEN_SFX_DELAY:
+            m_nSoundNextSeg =- 1;
+            return 1;
+
+        case PRIMAGEN_SFX_JUMP:
+            return 1;
+
+        case PRIMAGEN_SFX_END:
+            break;
+        }
+        return 0;
+    }
+    
+    //--------------------------------------------------
+    void SetupStage(const int nStage)
+    {
+        m_fRageDamage = 0;
+        
+        switch(nStage)
+        {
+        case 1:
+            m_modelActive = (1<<PRIMAGEN_MODEL_PART_LEFTTENDRIL)        |
+                            (1<<PRIMAGEN_MODEL_PART_MIDLEFTTENDRIL)     |
+                            (1<<PRIMAGEN_MODEL_PART_MIDRIGHTTENDRIL)    |
+                            (1<<PRIMAGEN_MODEL_PART_RIGHTTENDRIL);
+                            
+            m_fDroneDoorTimer = 2.0f;
+            
+            m_modelHealth[PRIMAGEN_MODEL_PART_LEFTTENDRIL] = TENDRIL_HEALTH;
+            m_modelHealth[PRIMAGEN_MODEL_PART_MIDLEFTTENDRIL] = TENDRIL_HEALTH;
+            m_modelHealth[PRIMAGEN_MODEL_PART_RIGHTTENDRIL] = TENDRIL_HEALTH;
+            m_modelHealth[PRIMAGEN_MODEL_PART_MIDRIGHTTENDRIL] = TENDRIL_HEALTH;
+            m_modelHealth[PRIMAGEN_MODEL_PART_SMALLCLAW] = SMALLCLAW_HEALTH;
+            m_modelHealth[PRIMAGEN_MODEL_PART_BIGCLAW] = BIGCLAW_HEALTH;
+            m_modelHealth[PRIMAGEN_MODEL_PART_HEAD] = BODY_HEALTH;
+            
+            m_maxModelHealth[PRIMAGEN_MODEL_PART_LEFTTENDRIL] = TENDRIL_HEALTH;
+            m_maxModelHealth[PRIMAGEN_MODEL_PART_MIDLEFTTENDRIL] = TENDRIL_HEALTH;
+            m_maxModelHealth[PRIMAGEN_MODEL_PART_RIGHTTENDRIL] = TENDRIL_HEALTH;
+            m_maxModelHealth[PRIMAGEN_MODEL_PART_MIDRIGHTTENDRIL] = TENDRIL_HEALTH;
+            m_maxModelHealth[PRIMAGEN_MODEL_PART_SMALLCLAW] = SMALLCLAW_HEALTH;
+            m_maxModelHealth[PRIMAGEN_MODEL_PART_BIGCLAW] = BIGCLAW_HEALTH;
+            m_maxModelHealth[PRIMAGEN_MODEL_PART_HEAD] = BODY_HEALTH;
+            
+            m_totalStageHealth[0] = 0;
+            
+            for(int i = 0; i < PRIMAGEN_MODEL_PARTS; ++i)
+            {
+                int modelBit = (1 << i);
+                if((m_modelActive & modelBit) != 0)
+                {
+                    m_totalStageHealth[0] += m_modelHealth[i];
+                }
+            }
+            break;
+        case 2:
+            m_modelActive = (1<<PRIMAGEN_MODEL_PART_SMALLCLAW) |
+                            (1<<PRIMAGEN_MODEL_PART_BIGCLAW);
+                            
+            m_modelHealth[PRIMAGEN_MODEL_PART_SMALLCLAW] = SMALLCLAW_HEALTH;
+            m_modelHealth[PRIMAGEN_MODEL_PART_BIGCLAW] = BIGCLAW_HEALTH;
+            
+            m_maxModelHealth[PRIMAGEN_MODEL_PART_SMALLCLAW] = SMALLCLAW_HEALTH;
+            m_maxModelHealth[PRIMAGEN_MODEL_PART_BIGCLAW] = BIGCLAW_HEALTH;
+            
+            m_totalStageHealth[1] = 0;
+            
+            for(int i = 0; i < PRIMAGEN_MODEL_PARTS; ++i)
+            {
+                int modelBit = (1 << i);
+                if((m_modelActive & modelBit) != 0)
+                {
+                    m_totalStageHealth[1] += m_modelHealth[i];
+                }
+            }
+            break;
+        case 3:
+            m_modelActive = (1<<PRIMAGEN_MODEL_PART_HEAD);
+            m_modelHealth[PRIMAGEN_MODEL_PART_HEAD] = BODY_HEALTH;
+            m_maxModelHealth[PRIMAGEN_MODEL_PART_HEAD] = BODY_HEALTH;
+            m_totalStageHealth[2] = 0;
+            
+            for(int i = 0; i < PRIMAGEN_MODEL_PARTS; ++i)
+            {
+                int modelBit = (1 << i);
+                if((m_modelActive & modelBit) != 0)
+                {
+                    m_totalStageHealth[2] += m_modelHealth[i];
+                }
+            }
+            break;
+        default:
+            break;
+        }
+        
+        m_stage = nStage;
+        m_bRaging = false;
+        m_bRegenerating = false;
+    }
+    
+    //--------------------------------------------------
+    void ProcessBombs(void)
+    {
+        if(m_pControlScr is null)
+        {
+            return;
+        }
+        
+        if(m_nBombNum > 0 && m_fBombTimer <= 0 && m_nContNextSeg != -1)
+        {
+            float fReleaseDelay = m_pControlScr[m_nContNextSeg].fDelayBetweenRelease;
+            int delayParam = m_pControlScr[m_nContNextSeg].delayParm;
+            
+            if(--m_nBombNum <= 0)
+            {
+                m_bEvent = true;
+                m_nContNextSeg = -1;
+            }
+            else
+            {
+                m_fBombTimer = fReleaseDelay;
+                
+                if(delayParam != WAIT_CONST)
+                {
+                    float fDelay = float(delayParam);
+                    
+                    m_fBombTimer -= (fDelay-3) + Math::RandRange(0, (fDelay-3)*2);
+                }
+            }
+            
+            m_pBombDoorDev.ModeStateComponent().SetMode(DOOR_MODE_OPEN);
+        }
+    }
+    
+    //--------------------------------------------------
+    bool SpawnDrone(const float x, const float y, const float z, const bool bSetTimer)
+    {
+        bool bSetDroneTimer = false;
+        
+        if(m_nEnemyNum > 0 && m_nEnemyNum <= MAX_ENEMIES && m_fDroneTimer <= 0)
+        {
+            kActor@ pDrone = ActorFactory.Spawn(
+                kActor_AI_PrimagenDrone,
+                kVec3(x, y, z),
+                0,
+                0,
+                0,
+                true,
+                -1);
+                
+            if(!(pDrone is null))
+            {
+                pDrone.Scale().Set(2, 2, 2);
+                m_nEnemyNum--;
+                
+                if(!(m_pControlScr is null))
+                {
+                    CPrimagenControlScr@ pScr = m_pControlScr[m_nContNextSeg];
+                    if(m_nEnemyNum <= 0 && pScr.waitParm != WAIT_UNTIL_DEAD)
+                    {
+                        m_bEvent = true;
+                        m_nContNextSeg = -1;
+                    }
+                    else
+                    {
+                        bSetDroneTimer = true;
+                    }
+                }
+                
+                if(bSetTimer)
+                {
+                    m_fDroneDoorTimer = DRONE_TIME;
+                }
+            }
+        }
+        
+        return bSetDroneTimer;
+    }
+    
+    //--------------------------------------------------
+    void ProcessDrones(void)
+    {
+        bool bSetDroneTimer = false;
+        kActorIterator cIterator;
+        kActor@ pDude;
+        
+        m_nEnemiesAlive = 0;
+        
+        while(!((@pDude = cIterator.GetNext()) is null))
+        {
+            if(pDude.Health() <= 0 || (pDude.Flags() & AF_DEAD) != 0)
+            {
+                continue;
+            }
+            
+            if(pDude.Type() == kActor_AI_PrimagenDrone)
+            {
+                m_nEnemiesAlive++;
+            }
+        }
+        
+        if(!m_bDroneDoorOpen && m_nEnemyNum > 0)
+        {
+            m_bDroneDoorOpen = true;
+            m_pLeftDroneDoorDev.ModeStateComponent().SetMode(DOOR_MODE_OPEN);
+            m_pRightDroneDoorDev.ModeStateComponent().SetMode(DOOR_MODE_OPEN);
+        }
+        
+        if(m_bDroneDoorOpen && m_nEnemyNum <= 0 && m_fDroneDoorTimer <= 0)
+        {
+            m_bDroneDoorOpen = false;
+            m_pLeftDroneDoorDev.ModeStateComponent().SetMode(DOOR_MODE_CLOSE);
+            m_pRightDroneDoorDev.ModeStateComponent().SetMode(DOOR_MODE_CLOSE);
+        }
+        
+        if(SpawnDrone(DRONE1X, DRONE1Y, DRONE1Z, true)) bSetDroneTimer = true;
+        if(SpawnDrone(DRONE2X, DRONE2Y, DRONE2Z, false)) bSetDroneTimer = true;
+        
+        if(bSetDroneTimer && m_nContNextSeg >= 0)
+        {
+            float fReleaseDelay = m_pControlScr[m_nContNextSeg].fDelayBetweenRelease;
+            int delayParam = m_pControlScr[m_nContNextSeg].delayParm;
+            
+            m_fDroneTimer = fReleaseDelay;
+            
+            if(delayParam != WAIT_CONST)
+            {
+                float fDelay = float(delayParam);
+                m_fDroneTimer -= (fDelay-3) + Math::RandRange(0, (fDelay-3)*2);
+            }
+        }
+    }
+    
+    //--------------------------------------------------
+    void CheckStage(void)
+    {
+        if(!m_bCanBeDamaged)
+        {
+            return;
+        }
+        
+        int modelsLiving = 0;
+        m_currentStageHealth = 0;
+        
+        for(int i = 0; i < PRIMAGEN_MODEL_PARTS; ++i)
+        {
+            int modelBit = (1 << i);
+            if((m_modelActive & modelBit) != 0)
+            {
+                if(m_modelHealth[i] > 0)
+                {
+                    m_currentStageHealth += m_modelHealth[i];
+                    modelsLiving++;
+                }
+            }
+        }
+        
+        if(m_bRegenerating)
+        {
+            return;
+        }
+        
+        if(m_stage == 3 && modelsLiving == 0)
+        {
+            m_pMSC.SetMode(PRIMAGEN_MODE_DEATHCIN);
+            return;
+        }
+        
+        if(modelsLiving == 0 && !m_bRegenerating)
+        {
+            m_stage++;
+            SetupStage(m_stage);
+            
+            Hud.DisableBar(0);
+            
+            if(m_stage > 1)
+            {
+                m_vMoveToPos = m_vControl;
+                m_changeState = STATE_BACKTOCOM;
+                m_state = STATE_BACKTOCOM;
+                m_bCanBeDamaged = false;
+                m_bWillAttack = false;
+            }
+            
+            m_pMSC.SetMode(PRIMAGEN_MODE_TAKEOFF);
+        }
+    }
+    
+    //--------------------------------------------------
+    void Update(void)
+    {
+        const float fDec = (GAME_DELTA_TIME*0.9f);
+        
+        //--------------------------------------------------
+        // update timers
+        m_fDroneTimer           = MAX(m_fDroneTimer - fDec, 0);
+        m_fNextSegTimer         = MAX(m_fNextSegTimer - fDec, 0);
+        m_fContNextSegTimer     = MAX(m_fContNextSegTimer - fDec, 0);
+        m_fSoundNextSegTimer    = MAX(m_fSoundNextSegTimer - fDec, 0);
+        m_fDroneDoorTimer       = MAX(m_fDroneDoorTimer - fDec, 0);
+        m_fTimer                = MAX(m_fTimer - fDec, 0);
+        m_fBombTimer            = MAX(m_fBombTimer - fDec, 0);
+        m_fPickupTimer          = MAX(m_fPickupTimer - fDec, 0);
+        
+        //--------------------------------------------------
+        // update stage
+        CheckStage();
+        
+        //--------------------------------------------------
+        // spawn pickups
+        if(m_fPickupTimer <= 0)
+        {
+            m_fPickupTimer = 20;
+            
+            SpawnRandomPickupInArena(
+                m_stage == 3 ? g_primagenRandomAmmo2 : g_primagenRandomAmmo1,
+                -233*GAME_SCALE,
+                0,
+                0);
+                
+            SpawnRandomPickupInArena(
+                m_stage == 3 ? g_primagenRandomAmmo2 : g_primagenRandomAmmo1,
+                0,
+                204*GAME_SCALE,
+                0);
+                
+            SpawnRandomPickupInArena(
+                m_stage == 3 ? g_primagenRandomHealth2 : g_primagenRandomHealth1,
+                226*GAME_SCALE,
+                0,
+                0);
+                
+            SpawnRandomPickupInArena(
+                g_primagenRandomAmmo1,
+                -45*GAME_SCALE,
+                45*GAME_SCALE,
+                0);
+                
+            SpawnRandomPickupInArena(
+                g_primagenRandomAmmo1,
+                45*GAME_SCALE,
+                45*GAME_SCALE,
+                0);
+                
+            SpawnRandomPickupInArena(
+                g_primagenRandomAmmo1,
+                0,
+                -60*GAME_SCALE,
+                0);
+        }
+    }
+    
+    //--------------------------------------------------
+    void OnSpawn(void)
+    {
+        @m_pEAIC = self.EnemyAIComponent();
+        @m_pMSC = self.ModeStateComponent();
+        @m_pATC = self.AnimTrackComponent();
+        @m_pMC = self.MovementComponent();
+        
+        if(!self.Deserialized())
+        {
+            m_modelHealth.resize(PRIMAGEN_MODEL_PARTS);
+            m_maxModelHealth.resize(PRIMAGEN_MODEL_PARTS);
+        }
+        
+        kActorIterator cIterator;
+        kActor@ pDude;
+        
+        while(!((@pDude = cIterator.GetNext()) is null))
+        {
+            if(pDude.TID() == 50)
+            {
+                @m_pConsoleDev = pDude;
+                pDude.AddComponent("kexModeStateComponent", true);
+            }
+            else if(pDude.TID() == 51)
+            {
+                @m_pShieldDev = pDude;
+                pDude.AddComponent("kexModeStateComponent", true);
+            }
+            else if(pDude.TID() == 52)
+            {
+                pDude.Remove();
+            }
+            else if(pDude.TID() == 53)
+            {
+                @m_pBombDoorDev = pDude;
+                pDude.AddComponent("kexModeStateComponent", true);
+            }
+            else if(pDude.TID() == 54)
+            {
+                @m_pLeftDroneDoorDev = pDude;
+                pDude.AddComponent("kexModeStateComponent", true);
+            }
+            else if(pDude.TID() == 55)
+            {
+                @m_pRightDroneDoorDev = pDude;
+                pDude.AddComponent("kexModeStateComponent", true);
+            }
+            
+            if(pDude.Type() == kActor_Player)
+            {
+                m_pPlayers.insertLast(pDude);
+            }
+        }
+        
+        // seize control of our ai
+        self.EnableComponent("kexEnemyAIComponent", false);
+        self.ModeStateComponent().AssignModeTable("PrimagenModeTable");
+        
+        if(!self.Deserialized())
+        {
+            SetupStage(1);
+            SetContScript(STAGE1SCR);
+            
+            m_changeState = STATE_CONTROLS;   // starts out at the controls
+            m_state = STATE_CONTROLS;         // starts out at the controls
+            m_nEnemyNum = 0;
+            m_nEnemiesAlive = 0;
+            m_bGetInfo = true;
+            m_bDroneDoorOpen = false;
+            m_fAccel = MAX_ACCEL;
+            m_vJumpDir = kVec3(0.5f, -(180*GAME_SCALE), 0.0f);
+            SetSeg(GROUND_SEG);
+            m_fNextSegTimer = 0;
+            m_fContNextSegTimer = 0;
+            m_notifyCount = 0;
+            m_waveCount = 0;
+            m_fDroneTimer = 0;
+            m_fDroneDoorTimer = 0;
+            m_fSoundNextSegTimer = 0;
+            m_fPickupTimer = 0;
+            m_vControl = self.Origin();
+            m_bWillAttack = false;
+            
+            m_currentPattern = 0;
+            m_currentNode = 0;
+            
+            m_pMC.ClipFlags() = CF_CHARACTER;
+            m_pMSC.SetMode(PRIMAGEN_MODE_SETUP);
+        }
+    }
+    
+    //--------------------------------------------------
+    void StartFx(const kStr&in szFxFile, const int modelBits)
+    {
+        int bits = 0;
+        
+        for(int i = 1; i < PRIMAGEN_MODEL_PARTS; ++i)
+        {
+            if(((1 << i) & modelBits) != 0)
+            {
+                bits |= (1 << (i-1));
+            }
+        }
+        
+        self.RenderMeshComponent().FxFlags() = bits;
+        self.RunFxEvent(szFxFile);
+    }
+    
+    //--------------------------------------------------
+    void SpawnRandomPickupInArena(const array<int>@ pList, const float x, const float y, const float z)
+    {
+        kSelectionListInt cPickups;
+        
+        for(uint i = 0; i < pList.length() && pList[i] != -1; i += 2)
+        {
+            cPickups.AddItem(pList[i+0], pList[i+1]);
+        }
+        
+        if(cPickups.GetNumEntries() == 0)
+        {
+            return;
+        }
+        
+        int nType = cPickups.Select(true);
+        
+        if(nType <= -1)
+        {
+            // just in case....
+            return;
+        }
+        
+        if(self.WorldComponent() is null)
+        {
+            return;
+        }
+		
+		//------------------
+		// Added by Rando
+		// If we're randomizing weapons, make all ammo spawns into random ammo.
+		//------------------
+		if (OPTION_WEAPON_SANITY)
+		{
+			kDictMem@ actorDef = TryGetActorDefWithClass(nType, "kexAmmoPickup");
+			if (actorDef !is null)
+			{
+				nType = kActor_Item_RandomAmmo;
+			}
+		}
+		//------------------
+        
+        kVec3 vRegPos = kVec3(x, y, z);
+        int16 nRegionIdx = self.WorldComponent().GetNearPositionAndRegionIndex(vRegPos, vRegPos);
+        kActor@ pItem = ActorFactory.Spawn(nType, vRegPos, 0, 0, 0, true, nRegionIdx);
+        
+        if(!(pItem is null))
+        {
+            pItem.AddComponent("kexMovementComponent", true);
+            pItem.MovementComponent().Velocity().z = 50.0f;
+            pItem.RunFxEvent("MotherItemWaitVanish");
+            
+            ParticleFactory.Spawn(kParticle_MotherItemFlash, pItem, vRegPos, kQuat(0, 0, 0), Math::vecZero);
+        }
+    }
+    
+    //--------------------------------------------------
+    void OnPreDamage(kDamageInfo& in dmgInfo)
+    {
+        bool    bPlayRage = false;
+        bool    bStartRegen = false;
+        float   fSplashDamage = 0;
+        
+        self.Flags() |= AF_NOINFLICTDAMAGE;
+        
+        if(!m_bCanBeDamaged)
+        {
+            return;
+        }
+        
+        float fHits = dmgInfo.hits;
+        
+        if(!(dmgInfo.particle is null))
+        {
+            // nerf damage if razor wind
+            if(dmgInfo.particle.ParticleType() == kParticle_RazorWind)
+            {
+                fHits *= 0.25f;
+            }
+        }
+        
+        // determine which part of the model was hit
+        for(int i = 0; i < PRIMAGEN_MODEL_PARTS; ++i)
+        {
+            int modelBit = (1 << i);
+            if((dmgInfo.boneFlags & modelBit) != 0 &&
+                ((m_modelActive & modelBit) != 0 || m_bRegenerating))
+            {
+                if(!m_bRegenerating)
+                {
+                    if(m_modelHealth[i] > 0)
+                    {
+                        m_modelHealth[i] -= fHits;
+                        if(m_modelHealth[i] <= 0 && m_stage != 3 && !m_bRegenerating)
+                        {
+                            m_lastModelPartKilled = i;
+                            m_modelActive &= ~(1<<m_lastModelPartKilled);
+                            self.RenderMeshComponent().SetAttachedMeshVisibility(m_lastModelPartKilled-1, false);
+                            bStartRegen = true;
+                            break;
+                        }
+                        else
+                        {
+                            StartFx("PrimagenFlashDamage", m_modelActive);
+                        }
+                    }
+                }
+                else
+                {
+                    if(i == PRIMAGEN_MODEL_PART_HEAD)
+                    {
+                        m_fRageDamage += fHits;
+                        StartFx("PrimagenFlashDamage", (1 << i));
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
+            }
+        }
+        
+        // calculate splash damage if an explosive weapon hits the primagen's face
+        if((dmgInfo.flags & DF_EXPLOSIVE) != 0 && m_stage == 1 &&
+            (dmgInfo.boneFlags & (1 << PRIMAGEN_MODEL_PART_HEAD)) != 0)
+        {
+            fSplashDamage = fHits * 0.25f;
+        }
+                      
+        // assign splash damage to the small tendrils if an explosive weapon hits the primagen's head
+        // the only time this needs to be checked is during stage 1 when the primagen still has its
+        // four neck tendrils
+        if(fSplashDamage > 0 && m_stage == 1 && !m_bRegenerating)
+        {
+            for(int i = PRIMAGEN_MODEL_PART_LEFTTENDRIL; i <= PRIMAGEN_MODEL_PART_RIGHTTENDRIL; ++i)
+            {
+                if(m_modelHealth[i] > 0)
+                {
+                    m_modelHealth[i] -= fSplashDamage;
+                    if(m_modelHealth[i] <= 0)
+                    {
+                        m_lastModelPartKilled = i;
+                        m_modelActive &= ~(1<<m_lastModelPartKilled);
+                        self.RenderMeshComponent().SetAttachedMeshVisibility(m_lastModelPartKilled-1, false);
+                        bStartRegen = true;
+                        break;
+                    }
+                    else
+                    {
+                        StartFx("PrimagenFlashDamage", m_modelActive);
+                    }
+                }
+            }
+        }
+        
+        // if a limb was blown off then the primagen will try to regenerate it
+        if(bStartRegen && !m_bRegenerating)
+        {
+            m_bRegenerating = true;
+            
+            // during stage 2 when a limb is blown off, send out a wave of drones
+            if(m_stage == 2)
+            {
+                SetContScript(ONEDRONE);
+            }
+            
+            if(!m_bFlying)
+            {
+                m_fRageTimer = REGEN_TIME;
+                m_fRand1 = Math::RandRange(0, 2);
+                m_fRand2 = Math::RandRange(2.5f, 4);
+                m_changeState = STATE_JUMPAWAY;
+                m_pMSC.SetMode(PRIMAGEN_MODE_TAKEOFF);
+            }
+            // if the primagen is flying, drop it to the ground before regen
+            else
+            {
+                m_pMSC.SetMode(PRIMAGEN_MODE_LANDGROUND);
+            }
+        }
+    }
+    
+    //--------------------------------------------------
+    void OnDeath(kDamageInfo& in dmgInfo)
+    {
+    }
+    
+    //--------------------------------------------------
+    void OnTick(void)
+    {
+        if(m_state == STATE_CONTROLS)
+        {
+            self.Origin() = m_vControl;
+        }
+        
+        Update();
+        
+        CheckEnemies();
+        
+        if(m_totalStageHealth[m_stage-1] > 0)
+        {
+            float fPercnt = (m_currentStageHealth / m_totalStageHealth[m_stage-1]) * 100.0f;
+            Hud.UpdateBar(0, int(fPercnt));
+        }
+        else
+        {
+            Hud.UpdateBar(0, 0);
+        }
+    }
+    
+    //--------------------------------------------------
+    void CheckEnemies(void)
+    {
+        kActor@ pPlayer = GetClosestPlayer(self.Origin());
+        
+        if(pPlayer is null)
+        {
+            return;
+        }
+        
+        if(m_bGetInfo)
+        {
+            m_nRegion = pPlayer.WorldComponent().RegionIndex();
+            m_bGetInfo = false;
+        }
+        
+        ProcessDrones();
+        ProcessBombs();
+        
+        m_pEAIC.GetTargetInfo(true, true);
+        
+        if(m_nContNextSeg <= -1)
+        {
+            GetContSeg();
+        }
+        
+        if(m_nSoundNextSeg <= -1)
+        {
+            SoundGetSeg();
+        }
+        
+        ContRunSeg(m_pEAIC.SightTarget().m_fDist);
+        SoundRunSeg(m_pEAIC.SightTarget().m_fDist);
+        
+        if(!(m_pControlScr is null) && m_nContNextSeg >= 0)
+        {
+            CPrimagenControlScr@ pScr = m_pControlScr[m_nContNextSeg];
+            
+            if(m_nEnemiesAlive <= 0 && pScr.waitParm == WAIT_UNTIL_DEAD &&
+                pScr.type == PRIMAGEN_DROPDRONES_CONTSCR && m_nEnemyNum <= 0 && m_fContNextSegTimer <= 0)
+            {
+                m_bEvent = true;
+                m_nContNextSeg = -1;
+            }
+        }
+        
+        if(m_nEnemiesAlive <= 0 && m_pControlScr is null && m_state == STATE_CONTROLS)
+        {
+            m_changeState = STATE_RAGECONTROLS;
+        }
+    }
+    
+    //--------------------------------------------------
+    void UserEvent(const float x, const float y, const float z, const float f1, const float f2, const float f3, const float f4)
+    {
+        m_pEAIC.GetTargetInfo(true, true);
+        
+        if(m_pEAIC.SightTarget().Target() is null)
+        {
+            return;
+        }
+        
+        switch(int(f1))
+        {
+        case 1:
+            if(m_pEAIC.SightTarget().m_fDist <= BIG_CLAW_DIST && m_modelHealth[PRIMAGEN_MODEL_PART_BIGCLAW] > 0)
+            {
+                kDamageInfo cDamageInfo;
+        
+                cDamageInfo.radius = 10*256;
+                cDamageInfo.flags = DF_NORMAL;
+                @cDamageInfo.inflictor = @self;
+                @cDamageInfo.source = @self;
+                @cDamageInfo.target = @m_pEAIC.SightTarget().Target();
+                @cDamageInfo.particle = null;
+                cDamageInfo.hits = BIG_CLAW_DAMAGE;
+                
+                m_pEAIC.SightTarget().Target().InflictDamage(cDamageInfo);
+            }
+            break;
+        case 2:
+            if(m_pEAIC.SightTarget().m_fDist <= SMALL_CLAW_DIST && m_modelHealth[PRIMAGEN_MODEL_PART_SMALLCLAW] > 0)
+            {
+                kDamageInfo cDamageInfo;
+        
+                cDamageInfo.radius = 10*256;
+                cDamageInfo.flags = DF_NORMAL;
+                @cDamageInfo.inflictor = @self;
+                @cDamageInfo.source = @self;
+                @cDamageInfo.target = @m_pEAIC.SightTarget().Target();
+                @cDamageInfo.particle = null;
+                cDamageInfo.hits = SMALL_CLAW_DAMAGE;
+                
+                m_pEAIC.SightTarget().Target().InflictDamage(cDamageInfo);
+            }
+            break;
+        default:
+            break;
+        }
+    }
+    
+    //--------------------------------------------------
+    PRIMAGEN_MODE_FUNCTION(PRIMAGEN_MODE_SETUP, { },
+    {
+        m_pShieldDev.ModeStateComponent().SetMode(DOOR_MODE_OPEN);
+        m_pConsoleDev.ModeStateComponent().SetMode(DOOR_MODE_OPEN);
+        
+        m_pMSC.SetMode(PRIMAGEN_MODE_INTROCIN);
+    });
+    
+    //--------------------------------------------------
+    PRIMAGEN_MODE_FUNCTION(PRIMAGEN_MODE_IDLE,
+    {
+        // used when the primagen is idling at his controls
+        if(m_changeState == STATE_IDLECONTROLS)
+        {
+            m_state = STATE_IDLECONTROLS;
+        }
+
+        // used when the primagen is idling when waiting for an attack
+        else if(m_changeState == STATE_IDLEGROUNDATTACK)
+        {
+            m_state = STATE_IDLEGROUNDATTACK;
+        }
+
+        // used when the primagen is idling when it cannot find turok
+        else if(m_changeState == STATE_IDLENOTUROK)
+        {
+            m_state = STATE_IDLENOTUROK;
+        }
+        else
+        {
+            m_state = STATE_IDLEGROUNDATTACK;
+        }
+    },
+    {
+        m_pEAIC.GetTargetInfo(true, true);
+        
+        // if turok has disappeared and the primagen can't find him
+        // then just wain until he reappears
+        if(m_state == STATE_IDLENOTUROK)
+        {
+            if(m_pATC.CycleCompleted() && !(m_pEAIC.SightTarget().Target() is null))
+            {
+                m_changeState = STATE_GROUNDATTACK;
+                m_pMSC.SetMode(PRIMAGEN_MODE_RUN);
+                return;
+            }
+        }
+
+        // go back to operating controls
+        if(m_state == STATE_IDLECONTROLS)
+        {
+            if(m_pATC.CycleCompleted() && m_fCount <= 0)
+            {
+                m_changeState = STATE_CONTROLS;
+                m_pMSC.SetMode(PRIMAGEN_MODE_CONTROLS);
+                return;
+            }
+        }
+
+        if(m_fCount > 0)
+        {
+            m_fCount -= GAME_DELTA_TIME;
+        }
+
+        // special case the close up ground attack. this is done to avoid a stutter that
+        // happens when the primagen switches to a run before running an attack when very
+        // close to turok.
+        if(m_bWillAttack && m_state != STATE_IDLENOTUROK)
+        {
+            if(m_nNextSeg == -1)
+            {
+                GetSeg();
+            }
+            
+            if(RunSeg(m_pEAIC.SightTarget().m_fDist) > 0)
+            {
+                return;
+            }
+        }
+
+        // go back to munching on turok.
+        if(m_state == STATE_IDLEGROUNDATTACK)
+        {
+            if(m_pEAIC.SightTarget().m_fDist > PRIMAGEN_CLOSEST_DIST)
+            {
+                m_changeState = STATE_GROUNDATTACK;
+                m_pMSC.SetMode(PRIMAGEN_MODE_RUN);
+                return;
+            }
+        }
+    });
+    
+    //--------------------------------------------------
+    PRIMAGEN_MODE_FUNCTION(PRIMAGEN_MODE_RECHARGE,
+    {
+        m_bFlying = false;
+        m_fRageDamage = 0;
+        
+        self.PlaySound(kSfx_Mother_SproutLimb);
+        self.PlayLoopingSound(kSfx_Primagen_Regen);
+    },
+    {
+        int regenDamage = REGEN_DAMAGE;
+        
+        m_pEAIC.GetTargetInfo(true, true);
+        if(m_stage == 0)
+        {
+            regenDamage /= 2;
+        }
+        
+        if(m_fRageDamage >= regenDamage)
+        {
+            self.StopLoopingSounds();
+            m_bRegenerating = false;
+            m_pMSC.SetMode(PRIMAGEN_MODE_RUN);
+            return;
+        }
+        
+        if(m_fRageTimer <= 0)
+        {
+            self.StopLoopingSounds();
+            m_modelHealth[m_lastModelPartKilled] =
+                m_maxModelHealth[m_lastModelPartKilled];
+                
+            m_bRegenerating = false;
+            m_modelActive |= (1<<m_lastModelPartKilled);
+            self.RenderMeshComponent().SetAttachedMeshVisibility(m_lastModelPartKilled-1, true);
+            
+            m_pMSC.SetMode(PRIMAGEN_MODE_RUN);
+            return;
+        }
+        
+        m_fRageTimer = MAX(m_fRageTimer - GAME_DELTA_TIME*0.5f, 0);
+    });
+    
+    //--------------------------------------------------
+    PRIMAGEN_MODE_FUNCTION(PRIMAGEN_MODE_CONTROLS,
+    {
+        self.Flags() |= AF_NODAMAGE;
+        m_bCanBeDamaged = false;
+        m_bWillAttack = false;
+        m_state = STATE_CONTROLS;
+    },
+    {
+        self.Yaw() = self.Yaw().Interpolate(Math::pi, 0.05f);
+        
+        if(m_pATC.CycleCompleted())
+        {
+            m_changeState = STATE_IDLECONTROLS;
+            m_fCount = Math::RandRange(CONTROL_LOW_IDLE_TIME, CONTROL_HIGH_IDLE_TIME);
+            m_pMSC.SetMode(PRIMAGEN_MODE_IDLE);
+        }
+        
+        if(m_changeState == STATE_RAGECONTROLS)
+        {
+            m_pMSC.SetMode(PRIMAGEN_MODE_RAGECONTROLS);
+        }
+    });
+    
+    //--------------------------------------------------
+    PRIMAGEN_MODE_FUNCTION(PRIMAGEN_MODE_RAGECONTROLS,
+    {
+        m_state = PRIMAGEN_MODE_RAGECONTROLS;
+    },
+    {
+        if(m_pATC.CycleCompleted())
+        {
+            m_pShieldDev.ModeStateComponent().SetMode(DOOR_MODE_CLOSE);
+            m_pConsoleDev.ModeStateComponent().SetMode(DOOR_MODE_CLOSE);
+            m_changeState = STATE_JUMPTOGROUND;
+            
+            m_pMSC.SetMode(PRIMAGEN_MODE_TAKEOFF);
+        }
+    });
+    
+    //--------------------------------------------------
+    PRIMAGEN_MODE_FUNCTION(PRIMAGEN_MODE_RUN,
+    {
+        if(m_changeState == STATE_GROUNDATTACK)
+        {
+            m_bCanBeDamaged = true;
+            m_bWillAttack = true;
+            m_state = STATE_GROUNDATTACK;
+        }
+        
+        if((m_stage == 1 && m_notifyCount == 0) ||
+           (m_stage == 2 && m_notifyCount == 1) ||
+           (m_stage == 3 && m_notifyCount == 2))
+        {
+            Hud.SetBar(0, 50, 255, 50, 255, 100);
+            
+            StartFx("PrimagenFlashHint", m_modelActive);
+            self.Flags() &= ~AF_NODAMAGE;
+            m_notifyCount++;
+        }
+    },
+    {
+        m_pEAIC.GetTargetInfo(true, true);
+        
+        switch(m_stage)
+        {
+        case 2:
+            m_pATC.ChangeSpeed(GAME_FRAME_UNIT / 1.2f);
+            break;
+        case 3:
+            m_pATC.ChangeSpeed(GAME_FRAME_UNIT / 1.3f);
+            break;
+        default:
+            break;
+        }
+        
+        if(m_pEAIC.SightTarget().Target() is null)
+        {
+            m_changeState = STATE_IDLENOTUROK;
+            m_pMSC.SetMode(PRIMAGEN_MODE_IDLE);
+            return;
+        }
+        
+        float fDist = m_pEAIC.SightTarget().m_fDist;
+        float fRot = m_pEAIC.SightTarget().m_fDeltaAngle;
+        
+        m_pEAIC.Turn(PRIMAGEN_TURN_SPEED, fRot);
+        
+        if(m_bWillAttack)
+        {
+            if(m_nNextSeg == -1)
+            {
+                GetSeg();
+            }
+            
+            if(RunSeg(fDist) > 0)
+            {
+                return;
+            }
+            
+            if(fDist <= PRIMAGEN_CLOSEST_DIST)
+            {
+                m_pMSC.SetMode(PRIMAGEN_MODE_IDLE);
+            }
+        }
+    });
+    
+    //--------------------------------------------------
+    PRIMAGEN_MODE_FUNCTION(PRIMAGEN_MODE_ATTACK, { },
+    {
+        m_pEAIC.GetTargetInfo(true, true);
+        
+        if(m_pATC.CycleCompleted())
+        {
+            m_nNextSeg = -1;
+            if(m_state == STATE_IDLEGROUNDATTACK ||
+                (!(m_pEAIC.PathTarget().Target() is null) && m_pEAIC.PathTarget().m_fDist <= PRIMAGEN_CLOSEST_DIST))
+            {
+                m_changeState = STATE_IDLEGROUNDATTACK;
+                m_pMSC.SetMode(PRIMAGEN_MODE_IDLE);
+                return;
+            }
+            
+            if(m_state == STATE_GROUNDATTACK)
+            {
+                m_pMSC.SetMode(PRIMAGEN_MODE_RUN);
+            }
+        }
+        else
+        {
+            m_pEAIC.Turn(PRIMAGEN_TURN_SPEED, self.GetDeltaFromPoint(m_pEAIC.SightTarget().m_vTargetPos));
+        }
+    });
+    
+    //--------------------------------------------------
+    PRIMAGEN_MODE_FUNCTION(PRIMAGEN_MODE_PSIATTACK1, { },
+    {
+        m_pEAIC.GetTargetInfo(true, true);
+        
+        if(!(m_pEAIC.SightTarget().Target() is null))
+        {
+            m_pEAIC.Turn(PRIMAGEN_TURN_SPEED, m_pEAIC.SightTarget().m_fDeltaAngle);
+            m_fLastDeltaAngle = m_pEAIC.SightTarget().m_fDeltaAngle;
+        }
+        else
+        {
+            m_pEAIC.Turn(PRIMAGEN_TURN_SPEED, m_fLastDeltaAngle);
+        }
+        
+        if(m_pATC.CycleCompleted())
+        {
+            m_nNextSeg = -1;
+            m_state = STATE_IDLEGROUNDATTACK;
+            
+            m_pMSC.SetMode(PRIMAGEN_MODE_IDLE);
+        }
+    });
+    
+    //--------------------------------------------------
+    PRIMAGEN_MODE_FUNCTION(PRIMAGEN_MODE_PSIATTACK2, { },
+    {
+        m_pEAIC.GetTargetInfo(true, true);
+        m_pEAIC.Turn(PRIMAGEN_TURN_SPEED, m_pEAIC.SightTarget().m_fDeltaAngle);
+        
+        
+        if(m_pATC.CycleCompleted())
+        {
+            m_nNextSeg = -1;
+            m_pMSC.SetMode(PRIMAGEN_MODE_RUN);
+        }
+    });
+    
+    //--------------------------------------------------
+    PRIMAGEN_MODE_FUNCTION(PRIMAGEN_MODE_REACTION_EXPLOSION, { },
+    {
+        if(m_pATC.CycleCompleted())
+        {
+            m_pMSC.SetMode(m_bFlying ? PRIMAGEN_MODE_FLY : PRIMAGEN_MODE_RUN);
+        }
+    });
+    
+    //--------------------------------------------------
+    PRIMAGEN_MODE_FUNCTION(PRIMAGEN_MODE_DEATH, { }, { });
+    
+    //--------------------------------------------------
+    PRIMAGEN_MODE_FUNCTION(PRIMAGEN_MODE_RAGE,
+    {
+        m_bRaging = true;
+        SoundSetScr(REGENSOUNDS);
+    },
+    {
+        if(m_pATC.CycleCompleted())
+        {
+            m_bRaging = false;
+            m_pMSC.SetMode(PRIMAGEN_MODE_RECHARGE);
+        }
+    });
+    
+    //--------------------------------------------------
+    PRIMAGEN_MODE_FUNCTION(PRIMAGEN_MODE_TAKEOFF,
+    {
+        if(m_changeState == STATE_BACKTOCOM)
+        {
+            m_fCount = JUMP_DELAY;
+        }
+        if(m_changeState == STATE_FLYATTACK)
+        {
+            m_bFlying = true;
+            m_fCount = JUMP_DELAY;
+        }
+        
+        m_pMC.Flags() |= (MCF_PROCESS_MOVEMENT|MCF_NO_GRAVITY);
+        m_pMC.ClipFlags() = CF_CHARACTER_FLYING;
+        
+        if(m_changeState != STATE_JUMPAWAY)
+        {
+            m_pMC.ClipFlags() |= CF_ALLOWRESTRICTEDAREAS;
+        }
+        
+        m_fTimer = 1.0f;
+    },
+    {
+        m_fCount = MAX(m_fCount - GAME_DELTA_TIME, 0);
+        
+        if((m_changeState == STATE_BACKTOCOM || m_changeState == STATE_FLYATTACK) &&
+            m_fCount <= 0)
+        {
+            if(m_pATC.CycleCompleted())
+            {
+                if(m_changeState == STATE_BACKTOCOM)
+                {
+                    m_pMSC.SetMode(PRIMAGEN_MODE_BLENDFLY);
+                }
+                else
+                {
+                    m_pMSC.SetMode(PRIMAGEN_MODE_FLY);
+                }
+                
+                return;
+            }
+        }
+        
+        if(m_changeState == STATE_JUMPTOGROUND)
+        {
+            m_pMC.ClipFlags() |= CF_ALLOWRESTRICTEDAREAS;
+            
+            kVec3 vPos = m_vJumpDir;
+            float fAng = self.GetDeltaFromPoint(vPos);
+            
+            if(Math::Fabs(fAng) <= 0.1f)
+            {
+                kVec3 vVel = m_pMC.Velocity();
+                
+                vVel.x += CONTROL_JUMP_X_ACCEL * Math::Sin(self.Yaw());
+                vVel.y += CONTROL_JUMP_Y_ACCEL * Math::Cos(self.Yaw());
+                vVel.z += CONTROL_JUMP_Z_ACCEL;
+                
+                m_pMC.Velocity() = vVel;
+                
+                float x = self.Origin().x - m_vJumpDir.x;
+                float y = self.Origin().y - m_vJumpDir.y;
+                
+                if(Math::Sqrt(x*x+y*y) <= (30*GAME_SCALE))
+                {
+                    if(m_pATC.CycleCompleted())
+                    {
+                        m_pMSC.SetMode(PRIMAGEN_MODE_LAND);
+                        m_pMC.Flags() &= ~(MCF_PROCESS_MOVEMENT|MCF_NO_GRAVITY);
+                        return;
+                    }
+                }
+            }
+            
+            m_pEAIC.Turn(PRIMAGEN_TURN_SPEED, fAng);
+        }
+        
+        if(m_changeState == STATE_JUMPAWAY)
+        {
+            if(m_fTimer <= 0)
+            {
+                kVec3 vVel = m_pMC.Velocity();
+                float r1 = m_fRand1;
+                float r2 = m_fRand2*2.0f;
+                
+                vVel.x += r2 * Math::Sin(self.Yaw() + r1);
+                vVel.y += r2 * Math::Cos(self.Yaw() + r1);
+                vVel.z += 0.1f;
+                
+                m_pMC.Velocity() = vVel;
+            }
+            
+            if(m_pATC.CycleCompleted())
+            {
+                m_changeState = STATE_GROUNDATTACK;
+                m_pMSC.SetMode(PRIMAGEN_MODE_LANDGROUND);
+                m_pMC.Flags() &= ~(MCF_PROCESS_MOVEMENT|MCF_NO_GRAVITY);
+            }
+        }
+    });
+    
+    //--------------------------------------------------
+    PRIMAGEN_MODE_FUNCTION(PRIMAGEN_MODE_FLY,
+    {
+        m_pMC.ClipFlags() = CF_CHARACTER_FLYING;
+        m_pEAIC.GetTargetInfo(false, true);
+        
+        if(m_changeState == STATE_CENTER)
+        {
+            m_state = STATE_CENTER;
+        }
+        
+        if(m_changeState == STATE_FLYATTACK)
+        {
+            if(m_state != STATE_FLYATTACK)
+            {
+                m_currentPattern = 0;
+                m_currentNode = 0;
+                m_vMoveToPos = g_vPrimagenFlightPatterns[m_currentPattern][m_currentNode];
+            }
+            
+            m_state = STATE_FLYATTACK;
+            m_movementType = MOVEMENT_LOC;
+        }
+        
+        if(m_changeState == STATE_BACKTOCOM)
+        {
+            m_state = STATE_BACKTOCOM;
+            m_movementType = MOVEMENT_LOC;
+            
+            m_pMC.ClipFlags() |= CF_ALLOWRESTRICTEDAREAS;
+        }
+    },
+    {
+        int attackNum = -1;
+        kVec3 vPos;
+        kVec3 vDelta;
+        float fRot = 0;
+        
+        if(m_state == STATE_BACKTOCOM)
+        {
+            m_pMC.ClipFlags() |= CF_ALLOWRESTRICTEDAREAS;
+        }
+        
+        m_pEAIC.GetTargetInfo(false, true);
+        m_movementType = MOVEMENT_LOC;
+        
+        if(!(m_pEAIC.SightTarget().Target() is null))
+        {
+            if(m_movementType == MOVEMENT_LOC)
+            {
+                if(m_state == STATE_FLYATTACK)
+                {
+                    vPos = m_pEAIC.SightTarget().m_vTargetPos;
+                    fRot = self.GetDeltaFromPoint(vPos);
+                }
+                
+                vPos = m_vMoveToPos;
+                if(m_state == STATE_BACKTOCOM || m_state == STATE_CENTER)
+                {
+                    fRot = self.GetDeltaFromPoint(vPos);
+                }
+                
+                vDelta = vPos - self.Origin();
+                float fDist = Math::Sqrt(vDelta.x*vDelta.x+vDelta.y*vDelta.y);
+                
+                if(fDist <= 50.0f)
+                {
+                    if(m_state == STATE_BACKTOCOM)
+                    {
+                        SetSeg(GROUND_SEG);
+                        m_pShieldDev.ModeStateComponent().SetMode(DOOR_MODE_OPEN);
+                        m_pConsoleDev.ModeStateComponent().SetMode(DOOR_MODE_OPEN);
+                        m_pMSC.SetMode(PRIMAGEN_MODE_LANDCOM);
+                        return;
+                    }
+                    
+                    if(m_state == STATE_CENTER)
+                    {
+                        SetSeg(GROUND_SEG);
+                        m_pMSC.SetMode(PRIMAGEN_MODE_LAND);
+                        return;
+                    }
+                    
+                    if(m_state == STATE_FLYATTACK)
+                    {
+                        m_currentNode++;
+                        if(g_vPrimagenFlightPatterns[m_currentPattern][m_currentNode].z < 0)
+                        {
+                            m_currentNode = 0;
+                            m_currentPattern++;
+                            if(m_currentPattern >= int(g_vPrimagenFlightPatterns.length())-1)
+                            {
+                                m_currentPattern = 0;
+                            }
+                        }
+                        
+                        m_vMoveToPos = g_vPrimagenFlightPatterns[m_currentPattern][m_currentNode];
+                    }
+                }
+            }
+        }
+        
+        m_pEAIC.Turn(PRIMAGEN_TURN_SPEED, fRot);
+        vPos = m_vMoveToPos;
+        
+        vDelta = vPos - self.Origin();
+        
+        float fRotZ = vDelta.ToYaw();
+        if(m_state == STATE_BACKTOCOM || m_state == STATE_CENTER)
+        {
+            m_pMC.Velocity().z = (self.Origin().z < FLY_HEIGHT) ? ((FLY_HEIGHT/2.0f) * GAME_DELTA_TIME) : 0.05f;
+            m_pMC.Velocity().x = (MAX_VEL * Math::Sin(fRotZ)) * GAME_DELTA_TIME;
+            m_pMC.Velocity().y = (MAX_VEL * Math::Cos(fRotZ)) * GAME_DELTA_TIME;
+        }
+        else
+        {
+            float fVelX = Math::Accelerate(m_pMC.Velocity().x, MAX_ACCEL*GAME_DELTA_TIME, MAX_VEL*GAME_DELTA_TIME);
+            float fVelY = Math::Accelerate(m_pMC.Velocity().y, MAX_ACCEL*GAME_DELTA_TIME, MAX_VEL*GAME_DELTA_TIME);
+            
+            m_pMC.Velocity().x += fVelX * Math::Sin(fRotZ);
+            m_pMC.Velocity().y += fVelY * Math::Cos(fRotZ);
+            m_pMC.Velocity().z = 0.125f;
+        }
+        
+        if(m_bWillAttack && m_state != STATE_BACKTOCOM && m_state != STATE_CENTER)
+        {
+            if(m_nNextSeg == -1)
+            {
+                GetSeg();
+            }
+            
+            RunSeg(m_pEAIC.SightTarget().m_fDistXY);
+        }
+    });
+    
+    //--------------------------------------------------
+    PRIMAGEN_MODE_FUNCTION(PRIMAGEN_MODE_FLAPATTACK,
+    {
+        m_fTimer = FLAP_DELAY;
+        m_fCount = FLAP_FORCE_DURATION;
+    },
+    {
+        m_pEAIC.GetTargetInfo(false, true);
+        
+        if(!(m_pEAIC.SightTarget().Target() is null))
+        {
+            m_pEAIC.Turn(PRIMAGEN_TURN_SPEED, m_pEAIC.SightTarget().m_fDeltaAngle);
+            m_fLastDeltaAngle = m_pEAIC.SightTarget().m_fDeltaAngle;
+        }
+        else
+        {
+            m_pEAIC.Turn(PRIMAGEN_TURN_SPEED, m_fLastDeltaAngle);
+        }
+        
+        if(!(m_pEAIC.SightTarget().Target() is null) && m_fTimer <= 0)
+        {
+            kVec3 vDelta = m_pEAIC.SightTarget().Target().Origin() - self.Origin();
+            float fRotZ = vDelta.ToYaw();
+            float fMag = FLAP_MAG * GAME_DELTA_TIME;
+            
+            if(!(m_pEAIC.SightTarget().Target().MovementComponent() is null))
+            {
+                kVec3 vVel = m_pEAIC.SightTarget().Target().MovementComponent().Velocity();
+                vVel.x += fMag * Math::Sin(fRotZ);
+                vVel.y += fMag * Math::Cos(fRotZ);
+                m_pEAIC.SightTarget().Target().MovementComponent().Velocity() = vVel;
+                
+                if(m_fCount > 0)
+                {
+                    m_fCount = MAX(m_fCount - GAME_DELTA_TIME, 0);
+                }
+            }
+        }
+        
+        if(m_pATC.CycleCompleted() && m_fCount <= 0 && m_fTimer <= 0)
+        {
+            m_nNextSeg = -1;
+            m_pMSC.SetMode(PRIMAGEN_MODE_RUN);
+        }
+    });
+    
+    //--------------------------------------------------
+    PRIMAGEN_MODE_FUNCTION(PRIMAGEN_MODE_FIREATTACK, { },
+    {
+        if(m_pATC.CycleCompleted())
+        {
+            m_nNextSeg = -1;
+            m_pMSC.SetMode(PRIMAGEN_MODE_FLY);
+        }
+    });
+    
+    //--------------------------------------------------
+    PRIMAGEN_MODE_FUNCTION(PRIMAGEN_MODE_LASERATTACK,
+    {
+        m_pMC.Velocity().Clear();
+    },
+    {
+        if(m_pATC.CycleCompleted())
+        {
+            m_nNextSeg = -1;
+            m_pMSC.SetMode(PRIMAGEN_MODE_FLY);
+        }
+    });
+    
+    //--------------------------------------------------
+    PRIMAGEN_MODE_FUNCTION(PRIMAGEN_MODE_SWOOPATTACK, { },
+    {
+        if(m_pATC.CycleCompleted())
+        {
+            m_nNextSeg = -1;
+            m_pMSC.SetMode(PRIMAGEN_MODE_FLY);
+        }
+        
+        m_pEAIC.GetTargetInfo(true, true);
+        
+        if(m_pEAIC.SightTarget().Target() is null)
+        {
+            return;
+        }
+        
+        kVec3 vPos = m_pEAIC.SightTarget().Target().Origin();
+        float fRot = self.GetDeltaFromPoint(vPos);
+        
+        m_pEAIC.Turn(PRIMAGEN_TURN_SPEED, fRot);
+        
+        kVec3 vDelta = vPos - self.Origin();
+        float fRotZ = vDelta.ToYaw();
+        
+        float fVelX = (50*GAME_SCALE)*GAME_SECONDS;
+        float fVelY = (50*GAME_SCALE)*GAME_SECONDS;
+        
+        m_pMC.Velocity().x += fVelX * Math::Sin(fRotZ);
+        m_pMC.Velocity().y += fVelY * Math::Cos(fRotZ);
+        m_pMC.Velocity().z += 0.06f;
+    });
+    
+    //--------------------------------------------------
+    PRIMAGEN_MODE_FUNCTION(PRIMAGEN_MODE_LAND,
+    {
+        m_fCount = 1.0f;
+        m_pMC.ClipFlags() = CF_CHARACTER;
+    },
+    {
+        if(m_pATC.CycleCompleted() && self.Origin().z < 10.0f)
+        {
+            m_nNextSeg = -1;
+            m_bFlying = false;
+            m_changeState = STATE_GROUNDATTACK;
+            
+            float x = self.Origin().x;
+            float y = self.Origin().y;
+            
+            if(Math::Sqrt(x*x+y*y) > (160*GAME_SCALE))
+            {
+                self.Origin() = m_vJumpDir;
+                self.WorldComponent().FindRegionAtOrigin(m_vJumpDir, true);
+            }
+            
+            if(!m_bRegenerating)
+            {
+                m_pMSC.SetMode(PRIMAGEN_MODE_RUN);
+            }
+            else
+            {
+                m_pMSC.SetMode(PRIMAGEN_MODE_RAGE);
+            }
+        }
+    });
+    
+    //--------------------------------------------------
+    PRIMAGEN_MODE_FUNCTION(PRIMAGEN_MODE_LANDGROUND,
+    {
+        m_fCount = 1.0f;
+        m_pMC.ClipFlags() = CF_CHARACTER;
+        m_vMoveToPos.z = (m_state == STATE_BACKTOCOM) ? m_vControl.z : 0;
+    },
+    {
+        if(m_pATC.CycleCompleted() &&
+            Math::Fabs(self.Origin().z - m_vMoveToPos.z) < 10.0f)
+        {
+            m_pMC.Velocity().Clear();
+            m_nNextSeg = -1;
+            m_bFlying = false;
+            
+            if(m_state == STATE_BACKTOCOM)
+            {
+                self.Origin() = m_vControl;
+                self.WorldComponent().FindRegionAtOrigin(m_vControl, true);
+                self.Yaw() = 0;
+                
+                m_changeState = STATE_CONTROLS;
+                
+                switch(m_stage)
+                {
+                case 1:
+                    SetContScript(STAGE1SCR);
+                    break;
+                case 2:
+                    SetContScript(STAGE2SCR);
+                    break;
+                case 3:
+                    SetContScript(STAGE3SCR);
+                    break;
+                default:
+                    break;
+                }
+                
+                m_pMSC.SetMode(PRIMAGEN_MODE_CONTROLS);
+                return;
+            }
+            
+            if(!m_bRegenerating)
+            {
+                m_pMSC.SetMode(PRIMAGEN_MODE_RUN);
+            }
+            else
+            {
+                m_pMSC.SetMode(PRIMAGEN_MODE_RAGE);
+            }
+        }
+        else if(m_state == STATE_BACKTOCOM)
+        {
+            float x = self.Origin().x - m_vMoveToPos.x;
+            float y = self.Origin().y - m_vMoveToPos.y;
+            
+            if(Math::Sqrt(x*x+y*y) <= 30*GAME_SCALE)
+            {
+                self.Origin().Lerp(m_vMoveToPos, 0.2f);
+            }
+        }
+        else if(m_pATC.CycleCompleted())
+        {
+            m_pMC.Flags() &= ~MCF_NO_GRAVITY;
+        }
+    });
+    
+    //--------------------------------------------------
+    PRIMAGEN_MODE_FUNCTION(PRIMAGEN_MODE_BLENDFLY,
+    {
+        MODE_SetupPRIMAGEN_MODE_FLY();
+    },
+    {
+        MODE_TickPRIMAGEN_MODE_FLY();
+    });
+    
+    //--------------------------------------------------
+    PRIMAGEN_MODE_FUNCTION(PRIMAGEN_MODE_LANDCOM,
+    {
+        MODE_SetupPRIMAGEN_MODE_LANDGROUND();
+    },
+    {
+        MODE_TickPRIMAGEN_MODE_LANDGROUND();
+    });
+    
+    //--------------------------------------------------
+    PRIMAGEN_MODE_FUNCTION(PRIMAGEN_MODE_INTROCIN, { },
+    {
+        if(!CinemaPlayer.Playing())
+        {
+            SetContScript(STAGE1SCR);
+            SoundSetScr(INTROSOUNDS);
+            m_pMSC.SetMode(PRIMAGEN_MODE_CONTROLS);
+        }
+    });
+    
+    //--------------------------------------------------
+    PRIMAGEN_MODE_FUNCTION(PRIMAGEN_MODE_DEATHCIN,
+    {
+        kPlayerInventory@ pInventory = LocalPlayer.Inventory();
+        
+        if(pInventory.GetCount(kActor_Misc_TotemInventory) == 5)
+        {
+            CinemaPlayer.StartCinema("cinemas/PD2-P tired.txt");
+        }
+        else
+        {
+            CinemaPlayer.StartCinema("cinemas/Primagen Death.txt");
+        }
+        
+        self.Remove();
+        
+        kActorIterator cIterator;
+        kActor@ pDude;
+        
+        while(!((@pDude = cIterator.GetNext()) is null))
+        {
+            if(pDude.Type() == kActor_AI_Primagen)
+            {
+                pDude.RenderMeshComponent().SetAttachedMeshVisibility(7, false);
+                pDude.RenderMeshComponent().SetAttachedMeshVisibility(8, true);
+            }
+        }
+    },
+    { });
+};
+
+#undef PRIMAGEN_MODE_FUNCTION

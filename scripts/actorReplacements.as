@@ -104,7 +104,7 @@ void AddWarpBarriers(const int16 &in mapId)
 			AddWarpBarrier(kVec3(-2225.035, 4691.924, 0), kActor_InventoryItem_ProgressiveWarpL3, 2);
 			break;
 		case kLevel_DeathMarsh_3: // Oblivion
-			AddWarpBarrier(kVec3(1228.8, 3850, 0), kActor_InventoryItem_ProgressiveWarpL3, 3);
+			AddWarpBarrier(kVec3(1228.8, 3840, 0), kActor_InventoryItem_ProgressiveWarpL3, 3);
 			break;
 		case kLevel_DeathMarsh_4: // Ammo 2, Bridge Bottom, Bridge Top
 			AddWarpBarrier(kVec3(-1559.966, 2460.242, 614.4), kActor_InventoryItem_ProgressiveWarpL3, 4);

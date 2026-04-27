@@ -56,13 +56,6 @@ class RandoPlayerObject : ScriptObject
 	}
 	
 	//---------------------------
-	// Checks if the player is using their scope
-	bool IsScoped(void)
-	{
-		return LocalPlayer.WeaponActor() !is null && LocalPlayer.WeaponActor().ScopeReady();
-	}
-	
-	//---------------------------
 	// Resets the state of the globals on a save load.
 	// Also handles actor replacements.
 	void OnSpawn(void)
@@ -454,4 +447,11 @@ class RandoPlayerObject : ScriptObject
 		// Mark as in-flight, but don't remove yet
 		g_outgoingMessageInFlight = true;
 	}
+}
+
+//---------------------------
+// Checks if the player is using their scope
+bool IsScoped(void)
+{
+	return LocalPlayer.WeaponActor() !is null && LocalPlayer.WeaponActor().ScopeReady();
 }
