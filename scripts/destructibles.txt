@@ -1,0 +1,540 @@
+//
+// Copyright(C) 2014-2015 Samuel Villarreal
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either version 2
+// of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// DESCRIPTION:
+//      Destructible Object Classes
+//
+
+//-----------------------------------------------------------------------------
+//
+// Flags
+//
+//-----------------------------------------------------------------------------
+
+const int8 DESTRUCTIBLE_FLAG_CHECK_BULLET_IMPACTS               = (1 << 0);
+const int8 DESTRUCTIBLE_FLAG_CHECK_EXPLOSION_IMPACTS            = (1 << 1);
+const int8 DESTRUCTIBLE_FLAG_CHECK_VANISH_AT_END_OF_TRIG_ANIM   = (1 << 2);
+const int8 DESTRUCTIBLE_FLAG_CHECK_AUTO_TRIG_FOR_PLAYER         = (1 << 3);
+const int8 DESTRUCTIBLE_FLAG_CHECK_AUTO_TRIG_FOR_ACTOR          = (1 << 4);
+const int8 DESTRUCTIBLE_FLAG_CHECK_VANISH_AT_END_OF_DEATH_ANIM  = (1 << 5);
+const int8 DESTRUCTIBLE_FLAG_CHECK_HAS_TRIG_DEATH_STATE         = (1 << 6);
+
+//-----------------------------------------------------------------------------
+//
+// Modes
+//
+//-----------------------------------------------------------------------------
+
+enum destructibleModes
+{
+    DESTRUCTIBLE_MODE_IDLE     = 0,
+    DESTRUCTIBLE_MODE_TRIGGER,
+    DESTRUCTIBLE_MODE_DEATH,
+    NUMDESTRUCTIBLEMODES
+}
+
+//-----------------------------------------------------------------------------
+//
+// Messages
+//
+//-----------------------------------------------------------------------------
+
+const int8 DESTRUCTIBLE_MSG_START           = 1;
+const int8 DESTRUCTIBLE_MSG_COLLISION_OFF   = 2;
+const int8 DESTRUCTIBLE_MSG_COLLISION_ON    = 3;
+const int8 DESTRUCTIBLE_MSG_INVISIBLE       = 4;
+const int8 DESTRUCTIBLE_MSG_VISIBLE         = 5;
+
+/*
+==============================================================
+InitDestructibleModeTable
+==============================================================
+*/
+
+void InitDestructibleModeTable(void)
+{
+    DefineMode("DestructibleModeTable", DESTRUCTIBLE_MODE_IDLE,     "",                             "",                             CF_STATIC, 0, "int MODE_IdleAnim(void)",    0, 0, 0, MF_NOROOTMOTION|MF_NO_BLEND);
+    DefineMode("DestructibleModeTable", DESTRUCTIBLE_MODE_TRIGGER,  "void MODE_TriggerSetup(void)", "void MODE_TriggerTick(void)",  CF_STATIC, 0, "int MODE_TriggerAnim(void)", 0, 0, 0, MF_NOROOTMOTION|MF_NO_BLEND);
+    DefineMode("DestructibleModeTable", DESTRUCTIBLE_MODE_DEATH,    "void MODE_DeathSetup(void)",   "void MODE_DeathTick(void)",    CF_STATIC, 0, "int MODE_DeathAnim(void)",   0, 0, 0, MF_NOROOTMOTION|MF_NO_BLEND);
+}
+
+/*
+==============================================================
+TurokDestructible
+==============================================================
+*/
+
+class TurokDestructible : ScriptObject
+{
+    kActor@     self;
+    int16       m_startHealth;
+    uint        m_dwFlags;
+    
+    // idle info
+    int         m_idleAnim;
+    float       m_fTriggerRadius;
+    
+    // trigger info
+    int         m_triggerAnim;
+    int         m_triggerParticle;
+    int         m_triggerSound;
+    uint        m_pickupFlags1;
+    uint        m_pickupFlags2;
+    
+    // trigger death info
+    int         m_triggerDeathAnim;
+    int         m_triggerDeathParticle;
+    int         m_triggerDeathSound;
+    uint        m_deathPickupFlags1;
+    uint        m_deathPickupFlags2;
+    
+    int         m_triggerDeathVanishDelay;
+    bool        m_bSpawnMarked;
+    bool        m_bLateCall;
+    
+    TurokDestructible(kActor@ actor)
+    {
+        @self = actor;
+        m_triggerDeathVanishDelay = 0;
+        m_bLateCall = false;
+    }
+    
+    /*
+    ==============================================================
+    OnLevelLoad
+    ==============================================================
+    */
+    
+    void OnLevelLoad(kDictMem@ pDict)
+    {
+        pDict.GetInt("startHealth", m_startHealth, 1);
+        pDict.GetInt("flags", m_dwFlags);
+        pDict.GetInt("idleAnim", m_idleAnim);
+        pDict.GetFloat("triggerRadius", m_fTriggerRadius);
+        pDict.GetInt("triggerAnim", m_triggerAnim);
+        pDict.GetInt("triggerParticle", m_triggerParticle);
+        pDict.GetInt("triggerSound", m_triggerSound);
+        pDict.GetInt("triggerPickupFlags1", m_pickupFlags1);
+        pDict.GetInt("triggerPickupFlags2", m_pickupFlags2);
+        pDict.GetInt("triggerDeathAnim", m_triggerDeathAnim);
+        pDict.GetInt("triggerDeathParticle", m_triggerDeathParticle);
+        pDict.GetInt("triggerDeathSound", m_triggerDeathSound);
+        pDict.GetInt("triggerDeathPickupFlags1", m_deathPickupFlags1);
+        pDict.GetInt("triggerDeathPickupFlags2", m_deathPickupFlags2);
+        
+        self.Health() = m_startHealth;
+    }
+    
+    /*
+    ==============================================================
+    OnSerialize
+    ==============================================================
+    */
+    
+    void OnSerialize(kDict& out dict)
+    {
+        SERIALIZE(m_startHealth);
+        SERIALIZE(m_dwFlags);
+        SERIALIZE(m_idleAnim);
+        SERIALIZE(m_fTriggerRadius);
+        SERIALIZE(m_triggerAnim);
+        SERIALIZE(m_triggerParticle);
+        SERIALIZE(m_triggerSound);
+        SERIALIZE(m_pickupFlags1);
+        SERIALIZE(m_pickupFlags2);
+        SERIALIZE(m_triggerDeathAnim);
+        SERIALIZE(m_triggerDeathParticle);
+        SERIALIZE(m_triggerDeathSound);
+        SERIALIZE(m_deathPickupFlags1);
+        SERIALIZE(m_deathPickupFlags2);
+        SERIALIZE(m_triggerDeathVanishDelay);
+        SERIALIZE(m_bSpawnMarked);
+        SERIALIZE(m_bLateCall);
+    }
+    
+    /*
+    ==============================================================
+    OnSerialize
+    ==============================================================
+    */
+    
+    void OnDeserialize(kDict& in dict)
+    {
+        DESERIALIZE_INT(m_startHealth);
+        DESERIALIZE_INT(m_dwFlags);
+        DESERIALIZE_INT(m_idleAnim);
+        DESERIALIZE_FLOAT(m_fTriggerRadius);
+        DESERIALIZE_INT(m_triggerAnim);
+        DESERIALIZE_INT(m_triggerParticle);
+        DESERIALIZE_INT(m_triggerSound);
+        DESERIALIZE_INT(m_pickupFlags1);
+        DESERIALIZE_INT(m_pickupFlags2);
+        DESERIALIZE_INT(m_triggerDeathAnim);
+        DESERIALIZE_INT(m_triggerDeathParticle);
+        DESERIALIZE_INT(m_triggerDeathSound);
+        DESERIALIZE_INT(m_deathPickupFlags1);
+        DESERIALIZE_INT(m_deathPickupFlags2);
+        DESERIALIZE_INT(m_triggerDeathVanishDelay);
+        DESERIALIZE_BOOL(m_bSpawnMarked);
+        DESERIALIZE_BOOL(m_bLateCall);
+        
+        self.Health() = m_startHealth;
+    }
+    
+    /*
+    ==============================================================
+    OnSpawn
+    ==============================================================
+    */
+    
+    void OnSpawn(void)
+    {
+
+        // set flag so that they won't get in the way of projectiles
+        if(!(self.RenderMeshComponent() is null))
+        {
+            if(self.RenderMeshComponent().SkipNoDamageFlag())
+            {
+                self.Flags() &= ~AF_NODAMAGE;
+            }
+            self.RenderMeshComponent().Flags() |= RMCF_NOEXPANDJOINTS;
+        }
+        
+        if(self.Deserialized())
+        {
+            return;
+        }
+     
+        m_bSpawnMarked = false;
+        self.AddComponent("kexModeStateComponent", true);
+     
+        if(self.ModeStateComponent() is null)
+        {
+            Sys.Print("Missing mode component on destructible (" + self.Type() + ")!");
+            return;
+        }
+        
+        self.ModeStateComponent().AssignModeTable("DestructibleModeTable");
+        
+        if(self.IsMarked())
+        {
+            m_bSpawnMarked = true;
+            m_bLateCall = true;
+            self.Flags() &= ~AF_IMPORTANT;
+            
+            if((m_dwFlags & DESTRUCTIBLE_FLAG_CHECK_HAS_TRIG_DEATH_STATE) != 0)
+            {
+                self.ModeStateComponent().SetMode(DESTRUCTIBLE_MODE_DEATH);
+            }
+            else
+            {
+                self.ModeStateComponent().SetMode(DESTRUCTIBLE_MODE_TRIGGER);
+            }
+            
+            return;
+        }
+        
+        self.ModeStateComponent().SetMode(DESTRUCTIBLE_MODE_IDLE);
+    }
+    
+    /*
+    ==============================================================
+    OnPreDamage
+    ==============================================================
+    */
+    
+    void OnPreDamage(kDamageInfo& in dmgInfo)
+    {
+        bool bTakeDamage = false;
+        bool bExplosiveDamage = (dmgInfo.flags & DF_EXPLOSIVE) != 0;
+        
+        //
+        // determine if we can take damage or not
+        //
+        
+        if((m_dwFlags & DESTRUCTIBLE_FLAG_CHECK_BULLET_IMPACTS) != 0 && !bExplosiveDamage)
+        {
+            bTakeDamage = true;
+        }
+        if((m_dwFlags & DESTRUCTIBLE_FLAG_CHECK_EXPLOSION_IMPACTS) != 0 && bExplosiveDamage)
+        {
+            bTakeDamage = true;
+        }
+        
+        if(!bTakeDamage)
+        {
+            self.Flags() |= AF_NOINFLICTDAMAGE;
+        }
+        else
+        {
+            self.RunFxEvent("MotherFlashDamage");
+        }
+    }
+    
+    /*
+    ==============================================================
+    OnDeath
+    ==============================================================
+    */
+    
+    void OnDeath(kDamageInfo& in dmgInfo)
+    {
+        self.TriggerMessageID() = DESTRUCTIBLE_MSG_START;
+        self.Trigger(null);
+    }
+    
+    /*
+    ==============================================================
+    OnTick
+    ==============================================================
+    */
+    
+    void OnTick(void)
+    {
+        if(self.IsMarked() && m_bLateCall)
+        {
+            self.SignalOn();
+            m_bLateCall = false;
+        }
+    }
+    
+    /*
+    ==============================================================
+    OnTrigger
+    ==============================================================
+    */
+    
+    void OnTrigger(kActor@ pInstigator, const int msg)
+    {
+        switch(self.TriggerMessageID())
+        {
+        case DESTRUCTIBLE_MSG_START:
+			Hud.AddMessage("" + Game.ActiveMapID() + "_" + self.TID());
+		
+            self.SignalOn();
+            self.Mark(true);
+            self.Flags() &= ~AF_IMPORTANT;
+            if((self.Flags() & AF_DEAD) != 0 && (m_dwFlags & DESTRUCTIBLE_FLAG_CHECK_HAS_TRIG_DEATH_STATE) != 0)
+            {		
+                self.ModeStateComponent().SetMode(DESTRUCTIBLE_MODE_DEATH);
+            }
+            else
+            {
+                self.ModeStateComponent().SetMode(DESTRUCTIBLE_MODE_TRIGGER);
+            }
+
+			//--------------------
+			// Rando code
+			TrySendActionObjectToAP(self.TID());
+			//--------------------	
+            break;
+            
+        case DESTRUCTIBLE_MSG_COLLISION_OFF:
+            if(!(self.WorldComponent() is null))
+            {
+                self.WorldComponent().Flags() |= WCF_NONSOLID;
+            }
+            break;
+            
+        case DESTRUCTIBLE_MSG_COLLISION_ON:
+            if(!(self.WorldComponent() is null))
+            {
+                self.WorldComponent().Flags() &= ~WCF_NONSOLID;
+            }
+            break;
+            
+        case DESTRUCTIBLE_MSG_INVISIBLE:
+            self.Flags() |= AF_HIDDEN;
+            self.Mark(true);
+            break;
+            
+        case DESTRUCTIBLE_MSG_VISIBLE:
+            self.Flags() &= ~AF_HIDDEN;
+            self.Mark(false);
+            break;
+        }
+        
+        //DEBUG_PRINT("Destructible recieved MSG: " + self.TriggerMessageID() + " with data: " + self.TriggerData());
+    }
+    
+    /*
+    ==============================================================
+    MODE_IdleAnim
+    ==============================================================
+    */
+    
+    int MODE_IdleAnim(void)
+    {
+        return m_idleAnim >= 0 ? m_idleAnim : ANIM_DESTRUCTIBLE_IDLE1;
+    }
+    
+    /*
+    ==============================================================
+    MODE_TriggerSetup
+    ==============================================================
+    */
+    
+    void MODE_TriggerSetup(void)
+    {
+        if(m_bSpawnMarked)
+        {
+            self.AnimTrackComponent().SetLastFrame(true);
+            if(!(self.WorldComponent() is null))
+            {
+                self.WorldComponent().Flags() |= WCF_NONSOLID;
+            }
+        }
+        else
+        {
+            if(m_triggerSound != -1)
+            {
+                self.PlaySound(m_triggerSound);
+            }
+            
+            if(m_triggerParticle != -1)
+            {
+                ParticleFactory.Spawn(m_triggerParticle, self, kQuat(self.Pitch(), 0, self.Yaw()), Math::vecZero);
+            }
+            
+            self.Flags() &= ~AF_NOGENERATE;
+            self.GenerateActors(m_pickupFlags1, 0);
+            self.Flags() &= ~AF_NOGENERATE;
+            self.GenerateActors(m_pickupFlags2, 1);
+        
+            if(self.Health() <= 0)
+            {
+                if(!(self.WorldComponent() is null))
+                {
+                    self.WorldComponent().Flags() |= WCF_NONSOLID;
+                }
+            }
+        }
+        
+        if(m_triggerAnim <= 0)
+        {
+            self.Remove();
+        }
+    }
+    
+    /*
+    ==============================================================
+    MODE_TriggerTick
+    ==============================================================
+    */
+    
+    void MODE_TriggerTick(void)
+    {
+        if(m_bSpawnMarked)
+        {
+            self.AnimTrackComponent().SetLastFrame(true);
+            m_bSpawnMarked = false;
+        }
+        
+        if((m_dwFlags & DESTRUCTIBLE_FLAG_CHECK_VANISH_AT_END_OF_TRIG_ANIM) != 0 &&
+            self.AnimTrackComponent().CycleCompleted())
+        {
+            self.Remove();
+        }
+    }
+    
+    /*
+    ==============================================================
+    MODE_TriggerAnim
+    ==============================================================
+    */
+    
+    int MODE_TriggerAnim(void)
+    {
+        return m_triggerAnim > 0 ? m_triggerAnim : ANIM_DESTRUCTIBLE_GO1;
+    }
+    
+    /*
+    ==============================================================
+    MODE_DeathSetup
+    ==============================================================
+    */
+    
+    void MODE_DeathSetup(void)
+    {
+        if(m_bSpawnMarked)
+        {
+            self.AnimTrackComponent().SetLastFrame(true);
+            if(!(self.WorldComponent() is null))
+            {
+                self.WorldComponent().Flags() |= WCF_NONSOLID;
+            }
+        }
+        else
+        {
+            if(m_triggerDeathSound != -1)
+            {
+                self.PlaySound(m_triggerDeathSound);
+            }
+            
+            if(m_triggerDeathParticle != -1)
+            {
+                ParticleFactory.Spawn(m_triggerDeathParticle, self, kQuat(self.Pitch(), 0, self.Yaw()), Math::vecZero);
+            }
+            
+            self.Flags() &= ~AF_NOGENERATE;
+            self.GenerateActors(m_deathPickupFlags1, 0);
+            self.Flags() &= ~AF_NOGENERATE;
+            self.GenerateActors(m_deathPickupFlags2, 1);
+            
+            if(self.Health() <= 0)
+            {
+                if(!(self.WorldComponent() is null))
+                {
+                    self.WorldComponent().Flags() |= WCF_NONSOLID;
+                }
+            }
+        }
+        
+        if(!self.AnimTrackComponent().CheckAnimID(m_triggerDeathAnim > 0 ? m_triggerDeathAnim : ANIM_DESTRUCTIBLE_GO1))
+        {
+            self.Remove();
+        }
+    }
+    
+    /*
+    ==============================================================
+    MODE_DeathTick
+    ==============================================================
+    */
+    
+    void MODE_DeathTick(void)
+    {
+        if(m_bSpawnMarked)
+        {
+            self.AnimTrackComponent().SetLastFrame(true);
+            m_bSpawnMarked = false;
+        }
+        
+        if((m_dwFlags & DESTRUCTIBLE_FLAG_CHECK_VANISH_AT_END_OF_DEATH_ANIM) != 0 &&
+            self.AnimTrackComponent().CycleCompleted())
+        {
+            self.Remove();
+        }
+    }
+    
+    /*
+    ==============================================================
+    MODE_DeathAnim
+    ==============================================================
+    */
+    
+    int MODE_DeathAnim(void)
+    {
+        return m_triggerDeathAnim > 0 ? m_triggerDeathAnim : ANIM_DESTRUCTIBLE_GO1;
+    }
+};

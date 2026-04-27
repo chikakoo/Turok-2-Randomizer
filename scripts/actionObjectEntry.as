@@ -110,6 +110,25 @@ void AddActionObject(
 }
 
 //------------------------------
+// Tries to send the ActionObject with the matching tag id on the current map to AP.
+// If it doesn't exist, it doesn't do anything.
+void TrySendActionObjectToAP(const int &in tagId)
+{
+	ActionObjectEntry@ actionObjectEntry;
+	if (TryGetActionObjectEntryForCurrentMap(tagId, actionObjectEntry))
+	{
+		actionObjectEntry.SendCheckToAP();
+		Hud.AddMessage("" + actionObjectEntry.name);
+		Sys.Print("" + actionObjectEntry.name);
+	}
+	else
+	{
+		Hud.AddMessage("" + Game.ActiveMapID() + "_" + tagId);
+		Sys.Print("" + Game.ActiveMapID() + "_" + tagId);
+	}
+}
+
+//------------------------------
 // Tries to get the replacement for the given actor id.
 // Will return false if not found.
 // - tagId: The tag id of the entry to get
