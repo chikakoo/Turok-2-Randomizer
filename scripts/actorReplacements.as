@@ -8,7 +8,7 @@ void DoActorReplacementsOnPlayerSpawn()
 {
 	int16 mapId = Game.ActiveMapID();
 	
-	if (OPTION_WEAPON_SANITY)
+	if (OPTION_RANDOMIZE_WEAPONS)
 	{
 		UseRandomAmmoGenerators();
 	}
@@ -534,6 +534,7 @@ void RemoveAllGenerators(void)
 //---------------------------
 // Modifies the Primagen Key turn-ins so they aren't active if level requirements aren't met.
 // Places the Level 1 barrier if appropriate.
+// Places generators for random ammo and full health.
 void DoHubModifications(const int16 &in mapId)
 {
 	if (mapId != kLevel_Hub)
@@ -548,11 +549,21 @@ void DoHubModifications(const int16 &in mapId)
 			kVec3(-30.72, 51.2, 0),
 			0, 0, 0);
 	}
-	
 
+	// Level 1 barrier
 	ActorFactory.Spawn(
 		kActor_ProgressionBlocker_Level1Barrier,
-		kVec3(-111.983, -2232.514, -256),
+		kVec3(-111.983, -2212.514, -256),
+		0, 0, 0);
+		
+	// Random ammo and full health
+	ActorFactory.Spawn(
+		kActor_Generator_RandomAmmo,
+		kVec3(-901.12, -1915.36, -235.52),
+		0, 0, 0);
+	ActorFactory.Spawn(
+		kActor_Generator_FullHealth,
+		kVec3(-901.12, -2242.56, -235.52),
 		0, 0, 0);
 }
 

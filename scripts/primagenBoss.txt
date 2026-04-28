@@ -1796,7 +1796,7 @@ class TurokPrimagenBoss : ScriptObject
 		// Added by Rando
 		// If we're randomizing weapons, make all ammo spawns into random ammo.
 		//------------------
-		if (OPTION_WEAPON_SANITY)
+		if (OPTION_RANDOMIZE_WEAPONS)
 		{
 			kDictMem@ actorDef = TryGetActorDefWithClass(nType, "kexAmmoPickup");
 			if (actorDef !is null)

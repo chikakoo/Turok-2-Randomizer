@@ -20,6 +20,7 @@
 
 #define kActor_Item_RandomAmmo 30000 // Limited to int16 for generators
 #define kActor_Generator_RandomAmmo 30100
+#define kActor_Generator_FullHealth 30101
 
 #define RANDO_TRAP_TYPE_ENEMY 0
 #define RANDO_TRAP_TYPE_DAMAGE 1
