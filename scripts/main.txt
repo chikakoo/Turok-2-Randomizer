@@ -17,7 +17,7 @@
 // Mod note: we shouldn't change the extension of any of the original files to .as
 
 // Include this at the top just to be sure that the memory block is stable
-#include "scripts/apMemory.as"
+#include "scripts/rando/apMemory.as"
 
 #define MAX(a,b) ((a)>(b)?(a):(b))
 #define MIN(a,b) ((a)<(b)?(a):(b))
@@ -66,29 +66,29 @@ bool DeserializeBool(kDict& in dict, const kStr& in key)
 #include "scripts/primagenBoss.txt"
 #include "scripts/netcallbacks.txt"
 
-#include "scripts/weaponInfoCache.as"
+#include "scripts/rando/weaponInfoCache.as"
 
-#include "scripts/scriptActor.as"
-#include "scripts/userEvent.as"
+#include "scripts/rando/scriptActor.as"
+#include "scripts/rando/userEvent.as"
 
-#include "scripts/ui.as"
-#include "scripts/uiElement.as"
+#include "scripts/rando/ui.as"
+#include "scripts/rando/uiElement.as"
 
-#include "scripts/utils.as"
-#include "scripts/actorUtils.as"
-#include "scripts/locations.as"
-#include "scripts/weaponsAndAmmo.as"
-#include "scripts/traps.as"
-#include "scripts/randoPrimagenKeyTrigger.as"
-#include "scripts/actorReplacements.as"
-#include "scripts/apProcessing.as"
-#include "scripts/randoPickupObject.as"
-#include "scripts/randoWarpBarrier.as"
-#include "scripts/randoLevel1Barrier.as"
-#include "scripts/randoPlayerObject.as"
-#include "scripts/replacementEntry.as"
-#include "scripts/actionObjectEntry.as"
-#include "scripts/consoleCommands.as"
+#include "scripts/rando/utils.as"
+#include "scripts/rando/actorUtils.as"
+#include "scripts/rando/locations.as"
+#include "scripts/rando/weaponsAndAmmo.as"
+#include "scripts/rando/traps.as"
+#include "scripts/rando/randoPrimagenKeyTrigger.as"
+#include "scripts/rando/actorReplacements.as"
+#include "scripts/rando/apProcessing.as"
+#include "scripts/rando/randoPickupObject.as"
+#include "scripts/rando/randoWarpBarrier.as"
+#include "scripts/rando/randoLevel1Barrier.as"
+#include "scripts/rando/randoPlayerObject.as"
+#include "scripts/rando/replacementEntry.as"
+#include "scripts/rando/actionObjectEntry.as"
+#include "scripts/rando/consoleCommands.as"
 
 /*
 ==============================================================
