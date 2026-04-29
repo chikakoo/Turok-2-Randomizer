@@ -275,7 +275,7 @@ PrimagenKeyTrigger kActor_Hub_PrimagenKeyTrigger
 	
 	initialScale              "0.5 0.5 0.5"
     Begin_Component "kexWorldComponent"
-		touchRadius           225.00
+		touchRadius           200.00
         height                81.92
         bNonSolid             TRUE
     End_Component

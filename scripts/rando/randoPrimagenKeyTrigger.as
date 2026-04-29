@@ -33,11 +33,20 @@ class RandoPrimagenKeyTrigger : ScriptObject
 	{
 		if (m_messageCooldown <= 0)
 		{
+			if (LocalPlayer.Inventory().HasBeenPickedUpBefore(kActor_InventoryItem_VisitedPrimagen))
+			{
+				DoPlayerWarp(0, 17602, kLevel_PrimagenBoss, true);
+				return;
+			}
+			
 			int levelsCompleted = GetInventoryItemCurrentTotal(kActor_Misc_TotemInventory);
-			Hud.AddMessage(
-				"Level goal not met: " + levelsCompleted + "/" + OPTION_GOAL_LEVELS,
-				240);
-			m_messageCooldown = 360;
+			if (levelsCompleted < OPTION_GOAL_LEVELS)
+			{
+				Hud.AddMessage(
+					"Level goal not met: " + levelsCompleted + "/" + OPTION_GOAL_LEVELS,
+					240);
+				m_messageCooldown = 360;
+			}
 		}
 	}
 	

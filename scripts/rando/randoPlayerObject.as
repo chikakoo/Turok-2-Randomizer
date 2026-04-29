@@ -101,6 +101,15 @@ class RandoPlayerObject : ScriptObject
 			CinemaPlayer.StopCinema();
 			DoPlayerWarp(0, 10099, kLevel_Hub, false);
 		}
+		else if (mapId == kLevel_PrimagenBoss)
+		{
+			// Give a "token" indicating whether you've visited the primagen
+			// This is so we know whether to spawn the actor to allow you to teleport back there
+			if (!LocalPlayer.Inventory().HasBeenPickedUpBefore(kActor_InventoryItem_VisitedPrimagen))
+			{
+				LocalPlayer.Inventory().Give(kActor_InventoryItem_VisitedPrimagen);
+			}
+		}
 		
 		//-------------------------
 		// Goals!

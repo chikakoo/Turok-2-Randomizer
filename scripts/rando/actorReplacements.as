@@ -542,7 +542,10 @@ void DoHubModifications(const int16 &in mapId)
 		return;
 	}
 
-	if (AreLevelRequirementsUsed() && !AreLevelRequirementsUsedAndMet())
+	// Spawn the primagen key trigger if we need to be able to warp back there
+	// Or if we haven't met level requirements and need to show the message
+	if (LocalPlayer.Inventory().HasBeenPickedUpBefore(kActor_InventoryItem_VisitedPrimagen) ||
+		(AreLevelRequirementsUsed() && !AreLevelRequirementsUsedAndMet()))
 	{
 		ActorFactory.Spawn(
 			kActor_Hub_PrimagenKeyTrigger,

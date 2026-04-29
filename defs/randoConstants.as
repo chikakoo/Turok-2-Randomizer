@@ -18,6 +18,9 @@
 #define kActor_InventoryItem_ProgressiveWarpL5 201005
 #define kActor_InventoryItem_ProgressiveWarpL6 201006
 
+// Dumb way to detect that you should be able to warp back there if you leave
+#define kActor_InventoryItem_VisitedPrimagen 202000 
+
 #define kActor_Item_RandomAmmo 30000 // Limited to int16 for generators
 #define kActor_Generator_RandomAmmo 30100
 #define kActor_Generator_FullHealth 30101
