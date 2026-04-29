@@ -359,6 +359,8 @@ kStr GetMapDisplayName(const int &in mapId)
 //------------------------------
 // Whether the player is in a totem or boss level.
 // These can't be teleported out of via the UI menu.
+//
+// Excludes the Primagen, as we have a way to deal with that now.
 bool IsInTotemOrBossLevel()
 {
 	switch(Game.ActiveMapID())
@@ -371,7 +373,6 @@ bool IsInTotemOrBossLevel()
 		case kLevel_BlindOneBoss:
 		case kLevel_QueenBoss:
 		case kLevel_MotherBoss:
-		case kLevel_PrimagenBoss:
 			return true;
 	}
 	
