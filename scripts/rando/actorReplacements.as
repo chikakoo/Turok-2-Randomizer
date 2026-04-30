@@ -576,7 +576,7 @@ void DoHubModifications(const int16 &in mapId)
 bool AreLevelRequirementsUsedAndMet()
 {
 	return AreLevelRequirementsUsed() &&
-		(GetInventoryItemCurrentTotal(kActor_Misc_TotemInventory) >= OPTION_GOAL_LEVELS);
+		(GetNumberOfFinishedLevels() >= OPTION_GOAL_LEVELS);
 }
 
 //---------------------------

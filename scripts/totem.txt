@@ -131,16 +131,32 @@ class TurokTotem : ScriptObject
             switch(Game.ActiveMapID())
             {
             case kLevel_PortOfAdia_Totem:
+				// ------------------------------------------
+				// Added by Rando to track individual cleared levels
+				LocalPlayer.Inventory().Give(kActor_InventoryItem_FinishedLevel1);
+				// ------------------------------------------
                 DoPlayerWarp(0, 11999, kLevel_Hub, true);
                 break;
                 
             case kLevel_RiverOfSouls_Totem:
+				// ------------------------------------------
+				// Added by Rando to track individual cleared levels
+				LocalPlayer.Inventory().Give(kActor_InventoryItem_FinishedLevel2);
+				// ------------------------------------------
                 DoPlayerWarp(0, 12999, kLevel_Hub, true);
                 break;
                 
             case kLevel_DeathMarsh_Totem:
+				// ------------------------------------------
+				// Added by Rando to track individual cleared levels
+				LocalPlayer.Inventory().Give(kActor_InventoryItem_FinishedLevel3);
+				// ------------------------------------------
                 DoPlayerWarp(0, 13999, kLevel_Hub, true);
                 break;
+				
+			// ------------------------------------------
+			// Rando note: Levels 4-6 have bosses, we can't set the completion here
+			// ------------------------------------------
                 
             case kLevel_BlindLair_Totem:
                 DoPlayerWarp(0, 17401, kLevel_BlindOneBoss, true);

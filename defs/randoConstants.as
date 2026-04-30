@@ -18,8 +18,18 @@
 #define kActor_InventoryItem_ProgressiveWarpL5 201005
 #define kActor_InventoryItem_ProgressiveWarpL6 201006
 
-// Dumb way to detect that you should be able to warp back there if you leave
-#define kActor_InventoryItem_VisitedPrimagen 202000 
+// Dumb way to detect that you should be able to warp back to bosses if you leave
+#define kActor_InventoryItem_VisitedPrimagen 202000
+#define kActor_InventoryItem_VisitedL4Boss 202004
+#define kActor_InventoryItem_VisitedL5Boss 202005
+#define kActor_InventoryItem_VisitedL6Boss 202006
+
+#define kActor_InventoryItem_FinishedLevel1 203001
+#define kActor_InventoryItem_FinishedLevel2 203002
+#define kActor_InventoryItem_FinishedLevel3 203003
+#define kActor_InventoryItem_FinishedLevel4 203004
+#define kActor_InventoryItem_FinishedLevel5 203005
+#define kActor_InventoryItem_FinishedLevel6 203006
 
 #define kActor_Item_RandomAmmo 30000 // Limited to int16 for generators
 #define kActor_Generator_RandomAmmo 30100
@@ -95,3 +105,4 @@
 #define RANDO_UI_TEXTURE_TEXT_GREEN_START 15 // 24 is the last
 #define RANDO_UI_TEXTURE_TEXT_LEFT 25
 #define RANDO_UI_TEXTURE_WARP_HUB 26
+#define RANDO_UI_TEXTURE_WARP_BOSS 27

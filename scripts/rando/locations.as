@@ -263,6 +263,26 @@ int GetLevelNumberFromMapId(const int &in mapId)
 }
 
 //------------------------------
+// Gets the boss level of the given map.
+// Returns 0 if there is none.
+//
+// TODO: This may need to be done for totems as well
+int16 GetBossLevelOfMap(const int &in mapId)
+{
+	switch(GetLevelNumberFromMapId(mapId))
+	{
+		case LEVEL_LAIR_OF_THE_BLIND_ONES:
+			return kLevel_BlindOneBoss;
+		case LEVEL_HIVE_OF_THE_MANTIDS:
+			return kLevel_QueenBoss;
+		case LEVEL_PRIMAGENS_LIGHTSHIP:
+			return kLevel_MotherBoss;
+	}
+	
+	return 0;
+}
+
+//------------------------------
 // Gets the map display name from the given map id.
 kStr GetMapDisplayName(const int &in mapId)
 {
@@ -363,20 +383,20 @@ kStr GetMapDisplayName(const int &in mapId)
 // Excludes the Primagen, as we have a way to deal with that now.
 bool IsInTotemOrBossLevel()
 {
-	switch(Game.ActiveMapID())
-	{
-		case kLevel_PortOfAdia_Totem:
-		case kLevel_RiverOfSouls_Totem:
-		case kLevel_DeathMarsh_Totem:
-		case kLevel_BlindLair_Totem:
-		case kLevel_Hive_Totem:
-		case kLevel_BlindOneBoss:
-		case kLevel_QueenBoss:
-		case kLevel_MotherBoss:
-			return true;
-	}
-	
-	return false;
+    switch(Game.ActiveMapID())
+    {
+        case kLevel_PortOfAdia_Totem:
+        case kLevel_RiverOfSouls_Totem:
+        case kLevel_DeathMarsh_Totem:
+        case kLevel_BlindLair_Totem:
+        case kLevel_Hive_Totem:
+        case kLevel_BlindOneBoss:
+        case kLevel_QueenBoss:
+        case kLevel_MotherBoss:
+            return true;
+    }
+    
+    return false;
 }
 
 //------------------------------

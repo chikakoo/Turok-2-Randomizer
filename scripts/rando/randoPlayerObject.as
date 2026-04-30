@@ -103,12 +103,19 @@ class RandoPlayerObject : ScriptObject
 		}
 		else if (mapId == kLevel_PrimagenBoss)
 		{
-			// Give a "token" indicating whether you've visited the primagen
-			// This is so we know whether to spawn the actor to allow you to teleport back there
-			if (!LocalPlayer.Inventory().HasBeenPickedUpBefore(kActor_InventoryItem_VisitedPrimagen))
-			{
-				LocalPlayer.Inventory().Give(kActor_InventoryItem_VisitedPrimagen);
-			}
+			TryGiveBossLevelItem(kActor_InventoryItem_VisitedPrimagen);
+		}
+		else if (mapId == kLevel_BlindOneBoss)
+		{
+			TryGiveBossLevelItem(kActor_InventoryItem_VisitedL4Boss);
+		}
+		else if (mapId == kLevel_QueenBoss)
+		{
+			TryGiveBossLevelItem(kActor_InventoryItem_VisitedL5Boss);
+		}
+		else if (mapId == kLevel_MotherBoss)
+		{
+			TryGiveBossLevelItem(kActor_InventoryItem_VisitedL6Boss);
 		}
 		
 		//-------------------------
@@ -163,6 +170,17 @@ class RandoPlayerObject : ScriptObject
 		
 		// Show level progress on spawn as a convenience
 		DisplayCollectedLocationsForCurrentMap();
+	}
+	
+	//---------------------------
+	// Give a "token" indicating whether you've visited the associated map.
+	// This is so we know whether to allow the player to re-enter boss fights.
+	void TryGiveBossLevelItem(const int &in inventoryItem)
+	{
+		if (!LocalPlayer.Inventory().HasBeenPickedUpBefore(inventoryItem))
+		{
+			LocalPlayer.Inventory().Give(inventoryItem);
+		}
 	}
 	
 	//---------------------------
@@ -396,4 +414,19 @@ class RandoPlayerObject : ScriptObject
 bool IsScoped(void)
 {
 	return LocalPlayer.WeaponActor() !is null && LocalPlayer.WeaponActor().ScopeReady();
+}
+
+//---------------------------
+// Gets the number of levels the player has finished
+int16 GetNumberOfFinishedLevels(void)
+{
+	int16 finishedLevels = 0;
+	if (GetInventoryItemCurrentTotal(kActor_InventoryItem_FinishedLevel1) > 0) { finishedLevels++; }
+	if (GetInventoryItemCurrentTotal(kActor_InventoryItem_FinishedLevel2) > 0) { finishedLevels++; }
+	if (GetInventoryItemCurrentTotal(kActor_InventoryItem_FinishedLevel3) > 0) { finishedLevels++; }
+	if (GetInventoryItemCurrentTotal(kActor_InventoryItem_FinishedLevel4) > 0) { finishedLevels++; }
+	if (GetInventoryItemCurrentTotal(kActor_InventoryItem_FinishedLevel5) > 0) { finishedLevels++; }
+	if (GetInventoryItemCurrentTotal(kActor_InventoryItem_FinishedLevel6) > 0) { finishedLevels++; }
+	
+	return finishedLevels;
 }

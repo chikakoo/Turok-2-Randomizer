@@ -39,7 +39,7 @@ class RandoPrimagenKeyTrigger : ScriptObject
 				return;
 			}
 			
-			int levelsCompleted = GetInventoryItemCurrentTotal(kActor_Misc_TotemInventory);
+			int levelsCompleted = GetNumberOfFinishedLevels();
 			if (levelsCompleted < OPTION_GOAL_LEVELS)
 			{
 				Hud.AddMessage(

@@ -1,0 +1,1367 @@
+//
+// Copyright(C) 2014-2015 Samuel Villarreal
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either version 2
+// of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// DESCRIPTION:
+//      Blind One Boss behavior logic
+//
+
+//-----------------------------------------------------------------------------
+//
+// Vars
+//
+//-----------------------------------------------------------------------------
+
+const int SPHINCTER_HEALTH                      = 100;
+const int SWAMP_TENTACLE_HEALTH                 = 80;
+const int CEILING_TENTACLE_HEALTH               = 100;
+const int EYE_BALL_HEALTH                       = 50;
+const int ACTIVE_GRUB_FLOW_AMOUNT               = 4;
+
+const int TOTAL_SPHINCTERS                      = 4;
+const int TOTAL_SWAMP_TENTACLES                 = 4;
+const int TOTAL_CEILING_TENTACLES               = 3;
+
+const float ENCOUNTER_START_RADIUS              = (70*GAME_SCALE);
+const float SWAMP_INNER_RADIUS                  = (120*GAME_SCALE);
+const float SWAMP_OUTER_RADIUS                  = (150*GAME_SCALE);
+
+const float SPHINCTER_TURN_SPEED                = Math::Deg2Rad(4);
+const float SPHINCTER_TURN_LIMIT                = Math::Deg2Rad(360);
+
+const float SWAMP_TENTACLE_ATTACK_FAR_DIST      = (120*GAME_SCALE);
+const float SWAMP_TENTACLE_TURN_SPEED           = Math::Deg2Rad(4);
+const float SWAMP_TENTACLE_TURN_LIMIT           = Math::Deg2Rad(45);
+
+const float CEILING_TENTACLE_TURN_SPEED         = Math::Deg2Rad(4);
+const float CEILING_TENTACLE_TURN_LIMIT         = Math::Deg2Rad(360);
+
+CBlindBossController@ g_pBlindBossController    = null;
+
+//-----------------------------------------------------------------------------
+//
+// Modes
+//
+//-----------------------------------------------------------------------------
+
+enum eyeBallModes
+{
+    EYEBALL_MODE_ENTER      = 0,
+    EYEBALL_MODE_EXIT,
+    EYEBALL_MODE_HIDE,
+    EYEBALL_MODE_IDLE,
+    EYEBALL_MODE_IMPACT,
+    EYEBALL_MODE_BLINK,
+    EYEBALL_MODE_BLINK_FAST_CLOSE,
+    EYEBALL_MODE_BLINK_FAST_OPEN,
+    EYEBALL_MODE_QUIVER,
+    EYEBALL_MODE_DEATH,
+    
+    NUMEYEBALLMODES
+}
+
+enum tentacleModes
+{
+    TENTACLE_MODE_ENTER     = 0,
+    TENTACLE_MODE_EXIT,
+    TENTACLE_MODE_IDLE,
+    TENTACLE_MODE_SPIT,
+    TENTACLE_MODE_ATTACK_CLOSE,
+    TENTACLE_MODE_ATTACK_FAR,
+    TENTACLE_MODE_DEATH,
+    
+    NUMTENTACLEMODES
+}
+
+enum eyeBallVarsModes
+{
+    STAGE_MODE_INIT     = 0,
+    STAGE_MODE_WAIT_FOR_PLAYER,
+    STAGE_MODE_INTRO,
+    
+    STAGE_MODE_SLUGS,
+    STAGE_MODE_SPHINCTERS,
+    STAGE_MODE_SWAMP_TENTACLES,
+    STAGE_MODE_CEILING_TENTACLES,
+    
+    STAGE_MODE_EYE_ENTER,
+    STAGE_MODE_EYE_EXIT,
+    STAGE_MODE_EYE_VULNERABLE,
+    STAGE_MODE_EYE_DEATH,
+    
+    NUMEYEBALLVARSMODES
+}
+
+void InitBlindBossModeTable(void)
+{
+    DefineMode("EyeBallModeTable", EYEBALL_MODE_ENTER,              "",                                     "void MODE_ToIdle(void)",           CF_STATIC, ANIM_EYE_ENTER,  "", 0, 10, 0, MF_NOROOTMOTION);
+    DefineMode("EyeBallModeTable", EYEBALL_MODE_EXIT,               "",                                     "void MODE_Exit(void)",             CF_STATIC, ANIM_EYE_EXIT,   "", 0, 10, 0, MF_NOROOTMOTION);
+    DefineMode("EyeBallModeTable", EYEBALL_MODE_HIDE,               "",                                     "void MODE_ToIdle(void)",           CF_STATIC, ANIM_EYE_HIDE,   "", 0, 10, 0, MF_NOROOTMOTION|MF_HEADTRACK);
+    DefineMode("EyeBallModeTable", EYEBALL_MODE_IDLE,               "void MODE_IdleSetup(void)",            "void MODE_Idle(void)",             CF_STATIC, ANIM_EYE_IDLE,   "", 0, 24, 0, MF_NOROOTMOTION|MF_HEADTRACK);
+    DefineMode("EyeBallModeTable", EYEBALL_MODE_IMPACT,             "",                                     "void MODE_ToIdle(void)",           CF_STATIC, ANIM_EYE_IMPACT, "", 0, 5,  0, MF_NOROOTMOTION|MF_HEADTRACK);
+    DefineMode("EyeBallModeTable", EYEBALL_MODE_BLINK,              "",                                     "void MODE_ToIdle(void)",           CF_STATIC, ANIM_EYE_BLINK,  "", 0, 16, 0, MF_NOROOTMOTION|MF_HEADTRACK);
+    DefineMode("EyeBallModeTable", EYEBALL_MODE_BLINK_FAST_CLOSE,   "",                                     "void MODE_FastClose(void)",        CF_STATIC, ANIM_EYE_CLOSE,  "", 1, 2,  0, MF_NOROOTMOTION|MF_HEADTRACK);
+    DefineMode("EyeBallModeTable", EYEBALL_MODE_BLINK_FAST_OPEN,    "",                                     "void MODE_ToIdle(void)",           CF_STATIC, ANIM_EYE_OPEN,   "", 2, 2,  0, MF_NOROOTMOTION|MF_HEADTRACK);
+    DefineMode("EyeBallModeTable", EYEBALL_MODE_QUIVER,             "",                                     "void MODE_ToIdle(void)",           CF_STATIC, ANIM_EYE_IMPACT, "", 0, 5,  0, MF_NOROOTMOTION|MF_HEADTRACK);
+    DefineMode("EyeBallModeTable", EYEBALL_MODE_DEATH,              "void MODE_DeathSetup(void)",           "void MODE_Death(void)",            CF_STATIC, ANIM_EYE_DEATH,  "", 0, 10, 0, MF_NOROOTMOTION);
+    
+    DefineMode("TentacleModeTable",TENTACLE_MODE_ENTER,             "void MODE_SetupEnter(void)",           "void MODE_ToIdle(void)",           0, ANIM_TENTACLE_ENTER,         "", 0, 5, 0, MF_NOACCUMULATION);
+    DefineMode("TentacleModeTable",TENTACLE_MODE_EXIT,              "",                                     "",                                 0, ANIM_TENTACLE_EXIT,          "", 0, 5, 0, MF_NOACCUMULATION);
+    DefineMode("TentacleModeTable",TENTACLE_MODE_IDLE,              "",                                     "void MODE_Idle(void)",             0, ANIM_TENTACLE_IDLE,          "", 0, 5, 0, MF_NOACCUMULATION|MF_HEADTRACK);
+    DefineMode("TentacleModeTable",TENTACLE_MODE_SPIT,              "",                                     "void MODE_ToIdle(void)",           0, ANIM_TENTACLE_SPIT,          "", 0, 5, 0, MF_NOACCUMULATION|MF_HEADTRACK);
+    DefineMode("TentacleModeTable",TENTACLE_MODE_ATTACK_CLOSE,      "",                                     "void MODE_ToIdle(void)",           0, ANIM_TENTACLE_ATTACK_CLOSE,  "", 0, 5, 0, MF_NOACCUMULATION|MF_HEADTRACK);
+    DefineMode("TentacleModeTable",TENTACLE_MODE_ATTACK_FAR,        "",                                     "void MODE_ToIdle(void)",           0, ANIM_TENTACLE_ATTACK_FAR,    "", 0, 5, 0, MF_NOACCUMULATION|MF_HEADTRACK);
+    DefineMode("TentacleModeTable",TENTACLE_MODE_DEATH,             "void MODE_DeathSetup(void)",           "void MODE_Death(void)",            0, ANIM_TENTACLE_DEATH,         "", 0, 5, 0, 0);
+}
+
+//-----------------------------------------------------------------------------
+//
+// Stage Struct
+//
+//-----------------------------------------------------------------------------
+
+// EyeBallStage = { mode, data1, data2 }
+const array<float> g_cEyeBallStage_Slugs        = { STAGE_MODE_SLUGS, 16, 8 };
+const array<float> g_cEyeBallStage_EyeEnter     = { STAGE_MODE_EYE_ENTER, 0, 0 };
+const array<float> g_cEyeBallStage_EyeExit      = { STAGE_MODE_EYE_EXIT, 0, 0 };
+
+const array<float> g_cEyeBallStage_1            = { STAGE_MODE_INIT, 0, 0 };
+const array<float> g_cEyeBallStage_2            = { STAGE_MODE_WAIT_FOR_PLAYER, 0, 0 };
+const array<float> g_cEyeBallStage_3            = { STAGE_MODE_INTRO, 0, 0 };
+const array<float> g_cEyeBallStage_4            = { STAGE_MODE_SWAMP_TENTACLES, 0.5f, 0 };
+const array<float> g_cEyeBallStage_5            = { STAGE_MODE_SPHINCTERS, 0.5f, 0 };
+const array<float> g_cEyeBallStage_6            = { STAGE_MODE_CEILING_TENTACLES, 0.5f, 0 };
+const array<float> g_cEyeBallStage_7            = { STAGE_MODE_EYE_VULNERABLE, 0, 0 };
+const array<float> g_cEyeBallStage_8            = { STAGE_MODE_EYE_DEATH, 0, 0 };
+
+enum eyeBallStageProp
+{
+    STAGE_MODE      = 0,
+    STAGE_DATA1,
+    STAGE_DATA2
+}
+
+const array<const array<float>@> g_cEyeBallStages =
+{
+    @g_cEyeBallStage_1,
+    @g_cEyeBallStage_2,
+    @g_cEyeBallStage_Slugs,
+    @g_cEyeBallStage_3,
+    @g_cEyeBallStage_EyeEnter,
+    @g_cEyeBallStage_4,
+    @g_cEyeBallStage_EyeExit,
+    @g_cEyeBallStage_Slugs,
+    @g_cEyeBallStage_EyeEnter,
+    @g_cEyeBallStage_5,
+    @g_cEyeBallStage_EyeExit,
+    @g_cEyeBallStage_Slugs,
+    @g_cEyeBallStage_EyeEnter,
+    @g_cEyeBallStage_6,
+    @g_cEyeBallStage_7,
+    @g_cEyeBallStage_8
+};
+
+//-----------------------------------------------------------------------------
+//
+// Sequence Struct
+//
+//-----------------------------------------------------------------------------
+
+enum sequenceCommandFlags
+{
+    SEQ_SPHINCTER_ATTACK_BITS       = 0,
+    SEQ_FLAG_SPHINCTER1_ATTACK      = (1<<0),
+    SEQ_FLAG_SPHINCTER2_ATTACK      = (1<<1),
+    SEQ_FLAG_SPHINCTER3_ATTACK      = (1<<2),
+    SEQ_FLAG_SPHINCTER4_ATTACK      = (1<<3),
+    
+    SEQ_SWAMP_TENT_ATTACK_BITS      = 4,
+    SEQ_FLAG_SWAMP_TENT1_ATTACK     = (1<<4),
+    SEQ_FLAG_SWAMP_TENT2_ATTACK     = (1<<5),
+    SEQ_FLAG_SWAMP_TENT3_ATTACK     = (1<<6),
+    SEQ_FLAG_SWAMP_TENT4_ATTACK     = (1<<7),
+    
+    SEQ_CEIL_TENT_ATTACK_BITS       = 8,
+    SEQ_FLAG_CEIL_TENT1_ATTACK      = (1<<8),
+    SEQ_FLAG_CEIL_TENT2_ATTACK      = (1<<9),
+    SEQ_FLAG_CEIL_TENT3_ATTACK      = (1<<10),
+    
+    SEQ_FLAG_CONTINUE               = (1<<11),
+    
+    SEQ_STOP                        = 0,
+    SEQ_END                         = -1
+}
+
+const array<int> g_cSphinctersSequence =
+{
+    SEQ_FLAG_SPHINCTER1_ATTACK | SEQ_FLAG_CONTINUE,
+    SEQ_FLAG_SPHINCTER2_ATTACK | SEQ_FLAG_CONTINUE,
+    SEQ_FLAG_SPHINCTER3_ATTACK | SEQ_FLAG_CONTINUE,
+    SEQ_FLAG_SPHINCTER4_ATTACK | SEQ_FLAG_CONTINUE,
+    SEQ_STOP,
+    
+    SEQ_FLAG_SPHINCTER1_ATTACK|SEQ_FLAG_SPHINCTER2_ATTACK|SEQ_FLAG_SPHINCTER3_ATTACK|SEQ_FLAG_SPHINCTER4_ATTACK,
+    SEQ_STOP,
+    
+    SEQ_FLAG_SPHINCTER1_ATTACK | SEQ_FLAG_CONTINUE,
+    SEQ_FLAG_SPHINCTER3_ATTACK | SEQ_FLAG_CONTINUE,
+    SEQ_FLAG_SPHINCTER2_ATTACK | SEQ_FLAG_CONTINUE,
+    SEQ_FLAG_SPHINCTER4_ATTACK | SEQ_FLAG_CONTINUE,
+    SEQ_STOP,
+    
+    SEQ_END
+};
+
+const array<int> g_cSwampTentaclesSequence =
+{
+    SEQ_FLAG_SWAMP_TENT1_ATTACK | SEQ_FLAG_CONTINUE,
+    SEQ_FLAG_SWAMP_TENT2_ATTACK | SEQ_FLAG_CONTINUE,
+    SEQ_FLAG_SWAMP_TENT3_ATTACK | SEQ_FLAG_CONTINUE,
+    SEQ_FLAG_SWAMP_TENT4_ATTACK | SEQ_FLAG_CONTINUE,
+    SEQ_STOP,
+    
+    SEQ_FLAG_SWAMP_TENT4_ATTACK | SEQ_FLAG_CONTINUE,
+    SEQ_FLAG_SWAMP_TENT3_ATTACK | SEQ_FLAG_CONTINUE,
+    SEQ_FLAG_SWAMP_TENT2_ATTACK | SEQ_FLAG_CONTINUE,
+    SEQ_FLAG_SWAMP_TENT1_ATTACK | SEQ_FLAG_CONTINUE,
+    SEQ_STOP,
+    
+    SEQ_END
+};
+
+const array<int> g_cCeilingTentaclesSequence =
+{
+    SEQ_FLAG_CEIL_TENT1_ATTACK | SEQ_FLAG_CONTINUE,
+    SEQ_FLAG_CEIL_TENT2_ATTACK | SEQ_FLAG_CONTINUE,
+    SEQ_FLAG_CEIL_TENT3_ATTACK | SEQ_FLAG_CONTINUE,
+    SEQ_STOP,
+    
+    SEQ_FLAG_CEIL_TENT3_ATTACK | SEQ_FLAG_CONTINUE,
+    SEQ_FLAG_CEIL_TENT2_ATTACK | SEQ_FLAG_CONTINUE,
+    SEQ_FLAG_CEIL_TENT1_ATTACK | SEQ_FLAG_CONTINUE,
+    SEQ_STOP,
+    
+    SEQ_END
+};
+
+final class CBlindBossSeq
+{
+    const array<int>@       m_pData;
+    const array<kActor@>@   m_pActors;
+    int                     m_pos;
+    float                   m_fDelay;
+    float                   m_fDelayTime;
+    int                     m_repeatInc;
+    int                     m_repeatCount;
+    int8                    m_bits;
+    
+    //--------------------------------------------------
+    void Stop(void)
+    {
+        @m_pData = null;
+        @m_pActors = null;
+    }
+    
+    //--------------------------------------------------
+    void Start(const array<int>@ pData, const array<kActor@>@ pActors, const int8 bits, float delay)
+    {
+        @m_pData = pData;
+        @m_pActors = pActors;
+        m_pos = 0;
+        m_fDelay = delay;
+        m_fDelayTime = 0;
+        m_repeatInc = 1;
+        m_repeatCount = 0;
+        m_bits = bits;
+    }
+    
+    //--------------------------------------------------
+    // TODO: this could potentially go into a infinite loop
+    void Run(void)
+    {
+        m_fDelayTime -= GAME_DELTA_TIME;
+        if(m_fDelayTime > 0)
+        {
+            return;
+        }
+        
+        bool bContinue = false;
+        m_fDelayTime += m_fDelay;
+        
+        do
+        {
+            int command = m_pData[m_pos++];
+            
+            bContinue = ((command & SEQ_FLAG_CONTINUE) != 0);
+            
+            for(uint i = 0; i < m_pActors.length(); ++i)
+            {
+                int index = (i + m_repeatCount) % m_pActors.length();
+                if((command & (1 << (index+m_bits))) != 0)
+                {
+                    kActor@ pActor = m_pActors[i];
+                    if(pActor is null)
+                    {
+                        return;
+                    }
+                    
+                    if((pActor.Flags() & AF_NODAMAGE) != 0)
+                    {
+                        bContinue = true;
+                        continue;
+                    }
+                    
+                    if(pActor.Health() > 0)
+                    {
+                        bContinue = false;
+                        
+                        // signal it to attack
+                        pActor.TID() = -666;
+                    }
+                }
+            }
+            
+            if(m_pData[m_pos] == SEQ_END)
+            {
+                m_pos = 0;
+                m_repeatCount += m_repeatInc;
+            }
+            
+        } while(bContinue);
+    }
+};
+
+//-----------------------------------------------------------------------------
+//
+// Controller
+//
+//-----------------------------------------------------------------------------
+
+final class CBlindBossController
+{
+    kActor@                 m_pEyeBall;
+    
+    array<kActor@>          m_pSphincters;
+    array<kActor@>          m_pSwampTentacles;
+    array<kActor@>          m_pCeilingTentacles;
+    array<kActor@>          m_pPlayers;
+    
+    const array<float>@     m_pStageInfo;
+    uint                    m_nStage;    
+    int                     m_mode;
+    
+    int                     m_nGrubsRemaining;
+    int                     m_nActiveGrubs;
+    int                     m_nMaxGrubs;
+
+    int                     m_nActiveSphincters;
+    int                     m_nActiveSwampTentacles;
+    int                     m_nActiveCeilingTentacles;
+    
+    CBlindBossSeq           m_cSeq;
+    
+    //--------------------------------------------------
+    CBlindBossController(void)
+    {
+    }
+    
+    //--------------------------------------------------
+    CBlindBossController(kActor@ pEyeBall)
+    {
+        @m_pEyeBall = pEyeBall;
+        m_mode = 0;
+        m_nStage = 0;
+        @m_pStageInfo = g_cEyeBallStages[m_nStage];
+        
+        m_nActiveSphincters = 0;
+        m_nActiveSwampTentacles = 0;
+        m_nActiveCeilingTentacles = 0;
+        
+        SetupMode(int(m_pStageInfo[STAGE_MODE]));
+    }
+    
+    //--------------------------------------------------
+    void InitActorRefArrays(void)
+    {
+        kActorIterator cIterator;
+        kActor@ pActor;
+        
+        while(!((@pActor = cIterator.GetNext()) is null))
+        {
+            switch(pActor.Type())
+            {
+            case kActor_AI_Sphincter:
+                m_pSphincters.insertLast(pActor);
+                break;
+            case kActor_AI_SwampTentacle:
+                if(IsValidSwampTentacle(pActor))
+                {
+                    m_pSwampTentacles.insertLast(pActor);
+                }
+                break;
+            case kActor_AI_CeilingTentacle:
+                m_pCeilingTentacles.insertLast(pActor);
+                break;
+            case kActor_Player:
+                m_pPlayers.insertLast(pActor);
+                break;
+            default:
+                break;
+            }
+        }
+    }
+    
+    //--------------------------------------------------
+    bool IsValidSwampTentacle(kActor@ pActor)
+    {
+        if( pActor.TID() == 10 ||
+            pActor.TID() == 17 ||
+            pActor.TID() == 15 ||
+            pActor.TID() == 16)
+        {
+            return false;
+        }
+        
+        return (pActor.Type() == kActor_AI_SwampTentacle);
+    }
+    
+    //--------------------------------------------------
+    void SetupStagePostDeserialization(void)
+    {
+        switch(m_mode)
+        {
+        case STAGE_MODE_SPHINCTERS:
+            Hud.SetBar(0, 50, 255, 50, 255, SPHINCTER_HEALTH * m_pSphincters.length());
+            @m_cSeq.m_pData = g_cSphinctersSequence;
+            @m_cSeq.m_pActors = m_pSphincters;
+            break;
+        case STAGE_MODE_SWAMP_TENTACLES:
+            Hud.SetBar(0, 50, 255, 50, 255, SWAMP_TENTACLE_HEALTH * m_pSwampTentacles.length());
+            @m_cSeq.m_pData = g_cSwampTentaclesSequence;
+            @m_cSeq.m_pActors = m_pSwampTentacles;
+            break;
+        case STAGE_MODE_CEILING_TENTACLES:
+            Hud.SetBar(0, 50, 255, 50, 255, CEILING_TENTACLE_HEALTH * m_pCeilingTentacles.length());
+            @m_cSeq.m_pData = g_cCeilingTentaclesSequence;
+            @m_cSeq.m_pActors = m_pCeilingTentacles;
+            break;
+        default:
+            break;
+        }
+    }
+    
+    //--------------------------------------------------
+    void SetupMode(const int newMode)
+    {
+        m_cSeq.Stop();
+        
+        for(uint i = 0; i < m_pSphincters.length(); ++i)
+        {
+            m_pSphincters[i].TID() = -1;
+        }
+        
+        for(uint i = 0; i < m_pCeilingTentacles.length(); ++i)
+        {
+            m_pCeilingTentacles[i].TID() = -1;
+        }
+        
+        m_mode = newMode;
+        
+        switch(m_mode)
+        {
+        case STAGE_MODE_INTRO:
+            STAGE_SetupIntro();
+            break;
+        case STAGE_MODE_SLUGS:
+            STAGE_SetupSlugs();
+            break;
+        case STAGE_MODE_SPHINCTERS:
+            STAGE_SetupSphincters();
+            break;
+        case STAGE_MODE_SWAMP_TENTACLES:
+            STAGE_SetupSwampTentacles();
+            break;
+        case STAGE_MODE_CEILING_TENTACLES:
+            STAGE_SetupCeilingTentacles();
+            break;
+        case STAGE_MODE_EYE_VULNERABLE:
+            STAGE_SetupEyeFinal();
+            break;
+        case STAGE_MODE_EYE_DEATH:
+            break;
+        default:
+            break;
+        }
+    }
+    
+    //--------------------------------------------------
+    void ModeComplete(void)
+    {
+        m_nStage++;
+        @m_pStageInfo = g_cEyeBallStages[m_nStage];
+        
+        SetupMode(int(m_pStageInfo[STAGE_MODE]));
+    }
+    
+    //--------------------------------------------------
+    void CreateGrub(const kVec3& in vOrigin, const float fRadius, const float fAngle)
+    { 
+        if(m_nGrubsRemaining == 0)
+        {
+            return;
+        }
+        
+        if(m_nMaxGrubs != -1 && m_nActiveGrubs >= m_nMaxGrubs)
+        {
+            return;
+        }
+        
+        kVec3 vPos;
+        
+        vPos.x = vOrigin.x + (Math::Sin(fAngle) * fRadius);
+        vPos.y = vOrigin.y + (Math::Cos(fAngle) * fRadius);
+        vPos.z = 0.0f;
+        
+        int16 nRegionIdx = m_pEyeBall.WorldComponent().GetNearPositionAndRegionIndex(vPos, vPos);
+        kActor@ pGrub = ActorFactory.Spawn(kActor_AI_Grub, vPos, 0, 0, 0, true, nRegionIdx);
+        
+        if(!(pGrub is null))
+        {
+            m_nGrubsRemaining--;
+        }
+    }
+    
+    //--------------------------------------------------
+    void Tick(void)
+    {
+        switch(m_mode)
+        {
+        case STAGE_MODE_INIT:
+            STAGE_Init();
+            break;
+        case STAGE_MODE_WAIT_FOR_PLAYER:
+            STAGE_WaitForPlayers();
+            break;
+        case STAGE_MODE_INTRO:
+            STAGE_Intro();
+            break;
+        case STAGE_MODE_SLUGS:
+            STAGE_Slugs();
+            break;
+        case STAGE_MODE_SPHINCTERS:
+            STAGE_Sphincters();
+            break;
+        case STAGE_MODE_SWAMP_TENTACLES:
+            STAGE_SwampTentacles();
+            break;
+        case STAGE_MODE_CEILING_TENTACLES:
+            STAGE_CeilingTentacles();
+            break;
+        case STAGE_MODE_EYE_ENTER:
+            STAGE_SetupEyeEnter();
+            break;
+        case STAGE_MODE_EYE_EXIT:
+            STAGE_SetupEyeExit();
+            break;
+        case STAGE_MODE_EYE_VULNERABLE:
+            STAGE_EyeFinal();
+            break;
+        case STAGE_MODE_EYE_DEATH:
+            STAGE_EyeDeath();
+            break;
+        default:
+            break;
+        }
+    }
+    
+    //--------------------------------------------------
+    void STAGE_Init(void)
+    {
+        m_pEyeBall.Health() = EYE_BALL_HEALTH;
+        
+        for(uint i = 0; i < m_pSphincters.length(); ++i)
+        {
+            m_pSphincters[i].Health() = SPHINCTER_HEALTH;
+        }
+        
+        for(uint i = 0; i < m_pSwampTentacles.length(); ++i)
+        {
+            m_pSwampTentacles[i].Health() = SWAMP_TENTACLE_HEALTH;
+        }
+        
+        for(uint i = 0; i < m_pCeilingTentacles.length(); ++i)
+        {
+            m_pCeilingTentacles[i].Health() = CEILING_TENTACLE_HEALTH;
+        }
+        
+        m_nGrubsRemaining = 0;
+        m_nActiveGrubs = 0;
+        m_nMaxGrubs = 0;
+        m_nActiveSphincters = 0;
+        m_nActiveSwampTentacles = 0;
+        m_nActiveCeilingTentacles = 0;
+        
+        ModeComplete();
+    }
+    
+    //--------------------------------------------------
+    void STAGE_WaitForPlayers(void)
+    {
+        for(uint i = 0; i < m_pPlayers.length(); ++i)
+        {
+            if(m_pPlayers[i].Origin().Length() < ENCOUNTER_START_RADIUS)
+            {
+                // let's get the show on the road
+                ModeComplete();
+                return;
+            }
+        }
+    }
+    
+    //--------------------------------------------------
+    void STAGE_SetupIntro(void)
+    {
+        CinemaPlayer.StartCinema("cinemas/Eye opens.txt");
+    }
+    
+    //--------------------------------------------------
+    void STAGE_Intro(void)
+    {
+        if(!CinemaPlayer.Playing())
+        {
+            ModeComplete();
+        }
+    }
+    
+    //--------------------------------------------------
+    void STAGE_SetupSlugs(void)
+    {
+        m_nGrubsRemaining   = int(m_pStageInfo[STAGE_DATA1]);
+        m_nMaxGrubs         = int(m_pStageInfo[STAGE_DATA2]);
+    }
+    
+    //--------------------------------------------------
+    void STAGE_Slugs(void)
+    {
+        kActorIterator cIterator;
+        kActor@ pActor;
+        
+        m_nActiveGrubs = 0;
+        
+        while(!((@pActor = cIterator.GetNext()) is null))
+        {
+            if(pActor.Type() == kActor_AI_Grub)
+            {
+                m_nActiveGrubs++;
+            }
+        }
+        
+        CreateGrub(
+            m_pEyeBall.Origin(),
+            Math::RandRange(SWAMP_INNER_RADIUS, SWAMP_OUTER_RADIUS),
+            Math::RandRange(-Math::pi, Math::pi));
+        
+        if(m_nGrubsRemaining <= 0 && m_nActiveGrubs <= ACTIVE_GRUB_FLOW_AMOUNT)
+        {
+            ModeComplete();
+        }
+    }
+    
+    //--------------------------------------------------
+    void STAGE_SetupEyeEnter(void)
+    {
+        if(!(m_pEyeBall.ModeStateComponent() is null))
+        {
+            m_pEyeBall.ModeStateComponent().SetMode(EYEBALL_MODE_ENTER);
+            ModeComplete();
+        }
+    }
+    
+    //--------------------------------------------------
+    void STAGE_SetupEyeExit(void)
+    {
+        m_pEyeBall.PlaySound(kSfx_Eye_Scream);
+        
+        if(!(m_pEyeBall.ModeStateComponent() is null))
+        {
+            m_pEyeBall.ModeStateComponent().SetMode(EYEBALL_MODE_EXIT);
+            ModeComplete();
+        }
+    }
+    
+    //--------------------------------------------------
+    void STAGE_SetupEyeFinal(void)
+    {
+        m_pEyeBall.Flags() &= ~AF_NODAMAGE;
+        Hud.SetBar(0, 50, 255, 50, 255, int(m_pEyeBall.Health()));
+        
+        if(!(m_pEyeBall.ModeStateComponent() is null))
+        {
+            m_pEyeBall.ModeStateComponent().SetMode(EYEBALL_MODE_ENTER);
+        }
+    }
+    
+    //--------------------------------------------------
+    void STAGE_EyeFinal(void)
+    {
+        Hud.UpdateBar(0, int(m_pEyeBall.Health()));
+        
+        if(m_pEyeBall.Health() <= 0)
+        {
+            Hud.DisableBar(0);
+            ModeComplete();
+        }
+    }
+    
+    //--------------------------------------------------
+    void STAGE_EyeDeath(void)
+    {
+        if(!(m_pEyeBall.ModeStateComponent() is null))
+        {
+            if(m_pEyeBall.ModeStateComponent().ModeTime() > 128.0f)
+            {
+				// ------------------------------------------
+				// Added by Rando to track individual cleared levels
+				LocalPlayer.Inventory().Give(kActor_InventoryItem_FinishedLevel4);
+				// ------------------------------------------
+                DoPlayerWarp(0, 14999, kLevel_Hub, true);
+            }
+        }
+    }
+    
+    //--------------------------------------------------
+    void STAGE_SetupSwampTentacles(void)
+    {
+        for(uint i = 0; i < m_pSwampTentacles.length(); ++i)
+        {
+            if(!(m_pSwampTentacles[i].ModeStateComponent() is null))
+            {
+                m_pSwampTentacles[i].ModeStateComponent().SetMode(TENTACLE_MODE_ENTER);
+                m_nActiveSwampTentacles++;
+            }
+        }
+        
+        Hud.SetBar(0, 50, 255, 50, 255, SWAMP_TENTACLE_HEALTH * m_pSwampTentacles.length());
+        
+        m_cSeq.Start(
+            @g_cSwampTentaclesSequence,
+            @m_pSwampTentacles,
+            SEQ_SWAMP_TENT_ATTACK_BITS,
+            m_pStageInfo[STAGE_DATA1]);
+    }
+    
+    //--------------------------------------------------
+    void STAGE_SwampTentacles(void)
+    {
+        kActorIterator cIterator;
+        kActor@ pActor;
+        float totalHealth = 0;
+        
+        while(!((@pActor = cIterator.GetNext()) is null))
+        {
+            if(pActor.Health() <= 0 || (pActor.Flags() & AF_DEAD) != 0)
+            {
+                continue;
+            }
+            
+            if(IsValidSwampTentacle(pActor))
+            {
+                totalHealth += pActor.Health();
+            }
+        }
+        
+        Hud.UpdateBar(0, int(totalHealth));
+        
+        m_cSeq.Run();
+        
+        if(m_nActiveSwampTentacles <= 0)
+        {
+            Hud.DisableBar(0);
+            ModeComplete();
+        }
+    }
+    
+    //--------------------------------------------------
+    void STAGE_SetupSphincters(void)
+    {
+        for(uint i = 0; i < m_pSphincters.length(); ++i)
+        {
+            if(!(m_pSphincters[i].ModeStateComponent() is null))
+            {
+                m_pSphincters[i].ModeStateComponent().SetMode(TENTACLE_MODE_ENTER);
+                m_nActiveSphincters++;
+            }
+        }
+        
+        Hud.SetBar(0, 50, 255, 50, 255, SPHINCTER_HEALTH * m_pSphincters.length());
+        
+        m_cSeq.Start(
+            @g_cSphinctersSequence,
+            @m_pSphincters,
+            SEQ_SPHINCTER_ATTACK_BITS,
+            m_pStageInfo[STAGE_DATA1]);
+    }
+    
+    //--------------------------------------------------
+    void STAGE_Sphincters(void)
+    {
+        kActorIterator cIterator;
+        kActor@ pActor;
+        float totalHealth = 0;
+        
+        while(!((@pActor = cIterator.GetNext()) is null))
+        {
+            if(pActor.Health() <= 0 || (pActor.Flags() & AF_DEAD) != 0)
+            {
+                continue;
+            }
+            
+            if(pActor.Type() == kActor_AI_Sphincter)
+            {
+                totalHealth += pActor.Health();
+            }
+        }
+        
+        Hud.UpdateBar(0, int(totalHealth));
+        
+        m_cSeq.Run();
+        
+        if(m_nActiveSphincters <= 0)
+        {
+            Hud.DisableBar(0);
+            ModeComplete();
+        }
+    }
+    
+    //--------------------------------------------------
+    void STAGE_SetupCeilingTentacles(void)
+    {
+        m_nActiveCeilingTentacles = m_pCeilingTentacles.length();
+        m_pCeilingTentacles[0].ModeStateComponent().SetMode(TENTACLE_MODE_ENTER);
+        
+        Hud.SetBar(0, 50, 255, 50, 255, CEILING_TENTACLE_HEALTH * m_pCeilingTentacles.length());
+        
+        m_cSeq.Start(
+            @g_cCeilingTentaclesSequence,
+            @m_pCeilingTentacles,
+            SEQ_CEIL_TENT_ATTACK_BITS,
+            m_pStageInfo[STAGE_DATA1]);
+    }
+    
+    //--------------------------------------------------
+    void STAGE_CeilingTentacles(void)
+    {
+        kActorIterator cIterator;
+        kActor@ pActor;
+        float totalHealth = 0;
+        
+        while(!((@pActor = cIterator.GetNext()) is null))
+        {
+            if(pActor.Health() <= 0 || (pActor.Flags() & AF_DEAD) != 0)
+            {
+                continue;
+            }
+            
+            if(pActor.Type() == kActor_AI_CeilingTentacle)
+            {
+                totalHealth += pActor.Health();
+            }
+        }
+        
+        Hud.UpdateBar(0, int(totalHealth));
+        
+        m_cSeq.Run();
+        
+        if(m_nActiveCeilingTentacles <= 0 || totalHealth <= 0)
+        {
+            ModeComplete();
+        }
+    }
+};
+
+/*
+==============================================================
+TurokBlindBossEye
+==============================================================
+*/
+
+class TurokBlindBossEye : ScriptObject
+{
+    kActor@                 self;
+    CBlindBossController    m_cController;
+    float                   m_fBlinkDelay;
+    float                   m_fFlashTime;
+    
+    TurokBlindBossEye(kActor@ actor)
+    {
+        @self = actor;
+        m_cController = CBlindBossController(self);
+        m_fBlinkDelay = 0;
+        m_fFlashTime = 0;
+        
+        @g_pBlindBossController = @m_cController;
+        
+        self.AddComponent("kexModeStateComponent", true);
+        self.Flags() |= AF_NODAMAGE;
+    }
+    
+    //--------------------------------------------------
+    void OnSerialize(kDict& out dict)
+    {
+        SERIALIZE(m_fBlinkDelay);
+        SERIALIZE(m_fFlashTime);
+        SERIALIZE(m_cController.m_cSeq.m_pos);
+        SERIALIZE(m_cController.m_cSeq.m_fDelay);
+        SERIALIZE(m_cController.m_cSeq.m_fDelayTime);
+        SERIALIZE(m_cController.m_cSeq.m_repeatInc);
+        SERIALIZE(m_cController.m_cSeq.m_repeatCount);
+        SERIALIZE(m_cController.m_cSeq.m_bits);
+        SERIALIZE(m_cController.m_nStage);
+        SERIALIZE(m_cController.m_mode);
+        SERIALIZE(m_cController.m_nGrubsRemaining);
+        SERIALIZE(m_cController.m_nActiveGrubs);
+        SERIALIZE(m_cController.m_nMaxGrubs);
+        SERIALIZE(m_cController.m_nActiveSphincters);
+        SERIALIZE(m_cController.m_nActiveSwampTentacles);
+        SERIALIZE(m_cController.m_nActiveCeilingTentacles);
+    }
+    
+    //--------------------------------------------------
+    void OnDeserialize(kDict& in dict)
+    {
+        DESERIALIZE_FLOAT(m_fBlinkDelay);
+        DESERIALIZE_FLOAT(m_fFlashTime);
+        DESERIALIZE_INT(m_cController.m_cSeq.m_pos);
+        DESERIALIZE_FLOAT(m_cController.m_cSeq.m_fDelay);
+        DESERIALIZE_FLOAT(m_cController.m_cSeq.m_fDelayTime);
+        DESERIALIZE_INT(m_cController.m_cSeq.m_repeatInc);
+        DESERIALIZE_INT(m_cController.m_cSeq.m_repeatCount);
+        DESERIALIZE_INT(m_cController.m_cSeq.m_bits);
+        DESERIALIZE_INT(m_cController.m_nStage);
+        DESERIALIZE_INT(m_cController.m_mode);
+        DESERIALIZE_INT(m_cController.m_nGrubsRemaining);
+        DESERIALIZE_INT(m_cController.m_nActiveGrubs);
+        DESERIALIZE_INT(m_cController.m_nMaxGrubs);
+        DESERIALIZE_INT(m_cController.m_nActiveSphincters);
+        DESERIALIZE_INT(m_cController.m_nActiveSwampTentacles);
+        DESERIALIZE_INT(m_cController.m_nActiveCeilingTentacles);
+    }
+    
+    //--------------------------------------------------
+    void OnSpawn(void)
+    {
+        m_cController.InitActorRefArrays();
+        
+        if(!self.Deserialized())
+        {
+            self.AnimTrackComponent().Stop();
+            self.ModeStateComponent().AssignModeTable("EyeBallModeTable");
+            self.ModeStateComponent().SetMode(EYEBALL_MODE_EXIT);
+        }
+        else
+        {
+            m_cController.SetupStagePostDeserialization();
+        }
+    }
+    
+    //--------------------------------------------------
+    void OnPreDamage(kDamageInfo& in dmgInfo)
+    {
+        if((self.Flags() & AF_NODAMAGE) != 0)
+        {
+            self.Flags() |= AF_NOINFLICTDAMAGE;
+            
+            if(self.ModeStateComponent().Mode() == EYEBALL_MODE_IDLE)
+            {
+                self.ModeStateComponent().SetMode(EYEBALL_MODE_BLINK_FAST_CLOSE);
+            }
+        }
+    }
+    
+    //--------------------------------------------------
+    void OnDeath(kDamageInfo& in dmgInfo)
+    {
+        self.ModeStateComponent().SetMode(EYEBALL_MODE_DEATH);
+    }
+    
+    //--------------------------------------------------
+    void OnTick(void)
+    {
+        m_cController.Tick();
+        
+        if(CinemaPlayer.Playing())
+        {
+            self.Flags() |= AF_HIDDEN;
+        }
+        else
+        {
+            self.Flags() &= ~AF_HIDDEN;
+        }
+        
+        if((self.Flags() & AF_NODAMAGE) == 0 && self.Health() > 0 && !CinemaPlayer.Playing())
+        {
+            m_fFlashTime -= GAME_DELTA_TIME;
+            if(m_fFlashTime < 0)
+            {
+                m_fFlashTime = 2.0f;
+                self.RunFxEvent("Blink");
+            }
+        }
+        
+        // kaiser@05142017 - how the hell did this happen??!?
+        // if we're in the final stage but eye can't be hurt, then
+        // check again and force the final stage to re-initialize
+        if(m_cController.m_mode == STAGE_MODE_EYE_VULNERABLE &&
+            (self.Flags() & AF_NODAMAGE) != 0)
+        {
+            m_cController.STAGE_SetupEyeFinal();
+        }
+    }
+    
+    //--------------------------------------------------
+    void MODE_ToIdle(void)
+    {
+        if(self.AnimTrackComponent() is null)
+        {
+            return;
+        }
+        
+        if(!self.AnimTrackComponent().CycleCompleted())
+        {
+            return;
+        }
+        
+        self.ModeStateComponent().SetMode(EYEBALL_MODE_IDLE);
+    }
+    
+    //--------------------------------------------------
+    void MODE_FastClose(void)
+    {
+        if(self.AnimTrackComponent() is null)
+        {
+            return;
+        }
+        
+        if(!self.AnimTrackComponent().CycleCompleted())
+        {
+            return;
+        }
+        
+        self.ModeStateComponent().SetMode(EYEBALL_MODE_BLINK_FAST_OPEN);
+    }
+    
+    //--------------------------------------------------
+    void MODE_Exit(void)
+    {
+        if(self.AnimTrackComponent() is null)
+        {
+            return;
+        }
+        
+        if(!self.AnimTrackComponent().CycleCompleted())
+        {
+            return;
+        }
+        
+        if(self.AnimTrackComponent().Stopped())
+        {
+            return;
+        }
+        
+        self.AnimTrackComponent().Stop();
+    }
+
+    //--------------------------------------------------
+    void MODE_IdleSetup(void)
+    {
+        m_fBlinkDelay = Math::RandRange(1.0f, 5.0f);
+    }
+
+    //--------------------------------------------------
+    void MODE_Idle(void)
+    {
+        m_fBlinkDelay -= GAME_DELTA_TIME;
+        if(m_fBlinkDelay < 0)
+        {
+            self.ModeStateComponent().SetMode(EYEBALL_MODE_BLINK);
+        }
+    }
+
+    //--------------------------------------------------
+    void MODE_DeathSetup(void)
+    {
+        self.PlaySound(kSfx_Eye_Explode);
+        self.RenderMeshComponent().SwapOutMesh(1);
+        Hud.DisableBar(0);
+    }
+
+    //--------------------------------------------------
+    void MODE_Death(void)
+    {
+    }
+
+};
+
+/*
+==============================================================
+TurokBlindBossSwampTentacle
+==============================================================
+*/
+
+class TurokBlindBossSwampTentacle : ScriptObject
+{
+    kActor@ self;
+    uint    m_dwPlayerIdx;
+    float   m_fPlayerDist;
+    float   m_fFlashTime;
+    
+    TurokBlindBossSwampTentacle(kActor@ actor)
+    {
+        @self = actor;
+        m_fFlashTime = 0;
+        self.AddComponent("kexModeStateComponent", true);
+    }
+    
+    //--------------------------------------------------
+    void OnSpawn(void)
+    {
+        if(!self.Deserialized())
+        {
+            self.Flags() |= AF_NODAMAGE;
+            self.AnimTrackComponent().Stop();
+            self.ModeStateComponent().AssignModeTable("TentacleModeTable");
+            self.ModeStateComponent().SetMode(TENTACLE_MODE_EXIT);
+        }
+    }
+    
+    //--------------------------------------------------
+    void OnSerialize(kDict& out dict)
+    {
+        SERIALIZE(m_dwPlayerIdx);
+        SERIALIZE(m_fPlayerDist);
+        SERIALIZE(m_fFlashTime);
+    }
+    
+    //--------------------------------------------------
+    void OnDeserialize(kDict& in dict)
+    {
+        DESERIALIZE_INT(m_dwPlayerIdx);
+        DESERIALIZE_FLOAT(m_fPlayerDist);
+        DESERIALIZE_FLOAT(m_fFlashTime);
+    }
+    
+    //--------------------------------------------------
+    void OnTick(void)
+    {
+        if((self.Flags() & AF_NODAMAGE) == 0 && self.Health() > 0 && !CinemaPlayer.Playing())
+        {
+            m_fFlashTime -= GAME_DELTA_TIME;
+            if(m_fFlashTime < 0)
+            {
+                m_fFlashTime = 2.0f;
+                self.RunFxEvent("Blink");
+            }
+        }
+        
+        if(self.Type() == kActor_AI_Sphincter)
+        {
+            kActor@ pActor = GetClosestPlayer();
+            
+            if(!(pActor is null))
+            {
+                kVec3 vPos = pActor.Origin();
+                vPos.z += (120*GAME_SCALE);
+                
+                self.RenderMeshComponent().HeadTrackPos() = vPos;
+            }
+        }
+        else if(self.Type() == kActor_AI_CeilingTentacle)
+        {
+             kActor@ pActor = GetClosestPlayer();
+            
+            if(!(pActor is null))
+            {
+                self.SetTarget(pActor);
+            }
+        }
+        
+        if(self.TID() == -666)
+        {
+            self.TID() = -1;
+            switch(self.Type())
+            {
+            case kActor_AI_Sphincter:
+                self.ModeStateComponent().SetMode(TENTACLE_MODE_SPIT);
+                break;
+            case kActor_AI_SwampTentacle:
+                if(m_fPlayerDist >= SWAMP_TENTACLE_ATTACK_FAR_DIST)
+                {
+                    self.ModeStateComponent().SetMode(TENTACLE_MODE_ATTACK_FAR);
+                }
+                else
+                {
+                    self.ModeStateComponent().SetMode(TENTACLE_MODE_ATTACK_CLOSE);
+                }
+                break;
+            case kActor_AI_CeilingTentacle:
+                self.ModeStateComponent().SetMode(TENTACLE_MODE_ATTACK_CLOSE);
+                break;
+            }
+        }
+    }
+    
+    //--------------------------------------------------
+    void OnDeath(kDamageInfo& in dmgInfo)
+    {
+        kActor@ pNull = null;
+        
+        self.SetTarget(pNull);
+        self.ModeStateComponent().SetMode(TENTACLE_MODE_DEATH);
+    }
+    
+    //--------------------------------------------------
+    kActor@ GetClosestPlayer(void)
+    {
+        if(g_pBlindBossController is null)
+        {
+            return null;
+        }
+        
+        float fDist = 100000000.0f;
+        uint nPlayerIdx = 0;
+        
+        for(uint i = 0; i < g_pBlindBossController.m_pPlayers.length(); ++i)
+        {
+            kActor@ pPlayer = g_pBlindBossController.m_pPlayers[i];
+            
+            float x = pPlayer.Origin().x - self.Origin().x;
+            float y = pPlayer.Origin().y - self.Origin().y;
+            
+            float d = Math::Sqrt(x*x+y*y);
+            if(d < fDist)
+            {
+                fDist = d;
+                nPlayerIdx = i;
+            }
+        }
+        
+        m_fPlayerDist = fDist;
+        m_dwPlayerIdx = nPlayerIdx;
+        
+        return g_pBlindBossController.m_pPlayers[nPlayerIdx];
+    }
+    
+    //--------------------------------------------------
+    void MODE_SetupEnter(void)
+    {
+        switch(self.Type())
+        {
+        case kActor_AI_Sphincter:
+            self.Health() = SPHINCTER_HEALTH;
+            break;
+        case kActor_AI_SwampTentacle:
+            self.Health() = SWAMP_TENTACLE_HEALTH;
+            break;
+        case kActor_AI_CeilingTentacle:
+            self.Health() = CEILING_TENTACLE_HEALTH;
+            break;
+        }
+        
+        self.Flags() &= ~AF_NODAMAGE;
+    }
+
+    //--------------------------------------------------
+    void MODE_ToIdle(void)
+    {
+        if(self.AnimTrackComponent() is null)
+        {
+            return;
+        }
+        
+        if(!self.AnimTrackComponent().CycleCompleted())
+        {
+            return;
+        }
+        
+        self.ModeStateComponent().SetMode(TENTACLE_MODE_IDLE);
+    }
+
+    //--------------------------------------------------
+    void MODE_Idle(void)
+    {
+        kActor@ pPlayer = GetClosestPlayer();
+        if(pPlayer is null)
+        {
+            return;
+        }
+        
+        float anTurn = self.GetDeltaFromPoint(pPlayer.Origin());
+        if(anTurn < -SWAMP_TENTACLE_TURN_LIMIT) anTurn = -SWAMP_TENTACLE_TURN_LIMIT;
+        if(anTurn >  SWAMP_TENTACLE_TURN_LIMIT) anTurn =  SWAMP_TENTACLE_TURN_LIMIT;
+        
+        self.Yaw() += (anTurn / SWAMP_TENTACLE_TURN_SPEED) * GAME_DELTA_TIME;
+    }
+
+    //--------------------------------------------------
+    void MODE_DeathSetup(void)
+    {
+        kActor@ pEyeBall = g_pBlindBossController.m_pEyeBall;
+        array<kActor@>@ pCeilingTentacles = @g_pBlindBossController.m_pCeilingTentacles;
+        
+        if(pEyeBall.ModeStateComponent().Mode() != EYEBALL_MODE_EXIT)
+        {
+            pEyeBall.ModeStateComponent().SetMode(EYEBALL_MODE_QUIVER);
+        }
+        
+        switch(self.Type())
+        {
+        case kActor_AI_Sphincter:
+            g_pBlindBossController.m_nActiveSphincters--;
+            break;
+        case kActor_AI_SwampTentacle:
+            self.RenderMeshComponent().SwapOutMesh(1);
+            g_pBlindBossController.m_nActiveSwampTentacles--;
+            break;
+        case kActor_AI_CeilingTentacle:
+            for(uint i = 0; i < pCeilingTentacles.length(); ++i)
+            {
+                if(pCeilingTentacles[i].Health() > 0 && @pCeilingTentacles[i] != @self)
+                {
+                    pCeilingTentacles[i].ModeStateComponent().SetMode(TENTACLE_MODE_ENTER);
+                    break;
+                }
+            }
+            g_pBlindBossController.m_nActiveCeilingTentacles--;
+            break;
+        }
+    }
+
+    //--------------------------------------------------
+    void MODE_Death(void)
+    {
+        if(self.Type() == kActor_AI_CeilingTentacle)
+        {
+            self.AnimTrackComponent().Flags() &= ~ANF_NOACCUMULATION;
+            self.AnimTrackComponent().Flags() |= ANF_ROOTMOTION;
+        }
+        
+        if(self.Type() == kActor_AI_Sphincter)
+        {
+            if(!self.AnimTrackComponent().CycleCompleted())
+            {
+                return;
+            }
+            
+            self.ModeStateComponent().SetMode(TENTACLE_MODE_EXIT);
+        }
+    }
+};

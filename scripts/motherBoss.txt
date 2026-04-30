@@ -2207,9 +2207,10 @@ class TurokMotherBoss : ScriptObject
         
         if(!CinemaPlayer.Playing())
         {
-			// Added by Rando - give the totem item here to track that the level is complete
-			LocalPlayer.Inventory().Give(kActor_Misc_TotemInventory);
-		
+			// ------------------------------------------
+			// Added by Rando to track individual cleared levels
+			LocalPlayer.Inventory().Give(kActor_InventoryItem_FinishedLevel6);
+			// ------------------------------------------
             DoPlayerWarp(0, 16999, kLevel_Hub, true);
         }
     });

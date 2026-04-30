@@ -3,6 +3,7 @@
 //---------------------------
 int g_messageCooldown = 0;
 int g_uiCooldown = 0;
+int g_bossMessageCooldown = 0;
 int g_progressMenuDisplayTime = 330;
 
 // --------------------------
@@ -28,6 +29,7 @@ const int UI_OFFSET_HEADER = 44;
 const int UI_OFFSET_ROW_HEIGHT = 77;
 const int UI_OFFSET_ROW_BOTTOM = 22;
 
+const int UI_OFFSET_LEVEL_COMPLETE = 14;
 const int UI_OFFSET_LEVEL_KEY = 70;
 const int UI_OFFSET_PROGRESSIVE_WARP = 125;
 const int UI_OFFSET_FEATHER = 176;
@@ -44,6 +46,8 @@ const int UI_OFFSET_NUKE_Y = 539;
 const int UI_WARP_BUTTON_WIDTH = 157;
 const int UI_WARP_BUTTON_HEIGHT = 28;
 
+//const int UI_OFFSET_WARP_HUB_X = 130;
+//const int UI_OFFSET_WARP_BOSS_X = 336;
 const int UI_OFFSET_WARP_HUB_X = 250;
 const int UI_OFFSET_WARP_BUTTON_Y = 528;
 
@@ -163,12 +167,12 @@ class RandoUI
 		{
 			return false;
 		}
-	
+		
 		if (IsInTotemOrBossLevel())
-		{
-			Hud.AddMessage("You can't open the UI here!");
-			return false;
-		}
+        {
+            Hud.AddMessage("You can't open the UI here!");
+            return false;
+        }
 	
 		@owner = LocalPlayer.Actor().CastToActor();
 		kPuppet@ puppet = owner.CastToPuppet();
@@ -206,6 +210,7 @@ class RandoUI
 		lastMouseX = 0.0f;
 		lastMouseY = 0.0f;
 		closeTime = 0.0f;
+		g_bossMessageCooldown = 0;
 		
 		isActive = true;
 		uiOrigin = owner.Origin();
@@ -267,36 +272,42 @@ class RandoUI
 		AddBackgroundImage(RANDO_UI_TEXTURE_BACKGROUND);
 		
 		DisplayLevel(1,
+			kActor_InventoryItem_FinishedLevel1,
 			kActor_InventoryItem_Level1Key, 3,
 			kActor_InventoryItem_ProgressiveWarpL1, 9,
 			-1, 
 			kActor_PrimagenKey_1, 
 			-1);
 		DisplayLevel(2,
+			kActor_InventoryItem_FinishedLevel2,
 			kActor_InventoryItem_Level2Key, 3,
 			kActor_InventoryItem_ProgressiveWarpL2, 11,
 			kActor_Feather_2, 
 			kActor_PrimagenKey_2, 
 			kActor_Talisman_LeapOfFaith);
 		DisplayLevel(3,
+			kActor_InventoryItem_FinishedLevel3,
 			kActor_InventoryItem_Level3Key, 3,
 			kActor_InventoryItem_ProgressiveWarpL3, 8,
 			kActor_Feather_3, 
 			kActor_PrimagenKey_3,
 			kActor_Talisman_BreathOfLife);
 		DisplayLevel(4,
+			kActor_InventoryItem_FinishedLevel4,
 			kActor_InventoryItem_Level4Key, 3,
 			kActor_InventoryItem_ProgressiveWarpL4, 10,
 			kActor_Feather_4, 
 			kActor_PrimagenKey_4, 
 			kActor_Talisman_HeartOfFire);
 		DisplayLevel(5,
+			kActor_InventoryItem_FinishedLevel5,
 			kActor_InventoryItem_Level5Key, 3,
 			kActor_InventoryItem_ProgressiveWarpL5, 10,
 			kActor_Feather_5, 
 			kActor_PrimagenKey_5,
 			kActor_Talisman_Whispers);
 		DisplayLevel(6,
+			kActor_InventoryItem_FinishedLevel6,
 			kActor_InventoryItem_Level6Key, 6,
 			kActor_InventoryItem_ProgressiveWarpL6, 13,
 			kActor_Feather_6, 
@@ -314,6 +325,16 @@ class RandoUI
 			UI_WARP_BUTTON_WIDTH,
 			UI_WARP_BUTTON_HEIGHT);
 		@hubButton.onSelect = UIElementSelectCallBack(OnWarpHubClicked);
+		
+		/***
+		// Boss warp disabled until we can figure out how to actually warp back...
+		RandoUIElement@ bossButton = AddImage(
+			RANDO_UI_TEXTURE_WARP_BOSS, 
+			PositionPixelToUI(UI_OFFSET_WARP_BOSS_X, UI_OFFSET_WARP_BUTTON_Y),
+			UI_WARP_BUTTON_WIDTH,
+			UI_WARP_BUTTON_HEIGHT);
+		@bossButton.onSelect = UIElementSelectCallBack(OnWarpBossClicked);
+		*/
 	}
 	
 	// --------------------------
@@ -341,10 +362,82 @@ class RandoUI
 	}
 	
 	// --------------------------
+	// Handle warping to the current level's boss
+	void OnWarpBossClicked()
+	{
+		if (g_bossMessageCooldown > 0)
+		{
+			return;
+		}
+		g_bossMessageCooldown = 130;
+	
+		int16 mapId = Game.ActiveMapID();
+		if (mapId == kLevel_Hub)
+		{
+			Hud.AddMessage("The Primagen entrance is at the center of the hub.");
+			return;
+		}
+		
+		int bossLevelId = GetBossLevelOfMap(mapId);
+		if (bossLevelId == 0)
+		{
+			Hud.AddMessage("This level does not have a boss.");
+			return;
+		}
+		
+		int warpId = -1;
+		switch(bossLevelId)
+		{
+			case kLevel_PortOfAdia_Totem:
+				warpId = 17100;
+				break;
+		
+			case kLevel_BlindOneBoss:
+				warpId = 0;
+				if (GetInventoryItemCurrentTotal(kActor_InventoryItem_VisitedL4Boss) > 0)
+				{
+					warpId = 17401;
+				}
+				break;
+			case kLevel_QueenBoss:
+				warpId = 0;
+				if (GetInventoryItemCurrentTotal(kActor_InventoryItem_VisitedL5Boss) > 0)
+				{
+					warpId = 17501;
+				}
+				break;
+			case kLevel_MotherBoss:
+				warpId = 0;
+				if (GetInventoryItemCurrentTotal(kActor_InventoryItem_VisitedL6Boss) > 0)
+				{
+					warpId = 17601;
+				}
+				break;
+		}
+		
+		if (warpId == -1)
+		{
+			Hud.AddMessage("Error getting boss warp id... contact the dev!");
+			return;
+		}
+		else if (warpId == 0)
+		{
+			Hud.AddMessage("You can only warp to bosses you've visited before!");
+			return;
+		}
+		
+		Sys.Print("WARP/BOSS: " + warpId + "/" + bossLevelId);
+		
+		Deactivate();
+		DoPlayerWarp(0, warpId, bossLevelId, true);
+	}
+	
+	// --------------------------
 	// Displays the status for the given Level
 	// Level 1 only has primagen keys and mission items, so it returns early
 	void DisplayLevel(
-		const int &in level, 
+		const int &in level,
+		const int &in completedLevelActor,
 		const int &in levelKeyActor, const int &in maxKeys,
 		const int &in progressiveWarpActor, const int &in baseMaxProgressiveWarps,
 		const int &in featherActor,
@@ -353,6 +446,17 @@ class RandoUI
 	{
 		bool isExcluded = IsLevelExcluded(level);
 		int levelHeightOffset = GetLevelRowHeightOffset(level);
+		
+		// Level Completed
+		if (GetInventoryItemCurrentTotal(completedLevelActor) > 0)
+		{
+			AddImage(
+				RANDO_UI_TEXTURE_COMPLETE, 
+				PositionPixelToUI(
+					UI_OFFSET_LEVEL_COMPLETE, 
+					UI_OFFSET_HEADER + (UI_OFFSET_ROW_HEIGHT * (level - 1)) + (UI_ICON_SIZE / 2))
+			);
+		}
 
 		// Primagen Keys
 		int primagenKeyTexture = GetInventoryItemCollectedTotal(primagenKeyActor) > 0
@@ -683,6 +787,11 @@ class RandoUI
 		{
 			mouse.self.Flags() |= AF_HIDDEN;
 			return;
+		}
+		
+		if (g_bossMessageCooldown > 0)
+		{
+			g_bossMessageCooldown--;
 		}
 		
 		lastPlayerHealth = owner.Health();
