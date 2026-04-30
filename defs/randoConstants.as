@@ -6,7 +6,8 @@
 #define RANDO_MSG_GET_SCRIPT 100
 
 #define kActor_Item_APItemProgression 100000
-#define kActor_Item_APItemNonProgression 100001
+#define kActor_Item_APItemUseful 100001
+#define kActor_Item_APItemNonProgression 100002
 #define kActor_Hub_PrimagenKeyTrigger 200000
 
 #define kActor_ProgressionBlocker_WarpBarrier 200100

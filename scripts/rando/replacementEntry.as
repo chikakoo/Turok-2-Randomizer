@@ -44,18 +44,30 @@ class ReplacementEntry
 		const int &in initApId,
 		const kStr &in initPosition,
 		const kStr &in initDisplayString,
-		const bool &in isProgression = false)
+		const int &in progressionType = 0)
     {
         name = initName;
         apId = initApId;
 		position = initPosition;
 		mapId = position.Atoi();
-		replacementActorId = isProgression
-			? kActor_Item_APItemProgression
-			: kActor_Item_APItemNonProgression;
         displayString = initDisplayString;
 		isSentToAP = false;
 		isCollected = false;
+		
+		// Hacky magic number way to assign the type (for now)
+		// 0 = non progression, 1 = useful, 2 = progression
+		switch(progressionType)
+		{
+			case 1:
+				replacementActorId = kActor_Item_APItemUseful; 
+				break;
+			case 2:
+				replacementActorId = kActor_Item_APItemProgression; 
+				break;
+			default:
+				replacementActorId = kActor_Item_APItemNonProgression; 
+				break;
+		}
     }
 }
 
@@ -83,15 +95,15 @@ void AddReplacement(
 // - apId: The AP id of the location
 // - position: The position of the actor, to identify it on the map
 // - displayString: What text to display when picking up the item
-// - isProgression: Affects whether we use the gold or gray outined model
+// - progressionType: 0 for non-progression, 1 for useful, 2 for progression
 void AddReplacement(
 	const kStr &in name,
 	const int &in apId, 
 	const kStr &in position,
 	const kStr &in displayString,
-	const bool &in isProgression = false)
+	const int &in progressionType = 0)
 {
 	ReplacementEntry @entry = ReplacementEntry(
-		name, apId, position, displayString, isProgression);
+		name, apId, position, displayString, progressionType);
     g_mapReplacements[entry.mapId].insertLast(entry);
 }
