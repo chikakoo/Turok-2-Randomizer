@@ -118,13 +118,6 @@ void TrySendActionObjectToAP(const int &in tagId)
 	if (TryGetActionObjectEntryForCurrentMap(tagId, actionObjectEntry))
 	{
 		actionObjectEntry.SendCheckToAP();
-		Hud.AddMessage("" + actionObjectEntry.name);
-		Sys.Print("" + actionObjectEntry.name);
-	}
-	else
-	{
-		Hud.AddMessage("" + Game.ActiveMapID() + "_" + tagId);
-		Sys.Print("" + Game.ActiveMapID() + "_" + tagId);
 	}
 }
 

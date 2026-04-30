@@ -319,8 +319,6 @@ class TurokDestructible : ScriptObject
         switch(self.TriggerMessageID())
         {
         case DESTRUCTIBLE_MSG_START:
-			Hud.AddMessage("" + Game.ActiveMapID() + "_" + self.TID());
-		
             self.SignalOn();
             self.Mark(true);
             self.Flags() &= ~AF_IMPORTANT;

@@ -426,8 +426,6 @@ class RandoUI
 			return;
 		}
 		
-		Sys.Print("WARP/BOSS: " + warpId + "/" + bossLevelId);
-		
 		Deactivate();
 		DoPlayerWarp(0, warpId, bossLevelId, true);
 	}
