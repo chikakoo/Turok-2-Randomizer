@@ -103,19 +103,19 @@ class RandoPlayerObject : ScriptObject
 		}
 		else if (mapId == kLevel_PrimagenBoss)
 		{
-			TryGiveBossLevelItem(kActor_InventoryItem_VisitedPrimagen);
+			OnBossEntry(kActor_InventoryItem_VisitedPrimagen, 0);
 		}
 		else if (mapId == kLevel_BlindOneBoss)
 		{
-			TryGiveBossLevelItem(kActor_InventoryItem_VisitedL4Boss);
+			OnBossEntry(kActor_InventoryItem_VisitedL4Boss, OPTION_BOSS_WEAPON_4);
 		}
 		else if (mapId == kLevel_QueenBoss)
 		{
-			TryGiveBossLevelItem(kActor_InventoryItem_VisitedL5Boss);
+			OnBossEntry(kActor_InventoryItem_VisitedL5Boss, OPTION_BOSS_WEAPON_5);
 		}
 		else if (mapId == kLevel_MotherBoss)
 		{
-			TryGiveBossLevelItem(kActor_InventoryItem_VisitedL6Boss);
+			OnBossEntry(kActor_InventoryItem_VisitedL6Boss, OPTION_BOSS_WEAPON_6);
 		}
 		
 		//-------------------------
@@ -175,11 +175,17 @@ class RandoPlayerObject : ScriptObject
 	//---------------------------
 	// Give a "token" indicating whether you've visited the associated map.
 	// This is so we know whether to allow the player to re-enter boss fights.
-	void TryGiveBossLevelItem(const int &in inventoryItem)
+	//
+	// Also gives the player the given weapon id, to help with the boss fight.
+	void OnBossEntry(const int &in inventoryItem, const int &in weaponToGive)
 	{
 		if (!LocalPlayer.Inventory().HasBeenPickedUpBefore(inventoryItem))
 		{
 			LocalPlayer.Inventory().Give(inventoryItem);
+			if (weaponToGive != 0)
+			{
+				TryGivePlayerWeapon(weaponToGive);
+			}
 		}
 	}
 	
