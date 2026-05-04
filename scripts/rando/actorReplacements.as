@@ -417,6 +417,15 @@ bool DoMapSpecificEdits(kActor@ actor, const int &in mapId)
 					actor.WorldComponent().TouchRadius() = 0;
 				}
 			break;
+			
+		// Trigger the ship exploding so it's clear where to swim to get the Life Forces
+		case kLevel_PortOfAdia_1:
+			if (actor.TID() == 200000 ||
+				actor.TID() == 200001 ||
+				actor.TID() == 200002)
+			{
+				actor.Trigger(LocalPlayer.Actor().CastToActor());
+			}
 
 		// Open the door to the last graveyard gate so the player can't get stuck there
 		// Afterwards, disable the component so it can't be closed
