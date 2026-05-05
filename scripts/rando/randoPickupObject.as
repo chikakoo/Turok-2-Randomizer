@@ -24,8 +24,14 @@ class RandoPickupObject : ScriptObject
 		// Force the pickup to be non-solid - this is mainly for generated ammo
 		self.WorldComponent().Flags() |= WCF_NONSOLID;
 		
+		// These aren't showing as important for some reason when they should
+		if (self.Type() == kActor_MissionItem_BeaconPowerCell)
+		{
+			self.Flags() |= AF_IMPORTANT;
+		}
+		
 		// Hack to increase the touch radius of the previously missable Level 4 boss pickup
-		if (m_position == "1_-2611_0_972")
+		else if (m_position == "1_-2611_0_972")
 		{
 			self.WorldComponent().Radius() = 100.0f;
 		}
@@ -150,9 +156,6 @@ class RandoPickupObject : ScriptObject
 			}
 			m_wasSentToAP = true;
 			
-			// If this item is an inventory item, do this to track the total you've ever received
-			HandleTrackInventoryItems(self.Type());
-			
 			// Try to trigger it if it is a trap.
 			// If it isn't, this doesn't do anything.
 			if (TryTriggerTrap(self.Type()))
@@ -187,5 +190,8 @@ class RandoPickupObject : ScriptObject
 			// Not doing so can lead to soft-locks
 			TryTriggerActors(m_position);
 		}
+		
+		// If this item is an inventory item, do this to track the total you've ever received
+		HandleTrackInventoryItems(self.Type());
 	}
 }

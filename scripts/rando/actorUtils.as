@@ -223,8 +223,8 @@ void TryGetInventoryItems(int &in actorId, int &in count)
 }
 
 //---------------------------
-// Some items (primagen keys) will disappear when you use them.
-// We want to track these still, so give a second one of them.
+// Some items (primagen keys, level keys, etc) will disappear when you use them.
+// We want to track these still, so give a version of them that's offset.
 void HandleTrackInventoryItems(int &in actorId, kDictMem@ itemDef = null)
 {
 	if (itemDef is null)
