@@ -25,6 +25,29 @@ APItemProgression kActor_Item_APItemProgression
     End_Component
 }
 
+APItemUseful kActor_Item_APItemUseful
+{
+    className                   "kexLifeForcePickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
+	pickup.lifeforce.amount     0
+    
+    initialScale              "0.5 0.5 0.5"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+    Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/APLogo_Useful.staticmesh"
+    End_Component
+    Begin_Component "kexScriptComponent"
+        scriptClass           "RandoPickupObject"
+        triggerRadius         81.92
+    End_Component
+}
+
 APItemNonProgression kActor_Item_APItemNonProgression
 {
     className                   "kexLifeForcePickup"
@@ -45,6 +68,196 @@ APItemNonProgression kActor_Item_APItemNonProgression
     Begin_Component "kexScriptComponent"
         scriptClass           "RandoPickupObject"
         triggerRadius         81.92
+    End_Component
+}
+
+//------------------------------
+// AP Progressive warps
+APProgressiveWarpL1 kActor_InventoryItem_ProgressiveWarpL1
+{
+    className                   "kexInventoryPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Ammo Pickup.ksnd"
+	pickup.pickupMessage 		"Progressive Warp Level 1"
+    
+    initialScale              "0.4 0.4 0.4"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+	Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Progressive_Warp_L1.staticmesh"
+    End_Component
+    Begin_Component "kexScriptComponent"
+        scriptClass           "RandoPickupObject"
+        triggerRadius         81.92
+    End_Component
+}
+
+APProgressiveWarpL2 kActor_InventoryItem_ProgressiveWarpL2
+{
+    className                   "kexInventoryPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Ammo Pickup.ksnd"
+	pickup.pickupMessage 		"Progressive Warp Level 2"
+    
+    initialScale              "0.4 0.4 0.4"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+	Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Progressive_Warp_L2.staticmesh"
+    End_Component
+    Begin_Component "kexScriptComponent"
+        scriptClass           "RandoPickupObject"
+        triggerRadius         81.92
+    End_Component
+}
+
+APProgressiveWarpL3 kActor_InventoryItem_ProgressiveWarpL3
+{
+    className                   "kexInventoryPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Ammo Pickup.ksnd"
+	pickup.pickupMessage 		"Progressive Warp Level 3"
+    
+    initialScale              "0.4 0.4 0.4"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+	Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Progressive_Warp_L3.staticmesh"
+    End_Component
+    Begin_Component "kexScriptComponent"
+        scriptClass           "RandoPickupObject"
+        triggerRadius         81.92
+    End_Component
+}
+
+APProgressiveWarpL4 kActor_InventoryItem_ProgressiveWarpL4
+{
+    className                   "kexInventoryPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Ammo Pickup.ksnd"
+	pickup.pickupMessage 		"Progressive Warp Level 4"
+    
+    initialScale              "0.4 0.4 0.4"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+	Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Progressive_Warp_L4.staticmesh"
+    End_Component
+    Begin_Component "kexScriptComponent"
+        scriptClass           "RandoPickupObject"
+        triggerRadius         81.92
+    End_Component
+}
+
+APProgressiveWarpL5 kActor_InventoryItem_ProgressiveWarpL5
+{
+    className                   "kexInventoryPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Ammo Pickup.ksnd"
+	pickup.pickupMessage 		"Progressive Warp Level 5"
+    
+    initialScale              "0.4 0.4 0.4"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+	Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Progressive_Warp_L5.staticmesh"
+    End_Component
+    Begin_Component "kexScriptComponent"
+        scriptClass           "RandoPickupObject"
+        triggerRadius         81.92
+    End_Component
+}
+
+APProgressiveWarpL6 kActor_InventoryItem_ProgressiveWarpL6
+{
+    className                   "kexInventoryPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Ammo Pickup.ksnd"
+	pickup.pickupMessage 		"Progressive Warp Level 6"
+    
+    initialScale              "0.4 0.4 0.4"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+	Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Progressive_Warp_L6.staticmesh"
+    End_Component
+    Begin_Component "kexScriptComponent"
+        scriptClass           "RandoPickupObject"
+        triggerRadius         81.92
+    End_Component
+}
+
+//------------------------------
+// Warp Barrier - used to block warps for progressive warps
+// The radius is the standard size for warp portals - adjust as needed
+WarpBarrier kActor_ProgressionBlocker_WarpBarrier
+{
+	className				  "kexActor"
+	placeable                 TRUE
+	flags.noDamage            TRUE
+	flags.allowTracking       FALSE
+	
+    Begin_Component "kexWorldComponent"
+        radius                140.0
+		touchRadius			  150.0
+		height				  300.0
+		bNonSolid             FALSE
+    End_Component
+	Begin_Component "kexParticleEmitterComponent"
+        particle                "particles/rando_progression_barrier.particle"
+        offset                  "0.0 0.0 0.0"
+    End_Component
+	Begin_Component "kexScriptComponent"
+        scriptClass           "RandoWarpBarrier"
+    End_Component
+}
+
+//------------------------------
+// Level 1 Barrier - used if not starting in level 1
+// Will be there until the player has all their Level 1 keys
+WarpBarrier kActor_ProgressionBlocker_Level1Barrier
+{
+	className				  "kexActor"
+	placeable                 TRUE
+	flags.noDamage            TRUE
+	flags.allowTracking       FALSE
+	
+    Begin_Component "kexWorldComponent"
+        radius                140.0
+		touchRadius			  150.0
+		height				  300.0
+		bNonSolid             FALSE
+    End_Component
+	Begin_Component "kexParticleEmitterComponent"
+        particle                "particles/rando_level1_barrier.particle"
+        offset                  "0.0 0.0 0.0"
+    End_Component
+	Begin_Component "kexScriptComponent"
+        scriptClass           "RandoLevel1Barrier"
     End_Component
 }
 
@@ -74,48 +287,6 @@ RandomAmmo kActor_Item_RandomAmmo
 }
 
 //------------------------------
-// Portal - warp back to the hub even if mission objectives aren't complete.
-//------------------------------
-HubWarpPortal kActor_Portal_HubWarp
-{
-	className				  "kexActor"
-	placeable                 TRUE
-	flags.noDamage            TRUE
-	flags.allowTracking       FALSE
-	
-	initialScale              "0.25 0.25 0.25"
-    Begin_Component "kexWorldComponent"
-		touchRadius           30.00
-        height                81.92
-        bNonSolid             TRUE
-    End_Component
-    Begin_Component "kexStaticMeshComponent"
-        mesh                  "models/model0498.staticmesh"
-    End_Component
-    Begin_Component "kexScriptComponent"
-        scriptClass           "RandoHubWarp"
-        triggerRadius         81.92
-    End_Component
-}
-
-HubWarpFrame kActor_Portal_HubWarpFrame
-{
-	className				  "kexActor"
-	placeable                 TRUE
-	flags.noDamage            TRUE
-	flags.allowTracking       FALSE
-	
-	initialScale              "0.25 0.25 0.25"
-    Begin_Component "kexWorldComponent"
-        radius                0
-        height                0
-    End_Component
-    Begin_Component "kexStaticMeshComponent"
-        mesh                  "models/model2278.staticmesh"
-    End_Component
-}
-
-//------------------------------
 // Primagen Key Trigger - used to display a message if you didn't yet meet the level goal
 //------------------------------
 PrimagenKeyTrigger kActor_Hub_PrimagenKeyTrigger
@@ -127,7 +298,7 @@ PrimagenKeyTrigger kActor_Hub_PrimagenKeyTrigger
 	
 	initialScale              "0.5 0.5 0.5"
     Begin_Component "kexWorldComponent"
-		touchRadius           225.00
+		touchRadius           200.00
         height                81.92
         bNonSolid             TRUE
     End_Component
@@ -135,6 +306,26 @@ PrimagenKeyTrigger kActor_Hub_PrimagenKeyTrigger
         scriptClass           "RandoPrimagenKeyTrigger"
         triggerRadius         81.92
     End_Component
+}
+
+//------------------------------
+// UI actors - for our fake UI
+// TODO - the meshes
+//------------------------------
+UIElement kActor_UI_Element
+{
+	className 					"kexActor"
+	flags.noDamage 				TRUE
+	flags.allowTracking			FALSE
+	placeable					FALSE
+	
+	Begin_Component "kexRenderMeshComponent"
+		mesh "char/ui/ui.skinnedmesh"
+		anim "anims/none.anim"
+	End_Component
+	Begin_Component "kexScriptComponent"
+		scriptClass "RandoUIElement"
+	End_Component
 }
 
 //------------------------------

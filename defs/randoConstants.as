@@ -1,15 +1,40 @@
-#define AF_EASY 1 << 10
-#define AF_NORMAL 1 << 11
-#define AF_HARD 1 << 12
-#define AF_HARDCORE 1 << 13
+// Inventory items add 400000 to the existing id to get
+// the "how many have I ever collected" value
+#define RANDO_INVENTORY_ITEM_OFFSET 400000
+
+// Called in UserEvent to get the script object back
+#define RANDO_MSG_GET_SCRIPT 100
 
 #define kActor_Item_APItemProgression 100000
-#define kActor_Item_APItemNonProgression 100001
-#define kActor_Portal_HubWarp 200000
-#define kActor_Portal_HubWarpFrame 200001
-#define kActor_Hub_PrimagenKeyTrigger 200002
+#define kActor_Item_APItemUseful 100001
+#define kActor_Item_APItemNonProgression 100002
+#define kActor_Hub_PrimagenKeyTrigger 200000
+
+#define kActor_ProgressionBlocker_WarpBarrier 200100
+#define kActor_ProgressionBlocker_Level1Barrier 200200
+#define kActor_InventoryItem_ProgressiveWarpL1 201001
+#define kActor_InventoryItem_ProgressiveWarpL2 201002
+#define kActor_InventoryItem_ProgressiveWarpL3 201003
+#define kActor_InventoryItem_ProgressiveWarpL4 201004
+#define kActor_InventoryItem_ProgressiveWarpL5 201005
+#define kActor_InventoryItem_ProgressiveWarpL6 201006
+
+// Dumb way to detect that you should be able to warp back to bosses if you leave
+#define kActor_InventoryItem_VisitedPrimagen 202000
+#define kActor_InventoryItem_VisitedL4Boss 202004
+#define kActor_InventoryItem_VisitedL5Boss 202005
+#define kActor_InventoryItem_VisitedL6Boss 202006
+
+#define kActor_InventoryItem_FinishedLevel1 203001
+#define kActor_InventoryItem_FinishedLevel2 203002
+#define kActor_InventoryItem_FinishedLevel3 203003
+#define kActor_InventoryItem_FinishedLevel4 203004
+#define kActor_InventoryItem_FinishedLevel5 203005
+#define kActor_InventoryItem_FinishedLevel6 203006
+
 #define kActor_Item_RandomAmmo 30000 // Limited to int16 for generators
 #define kActor_Generator_RandomAmmo 30100
+#define kActor_Generator_FullHealth 30101
 
 #define RANDO_TRAP_TYPE_ENEMY 0
 #define RANDO_TRAP_TYPE_DAMAGE 1
@@ -69,3 +94,16 @@
 #define kActor_PrimagenKey_4 4363
 #define kActor_PrimagenKey_5 4364
 #define kActor_PrimagenKey_6 4365
+
+// ---------
+// UI
+#define kActor_UI_Element 300000
+#define RANDO_UI_TEXTURE_CURSOR 1
+#define RANDO_UI_TEXTURE_BACKGROUND 2
+#define RANDO_UI_TEXTURE_INCOMPLETE 3
+#define RANDO_UI_TEXTURE_COMPLETE 4
+#define RANDO_UI_TEXTURE_TEXT_START 5 // 14 is the last
+#define RANDO_UI_TEXTURE_TEXT_GREEN_START 15 // 24 is the last
+#define RANDO_UI_TEXTURE_TEXT_LEFT 25
+#define RANDO_UI_TEXTURE_WARP_HUB 26
+#define RANDO_UI_TEXTURE_WARP_BOSS 27

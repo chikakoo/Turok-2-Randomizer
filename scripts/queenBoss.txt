@@ -1,0 +1,1156 @@
+//
+// Copyright(C) 2014-2015 Samuel Villarreal
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either version 2
+// of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// DESCRIPTION:
+//      Queen Boss behavior logic
+//
+
+//-----------------------------------------------------------------------------
+//
+// Vars
+//
+//-----------------------------------------------------------------------------
+
+// Stage 1 constants
+#define QUEEN_STAGE1_ENEMIES                        3
+#define QUEEN_STAGE1_MAX_ENEMIES_ON_SCREEN          3
+#define QUEEN_LITTLE_ARMS_HEALTH                    80
+
+// Stage 2 constants
+#define QUEEN_STAGE2_ENEMIES                        4
+#define QUEEN_STAGE2_MAX_ENEMIES_ON_SCREEN          4
+#define QUEEN_ASS_HEALTH                            350
+
+// Stage 3 constants
+#define QUEEN_STAGE3_ENEMIES                        4
+#define QUEEN_STAGE3_MAX_ENEMIES_ON_SCREEN          4
+#define QUEEN_GUNS_HEALTH                           200
+#define QUEEN_HEAD_HEALTH                           30
+
+// Movement constants
+#define QUEEN_ATTACK_DIST                           (90*GAME_SCALE)
+#define QUEEN_HOP_DIST                              (120*GAME_SCALE)
+
+// General defines
+#define QUEEN_DEVICES                               8                   // Total devices in arena
+#define QUEEN_MAX_ENEMIES_WITH_QUEEN                0                   // Enemies with queen
+#define QUEEN_TURN_SPEED                            Math::Deg2Rad(10)   // Speed at which queen turns
+#define QUEEN_FACING_ANGLE                          Math::Deg2Rad(30)   // Angle for when queen is facing target
+#define QUEEN_EVADE_ANGLE                           Math::Deg2Rad(45)   // Angle threshold for evading
+
+#define QUEEN_TOTAL_HEALTH  (QUEEN_LITTLE_ARMS_HEALTH + QUEEN_ASS_HEALTH + QUEEN_GUNS_HEALTH + QUEEN_HEAD_HEALTH)
+
+#define QUEEN_STAGES                                8
+#define QUEEN_DEATH_STAGE                           (QUEEN_STAGES-2)
+#define QUEEN_DEATH_HEAD_BLOWN_OFF_STAGE            (QUEEN_STAGES-1)
+
+enum queenAttachedMeshes
+{
+    QUEEN_MODEL_PART_ASS,
+    QUEEN_MODEL_PART_GUNS,
+    QUEEN_MODEL_PART_HEAD,
+    QUEEN_MODEL_PART_LITTLE_ARMS,
+    TOTAL_QUEEN_MODEL_PARTS
+};
+
+enum queenEnemies
+{
+    QUEEN_ENEMY_MITE,
+    QUEEN_ENEMY_WORKER,
+    TOTAL_QUEEN_ENEMIES
+};
+
+#define QUEEN_ANIM_IN_POD                       ANIM_GROUND_REACTION_GETUP
+#define QUEEN_ANIM_BREAK_POD                    ANIM_GROUND_REACTION_GETUP
+#define QUEEN_ANIM_JUMP_IN_POD                  ANIM_GROUND_JUMP1
+#define QUEEN_ANIM_LAND_FROM_POD                ANIM_GROUND_LAND1
+
+#define QUEEN_ANIM_RUN                          ANIM_GROUND_MOVE1
+#define QUEEN_ANIM_ATTACK_HEAD_THRUST           ANIM_GROUND_ATTACK_COMBAT1
+#define QUEEN_ANIM_RAGE                         ANIM_GROUND_ATTACK_COMBAT2
+#define QUEEN_ANIM_ATTACK_SWIPE                 ANIM_GROUND_ATTACK_COMBAT3
+#define QUEEN_ANIM_ATTACK_GUN_BLAST             ANIM_GROUND_ATTACK_WEAPON1
+#define QUEEN_ANIM_ATTACK_GUN_FIRE              ANIM_GROUND_ATTACK_WEAPON2
+#define QUEEN_ANIM_ATTACK_ARM_FIRE              ANIM_GROUND_ATTACK_WEAPON3
+#define QUEEN_ANIM_ATTACK_ASS_PODS              ANIM_GROUND_ATTACK_PROJECTILE1
+#define QUEEN_ANIM_ATTACK_MOUTH_BLAST           ANIM_GROUND_ATTACK_PROJECTILE2
+
+#define QUEEN_ANIM_HOP                          ANIM_GROUND_ATTACK_LEAP1
+
+#define QUEEN_ANIM_EVADE_LEFT                   ANIM_GROUND_EVADE_LEFT1
+#define QUEEN_ANIM_EVADE_RIGHT                  ANIM_GROUND_EVADE_RIGHT1
+
+#define QUEEN_ANIM_REACTION_EXPLOSION1          ANIM_GROUND_REACTION_EXPLOSION
+#define QUEEN_ANIM_REACTION_EXPLOSION2          ANIM_GROUND_ATTACK_COMBAT2
+
+#define QUEEN_ANIM_DEATH                        ANIM_GROUND_DEATH_NORMAL1
+#define QUEEN_ANIM_DEATH_CRAWL                  ANIM_GROUND_DEATH_NORMAL2
+#define QUEEN_ANIM_DEATH_HEAD_BLOWN_OFF         ANIM_GROUND_DEATH_NORMAL1
+
+//-----------------------------------------------------------------------------
+//
+// Modes
+//
+//-----------------------------------------------------------------------------
+
+// modes 0 - 55 are already reserved by the enemy ai component
+enum queenModes
+{
+    QUEEN_MODE_SETUP = 1000,
+    QUEEN_MODE_INTRO,
+    QUEEN_MODE_IN_POD,
+    QUEEN_MODE_BREAK_POD,
+    QUEEN_MODE_JUMP_IN_POD,
+    QUEEN_MODE_INSIDE_POD,
+    QUEEN_MODE_LAND_FROM_POD,
+    QUEEN_MODE_RAGE,
+    QUEEN_MODE_RUN,
+    QUEEN_MODE_HOP,
+    QUEEN_MODE_ATTACK,
+    QUEEN_MODE_EVADE_LEFT,
+    QUEEN_MODE_EVADE_RIGHT,
+    QUEEN_MODE_REACTION_EXPLOSION,
+    QUEEN_MODE_DEATH,
+    QUEEN_MODE_DEATH_CRAWL,
+    QUEEN_MODE_DEATH_HEAD_BLOWN_OFF,
+};
+
+#define DEFINE_QUEEN_MODE(mode, title, anim, flags) \
+    DefineMode("QueenModeTable", mode, "void MODE_Setup"#title"(void)", "void MODE_Tick"#title"(void)", CF_CHARACTER, anim, "", 0, 20, 0, flags);
+
+void InitQueenBossModeTable(void)
+{
+    DEFINE_QUEEN_MODE(QUEEN_MODE_SETUP,                 Init,               QUEEN_ANIM_IN_POD, 0);
+    DEFINE_QUEEN_MODE(QUEEN_MODE_INTRO,                 Intro,              QUEEN_ANIM_IN_POD, 0);
+    DEFINE_QUEEN_MODE(QUEEN_MODE_IN_POD,                InPod,              QUEEN_ANIM_IN_POD, 0);
+    DEFINE_QUEEN_MODE(QUEEN_MODE_BREAK_POD,             BreakPod,           QUEEN_ANIM_BREAK_POD, 0);
+    DEFINE_QUEEN_MODE(QUEEN_MODE_JUMP_IN_POD,           JumpInPod,          QUEEN_ANIM_JUMP_IN_POD, MF_HEADTRACK);
+    DEFINE_QUEEN_MODE(QUEEN_MODE_INSIDE_POD,            InsidePod,          0, MF_HEADTRACK);
+    DEFINE_QUEEN_MODE(QUEEN_MODE_LAND_FROM_POD,         LandFromPod,        QUEEN_ANIM_LAND_FROM_POD, MF_HEADTRACK);
+    DEFINE_QUEEN_MODE(QUEEN_MODE_RAGE,                  Rage,               QUEEN_ANIM_RAGE, MF_HEADTRACK);
+    DEFINE_QUEEN_MODE(QUEEN_MODE_RUN,                   Think,              QUEEN_ANIM_RUN, MF_HEADTRACK);
+    DEFINE_QUEEN_MODE(QUEEN_MODE_HOP,                   Hop,                QUEEN_ANIM_HOP, MF_HEADTRACK);
+    DEFINE_QUEEN_MODE(QUEEN_MODE_EVADE_LEFT,            Evade,              QUEEN_ANIM_EVADE_LEFT, MF_HEADTRACK);
+    DEFINE_QUEEN_MODE(QUEEN_MODE_EVADE_RIGHT,           Evade,              QUEEN_ANIM_EVADE_RIGHT, MF_HEADTRACK);
+    DEFINE_QUEEN_MODE(QUEEN_MODE_REACTION_EXPLOSION,    ReactionExplosion,  QUEEN_ANIM_REACTION_EXPLOSION1, 0);
+    DEFINE_QUEEN_MODE(QUEEN_MODE_DEATH,                 Death,              QUEEN_ANIM_DEATH, 0);
+    DEFINE_QUEEN_MODE(QUEEN_MODE_DEATH_CRAWL,           DeathCrawl,         QUEEN_ANIM_DEATH_CRAWL, 0);
+    DEFINE_QUEEN_MODE(QUEEN_MODE_DEATH_HEAD_BLOWN_OFF,  HeadBlownOff,       QUEEN_ANIM_DEATH_HEAD_BLOWN_OFF, 0);
+    
+    DefineMode("QueenModeTable", QUEEN_MODE_ATTACK, "", "void MODE_TickAttack(void)", CF_CHARACTER, 0, "int MODE_AnimAttack(void)", 0, 20, 0, 0);
+}
+
+#undef DEFINE_QUEEN_MODE
+
+//-----------------------------------------------------------------------------
+//
+// Structs
+//
+//-----------------------------------------------------------------------------
+
+final class CQueenStageInfo
+{
+    kSelectionListInt   m_cEnemySelection;
+    int                 m_nEnemiesToGenerate;
+    int                 m_nMaxEnemies;
+    
+    bool                m_bCanJump;
+    
+    kSelectionListInt   m_cAttackSelection;
+    int                 m_nDamageModel;
+    
+    float               m_fEvadeTime;
+    float               m_fNoEvadeTime;
+    
+    CQueenStageInfo(void) {}
+};
+
+final class CQueenModelInfo
+{
+    float               m_health;
+    kStr                m_szFxName;    
+    
+    CQueenModelInfo(void) {}
+};
+
+final class CQueenEnemyInfo
+{
+    int                 m_actorType;
+    kVec3               m_vScale;
+    
+    CQueenEnemyInfo(void) {}
+};
+
+//-----------------------------------------------------------------------------
+//
+// Controller
+//
+//-----------------------------------------------------------------------------
+
+final class CQueenBossController
+{
+    array<CQueenStageInfo>  m_cStageInfos;
+    array<CQueenModelInfo>  m_cModelInfos;
+    array<CQueenEnemyInfo>  m_cEnemyInfos;
+    
+    kActor@                 m_pQueen;
+    bool                    m_bHopped;
+    CQueenStageInfo@        m_pStage;
+    int                     m_nStage;
+    
+    int                     m_nEnemiesToGenerate;
+    int                     m_nActiveEnemies;
+    float                   m_fEnemyTimer;
+    
+    kActor@                 m_pPodDevice;
+    array<kActor@>          m_pDevices;
+    
+    bool                    m_bEnemyStage;
+    bool                    m_bCanEvade;
+    float                   m_fEvadeTimer;
+    
+    bool                    m_bSpawnedMites;
+    
+    array<kActor@>          m_pPlayers;
+    
+    //--------------------------------------------------
+    CQueenBossController(void) {}
+    
+    //--------------------------------------------------
+    void Initialize(kActor@ pQueen, const bool bDeserializing)
+    {
+        @m_pQueen = pQueen;
+        
+        if(!bDeserializing)
+        {
+            m_bCanEvade = false;
+            m_bSpawnedMites = false;
+            m_fEvadeTimer = 0;
+            m_nStage = 0;
+            m_nEnemiesToGenerate = 0;
+            m_nActiveEnemies = 0;
+            m_fEnemyTimer = 0;
+        }
+        
+        m_cStageInfos.resize(QUEEN_STAGES);
+        m_cEnemyInfos.resize(TOTAL_QUEEN_ENEMIES);
+        
+        if(!bDeserializing)
+        {
+            m_cModelInfos.resize(TOTAL_QUEEN_MODEL_PARTS);
+        }
+        
+        kActorIterator cIterator;
+        kActor@ pActor;
+        
+        // gather all important actors
+        while(!((@pActor = cIterator.GetNext()) is null))
+        {
+            switch(pActor.Type())
+            {
+            case kActor_ActionObject_QueenGen:
+                m_pDevices.insertLast(pActor);
+                break;
+                
+            case kActor_AI_QueenPod:
+                if(pActor.TID() == 1)
+                {
+                    @m_pPodDevice = @pActor;
+                    if(!bDeserializing)
+                    {
+                        m_pPodDevice.Flags() |= AF_HIDDEN;
+                    }
+                }
+                else if(pActor.TID() == 2)
+                {
+                    if(!bDeserializing)
+                    {
+                        pActor.Flags() &= ~AF_HIDDEN;
+                    }
+                }
+                break;
+                
+            case kActor_Player:
+                m_pPlayers.insertLast(pActor);
+                break;
+                
+            default:
+                break;
+            }
+        }
+        
+        // setup enemy info
+        m_cEnemyInfos[0].m_actorType    = kActor_AI_Mite;
+        m_cEnemyInfos[0].m_vScale       = kVec3(0.5f*2, 0.5f*2, 0.5f*2);
+        m_cEnemyInfos[1].m_actorType    = kActor_AI_Worker;
+        m_cEnemyInfos[1].m_vScale       = kVec3(0.6f, 0.6f, 0.6f);
+        
+        if(!bDeserializing)
+        {
+            // setup model info
+            m_cModelInfos[QUEEN_MODEL_PART_ASS].m_health            = QUEEN_ASS_HEALTH;
+            m_cModelInfos[QUEEN_MODEL_PART_GUNS].m_health           = QUEEN_GUNS_HEALTH;
+            m_cModelInfos[QUEEN_MODEL_PART_HEAD].m_health           = QUEEN_HEAD_HEALTH;
+            m_cModelInfos[QUEEN_MODEL_PART_LITTLE_ARMS].m_health    = QUEEN_LITTLE_ARMS_HEALTH;
+        }
+        
+        //
+        // setup stage info
+        //
+        
+        // 1a - kill enemies
+        m_cStageInfos[0].m_cEnemySelection.AddItem(kActor_AI_Mite, 100);
+        m_cStageInfos[0].m_nEnemiesToGenerate   = QUEEN_STAGE1_ENEMIES;
+        m_cStageInfos[0].m_nMaxEnemies          = QUEEN_STAGE1_MAX_ENEMIES_ON_SCREEN;
+        m_cStageInfos[0].m_bCanJump             = false;
+        m_cStageInfos[0].m_cAttackSelection.AddItem(QUEEN_ANIM_ATTACK_ARM_FIRE, 40);
+        m_cStageInfos[0].m_cAttackSelection.AddItem(QUEEN_ANIM_ATTACK_SWIPE, 10);
+        m_cStageInfos[0].m_nDamageModel         = -1;
+        m_cStageInfos[0].m_fEvadeTime           = 1.0f;
+        m_cStageInfos[0].m_fNoEvadeTime         = 4.0f;
+        
+        // 1b - shoot arms
+        m_cStageInfos[1].m_cEnemySelection.AddItem(kActor_AI_Mite, 100);
+        m_cStageInfos[1].m_nEnemiesToGenerate   = 0;
+        m_cStageInfos[1].m_nMaxEnemies          = 0;
+        m_cStageInfos[1].m_bCanJump             = false;
+        m_cStageInfos[1].m_cAttackSelection.AddItem(QUEEN_ANIM_ATTACK_ARM_FIRE, 40);
+        m_cStageInfos[1].m_cAttackSelection.AddItem(QUEEN_ANIM_ATTACK_SWIPE, 10);
+        m_cStageInfos[1].m_nDamageModel         = QUEEN_MODEL_PART_LITTLE_ARMS;
+        m_cStageInfos[1].m_fEvadeTime           = 1.0f;
+        m_cStageInfos[1].m_fNoEvadeTime         = 4.0f;
+        
+        // 2a - kill enemies
+        m_cStageInfos[2].m_cEnemySelection.AddItem(kActor_AI_Mite, 100);
+        m_cStageInfos[2].m_nEnemiesToGenerate   = QUEEN_STAGE2_ENEMIES;
+        m_cStageInfos[2].m_nMaxEnemies          = QUEEN_STAGE2_MAX_ENEMIES_ON_SCREEN;
+        m_cStageInfos[2].m_bCanJump             = false;
+        m_cStageInfos[2].m_cAttackSelection.AddItem(QUEEN_ANIM_ATTACK_ASS_PODS, 40);
+        m_cStageInfos[2].m_cAttackSelection.AddItem(QUEEN_ANIM_ATTACK_ARM_FIRE, 10);
+        m_cStageInfos[2].m_cAttackSelection.AddItem(QUEEN_ANIM_ATTACK_SWIPE, 20);
+        m_cStageInfos[2].m_nDamageModel         = -1;
+        m_cStageInfos[2].m_fEvadeTime           = 2.0f;
+        m_cStageInfos[2].m_fNoEvadeTime         = 3.0f;
+        
+        // 2b - shoot ass
+        m_cStageInfos[3].m_cEnemySelection.AddItem(kActor_AI_Mite, 100);
+        m_cStageInfos[3].m_nEnemiesToGenerate   = 0;
+        m_cStageInfos[3].m_nMaxEnemies          = 0;
+        m_cStageInfos[3].m_bCanJump             = true;
+        m_cStageInfos[3].m_cAttackSelection.AddItem(QUEEN_ANIM_ATTACK_ASS_PODS, 40);
+        m_cStageInfos[3].m_cAttackSelection.AddItem(QUEEN_ANIM_ATTACK_ARM_FIRE, 10);
+        m_cStageInfos[3].m_cAttackSelection.AddItem(QUEEN_ANIM_ATTACK_SWIPE, 20);
+        m_cStageInfos[3].m_nDamageModel         = QUEEN_MODEL_PART_ASS;
+        m_cStageInfos[3].m_fEvadeTime           = 2.0f;
+        m_cStageInfos[3].m_fNoEvadeTime         = 3.0f;
+        
+        // 3a - kill a bunch of enemies
+        m_cStageInfos[4].m_cEnemySelection.AddItem(kActor_AI_Mite, 100);
+        m_cStageInfos[4].m_nEnemiesToGenerate   = QUEEN_STAGE3_ENEMIES;
+        m_cStageInfos[4].m_nMaxEnemies          = QUEEN_STAGE3_MAX_ENEMIES_ON_SCREEN;
+        m_cStageInfos[4].m_bCanJump             = false;
+        m_cStageInfos[4].m_cAttackSelection.AddItem(QUEEN_ANIM_ATTACK_GUN_FIRE, 40);
+        m_cStageInfos[4].m_cAttackSelection.AddItem(QUEEN_ANIM_ATTACK_GUN_BLAST, 40);
+        m_cStageInfos[4].m_cAttackSelection.AddItem(QUEEN_ANIM_ATTACK_SWIPE, 10);
+        m_cStageInfos[4].m_nDamageModel         = -1;
+        m_cStageInfos[4].m_fEvadeTime           = 3.0f;
+        m_cStageInfos[4].m_fNoEvadeTime         = 3.0f;
+        
+        // 3b - shoot guns
+        m_cStageInfos[5].m_cEnemySelection.AddItem(kActor_AI_Mite, 100);
+        m_cStageInfos[5].m_nEnemiesToGenerate   = 0;
+        m_cStageInfos[5].m_nMaxEnemies          = 0;
+        m_cStageInfos[5].m_bCanJump             = true;
+        m_cStageInfos[5].m_cAttackSelection.AddItem(QUEEN_ANIM_ATTACK_GUN_FIRE, 40);
+        m_cStageInfos[5].m_cAttackSelection.AddItem(QUEEN_ANIM_ATTACK_GUN_BLAST, 40);
+        m_cStageInfos[5].m_cAttackSelection.AddItem(QUEEN_ANIM_ATTACK_SWIPE, 10);
+        m_cStageInfos[5].m_nDamageModel         = QUEEN_MODEL_PART_GUNS;
+        m_cStageInfos[5].m_fEvadeTime           = 3.0f;
+        m_cStageInfos[5].m_fNoEvadeTime         = 3.0f;
+        
+        // 4 - on floor waiting for head to be blown off
+        m_cStageInfos[6].m_cEnemySelection.AddItem(kActor_AI_Mite, 100);
+        m_cStageInfos[6].m_nEnemiesToGenerate   = 0;
+        m_cStageInfos[6].m_nMaxEnemies          = 0;
+        m_cStageInfos[6].m_bCanJump             = false;
+        m_cStageInfos[6].m_cAttackSelection.AddItem(QUEEN_ANIM_ATTACK_SWIPE, 1);
+        m_cStageInfos[6].m_nDamageModel         = QUEEN_MODEL_PART_HEAD;
+        m_cStageInfos[6].m_fEvadeTime           = 0;
+        m_cStageInfos[6].m_fNoEvadeTime         = 0;
+        
+        // 5 - death
+        m_cStageInfos[7].m_cEnemySelection.AddItem(kActor_AI_Mite, 100);
+        m_cStageInfos[7].m_nEnemiesToGenerate   = 0;
+        m_cStageInfos[7].m_nMaxEnemies          = 0;
+        m_cStageInfos[7].m_bCanJump             = false;
+        m_cStageInfos[7].m_cAttackSelection.AddItem(QUEEN_ANIM_ATTACK_SWIPE, 1);
+        m_cStageInfos[7].m_nDamageModel         = -1;
+        m_cStageInfos[7].m_fEvadeTime           = 0;
+        m_cStageInfos[7].m_fNoEvadeTime         = 0;
+        
+        if(!bDeserializing)
+        {
+            SetupStage(m_nStage);
+        }
+        else
+        {
+            @m_pStage = @m_cStageInfos[m_nStage];
+        }
+    }
+    
+    //--------------------------------------------------
+    void SetupStage(const int stage)
+    {
+        @m_pStage = @m_cStageInfos[stage];
+        m_nEnemiesToGenerate = 0;
+        m_nEnemiesToGenerate += m_pStage.m_nEnemiesToGenerate;
+        m_fEnemyTimer = 0;
+        m_nActiveEnemies = 0;
+        m_bSpawnedMites = false;
+        
+        m_bEnemyStage = (m_pStage.m_nEnemiesToGenerate > 0);
+        
+        if(stage == QUEEN_DEATH_STAGE)
+        {
+            m_pQueen.ModeStateComponent().SetMode(QUEEN_MODE_DEATH);
+        }
+        else if(stage == QUEEN_DEATH_HEAD_BLOWN_OFF_STAGE)
+        {
+            m_pQueen.ModeStateComponent().SetMode(QUEEN_MODE_DEATH_HEAD_BLOWN_OFF);
+        }
+    }
+    
+    //--------------------------------------------------
+    void AdvanceStage(void)
+    {
+        //Sys.Print("Next stage");
+        
+        m_nStage++;
+        SetupStage(m_nStage);
+    }
+    
+    //--------------------------------------------------
+    void PodAnimation(const int anim)
+    {
+        if(!(m_pPodDevice is null))
+        {
+            if(!(m_pPodDevice.AnimTrackComponent() is null))
+            {
+                if(anim == ANIM_QUEEN_POD_IDLE)
+                {
+                    m_pPodDevice.AnimTrackComponent().Blend(anim, 0, 0, ANF_LOOP);
+                }
+                else
+                {
+                    m_pPodDevice.AnimTrackComponent().Blend(anim, 0, 0, 0);
+                }
+            }
+        }
+    }
+    
+    //--------------------------------------------------
+    void Tick(void)
+    {
+        for(uint i = 0; i < m_pDevices.length(); ++i)
+        {
+            if( m_pDevices[i].ModeStateComponent().Mode() == ACTIONOBJECT_MODE_TRIGGER &&
+                m_pDevices[i].AnimTrackComponent().CycleCompleted())
+            {
+                m_pDevices[i].ModeStateComponent().SetMode(ACTIONOBJECT_MODE_IDLE);
+            }
+        }
+            
+        if(CinemaPlayer.PathTrackPlaying())
+        {
+            return;
+        }
+        
+        if(!m_bEnemyStage || m_pStage.m_nMaxEnemies <= 0)
+        {
+            return;
+        }
+        
+        if(m_nEnemiesToGenerate > 0)
+        {
+            GenerateEnemies();
+        }
+        
+        int nCount = ActiveMites();
+        
+        if(m_bSpawnedMites)
+        {
+            if(m_bEnemyStage && nCount <= 0)
+            {
+                AdvanceStage();
+            }
+        }
+    }
+    
+    //--------------------------------------------------
+    int ActiveMites(void)
+    {
+        kActorIterator cIterator;
+        kActor@ pActor;
+        int nCount = 0;
+        
+        while(!((@pActor = cIterator.GetNext()) is null))
+        {
+            if(pActor.Type() == kActor_AI_Mite)
+            {
+                m_bSpawnedMites = true;
+                
+                if(pActor.Health() > 0 && (pActor.Flags() & AF_DEAD) == 0)
+                {
+                    nCount++;
+                }
+            }
+        }
+        
+        return nCount;
+    }
+    
+    //--------------------------------------------------
+    void RemoveMites(void)
+    {
+        kActorIterator cIterator;
+        kActor@ pActor;
+        
+        while(!((@pActor = cIterator.GetNext()) is null))
+        {
+            if(pActor.Type() == kActor_AI_Mite && (pActor.Flags() & AF_DEAD) != 0)
+            {
+                pActor.RunFxEvent("Hostage_Fade");
+            }
+        }
+    }
+    
+    //--------------------------------------------------
+    void GenerateEnemies(void)
+    {
+        kActor@ pPlayer = GetClosestPlayer(m_pQueen.Origin());
+        kVec3 vTargetPos;
+        
+        if(!(pPlayer is null))
+        {
+            vTargetPos = pPlayer.Origin();
+        }
+        
+        uint i = 0;
+        
+        while(i < m_pDevices.length()   &&
+              m_nEnemiesToGenerate > 0  &&
+              m_nActiveEnemies < m_pStage.m_nMaxEnemies)
+        {
+            // WARNING: Assumes that it already has a mode state component!!!
+            if(m_pDevices[i].ModeStateComponent().Mode() == ACTIONOBJECT_MODE_IDLE)
+            {
+                m_pDevices[i].ModeStateComponent().SetMode(ACTIONOBJECT_MODE_TRIGGER);
+                m_nEnemiesToGenerate--;
+                m_nActiveEnemies++;
+            }
+            
+            i++;
+        }
+    }
+    
+    //--------------------------------------------------
+    kActor@ GetClosestPlayer(const kVec3&in vOrigin)
+    {
+        float fClosestDist = 1000000.0f;
+        kActor@ pPlayer = null;
+        
+        for(uint i = 0; i < m_pPlayers.length(); ++i)
+        {
+            float fDist = vOrigin.Distance(m_pPlayers[i].Origin());
+            if(fDist < fClosestDist)
+            {
+                fClosestDist = fDist;
+                @pPlayer = @m_pPlayers[i];
+            }
+        }
+        
+        return pPlayer;
+    }
+};
+
+/*
+==============================================================
+TurokQueenBoss
+==============================================================
+*/
+
+class TurokQueenBoss : ScriptObject
+{
+    kActor@                 self;
+    kEnemyAIComponent@      m_pEAIC;
+    CQueenBossController    m_cController;
+    
+    TurokQueenBoss(kActor@ actor)
+    {
+        @self = actor;
+        self.AddComponent("kexModeStateComponent", true);
+    }
+    
+    //--------------------------------------------------
+    void OnSerialize(kDict& out dict)
+    {
+        SERIALIZE(m_cController.m_bHopped);
+        SERIALIZE(m_cController.m_nStage);
+        SERIALIZE(m_cController.m_nEnemiesToGenerate);
+        SERIALIZE(m_cController.m_nActiveEnemies);
+        SERIALIZE(m_cController.m_fEnemyTimer);
+        SERIALIZE(m_cController.m_bEnemyStage);
+        SERIALIZE(m_cController.m_bCanEvade);
+        SERIALIZE(m_cController.m_fEvadeTimer);
+        SERIALIZE(m_cController.m_bSpawnedMites);
+        SERIALIZE(m_cController.m_cModelInfos[QUEEN_MODEL_PART_ASS].m_health);
+        SERIALIZE(m_cController.m_cModelInfos[QUEEN_MODEL_PART_GUNS].m_health);
+        SERIALIZE(m_cController.m_cModelInfos[QUEEN_MODEL_PART_HEAD].m_health);
+        SERIALIZE(m_cController.m_cModelInfos[QUEEN_MODEL_PART_LITTLE_ARMS].m_health);
+    }
+    
+    //--------------------------------------------------
+    void OnDeserialize(kDict& in dict)
+    {
+        DESERIALIZE_BOOL(m_cController.m_bHopped);
+        DESERIALIZE_INT(m_cController.m_nStage);
+        DESERIALIZE_INT(m_cController.m_nEnemiesToGenerate);
+        DESERIALIZE_INT(m_cController.m_nActiveEnemies);
+        DESERIALIZE_FLOAT(m_cController.m_fEnemyTimer);
+        DESERIALIZE_BOOL(m_cController.m_bEnemyStage);
+        DESERIALIZE_BOOL(m_cController.m_bCanEvade);
+        DESERIALIZE_FLOAT(m_cController.m_fEvadeTimer);
+        DESERIALIZE_BOOL(m_cController.m_bSpawnedMites);
+        
+        m_cController.m_cModelInfos.resize(TOTAL_QUEEN_MODEL_PARTS);
+        
+        DESERIALIZE_FLOAT(m_cController.m_cModelInfos[QUEEN_MODEL_PART_ASS].m_health);
+        DESERIALIZE_FLOAT(m_cController.m_cModelInfos[QUEEN_MODEL_PART_GUNS].m_health);
+        DESERIALIZE_FLOAT(m_cController.m_cModelInfos[QUEEN_MODEL_PART_HEAD].m_health);
+        DESERIALIZE_FLOAT(m_cController.m_cModelInfos[QUEEN_MODEL_PART_LITTLE_ARMS].m_health);
+    }
+    
+    //--------------------------------------------------
+    void OnSpawn(void)
+    {
+        m_cController.Initialize(self, self.Deserialized());
+        
+        if(!self.Deserialized())
+        {
+            self.Flags() |= AF_HIDDEN;
+            self.Health() = QUEEN_TOTAL_HEALTH;
+        
+            kActorIterator cIterator;
+            kActor@ pActor;
+            
+            while(!((@pActor = cIterator.GetNext()) is null))
+            {
+                switch(pActor.Type())
+                {
+                case kActor_AI_QueenPuppet:
+                    pActor.Flags() |= AF_HIDDEN;
+                    break;
+                }
+            }
+        }
+        
+        @m_pEAIC = self.EnemyAIComponent();
+        
+        // seize control of our ai
+        self.EnableComponent("kexEnemyAIComponent", false);
+        self.ModeStateComponent().AssignModeTable("QueenModeTable");
+        
+        if(!self.Deserialized())
+        {
+            self.ModeStateComponent().SetMode(QUEEN_MODE_SETUP);
+        }
+        else
+        {
+            Hud.SetBar(0, 50, 255, 50, 255, QUEEN_TOTAL_HEALTH);
+        }
+    }
+    
+    //--------------------------------------------------
+    void OnPreDamage(kDamageInfo& in dmgInfo)
+    {
+        // we're never dealing direct damage to the queen actor object
+        self.Flags() |= AF_NOINFLICTDAMAGE;
+        
+        if(m_cController.m_bEnemyStage)
+        {
+            return;
+        }
+        
+        if( self.ModeStateComponent().Mode() == QUEEN_MODE_HOP ||
+            self.ModeStateComponent().Mode() == QUEEN_MODE_LAND_FROM_POD ||
+            self.ModeStateComponent().Mode() == QUEEN_MODE_RAGE)
+        {
+            // TODO: don't damage while hopping; weird stuff happens....
+            return;
+        }
+        
+        int damageModelIndex = m_cController.m_pStage.m_nDamageModel;
+        int damageModel = 1 << (damageModelIndex+1);
+        
+        if(damageModelIndex >= TOTAL_QUEEN_MODEL_PARTS || damageModelIndex <= -1)
+        {
+            return;
+        }
+        
+        // hit correct model?
+        if((dmgInfo.boneFlags & damageModel) == 0)
+        {
+            return;
+        }
+        
+#define MODEL_HEALTH() m_cController.m_cModelInfos[damageModelIndex].m_health
+        if(MODEL_HEALTH() > 0)
+        {
+            float fHits = dmgInfo.hits;
+            if((dmgInfo.flags & DF_EXPLOSIVE) != 0)
+            {
+                fHits *= 0.5f;
+            }
+            
+            if(!(dmgInfo.particle is null))
+            {
+                // nerf damage if razor wind
+                if(dmgInfo.particle.ParticleType() == kParticle_RazorWind)
+                {
+                    fHits *= 0.25f;
+                }
+            }
+            
+            MODEL_HEALTH() -= fHits;
+            self.RunFxEvent("QueenFlash");
+            
+            if(MODEL_HEALTH() <= 0)
+            {
+                MODEL_HEALTH() = 0;
+                
+                self.RenderMeshComponent().SetAttachedMeshVisibility(damageModelIndex, false);
+                
+                if(self.ModeStateComponent().Mode() != QUEEN_MODE_DEATH_CRAWL)
+                {
+                    self.ModeStateComponent().SetMode(QUEEN_MODE_REACTION_EXPLOSION);
+                }
+                
+                m_cController.AdvanceStage();
+            }
+        }
+#undef MODEL_HEALTH
+        
+        // get total health remaining
+        float totalHealth = 0;
+        for(int i = 0; i < TOTAL_QUEEN_MODEL_PARTS; ++i)
+        {
+            totalHealth += m_cController.m_cModelInfos[i].m_health;
+        }
+        
+        Hud.UpdateBar(0, int(totalHealth));
+    }
+    
+    //--------------------------------------------------
+    void OnDeath(kDamageInfo& in dmgInfo)
+    {
+    }
+    
+    //--------------------------------------------------
+    void OnTick(void)
+    {
+        if(m_cController.m_bEnemyStage)
+        {
+            m_pEAIC.SetNoUpdateTarget(true, false);
+            m_pEAIC.PathTarget().Reset();
+        }
+        else
+        {
+            m_pEAIC.SetNoUpdateTarget(false, false);
+        }
+        
+        if(!(m_pEAIC.SightTarget().Target() is null))
+        {
+            self.RenderMeshComponent().HeadTrackPos() = m_pEAIC.SightTarget().Target().Origin();
+            self.RenderMeshComponent().HeadTrackPos().z += (GAME_SCALE*50);
+        }
+        
+        m_cController.Tick();
+        self.RenderMeshComponent().FxFlags() = (1 << m_cController.m_pStage.m_nDamageModel);
+    }
+    
+    //--------------------------------------------------
+    void TurnTowardsTarget(void)
+    {
+        if(!(m_pEAIC.SightTarget().Target() is null))
+        {
+            float ang = self.GetDeltaFromPoint(m_pEAIC.SightTarget().Target().Origin());
+            m_pEAIC.Turn(QUEEN_TURN_SPEED, ang);
+        }
+    }
+    
+    //--------------------------------------------------
+    void MODE_SetupInit(void)
+    {
+        self.ModeStateComponent().SetMode(QUEEN_MODE_INTRO);
+    }
+    
+    //--------------------------------------------------
+    void MODE_TickInit(void)
+    {
+    }
+    
+    //--------------------------------------------------
+    void MODE_SetupIntro(void)
+    {
+        CinemaPlayer.StartCinema("cinemas/quuen.txt");
+    }
+    
+    //--------------------------------------------------
+    void MODE_TickIntro(void)
+    {
+        if(!CinemaPlayer.PathTrackPlaying())
+        {
+            kActorIterator cIterator;
+            kVec3 vOrigin = self.Origin();
+            kActor@ pActor;
+            
+            self.Flags() &= ~AF_HIDDEN;
+            m_cController.m_pPodDevice.Flags() &= ~AF_HIDDEN;
+            
+            while(!((@pActor = cIterator.GetNext()) is null))
+            {
+                if(pActor.Type() == kActor_AI_QueenPuppet)
+                {
+                    vOrigin = pActor.Origin();
+                    break;
+                }
+            }
+            
+            Hud.SetBar(0, 50, 255, 50, 255, QUEEN_TOTAL_HEALTH);
+            
+            self.WorldComponent().SetNearestPosition(vOrigin);
+            self.ModeStateComponent().SetMode(QUEEN_MODE_RUN);
+        }
+    }
+    
+    //--------------------------------------------------
+    void MODE_SetupInPod(void)
+    {
+    }
+    
+    //--------------------------------------------------
+    void MODE_TickInPod(void)
+    {
+    }
+    
+    //--------------------------------------------------
+    void MODE_SetupBreakPod(void)
+    {
+    }
+    
+    //--------------------------------------------------
+    void MODE_TickBreakPod(void)
+    {
+    }
+    
+    //--------------------------------------------------
+    void MODE_SetupJumpInPod(void)
+    {
+        self.WorldComponent().Flags() |= WCF_NONSOLID;
+        m_cController.PodAnimation(ANIM_QUEEN_POD_OPEN);
+    }
+    
+    //--------------------------------------------------
+    void MODE_TickJumpInPod(void)
+    {
+        // lerp to center
+        self.Origin().x = (0 - self.Origin().x) * (1.0f / (5*GAME_SCALE)) + self.Origin().x;
+        self.Origin().y = (0 - self.Origin().y) * (1.0f / (5*GAME_SCALE)) + self.Origin().y;
+        
+        if(self.AnimTrackComponent().CycleCompleted())
+        {
+            self.ModeStateComponent().SetMode(QUEEN_MODE_INSIDE_POD);
+        }
+    }
+    
+    //--------------------------------------------------
+    void MODE_SetupInsidePod(void)
+    {
+        self.Flags() |= AF_HIDDEN;
+        m_cController.PodAnimation(ANIM_QUEEN_POD_CLOSE);
+    }
+    
+    //--------------------------------------------------
+    void MODE_TickInsidePod(void)
+    {
+        if(!m_cController.m_bEnemyStage)
+        {
+            self.ModeStateComponent().SetMode(QUEEN_MODE_LAND_FROM_POD);
+        }
+    }
+    
+    //--------------------------------------------------
+    void MODE_SetupLandFromPod(void)
+    {
+        m_cController.PodAnimation(ANIM_QUEEN_POD_OPEN);
+        self.WorldComponent().Flags() &= ~WCF_NONSOLID;
+        self.Flags() &= ~AF_HIDDEN;
+    }
+    
+    //--------------------------------------------------
+    void MODE_TickLandFromPod(void)
+    {
+        TurnTowardsTarget();
+        
+        if(self.AnimTrackComponent().CycleCompleted())
+        {
+            m_cController.PodAnimation(ANIM_QUEEN_POD_IDLE);
+            
+            self.RunFxEvent("QueenBlink");
+            self.ModeStateComponent().SetMode(QUEEN_MODE_RAGE);
+        }
+    }
+    
+    //--------------------------------------------------
+    void MODE_SetupRage(void)
+    {
+        m_cController.RemoveMites();
+    }
+    
+    //--------------------------------------------------
+    void MODE_TickRage(void)
+    {
+        TurnTowardsTarget();
+        
+        if(self.AnimTrackComponent().CycleCompleted())
+        {
+            self.ModeStateComponent().SetMode(QUEEN_MODE_RUN);
+        }
+    }
+    
+    //--------------------------------------------------
+    void MODE_SetupThink(void)
+    {
+        self.RunFxEvent("QueenBlink");
+    }
+    
+    //--------------------------------------------------
+    void MODE_TickThink(void)
+    {
+        float fTurnSpeed = QUEEN_TURN_SPEED;
+        
+        if(m_cController.m_bEnemyStage)
+        {
+            fTurnSpeed *= 2;
+        }
+        
+        m_pEAIC.GetTargetInfo(true, true);
+        m_pEAIC.GetMovementInfo();
+        m_pEAIC.Turn(fTurnSpeed, m_pEAIC.PathTarget().m_fDeltaAngle);
+        
+        // jump into cocoon if close enough
+        if(m_cController.m_bEnemyStage)
+        {
+            float x = self.Origin().x;
+            float y = self.Origin().y;
+            
+            if(Math::Sqrt(x*x+y*y) < (20*GAME_SCALE))
+            {
+                self.ModeStateComponent().SetMode(QUEEN_MODE_JUMP_IN_POD);
+            }
+        }
+        else
+        {
+            if(!(m_pEAIC.PathTarget().Target() is null) &&
+               !(m_pEAIC.SightTarget().Target() is null) &&
+               Math::Fabs(m_pEAIC.SightTarget().m_fDeltaAngle) <= QUEEN_FACING_ANGLE)
+            {
+                if(m_pEAIC.PathTarget().m_fDist >= QUEEN_HOP_DIST && m_cController.m_pStage.m_bCanJump)
+                {
+                    self.ModeStateComponent().SetMode(QUEEN_MODE_HOP);
+                }
+                else if(m_pEAIC.PathTarget().m_fDist <= QUEEN_ATTACK_DIST)
+                {
+                    self.ModeStateComponent().SetMode(QUEEN_MODE_ATTACK);
+                }
+            }
+        }
+    }
+    
+    //--------------------------------------------------
+    void MODE_SetupHop(void)
+    {
+        m_cController.m_bHopped = false;
+    }
+    
+    //--------------------------------------------------
+    void MODE_TickHop(void)
+    {
+        TurnTowardsTarget();
+        
+        if(self.AnimTrackComponent().PlayingID() == QUEEN_ANIM_HOP)
+        {
+            if(!m_cController.m_bHopped && self.AnimTrackComponent().CurrentFrame() >= 12)
+            {
+                m_cController.m_bHopped = true;
+                if(!(m_pEAIC.SightTarget().Target() is null))
+                {
+                    float fx = m_pEAIC.SightTarget().Target().Origin().x - self.Origin().x;
+                    float fy = m_pEAIC.SightTarget().Target().Origin().y - self.Origin().y;
+                    
+                    self.MovementComponent().AirFriction() = 1.0f;
+                    self.MovementComponent().Friction() = 1.0f;
+                    
+                    self.MovementComponent().Velocity().x += fx * (GAME_DELTA_TIME*1.5f);
+                    self.MovementComponent().Velocity().y += fy * (GAME_DELTA_TIME*1.5f);
+                }
+            }
+            
+            if(self.AnimTrackComponent().CurrentFrame() >= 20)
+            {
+                self.MovementComponent().AirFriction() = 0.5f;
+                self.MovementComponent().Friction() = 0.5f;
+                self.MovementComponent().Velocity() = Math::vecZero;
+            }
+        }
+        
+        if(self.AnimTrackComponent().CycleCompleted())
+        {
+            self.MovementComponent().AirFriction() = 0.5f;
+            self.MovementComponent().Friction() = 0.5f;
+            self.MovementComponent().Velocity() = Math::vecZero;
+            
+            self.ModeStateComponent().SetMode(QUEEN_MODE_RUN);
+        }
+    }
+    
+    //--------------------------------------------------
+    int MODE_AnimAttack(void)
+    {
+        return m_cController.m_pStage.m_cAttackSelection.Select(true);
+    }
+    
+    //--------------------------------------------------
+    void MODE_TickAttack(void)
+    {
+        float fLoopTime = 1.0f;
+        
+        switch(self.AnimTrackComponent().PlayingID())
+        {
+        case QUEEN_ANIM_ATTACK_ASS_PODS:
+        case QUEEN_ANIM_ATTACK_GUN_FIRE:
+            fLoopTime = 2.0f;
+            break;
+            
+        default:
+            break;
+        }
+        
+        if(self.AnimTrackComponent().CycleCompleted())
+        {
+            if(self.AnimTrackComponent().PlayTime() >= fLoopTime)
+            {
+                self.ModeStateComponent().SetMode(QUEEN_MODE_RUN);
+            }
+        }
+    }
+    
+    //--------------------------------------------------
+    void MODE_SetupEvade(void)
+    {
+    }
+    
+    //--------------------------------------------------
+    void MODE_TickEvade(void)
+    {
+    }
+    
+    //--------------------------------------------------
+    void MODE_SetupReactionExplosion(void)
+    {
+    }
+    
+    //--------------------------------------------------
+    void MODE_TickReactionExplosion(void)
+    {
+        if(self.AnimTrackComponent().CycleCompleted())
+        {
+            self.ModeStateComponent().SetMode(QUEEN_MODE_RUN);
+        }
+    }
+    
+    //--------------------------------------------------
+    void MODE_SetupDeath(void)
+    {
+    }
+    
+    //--------------------------------------------------
+    void MODE_TickDeath(void)
+    {
+        if(self.AnimTrackComponent().CycleCompleted())
+        {
+            self.ModeStateComponent().SetMode(QUEEN_MODE_DEATH_CRAWL);
+        }
+    }
+    
+    //--------------------------------------------------
+    void MODE_SetupDeathCrawl(void)
+    {
+        self.RunFxEvent("QueenBlink");
+    }
+    
+    //--------------------------------------------------
+    void MODE_TickDeathCrawl(void)
+    {
+        m_pEAIC.GetTargetInfo(true, true);
+        m_pEAIC.GetMovementInfo();
+        m_pEAIC.Turn(QUEEN_TURN_SPEED*0.1f, m_pEAIC.PathTarget().m_fDeltaAngle);
+    }
+    
+    //--------------------------------------------------
+    void MODE_SetupHeadBlownOff(void)
+    {
+        Hud.DisableBar(0);
+        self.Origin().Clear();
+        self.Yaw() = Math::pi;
+        CinemaPlayer.StartCinema("cinemas/death.txt");
+        
+        kActorIterator cIterator;
+        kActor@ pActor;
+        
+        while(!((@pActor = cIterator.GetNext()) is null))
+        {
+            if(pActor.TID() == 5)
+            {
+                pActor.RenderMeshComponent().SetAttachedMeshVisibility(QUEEN_MODEL_PART_ASS, false);
+                pActor.RenderMeshComponent().SetAttachedMeshVisibility(QUEEN_MODEL_PART_GUNS, false);
+                pActor.RenderMeshComponent().SetAttachedMeshVisibility(QUEEN_MODEL_PART_HEAD, false);
+                pActor.RenderMeshComponent().SetAttachedMeshVisibility(QUEEN_MODEL_PART_LITTLE_ARMS, false);
+                break;
+            }
+        }
+    }
+    
+    //--------------------------------------------------
+    void MODE_TickHeadBlownOff(void)
+    {
+        if(!CinemaPlayer.Playing())
+        {
+			// ------------------------------------------
+			// Added by Rando to track individual cleared levels
+			LocalPlayer.Inventory().Give(kActor_InventoryItem_FinishedLevel5);
+			// ------------------------------------------
+            DoPlayerWarp(0, 15999, kLevel_Hub, true);
+        }
+    }
+};

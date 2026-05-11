@@ -19,7 +19,6 @@ Feather1 kActor_Feather_3
 	flags.important 		TRUE 
 	pickup.pickupSound 		"sounds/shaders/Health Pickup Sound.ksnd" 
 	pickup.pickupMessage 	"$str_130"
-	rando.give2				TRUE
 	
 	initialScale              "0.3 0.3 0.3"
 	Begin_Component "kexStaticMeshComponent"
@@ -39,7 +38,6 @@ Feather2 kActor_Feather_6
 	flags.important 		TRUE 
 	pickup.pickupSound 		"sounds/shaders/Health Pickup Sound.ksnd" 
 	pickup.pickupMessage 	"$str_131" 
-	rando.give2				TRUE
 	
 	initialScale              "0.3 0.3 0.3"
 	Begin_Component "kexStaticMeshComponent"
@@ -59,7 +57,6 @@ Feather3 kActor_Feather_2
 	flags.important 		TRUE 
 	pickup.pickupSound 		"sounds/shaders/Health Pickup Sound.ksnd" 
 	pickup.pickupMessage 	"$str_132"
-	rando.give2				TRUE
 	
 	initialScale              "0.3 0.3 0.3"
 	Begin_Component "kexStaticMeshComponent"
@@ -79,7 +76,6 @@ Feather4 kActor_Feather_5
 	flags.important 		TRUE 
 	pickup.pickupSound 		"sounds/shaders/Health Pickup Sound.ksnd" 
 	pickup.pickupMessage 	"$str_133"
-	rando.give2				TRUE
 	
 	initialScale              "0.3 0.3 0.3"
 	Begin_Component "kexStaticMeshComponent"
@@ -99,7 +95,6 @@ Feather5 kActor_Feather_4
 	flags.important 		TRUE 
 	pickup.pickupSound 		"sounds/shaders/Health Pickup Sound.ksnd" 
 	pickup.pickupMessage 	"$str_134"
-	rando.give2				TRUE
 	
 	initialScale              "0.3 0.3 0.3"
 	Begin_Component "kexStaticMeshComponent"

@@ -16,6 +16,10 @@ HubKey1 kActor_InventoryItem_Level1Key
 	pickup.pickupSound "sounds/shaders/Ammo Pickup.ksnd" 
 	pickup.pickupMessage "$str_113"
 	
+	initialScale              "0.5 0.5 0.5"
+	Begin_Component "kexStaticMeshComponent"
+        mesh                  "models/Rando_Level_1_Key.staticmesh"
+    End_Component
 	Begin_Component "kexScriptComponent"
         scriptClass           "RandoPickupObject"
         triggerRadius         81.92

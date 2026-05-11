@@ -25,6 +25,30 @@ Generator_Ammo_Random kActor_Generator_RandomAmmo
     End_Component
 }
 
+//------------------------------------
+// Generator for full health - this needs to exist on a def file somewhere,
+// So we'll put it here since we need this one and not generatorPickups.txt.
+Generator_Health_FullRando kActor_Generator_FullHealth
+{
+    className                   "kexActor"
+    flags.noDamage              TRUE
+    flags.allowTracking         FALSE
+    placeable                   TRUE
+    
+    Begin_Component "kexGeneratorComponent"
+        maxActive               1
+        intervalTime1           30
+        intervalTime2           60
+        singleObjectType        kActor_Item_HealthFull
+        bInfiniteTotal          TRUE
+        bInitiallyActive        TRUE
+    End_Component
+    Begin_Component "kexWorldComponent"
+        bTrackGround            FALSE
+        bNonSolid               TRUE
+    End_Component
+}
+
 //-----------------------------------------------------------------------------
 //
 // Vanilla ammo

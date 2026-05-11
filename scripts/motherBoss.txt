@@ -501,10 +501,10 @@ final class CMotherBossController
 		
 		//------------------
 		// Added by Rando
-		// If we're randomizing weapons/ammo, make all ammo spawns into random ammo.
+		// If we're randomizing weapons, make all ammo spawns into random ammo.
 		//------------------
 		int typeToSpawn = nType;
-		if (OPTION_INCLUDE_WEAPONS_AND_AMMO)
+		if (OPTION_RANDOMIZE_WEAPONS)
 		{
 			kDictMem@ actorDef = TryGetActorDefWithClass(typeToSpawn, "kexAmmoPickup");
 			if (actorDef !is null)
@@ -2207,9 +2207,10 @@ class TurokMotherBoss : ScriptObject
         
         if(!CinemaPlayer.Playing())
         {
-			// Added by Rando - give the totem item here to track that the level is complete
-			LocalPlayer.Inventory().Give(kActor_Misc_TotemInventory);
-		
+			// ------------------------------------------
+			// Added by Rando to track individual cleared levels
+			LocalPlayer.Inventory().Give(kActor_InventoryItem_FinishedLevel6);
+			// ------------------------------------------
             DoPlayerWarp(0, 16999, kLevel_Hub, true);
         }
     });

@@ -1,0 +1,76 @@
+fx[2] =
+{
+    typeID = 10000
+    {
+        bDepthBuffer = 1
+        bNoDirection = 1
+        spawnSound = 0
+        shader = "progs/worldcolorfx"
+        softness = 0.0
+        sprite = "sprites/glowring"
+        animtype = 2
+        frames = 60
+        probability = 4
+        visibility = 2
+        instances = 1
+        fadeInTime = 10
+        fadeOutTime = 10
+        animSpeed = 30
+        alignment = 1
+        translation = { 0.000000 0.000000 0.000000 }
+        scale = { 25.0 25.0 7.781250 }
+        scaleInc = { 1.000000 1.000000 1.000000 }
+        farScale = 1.000000
+        nearScale = 1.000000
+        shadowScale = 1.000000
+        direction = { 0.000000 0.000000 1.000000 }
+        velocity = 65.000000
+        bounceEnergy = 1.000000
+        whiteColor1 = { 1.000000 0.701961 1.000000 }
+        whiteColor2 = { 1.000000 0.701961 1.000000 }
+        blackColor1 = { 1.000000 0.000000 0.000000 }
+        blackColor2 = { 1.000000 0.000000 0.000000 }
+        hueRandom = 0.000000
+        saturationRandom = 0.000000
+        brightnessRandom = 0.000000
+        onImpact
+        {
+        }
+    }
+    {
+        bDepthBuffer = 1
+        bNoDirection = 1
+        spawnSound = 0
+        shader = "progs/worldcolorfx"
+        softness = 0.0
+        sprite = "sprites/glowring"
+        animtype = 2
+        frames = 30
+        probability = 2
+        visibility = 2
+        instances = 1
+        fadeInTime = 10
+        fadeOutTime = 10
+        animSpeed = 30
+        alignment = 1
+        translation = { 0.000000 0.000000 0.000000 }
+        scale = { 25.0 25.0 7.781250 }
+        scaleInc = { 1.000000 1.000000 1.000000 }
+        farScale = 1.000000
+        nearScale = 1.000000
+        shadowScale = 1.000000
+        direction = { 0.000000 0.000000 1.000000 }
+        velocity = 120.000000
+        bounceEnergy = 1.000000
+        whiteColor1 = { 1.000000 0.801961 1.000000 }
+        whiteColor2 = { 1.000000 0.801961 1.000000 }
+        blackColor2 = { 0.929411 0.866666 0.866666 }
+        blackColor2 = { 0.929411 0.866666 0.866666 }
+        hueRandom = 0.000000
+        saturationRandom = 0.000000
+        brightnessRandom = 0.000000
+        onImpact
+        {
+        }
+    }
+}
