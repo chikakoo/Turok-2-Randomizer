@@ -1,0 +1,166 @@
+#include "defs/common.txt"
+#include "rando/apSettings.as"
+
+Ammo_Shell
+{
+    max                     OPTION_MAX_SHOTGUN_SHELL
+    icon                    "gfx/hud/ammo/h_a_shells1.png"
+    offset                  0.0
+    icon_width              32.0
+    icon_height             32.0
+}
+
+Ammo_Arrow
+{
+    max                     20
+    icon                    "gfx/hud/ammo/h_a_arrow.png"
+    offset                  0.0
+    icon_width              32.0
+    icon_height             32.0
+}
+
+Ammo_TekArrow
+{
+    max                     OPTION_MAX_TEK_ARROW
+    icon                    "gfx/hud/ammo/h_a_tekarrow.png"
+    offset                  0.0
+    icon_width              32.0
+    icon_height             32.0
+}
+
+Ammo_Bullet
+{
+    max                     OPTION_MAX_BULLET
+    icon                    "gfx/hud/ammo/h_a_bullets.png"
+    offset                  0.0
+    icon_width              32.0
+    icon_height             32.0
+}
+
+Ammo_Dart
+{
+    max                     OPTION_MAX_TRANQUILIZER_DART
+    icon                    "gfx/hud/ammo/h_a_darts.png"
+    offset                  0.0
+    icon_width              32.0
+    icon_height             32.0
+}
+
+Ammo_ChargeDart
+{
+    max                     OPTION_MAX_CHARGE_DART
+    icon                    "gfx/hud/ammo/h_a_shockdarts.png"
+    offset                  0.0
+    icon_width              32.0
+    icon_height             32.0
+}
+
+Ammo_ExpShells
+{
+    max                     OPTION_MAX_EXPLOSIVE_SHOTGUN_SHELL
+    icon                    "gfx/hud/ammo/h_a_shells2.png"
+    offset                  0.0
+    icon_width              32.0
+    icon_height             32.0
+}
+
+Ammo_Plasma
+{
+    max                     OPTION_MAX_PLASMA_ROUND
+    icon                    "gfx/hud/ammo/h_a_plasma.png"
+    offset                  0.0
+    icon_width              32.0
+    icon_height             32.0
+}
+
+Ammo_SunfirePod
+{
+    max                     OPTION_MAX_SUNFIRE_POD
+    icon                    "gfx/hud/ammo/h_a_sunfirepod.png"
+    offset                  0.0
+    icon_width              32.0
+    icon_height             32.0
+}
+
+Ammo_Bore
+{
+    max                     OPTION_MAX_BORE
+    icon                    "gfx/hud/ammo/h_a_bore.png"
+    offset                  0.0
+    icon_width              32.0
+    icon_height             32.0
+}
+
+Ammo_Mine
+{
+    max                     OPTION_MAX_MINE
+    icon                    "gfx/hud/ammo/h_a_mine.png"
+    offset                  0.0
+    icon_width              32.0
+    icon_height             32.0
+}
+
+Ammo_Grenades
+{
+    max                     OPTION_MAX_GRENADE
+    icon                    "gfx/hud/ammo/h_a_grenade.png"
+    offset                  0.0
+    icon_width              32.0
+    icon_height             32.0
+}
+
+Ammo_Rockets
+{
+    max                     OPTION_MAX_SCORPION_MISSILE
+    icon                    "gfx/hud/ammo/h_a_rockets.png"
+    offset                  0.0
+    icon_width              32.0
+    icon_height             32.0
+}
+
+Ammo_Spears
+{
+    max                     OPTION_MAX_SPEAR
+    icon                    "gfx/hud/ammo/h_a_harpoon.png"
+    offset                  0.0
+    icon_width              32.0
+    icon_height             32.0
+}
+
+Ammo_Torpedos
+{
+    max                     OPTION_MAX_TORPEDO
+    icon                    "gfx/hud/ammo/h_a_torpedos.png"
+    offset                  0.0
+    icon_width              32.0
+    icon_height             32.0
+}
+
+Ammo_Fuel
+{
+    max                     OPTION_MAX_FLAME_THROWER
+    icon                    "gfx/hud/ammo/h_a_fuel.png"
+    offset                  0.0
+    icon_width              32.0
+    icon_height             32.0
+}
+
+Ammo_Nuke
+{
+    max                     OPTION_MAX_NUKE_AMMO
+    icon                    "gfx/hud/ammo/h_a_nukes.png"
+    offset                  0.0
+    icon_width              32.0
+    icon_height             32.0
+}
+
+Ammo_Battery
+{
+    max                     9
+    icon                    "gfx/hud/flare/h_flare.png"
+    bRecharge               TRUE
+    rechargeTime            6.0
+    offset                  0.0
+    icon_width              32.0
+    icon_height             64.0
+}
