@@ -1,0 +1,1953 @@
+//
+// Copyright(C) 2014-2015 Samuel Villarreal
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either version 2
+// of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// DESCRIPTION:
+//      Weapon Actions
+//
+
+/*
+==============================================================
+TurokWeapon
+==============================================================
+*/
+
+class TurokWeapon : ScriptObject
+{
+    kWeapon @self;
+    
+    TurokWeapon(kWeapon @actor)
+    {
+        @self = actor;
+    }
+    
+    ~TurokWeapon() {}
+    
+    void OnTick(void) {}
+    void OnSpawn(void) {}
+    void OnBeginFire(void) {}
+    void OnFire(void) {}
+    void OnEndFire(void) {}
+    void OnLower(void) {}
+    void OnRaise(void) {}
+    void OnHoldster(void) {}
+    void OnFiredParticleFromAnim(kParticle@ particle) 
+	{
+		Hud.AddMessage("PARTICLE TYPE: " + particle.ParticleType());
+	
+		// Rando
+		// Consume additional ammo based on the particle that was fired
+		//
+		// Exceptions:
+		// - Mag 60 (multiple shots)
+		// - Scorpion Launcher (multiple shots)
+		// - Firestorm Cannon (doesn't use particles)
+		switch(particle.ParticleType())
+		{
+			case kParticle_TekArrow:
+			case kParticle_TekArrowSnipe:
+				// We defined Tek arrows as the "normal" ammo
+				ConsumeAdditionalAmmo(kActor_Item_WpnTekBow);
+				break;
+			case kParticle_Bullet:
+				ConsumeAdditionalAmmo(kActor_Item_WpnPistol);
+				break;
+			case kParticle_ShotgunBullet:
+				ConsumeAdditionalAmmo(kActor_Item_WpnShotgun);
+				break;
+			case kParticle_ExpShotgunBullet:
+				ConsumeAdditionalAltAmmo(kActor_Item_WpnShotgun);
+				break;
+			case kParticle_ScatterRound:
+				ConsumeAdditionalAmmo(kActor_Item_WpnScatter);
+				break;
+			case kParticle_ExpScatterRound:
+				ConsumeAdditionalAltAmmo(kActor_Item_WpnScatter);
+				break;
+			case kParticle_TranqDart:
+				ConsumeAdditionalAmmo(kActor_Item_WpnTranq);
+				break;
+			case kParticle_PlasmaShot:
+			case kParticle_PlasmaSnipe:
+				ConsumeAdditionalAmmo(kActor_Item_WpnPlasmaRifle, 5);
+				break;
+			case 10: // Sunfire Pod... no macro defined
+				ConsumeAdditionalAmmo(kActor_Item_WpnSunfirePod);
+				break;
+			case kParticle_Bore:
+				ConsumeAdditionalAmmo(kActor_Item_WpnCerebralBore);
+				break;
+			case kParticle_PFM:
+				ConsumeAdditionalAmmo(kActor_Item_WpnPFMLayer);
+				break;
+			case kParticle_Grenade:
+				ConsumeAdditionalAmmo(kActor_Item_WpnGrenadeLauncher);
+				break;
+			case kParticle_Spear:
+				ConsumeAdditionalAmmo(kActor_Item_WpnSpearGun);
+				break;
+			case 16: // Left torpedo... no macro defined
+				ConsumeAdditionalAmmo(kActor_Item_WpnTorpedoLauncher);
+				break;
+		}
+	}
+	
+	//----------------------------------
+	// Added by rando.
+	// Consume additional ammo based on the number of weapon upgrades obtained.
+	void ConsumeAdditionalAmmo(
+		const int &in pickupId, 
+		const int &in multiplier = 1, 
+		const bool &in isAltAmmo = false)
+	{
+		if (!OPTION_RANDOMIZE_WEAPONS)
+		{
+			return;
+		}
+		
+		int unobtainedUpgrades = OPTION_PROGRESSIVE_AMMO_COUNT - GetInventoryItemCollectedTotal(pickupId);
+		if (unobtainedUpgrades > 0)
+		{
+			int extraAmmoToConsume = unobtainedUpgrades * multiplier;
+			if (isAltAmmo)
+			{
+				self.Owner().ConsumeAltAmmo(extraAmmoToConsume);
+			}
+			else
+			{
+				self.Owner().ConsumeAmmo(extraAmmoToConsume);
+			}
+		}
+	}
+	
+	//----------------------------------
+	// Added by rando.
+	// Consume additional alt ammo based on the number of weapon upgrades obtained.
+	void ConsumeAdditionalAltAmmo(const int &in pickupId)
+	{
+		ConsumeAdditionalAmmo(pickupId, 1, true);
+	}
+}
+
+/*
+==============================================================
+TurokWarBlade
+==============================================================
+*/
+final class TurokWarBlade : TurokWeapon
+{
+    int  m_ticks;
+    bool m_bDoRaise;
+    
+    TurokWarBlade(kWeapon @actor)
+    {
+        super(actor);
+        m_ticks    = 0;
+        m_bDoRaise = false;
+    }
+    
+    void OnTick(void)
+    {
+        if(m_bDoRaise)
+        {
+            if(--m_ticks <= 0)
+            {
+                self.PlayTactile("tactile/WBLDRDY1.bnvib", kexVibrationPlayer::CHANNEL_WEAPON, kexVibrationPlayer::POSITION_NEUTRAL);
+                m_bDoRaise = false;
+            }
+        }
+    }
+    
+    void OnRaise(void)
+    {
+        m_bDoRaise = true;
+        m_ticks    = 1;
+    }
+    
+    void OnSerialize(kDict& out dict)
+    {
+        SERIALIZE(m_ticks);
+        SERIALIZE(m_bDoRaise);
+    }
+    
+    void OnDeserialize(kDict& in dict)
+    {
+        DESERIALIZE_INT(m_ticks);
+        DESERIALIZE_BOOL(m_bDoRaise);
+    }
+}
+
+/*
+==============================================================
+TurokBow
+==============================================================
+*/
+
+final class TurokBow : TurokWeapon
+{   
+    float m_fScalar;
+    
+    TurokBow(kWeapon @actor)
+    {
+        super(actor);
+        m_fScalar = 1.0f;
+    }
+    
+    /*
+    ==============================================================
+    OnSerialize
+    ==============================================================
+    */
+    
+    void OnSerialize(kDict& out dict)
+    {
+        SERIALIZE(m_fScalar);
+    }
+    
+    /*
+    ==============================================================
+    OnDeserialize
+    ==============================================================
+    */
+    
+    void OnDeserialize(kDict& in dict)
+    {
+        DESERIALIZE_FLOAT(m_fScalar);
+    }
+    
+    /*
+    ==============================================================
+    OnBeginFire
+    ==============================================================
+    */
+    
+    void OnBeginFire(void)
+    {
+    }
+    
+    /*
+    ==============================================================
+    OnEndFire
+    ==============================================================
+    */
+    
+    void OnEndFire(void)
+    {
+        m_fScalar = Math::Max(0.5f, Math::Min(1.5f, self.AnimTrackComponent().PlayTime()));
+    }
+    
+    /*
+    ==============================================================
+    OnFiredParticleFromAnim
+    ==============================================================
+    */
+    
+    void OnFiredParticleFromAnim(kParticle@ pArrow)
+    {
+        pArrow.Velocity() *= m_fScalar;
+        m_fScalar = 1.0f;
+        self.PlayTactile("tactile/pcbow1ap.bnvib", kexVibrationPlayer::CHANNEL_WEAPON, kexVibrationPlayer::POSITION_NEUTRAL);
+    }
+}
+
+/*
+==============================================================
+TurokTekBow
+==============================================================
+*/
+
+final class TurokTekBow : TurokWeapon
+{   
+    float m_fScalar;
+    
+    TurokTekBow(kWeapon @actor)
+    {
+        super(actor);
+        m_fScalar = 1.0f;
+    }
+    
+    /*
+    ==============================================================
+    OnSerialize
+    ==============================================================
+    */
+    
+    void OnSerialize(kDict& out dict)
+    {
+        SERIALIZE(m_fScalar);
+    }
+    
+    /*
+    ==============================================================
+    OnDeserialize
+    ==============================================================
+    */
+    
+    void OnDeserialize(kDict& in dict)
+    {
+        DESERIALIZE_FLOAT(m_fScalar);
+    }
+    
+    /*
+    ==============================================================
+    OnBeginFire
+    ==============================================================
+    */
+    
+    void OnBeginFire(void)
+    {
+    }
+    
+    /*
+    ==============================================================
+    OnEndFire
+    ==============================================================
+    */
+    
+    void OnEndFire(void)
+    {
+        m_fScalar = Math::Max(0.5f, Math::Min(2.0f, self.AnimTrackComponent().PlayTime()));
+    }
+    
+    /*
+    ==============================================================
+    OnFiredParticleFromAnim
+    ==============================================================
+    */
+    
+    void OnFiredParticleFromAnim(kParticle@ pArrow)
+    {
+		// Rando
+		if (pArrow.ParticleType() == kParticle_TekArrow ||
+			pArrow.ParticleType() == kParticle_TekArrowSnipe)
+		{
+			// We set the Tek Bow's alt ammo to be the normal arrows
+			// So here we just consume the normal ammo (which is Tek arrows)
+			ConsumeAdditionalAmmo(kActor_Item_WpnTekBow);
+		}
+		// End Rando
+	
+        self.PlayTactile("tactile/pcbow1ap.bnvib", kexVibrationPlayer::CHANNEL_WEAPON, kexVibrationPlayer::POSITION_NEUTRAL);
+    
+        if(self.ScopeReady())
+        {
+            return;
+        }
+        
+        pArrow.Velocity() *= m_fScalar;
+    }
+}
+
+/*
+==============================================================
+TurokPistol
+==============================================================
+*/
+
+final class TurokPistol : TurokWeapon
+{   
+    TurokPistol(kWeapon @actor)
+    {
+        super(actor);
+    }
+    
+    /*
+    ==============================================================
+    OnBeginFire
+    ==============================================================
+    */
+    
+    void OnBeginFire(void)
+    {
+    }
+    
+    /*
+    ==============================================================
+    OnFire
+    ==============================================================
+    */
+    
+    void OnFire(void)
+    {
+        if(self.AnimTrackComponent().TrackTime() >= 0.8f)
+        {
+            self.AnimTrackComponent().Flags() |= ANF_CYCLECOMPLETED;
+        }
+    }
+    
+    void OnFiredParticleFromAnim(kParticle@ pShot)
+    {
+        if(pShot.ParticleType() == kParticle_Bullet)
+        {
+            self.PlayTactile("tactile/pistl3ap.bnvib", kexVibrationPlayer::CHANNEL_WEAPON, kexVibrationPlayer::POSITION_RIGHT);
+        }
+		
+		TurokWeapon::OnFiredParticleFromAnim(pShot); // Rando
+    }
+}
+
+/*
+==============================================================
+TurokMag60
+==============================================================
+*/
+final class TurokMag60 : TurokWeapon
+{
+    int m_fireCount;
+    
+    TurokMag60(kWeapon @actor)
+    {
+        super(actor);
+        m_fireCount = 0;
+    }
+    
+    void OnSerialize(kDict& out dict)
+    {
+        SERIALIZE(m_fireCount);
+    }
+    
+    void OnDeserialize(kDict& in dict)
+    {
+        DESERIALIZE_INT(m_fireCount);
+    }
+
+    void OnBeginFire(void)
+    {
+        m_fireCount = 0;
+    }
+
+    void OnFiredParticleFromAnim(kParticle@ pShot)
+    {
+        if(pShot.ParticleType() == kParticle_MagnumBullet)
+        {
+            if(m_fireCount == 0)
+            {
+                self.PlayTactile("tactile/MAGMULTIMIX01.bnvib", kexVibrationPlayer::CHANNEL_WEAPON, kexVibrationPlayer::POSITION_RIGHT);
+            }
+            m_fireCount++;
+        }
+    }
+	
+	void OnEndFire(void) 
+	{
+		// Rando
+		// We can't do this one in OnFiredParticleFromAnim due to multiple bullets
+		ConsumeAdditionalAmmo(kActor_Item_WpnMag60, 3);
+	}
+}
+
+/*
+==============================================================
+TurokChargeDart
+==============================================================
+*/
+
+final class TurokChargeDart : TurokWeapon
+{   
+    int m_vibHandle;
+
+    TurokChargeDart(kWeapon @actor)
+    {
+        super(actor);
+        m_vibHandle = -1;
+    }
+
+    void OnSerialize(kDict& out dict)
+    {
+        SERIALIZE(m_vibHandle);
+    }
+    
+    void OnDeserialize(kDict& in dict)
+    {
+        dict.GetInt("m_vibHandle", m_vibHandle, -1);
+    }
+    
+    /*
+    ==============================================================
+    OnBeginFire
+    ==============================================================
+    */
+    
+    void OnBeginFire(void)
+    {
+        self.PlaySound("sounds/shaders/Charge Dart PowerUp.ksnd");
+        m_vibHandle = self.PlayTactile("tactile/FLMTHRW2.bnvib", kexVibrationPlayer::CHANNEL_WEAPON, kexVibrationPlayer::POSITION_RIGHT);
+    }
+    
+    /*
+    ==============================================================
+    OnEndFire
+    ==============================================================
+    */
+    
+    void OnEndFire(void)
+    {
+        self.AnimTrackComponent().Flags() |= ANF_CYCLECOMPLETED;
+        
+        if(m_vibHandle >= 0)
+        {
+            self.StopTactile(m_vibHandle);
+            m_vibHandle = -1;
+        }
+        
+        self.PlaySound("sounds/shaders/Charge Dart Fire.ksnd");
+        self.PlayTactile("tactile/CHGDART1.bnvib", kexVibrationPlayer::CHANNEL_WEAPON, kexVibrationPlayer::POSITION_RIGHT);
+        self.FireProjectile("particles/Charge_Dart.particle", kVec3(0, 0, 0));
+        
+        float scalar = self.AnimTrackComponent().PlayTime() * 2.75f;
+        if(scalar > 6.0f)
+        {
+            scalar = 6.0f;
+        }
+		
+		int baseAmmoToConsume = 0; // Added by rando
+        
+        switch(int(scalar))
+        {
+        case 0:
+            self.FireProjectile("particles/Charge_Dart_1.particle", kVec3(0, -10, 0));
+			baseAmmoToConsume = 1;
+            break;
+        case 1:
+            self.FireProjectile("particles/Charge_Dart_2.particle", kVec3(0, -10, 0));
+            baseAmmoToConsume = 1;
+            break;
+        case 2:
+            self.FireProjectile("particles/Charge_Dart_3.particle", kVec3(0, -10, 0));
+            baseAmmoToConsume = 1;
+            break;
+        case 3:
+            self.FireProjectile("particles/Charge_Dart_4.particle", kVec3(0, -10, 0));
+            baseAmmoToConsume = 1;
+            break;
+        case 4:
+            self.FireProjectile("particles/Charge_Dart_5.particle", kVec3(0, -10, 0));
+            baseAmmoToConsume = 1;
+            break;
+        case 5:
+            self.FireProjectile("particles/Charge_Dart_6.particle", kVec3(0, -10, 0));
+            baseAmmoToConsume = 2;
+            break;
+        case 6:
+            self.FireProjectile("particles/Charge_Dart_7.particle", kVec3(0, -10, 0));
+            baseAmmoToConsume = 3;
+            break;
+        }
+		
+		// Rando
+		self.Owner().ConsumeAmmo(baseAmmoToConsume);
+		ConsumeAdditionalAmmo(kActor_Item_WpnChargeDart, baseAmmoToConsume);
+    }
+
+    /*
+    ==============================================================
+    OnTick
+    ==============================================================
+    */
+    void OnTick(void)
+    {
+        if(m_vibHandle >= 0 && self.IsTactilePlaying(m_vibHandle) == false)
+        {
+            m_vibHandle = self.PlayTactile("tactile/FLMTHRW2.bnvib", kexVibrationPlayer::CHANNEL_WEAPON, kexVibrationPlayer::POSITION_RIGHT);
+        }
+    }
+    
+    /*
+    ==============================================================
+    OnLower
+    ==============================================================
+    */
+    void OnLower(void)
+    {
+        if(m_vibHandle >= 0)
+        {
+            self.StopTactile(m_vibHandle);
+            m_vibHandle = -1;
+        }
+    }
+    
+    /*
+    ==============================================================
+    OnHoldster
+    ==============================================================
+    */
+    void OnHoldster(void)
+    {
+        if(m_vibHandle >= 0)
+        {
+            self.StopTactile(m_vibHandle);
+            m_vibHandle = -1;
+        }
+    }
+}
+
+/*
+==============================================================
+TurokShotgun
+==============================================================
+*/
+
+final class TurokShotgun : TurokWeapon
+{   
+    float m_fYOffset;
+    float m_fInitialYOffset;
+    float m_fReturnTime;
+    
+    TurokShotgun(kWeapon @actor)
+    {
+        super(actor);
+        
+        m_fInitialYOffset = self.Origin().y;
+        m_fYOffset = 0.0f;
+        m_fReturnTime = 0.0f;
+    }
+    
+    /*
+    ==============================================================
+    OnSerialize
+    ==============================================================
+    */
+    
+    void OnSerialize(kDict& out dict)
+    {
+        SERIALIZE(m_fYOffset);
+        SERIALIZE(m_fInitialYOffset);
+        SERIALIZE(m_fReturnTime);
+    }
+    
+    /*
+    ==============================================================
+    OnDeserialize
+    ==============================================================
+    */
+    
+    void OnDeserialize(kDict& in dict)
+    {
+        DESERIALIZE_FLOAT(m_fYOffset);
+        DESERIALIZE_FLOAT(m_fInitialYOffset);
+        DESERIALIZE_FLOAT(m_fReturnTime);
+        
+        self.Origin().y = m_fYOffset;
+    }
+    
+    /*
+    ==============================================================
+    OnTick
+    ==============================================================
+    */
+    
+    void OnTick(void)
+    {
+        self.Origin().y = m_fYOffset;
+                
+        if(m_fReturnTime <= 0.0f)
+        {
+            if(self.AnimTrackComponent().PlayingID() == ANIM_WPN_ATK1)
+            {
+                if(self.AnimTrackComponent().TrackTime() > 0.8f)
+                {
+                    m_fReturnTime = 1.0f;
+                } 
+            }
+            
+            return;
+        }
+        
+        m_fReturnTime = Math::Max(m_fReturnTime - (GAME_DELTA_TIME * 0.35f), 0.0f);
+        
+        float t = Math::HermiteBlend(0.0f, 0.0f, Math::SmoothStep(0.0, 0.5, 1.0f - m_fReturnTime));
+        m_fYOffset = (m_fInitialYOffset - m_fYOffset) * t + m_fYOffset;
+    }
+    
+    /*
+    ==============================================================
+    OnBeginFire
+    ==============================================================
+    */
+    
+    void OnBeginFire(void)
+    {
+        m_fYOffset = 5*GAME_SCALE;
+        m_fReturnTime = 0.0f;
+    }
+    
+    /*
+    ==============================================================
+    OnBeginFire
+    ==============================================================
+    */
+    
+    void OnFire(void)
+    {
+    }
+    
+    /*
+    ==============================================================
+    OnLower
+    ==============================================================
+    */
+    
+    void OnLower(void)
+    {
+        m_fReturnTime = 0.0f;
+    }
+    
+    /*
+    ==============================================================
+    OnRaise
+    ==============================================================
+    */
+    
+    void OnRaise(void)
+    {
+        m_fReturnTime = 0.0f;
+    }
+    
+    void OnFiredParticleFromAnim(kParticle@ pShot)
+    {
+        if (pShot.ParticleType() == kParticle_ShotgunBullet || pShot.ParticleType() == kParticle_ExpShotgunBullet)
+        {
+            self.PlayTactile("tactile/shtgn3ap.bnvib", kexVibrationPlayer::CHANNEL_WEAPON, kexVibrationPlayer::POSITION_RIGHT);
+        }
+		
+		TurokWeapon::OnFiredParticleFromAnim(pShot); // Rando
+    }
+}
+
+/*
+==============================================================
+TurokPlasmaRifle
+==============================================================
+*/
+
+final class TurokPlasmaRifle : TurokWeapon
+{   
+    float m_fSpeed;
+    float m_fFireTime;
+    
+    TurokPlasmaRifle(kWeapon @actor)
+    {
+        m_fSpeed = 4.0f;
+        m_fFireTime = 0.0f;
+        super(actor);
+    }
+    
+    /*
+    ==============================================================
+    OnBeginFire
+    ==============================================================
+    */
+    
+    void OnBeginFire(void)
+    {
+        m_fSpeed = 4.0f;
+        m_fFireTime = 0.0f;
+    }
+    
+    /*
+    ==============================================================
+    OnFire
+    ==============================================================
+    */
+    
+    void OnFire(void)
+    {
+    }
+    
+    /*
+    ==============================================================
+    OnTick
+    ==============================================================
+    */
+    
+    void OnTick(void)
+    {
+        if(self.AnimTrackComponent().PlayingID() == ANIM_WPN_ATK1)
+        {
+            if(self.AnimTrackComponent().TrackTime() >= 0.5f)
+            {
+                if(m_fSpeed <= 4.0f)
+                {
+                    m_fSpeed = IsMultiplayer() ? 64.0f : 32.0f;
+                    m_fFireTime = 1.0f;
+                }
+                else
+                {
+                    self.AnimTrackComponent().ChangeSpeed(m_fSpeed);
+                
+                    m_fFireTime = Math::Max(m_fFireTime - (GAME_DELTA_TIME * 0.5f), 0.0f);
+                    float t = Math::HermiteBlend(0.0f, 0.0f, Math::SmoothStep(0.125, 0.4, 1.0f - m_fFireTime));
+                    m_fSpeed = (4.0f - m_fSpeed) * t + m_fSpeed;
+                }
+            }
+        }
+    }
+    
+    /*
+    ==============================================================
+    OnLower
+    ==============================================================
+    */
+    
+    void OnLower(void)
+    {
+        m_fSpeed = 4.0f;
+        m_fFireTime = 0.0f;
+    }
+    
+    /*
+    ==============================================================
+    OnRaise
+    ==============================================================
+    */
+    
+    void OnRaise(void)
+    {
+        m_fSpeed = 4.0f;
+        m_fFireTime = 0.0f;
+    }
+    
+    void OnFiredParticleFromAnim(kParticle@ particle)
+    {
+        self.PlayTactile("tactile/PLASMAMIX01SILENCED.bnvib", kexVibrationPlayer::CHANNEL_WEAPON, kexVibrationPlayer::POSITION_RIGHT);
+		
+		TurokWeapon::OnFiredParticleFromAnim(particle); // Rando
+    }
+}
+
+/*
+==============================================================
+TurokFireStormCannon
+==============================================================
+*/
+
+class TurokFireStormCannon : TurokWeapon
+{   
+    float m_fFireIntervals;
+    float m_spinRotVel;
+    float m_spinAngle;
+    bool  m_bFiring;
+    int   m_vibHandle;
+    
+    TurokFireStormCannon(kWeapon @actor)
+    {
+        m_fFireIntervals = 0.0f;
+        m_spinRotVel = 0.0f;
+        m_spinAngle = 0.0f;
+        m_bFiring = false;
+        m_vibHandle = -1;
+        
+        super(actor);
+    }
+    
+    /*
+    ==============================================================
+    OnSerialize
+    ==============================================================
+    */
+    
+    void OnSerialize(kDict& out dict)
+    {
+        SERIALIZE(m_fFireIntervals);
+        SERIALIZE(m_spinRotVel);
+        SERIALIZE(m_spinAngle);
+        SERIALIZE(m_bFiring);
+        SERIALIZE(m_vibHandle);
+    }
+    
+    /*
+    ==============================================================
+    OnDeserialize
+    ==============================================================
+    */
+    
+    void OnDeserialize(kDict& in dict)
+    {
+        DESERIALIZE_FLOAT(m_fFireIntervals);
+        DESERIALIZE_FLOAT(m_spinRotVel);
+        DESERIALIZE_FLOAT(m_spinAngle);
+        DESERIALIZE_BOOL(m_bFiring);
+        dict.GetInt("m_vibHandle", m_vibHandle, -1);
+    }
+    
+    /*
+    ==============================================================
+    OnBeginFire
+    ==============================================================
+    */
+    
+    void OnBeginFire(void)
+    {
+        m_fFireIntervals = 0.125f;
+        self.PlayLoopingSound("sounds/shaders/Firestorm Cannon Spin.ksnd");
+        m_vibHandle = self.PlayTactile("tactile/FIRESTORMEMULTIMIX01B.bnvib", kexVibrationPlayer::CHANNEL_BODY, kexVibrationPlayer::POSITION_NEUTRAL);
+    }
+    
+    /*
+    ==============================================================
+    OnFire
+    ==============================================================
+    */
+    
+    void OnFire(void)
+    {
+        m_spinRotVel = Math::IncMax(m_spinRotVel, 0.2f, 5);
+        m_spinAngle += m_spinRotVel;
+        
+        m_bFiring = true;
+        
+        if(m_spinRotVel < 3.75f)
+        {
+            return;
+        }
+        
+        m_fFireIntervals -= GAME_DELTA_TIME;
+        if(m_fFireIntervals <= 0)
+        {
+            if(IsMultiplayer())
+            {
+                // Consume extra ammo in multiplayer
+                self.Owner().ConsumeAmmo(1);
+            }
+            self.FireProjectile("particles/Firestorm_Cannon.particle", kVec3(0, 0, 6));
+            self.PlayLoopingSound("sounds/shaders/Firestorm Cannon Fire.ksnd");
+            self.PlayTactile("tactile/FIRESTORMMIX02B.bnvib", kexVibrationPlayer::CHANNEL_WEAPON, kexVibrationPlayer::POSITION_RIGHT);
+            m_fFireIntervals = 0.125f;
+			
+			// Rando
+			ConsumeAdditionalAmmo(kActor_Item_WpnFireStorm);
+        }
+    }
+    
+    /*
+    ==============================================================
+    OnEndFire
+    ==============================================================
+    */
+    
+    void OnEndFire(void)
+    {
+        self.AnimTrackComponent().Flags() |= ANF_CYCLECOMPLETED;
+        self.PlaySound("sounds/shaders/Firestorm Cannon Spin Stop.ksnd");
+        self.StopLoopingSounds();
+        if(m_vibHandle >= 0)
+        {
+            self.StopTactile(m_vibHandle);
+            m_vibHandle = -1;
+        }
+    }
+    
+    /*
+    ==============================================================
+    OnTick
+    ==============================================================
+    */
+    
+    void OnTick(void)
+    {
+        self.RenderMeshComponent().SetRotationOffset(1, Math::Deg2Rad(m_spinAngle), 0, 1, 0);
+        self.RenderMeshComponent().SetRotationOffset(7, Math::Deg2Rad(-m_spinAngle), 0, 1, 0);
+        self.RenderMeshComponent().SetRotationOffset(8, Math::Deg2Rad(m_spinAngle), 0, 1, 0);
+        self.RenderMeshComponent().SetRotationOffset(9, Math::Deg2Rad(m_spinAngle), 0, 1, 0);
+        self.RenderMeshComponent().SetRotationOffset(10, Math::Deg2Rad(m_spinAngle), 0, 1, 0);
+        self.RenderMeshComponent().SetRotationOffset(11, Math::Deg2Rad(m_spinAngle), 0, 1, 0);
+        self.RenderMeshComponent().SetRotationOffset(12, Math::Deg2Rad(m_spinAngle), 0, 1, 0);
+        
+        m_spinAngle += m_spinRotVel;
+        
+        if(m_bFiring)
+        {
+            m_bFiring = false;
+            return;
+        }
+        
+        m_spinRotVel = Math::IncMax(m_spinRotVel, Math::Deg2Rad(0.375f) * GAME_FRAME_UNIT, 0);
+        
+        if(m_vibHandle >= 0)
+        {
+            if(self.IsNamedTactilePlaying(m_vibHandle, "tactile/FIRESTORMEMULTIMIX01B.bnvib") == false)
+            {
+                m_vibHandle = self.PlayTactile("tactile/FIRESTORMEMULTIMIX01B.bnvib", kexVibrationPlayer::CHANNEL_BODY, kexVibrationPlayer::POSITION_NEUTRAL);
+            }
+        }
+    }
+    
+    /*
+    ==============================================================
+    OnLower
+    ==============================================================
+    */
+    
+    void OnLower(void)
+    {
+        m_spinRotVel = 0.0f;
+        if(m_vibHandle >= 0)
+        {
+            self.StopTactile(m_vibHandle);
+            m_vibHandle = -1;
+        }
+    }
+    
+    /*
+    ==============================================================
+    OnRaise
+    ==============================================================
+    */
+    
+    void OnRaise(void)
+    {
+        m_spinRotVel = 0.0f;
+    }
+}
+
+/*
+==============================================================
+TurokFireStormCannonMP
+==============================================================
+*/
+
+final class TurokFireStormCannonMP : TurokFireStormCannon
+{
+    TurokFireStormCannonMP(kWeapon @actor)
+    {
+        super(actor);
+    }
+    
+    /*
+    ==============================================================
+    OnFire
+    ==============================================================
+    */
+    
+    void OnFire(void)
+    {
+        m_spinRotVel = Math::IncMax(m_spinRotVel, 0.2f, 5);
+        m_spinAngle += m_spinRotVel;
+        
+        m_bFiring = true;
+        
+        if(m_spinRotVel < 3.75f)
+        {
+            return;
+        }
+        
+        m_fFireIntervals -= GAME_DELTA_TIME;
+        if(m_fFireIntervals <= 0)
+        {
+            self.FireProjectile("particles/Multiplayer5.particle", kVec3(0, 0, 6));
+            self.PlayLoopingSound("sounds/shaders/Firestorm Cannon Fire.ksnd");
+            self.PlayTactile("tactile/FIRESTORMMIX02B.bnvib", kexVibrationPlayer::CHANNEL_WEAPON, kexVibrationPlayer::POSITION_RIGHT);
+            m_fFireIntervals = 0.125f;
+        }
+    }
+    
+    /*
+    ==============================================================
+    OnTick
+    ==============================================================
+    */
+    
+    void OnTick(void)
+    {
+        self.RenderMeshComponent().SetRotationOffset(2, Math::Deg2Rad(m_spinAngle), 0, 1, 0);
+        m_spinAngle += m_spinRotVel;
+        
+        if(m_bFiring)
+        {
+            m_bFiring = false;
+            return;
+        }
+        
+        m_spinRotVel = Math::IncMax(m_spinRotVel, Math::Deg2Rad(0.375f) * GAME_FRAME_UNIT, 0);
+
+        if(m_vibHandle >= 0)
+        {
+            if(self.IsNamedTactilePlaying(m_vibHandle, "tactile/FIRESTORMEMULTIMIX01B.bnvib") == false)
+            {
+                m_vibHandle = self.PlayTactile("tactile/FIRESTORMEMULTIMIX01B.bnvib", kexVibrationPlayer::CHANNEL_BODY, kexVibrationPlayer::POSITION_NEUTRAL);
+            }
+        }
+    }
+}
+
+/*
+==============================================================
+TurokSunfirePod
+==============================================================
+*/
+
+final class TurokSunfirePod : TurokWeapon
+{   
+    float m_fScalar;
+    
+    TurokSunfirePod(kWeapon @actor)
+    {
+        super(actor);
+        m_fScalar = 1.0f;
+    }
+    
+    /*
+    ==============================================================
+    OnSerialize
+    ==============================================================
+    */
+    
+    void OnSerialize(kDict& out dict)
+    {
+        SERIALIZE(m_fScalar);
+    }
+    
+    /*
+    ==============================================================
+    OnDeserialize
+    ==============================================================
+    */
+    
+    void OnDeserialize(kDict& in dict)
+    {
+        DESERIALIZE_FLOAT(m_fScalar);
+    }
+    
+    /*
+    ==============================================================
+    OnEndFire
+    ==============================================================
+    */
+    
+    void OnEndFire(void)
+    {
+        m_fScalar = Math::Max(0.5f, Math::Min(1.5f, self.AnimTrackComponent().PlayTime()));
+    }
+    
+    /*
+    ==============================================================
+    OnFiredParticleFromAnim
+    ==============================================================
+    */
+    
+    void OnFiredParticleFromAnim(kParticle@ pPod)
+    {
+        pPod.Velocity() *= m_fScalar;
+        m_fScalar = 1.0f;
+        self.Owner().ConsumeAmmo(1);
+		
+		TurokWeapon::OnFiredParticleFromAnim(pPod); // Rando
+    }
+}
+
+/*
+==============================================================
+TurokBore
+==============================================================
+*/
+
+final class TurokBore : TurokWeapon
+{   
+    TurokBore(kWeapon @actor)
+    {
+        super(actor);
+    }
+    
+    /*
+    ==============================================================
+    OnFiredParticleFromAnim
+    ==============================================================
+    */
+    
+    void OnFiredParticleFromAnim(kParticle@ pMissile)
+    {
+		TurokWeapon::OnFiredParticleFromAnim(pMissile); // Rando
+		
+        // target is set if this weapon is able to track things
+        if(self.GetTarget() is null)
+        {
+            return;
+        }
+        
+        self.PlayTactile("tactile/CERBFIR1.bnvib", kexVibrationPlayer::CHANNEL_WEAPON, kexVibrationPlayer::POSITION_RIGHT);
+        
+        // have missile target the tracked object
+        pMissile.SetTarget(self.GetTarget());
+        
+        // spawn a controller for manipulating the missile
+        kActor@ pController =
+        ActorFactory.Spawn(
+            kActor_Misc_BoreController,
+            pMissile.Origin(),
+            0.0f,
+            0.0f,
+            0.0f);
+            
+        if(pController is null)
+        {
+            return;
+        }
+        
+        // pController.PlayLoopingSound("sounds/shaders/Cerebral Bore Track Loop.ksnd");
+        
+        // make controller target the missile so it can control it
+        pController.SetTarget(pMissile);
+        
+        // push the controller over the network for client replication
+        if(Network.IsNetgame() && Network.IsServer() && !(pMissile.GetTarget() is null))
+        {
+            NetSend::Clear();
+            
+            // writes NPN_SCRIPT and then the string of the global function decl
+            NetSend::WriteScriptHeader("void NetworkRecvSpawnBoreController(void)");
+            NetSend::WriteInt16(pMissile.NetID());
+            NetSend::WriteInt16(pMissile.GetTarget().NetID());
+            
+            // transmit pbuffer
+            // when client recieves this, it parses the string which is the decl to the global function and then calls it
+            Network.TransmitToAll();
+        }
+    }
+}
+
+/*
+==============================================================
+TurokQuadMissileLauncher
+==============================================================
+*/
+
+final class TurokQuadMissileLauncher : TurokWeapon
+{   
+    TurokQuadMissileLauncher(kWeapon @actor)
+    {
+        super(actor);
+    }
+    
+    /*
+    ==============================================================
+    OnBeginFire
+    ==============================================================
+    */
+    
+    void OnBeginFire(void)
+    {
+        self.Owner().ConsumeAmmo(1);
+		
+		// Rando
+		ConsumeAdditionalAmmo(kActor_Item_WpnMissileLauncher);
+    }
+    
+    /*
+    ==============================================================
+    OnFiredParticleFromAnim
+    ==============================================================
+    */
+    
+    void OnFiredParticleFromAnim(kParticle@ pMissile)
+    {
+        self.PlaySound("sounds/shaders/Scorpion Missile Launch.ksnd");
+        self.PlayTactile("tactile/roklch3p.bnvib", kexVibrationPlayer::CHANNEL_WEAPON, kexVibrationPlayer::POSITION_RIGHT);
+        
+        // target is set if this weapon is able to track things
+        if(self.GetTarget() is null)
+        {
+            return;
+        }
+        
+        // have missile target the tracked object
+        pMissile.SetTarget(self.GetTarget());
+        
+        // spawn a controller for manipulating the missile
+        kActor@ pController =
+        ActorFactory.Spawn(
+            kActor_Misc_MissileController,
+            pMissile.Origin(),
+            0.0f,
+            0.0f,
+            0.0f);
+            
+        if(pController is null)
+        {
+            return;
+        }
+        
+        // make controller target the missile so it can control it
+        pController.SetTarget(pMissile);
+    }
+    
+    /*
+    ==============================================================
+    OnTick
+    ==============================================================
+    */
+    
+    void OnTick(void)
+    {
+        /*if(self.AnimTrackComponent().PlayingID() == ANIM_WPN_ATK1 && IsMultiplayer())
+        {
+            self.AnimTrackComponent().ChangeSpeed(2.0f);
+        }*/
+    }
+}
+
+/*
+==============================================================
+TurokFlameThrower
+==============================================================
+*/
+
+final class TurokFlameThrower : TurokWeapon
+{   
+    float m_fTimeBeforeAmmoConsumption;
+    int   m_vibHandle;
+    
+    TurokFlameThrower(kWeapon @actor)
+    {
+        super(actor);
+        m_fTimeBeforeAmmoConsumption = 0;
+        m_vibHandle = -1;
+    }
+    
+    /*
+    ==============================================================
+    OnSerialize
+    ==============================================================
+    */
+    
+    void OnSerialize(kDict& out dict)
+    {
+        SERIALIZE(m_fTimeBeforeAmmoConsumption);
+        SERIALIZE(m_vibHandle);
+    }
+    
+    /*
+    ==============================================================
+    OnDeserialize
+    ==============================================================
+    */
+    
+    void OnDeserialize(kDict& in dict)
+    {
+        DESERIALIZE_FLOAT(m_fTimeBeforeAmmoConsumption);
+        dict.GetInt("m_vibHandle", m_vibHandle, -1);
+    }
+    
+    /*
+    ==============================================================
+    OnBeginFire
+    ==============================================================
+    */
+    
+    void OnBeginFire(void)
+    {
+        self.StopLoopingSounds();
+        self.PlayLoopingSound("sounds/shaders/Flame Thrower Loop.ksnd");
+        m_vibHandle = self.PlayTactile("tactile/FLMTHRW2.bnvib", kexVibrationPlayer::CHANNEL_WEAPON, kexVibrationPlayer::POSITION_RIGHT);
+    }
+    
+    /*
+    ==============================================================
+    OnEndFire
+    ==============================================================
+    */
+    
+    void OnEndFire(void)
+    {
+        self.AnimTrackComponent().Flags() |= ANF_CYCLECOMPLETED;
+        
+        self.StopLoopingSounds();
+        self.PlayLoopingSound("sounds/shaders/Flame Thrower Gas Loop.ksnd");
+        if(m_vibHandle >= 0)
+        {
+            self.StopTactile(m_vibHandle);
+            m_vibHandle = -1;
+        }
+    }
+    
+    /*
+    ==============================================================
+    OnFire
+    ==============================================================
+    */
+    
+    void OnFire(void)
+    {
+        const float fAmount = IsMultiplayer() ? 12 : 6;
+        
+        m_fTimeBeforeAmmoConsumption += (GAME_DELTA_TIME*fAmount);
+        
+        if(m_fTimeBeforeAmmoConsumption >= 1.0f)
+        {
+            self.Owner().ConsumeAmmo(1);
+            m_fTimeBeforeAmmoConsumption = 0;
+			
+			// Rando
+			ConsumeAdditionalAmmo(kActor_Item_WpnFlameThrower);
+        }
+    }
+    
+    /*
+    ==============================================================
+    OnLower
+    ==============================================================
+    */
+    
+    void OnLower(void)
+    {
+        self.StopLoopingSounds();
+        if(m_vibHandle >= 0)
+        {
+            self.StopTactile(m_vibHandle);
+            m_vibHandle = -1;
+        }
+    }
+    
+    /*
+    ==============================================================
+    OnHoldster
+    ==============================================================
+    */
+
+    void OnHoldster(void)
+    {
+        if(m_vibHandle >= 0)
+        {
+            self.StopTactile(m_vibHandle);
+            m_vibHandle = -1;
+        }
+    }
+    
+    /*
+    ==============================================================
+    OnRaise
+    ==============================================================
+    */
+    
+    void OnRaise(void)
+    {
+        self.PlayLoopingSound("sounds/shaders/Flame Thrower Gas Loop.ksnd");
+    }
+
+    /*
+    ==============================================================
+    OnTick
+    ==============================================================
+    */
+    
+    void OnTick(void)
+    {
+        if(m_vibHandle >= 0 && self.IsTactilePlaying(m_vibHandle) == false)
+        {
+            self.PlayTactile("tactile/FLMTHRW2.bnvib", kexVibrationPlayer::CHANNEL_WEAPON, kexVibrationPlayer::POSITION_RIGHT);
+        }
+    }
+}
+
+/*
+==============================================================
+TurokRazorWind
+==============================================================
+*/
+
+final class TurokRazorWind : TurokWeapon
+{   
+    float m_fZOffset;
+    float m_fInitialZOffset;
+    float m_fSpinAngle;
+    float m_fExtraSpinSpeed;
+    
+    TurokRazorWind(kWeapon @actor)
+    {
+        super(actor);
+        
+        m_fInitialZOffset = self.Origin().z;
+        m_fZOffset = m_fInitialZOffset;
+        m_fSpinAngle = 0.0;
+        m_fExtraSpinSpeed = 0.0;
+    }
+    
+    /*
+    ==============================================================
+    OnSerialize
+    ==============================================================
+    */
+    
+    void OnSerialize(kDict& out dict)
+    {
+        SERIALIZE(m_fZOffset);
+        SERIALIZE(m_fInitialZOffset);
+        SERIALIZE(m_fSpinAngle);
+        SERIALIZE(m_fExtraSpinSpeed);
+    }
+    
+    /*
+    ==============================================================
+    OnDeserialize
+    ==============================================================
+    */
+    
+    void OnDeserialize(kDict& in dict)
+    {
+        DESERIALIZE_FLOAT(m_fZOffset);
+        DESERIALIZE_FLOAT(m_fInitialZOffset);
+        DESERIALIZE_FLOAT(m_fSpinAngle);
+        DESERIALIZE_FLOAT(m_fExtraSpinSpeed);
+    }
+    
+    /*
+    ==============================================================
+    OnBeginFire
+    ==============================================================
+    */
+    
+    void OnBeginFire(void)
+    {
+    }
+    
+    /*
+    ==============================================================
+    OnTick
+    ==============================================================
+    */
+    
+    void OnTick(void)
+    {
+        self.RenderMeshComponent().SetRotationOffset(2, m_fSpinAngle, 0, 0, 1);
+        m_fSpinAngle += Math::Deg2Rad(10.0f + (m_fExtraSpinSpeed * 20.0)) * 0.5f * GAME_FRAME_TIME;
+        m_fExtraSpinSpeed = Math::Max(m_fExtraSpinSpeed - GAME_DELTA_TIME, 0.0f);
+        
+        self.Origin().y = m_fZOffset;
+        
+        if(m_fZOffset != m_fInitialZOffset)
+        {
+            m_fZOffset = (m_fInitialZOffset - m_fZOffset) * 0.1f + m_fZOffset;
+        }
+        
+        if(self.GetTarget() is null)
+        {
+            return;
+        }
+        
+        if(self.GetTarget().IsStale())
+        {
+            kActor@ pNull = null;
+            
+            self.SetTarget(pNull);
+            self.RenderMeshComponent().SwapOutMesh(0);
+            self.LockControls(false);
+            self.PlayTactile("tactile/CROSSBOWMIX02.bnvib", kexVibrationPlayer::CHANNEL_WEAPON, kexVibrationPlayer::POSITION_NEUTRAL);
+            
+            m_fZOffset = (5*GAME_SCALE);
+            m_fExtraSpinSpeed = 1.0f;
+        }
+    }
+    
+    /*
+    ==============================================================
+    OnFiredParticleFromAnim
+    ==============================================================
+    */
+    
+    void OnFiredParticleFromAnim(kParticle@ pBlade)
+    {
+        self.RenderMeshComponent().AltTexture() = -1;
+        self.RenderMeshComponent().SwapOutMesh(1);
+        self.LockControls(true);
+        
+        // spawn a controller for manipulating the blade
+        kActor@ pController =
+        ActorFactory.Spawn(
+            kActor_Misc_BladeController,
+            pBlade.Origin(),
+            0.0f,
+            0.0f,
+            0.0f);
+            
+        if(pController is null)
+        {
+            return;
+        }
+        
+        // target the controller so we can monitor it's lifetime
+        self.SetTarget(pController);
+        
+        // make controller target the blade so it can control it
+        pController.SetTarget(pBlade);
+        pController.PlayLoopingSound("sounds/shaders/Razor Wind Fly Loop.ksnd");
+        
+        self.PlayTactile("tactile/CROSSBOWMIX02.bnvib", kexVibrationPlayer::CHANNEL_WEAPON, kexVibrationPlayer::POSITION_NEUTRAL);
+    }
+}
+
+/*
+==============================================================
+TurokTorpedoLauncher
+==============================================================
+*/
+
+final class TurokTorpedoLauncher : TurokWeapon
+{   
+    float m_spinRotVel;
+    float m_spinAngle;
+    int   m_vibHandle;
+    
+    TurokTorpedoLauncher(kWeapon @actor)
+    {
+        super(actor);
+        
+        m_spinRotVel = 0;
+        m_spinAngle = 0;
+        m_vibHandle = -1;
+    }
+    
+    /*
+    ==============================================================
+    OnSerialize
+    ==============================================================
+    */
+    
+    void OnSerialize(kDict& out dict)
+    {
+        SERIALIZE(m_spinRotVel);
+        SERIALIZE(m_spinAngle);
+        SERIALIZE(m_vibHandle);
+    }
+    
+    /*
+    ==============================================================
+    OnDeserialize
+    ==============================================================
+    */
+    
+    void OnDeserialize(kDict& in dict)
+    {
+        DESERIALIZE_FLOAT(m_spinRotVel);
+        DESERIALIZE_FLOAT(m_spinAngle);
+        dict.GetInt("m_vibHandle", m_vibHandle, -1);
+    }
+    
+    /*
+    ==============================================================
+    OnTick
+    ==============================================================
+    */
+    
+    void OnTick(void)
+    {
+        float fAccel, fTarget;
+        
+        kVec3 vVel   = self.Owner().Actor().MovementComponent().Velocity();
+        float fSpeed = vVel.Length();
+        if(fSpeed > 1.0f)
+        {
+            fTarget = Math::Deg2Rad(24);
+            fAccel = fSpeed * 0.0525f;
+            
+            self.PlayLoopingSound("sounds/shaders/Torpedo Launcher Motor Loop.ksnd");
+            if(m_vibHandle == -1 || self.IsTactilePlaying(m_vibHandle) == false)
+            {
+                m_vibHandle = self.PlayTactile("tactile/TORPEDOMOTORLOOP.bnvib", kexVibrationPlayer::CHANNEL_BODY, kexVibrationPlayer::POSITION_NEUTRAL);
+            }
+        }
+        else
+        {
+            fAccel = Math::Deg2Rad(0.5f);
+            fTarget = (m_spinRotVel > 0) ? Math::Deg2Rad(1) : Math::Deg2Rad(-1);
+            self.StopLoopingSounds();
+            if(m_vibHandle >= 0)
+            {
+                self.StopTactile(m_vibHandle);
+                m_vibHandle = -1;
+            }
+        }
+        
+        m_spinRotVel = Math::IncMax(m_spinRotVel, fAccel, fTarget);
+        m_spinAngle += m_spinRotVel;
+        
+        self.RenderMeshComponent().SetRotationOffset(2, m_spinAngle, 0, 1, 0);
+        
+        int animID = self.AnimTrackComponent().PlayingID();
+        
+        // firing animation pauses for a really long time and its annoying.
+        // so force the animation to complete half-way through playing
+        switch(animID)
+        {
+        case ANIM_WPN_ATK1:
+        case ANIM_WPN_ATK2:
+        case ANIM_WPN_ATK3:
+        case ANIM_WPN_ATK4:
+            if(self.AnimTrackComponent().TrackTime() >= 0.5f)
+            {
+                self.AnimTrackComponent().Flags() |= ANF_CYCLECOMPLETED;
+            }
+            break;
+        default:
+            break;
+        };
+    }
+    
+    /*
+    ==============================================================
+    OnLower
+    ==============================================================
+    */
+    
+    void OnLower(void)
+    {
+        self.StopLoopingSounds();
+        if(m_vibHandle >= 0)
+        {
+            self.StopTactile(m_vibHandle);
+            m_vibHandle = -1;
+        }
+        m_spinAngle = 0;
+        self.RenderMeshComponent().SetRotationOffset(2, Math::Deg2Rad(0), 0, 1, 0);
+    }
+    
+    /*
+    ==============================================================
+    OnRaise
+    ==============================================================
+    */
+    
+    void OnRaise(void)
+    {
+        m_spinRotVel = 0;
+    }
+    
+    /*
+    ==============================================================
+    OnFiredParticleFromAnim
+    ==============================================================
+    */
+    
+    void OnFiredParticleFromAnim(kParticle@ pBlade)
+    {
+        // hack so that we consume ammo only once per fire animation
+        if(self.AnimTrackComponent().TrackTime() < 0.3f)
+        {
+            self.Owner().ConsumeAmmo(1);
+        }
+        self.PlayTactile("tactile/TORPEDOMIX01.bnvib", kexVibrationPlayer::CHANNEL_WEAPON, kexVibrationPlayer::POSITION_NEUTRAL);
+		
+		TurokWeapon::OnFiredParticleFromAnim(pBlade); // Rando
+    }
+}
+
+/*
+==============================================================
+TurokNuke
+==============================================================
+*/
+
+final class TurokNuke : TurokWeapon
+{   
+    float m_spinRotVel;
+    float m_spinAngle;
+    bool  m_bReleased;
+    bool  m_bStartVib;
+    int   m_vibHandle;
+    int   m_vibDelay;
+    
+    TurokNuke(kWeapon @actor)
+    {
+        super(actor);
+        
+        m_spinRotVel = 0;
+        m_spinAngle = 0;
+        m_bReleased = false;
+        m_bStartVib = false;
+        m_vibHandle = -1;
+        m_vibDelay  = 0;
+    }
+    
+    /*
+    ==============================================================
+    OnSerialize
+    ==============================================================
+    */
+    
+    void OnSerialize(kDict& out dict)
+    {
+        SERIALIZE(m_spinRotVel);
+        SERIALIZE(m_spinAngle);
+        SERIALIZE(m_bReleased);
+        SERIALIZE(m_bStartVib);
+        SERIALIZE(m_vibHandle);
+        SERIALIZE(m_vibDelay);
+    }
+    
+    /*
+    ==============================================================
+    OnDeserialize
+    ==============================================================
+    */
+    
+    void OnDeserialize(kDict& in dict)
+    {
+        DESERIALIZE_FLOAT(m_spinRotVel);
+        DESERIALIZE_FLOAT(m_spinAngle);
+        DESERIALIZE_BOOL(m_bReleased);
+        DESERIALIZE_BOOL(m_bStartVib);
+        dict.GetInt("m_vibHandle", m_vibHandle, -1);
+        DESERIALIZE_INT(m_vibDelay);
+    }
+    
+    /*
+    ==============================================================
+    OnBeginFire
+    ==============================================================
+    */
+    
+    void OnBeginFire(void)
+    {
+        self.PlayLoopingSound("sounds/shaders/Nuke Windup.ksnd");
+        m_bStartVib = true;
+        m_vibDelay  = 0;
+    }
+    
+    /*
+    ==============================================================
+    OnEndFire
+    ==============================================================
+    */
+    
+    void OnEndFire(void)
+    {
+        self.StopLoopingSounds();
+        self.AnimTrackComponent().Flags() |= ANF_CYCLECOMPLETED;
+        
+        if(self.AnimTrackComponent().PlayTime() >= 2.0f)
+        {
+            m_spinRotVel = 2;
+            self.RenderMeshComponent().SetRotationOffset(1, Math::Deg2Rad(m_spinAngle), 0, 1, 0);
+            self.RenderMeshComponent().SetRotationOffset(12, Math::Deg2Rad(-m_spinAngle*2), 0, 1, 0);
+            return;
+        }
+        
+        m_bReleased = true;
+        
+        // note that this function is called before the engine sets the 'discharge'
+        // animation on the weapon. flagging nointerrupt will prevent that from happening,
+        // allowing us to set this animation
+        self.AnimTrackComponent().Blend(ANIM_WPN_IDLE, 4, 16, ANF_NOINTERRUPT);
+    }
+    
+    /*
+    ==============================================================
+    OnFire
+    ==============================================================
+    */
+    
+    void OnFire(void)
+    {
+    }
+    
+    /*
+    ==============================================================
+    OnTick
+    ==============================================================
+    */
+    
+    void OnTick(void)
+    {
+        if(m_bReleased)
+        {
+            // clear the flag so we can immediately start using the weapon again
+            self.AnimTrackComponent().Flags() |= ANF_CYCLECOMPLETED;
+            self.AnimTrackComponent().Flags() &= ~ANF_NOINTERRUPT;
+            m_bReleased = false;
+            if(m_vibHandle >= 0)
+            {
+                self.StopTactile(m_vibHandle);
+                m_vibHandle = -1;
+                m_bStartVib = false;
+            }
+        }
+        
+        bool bStartVibNow = false;
+        if(m_bStartVib == true)
+        {
+            if(++m_vibDelay >= 30)
+            {
+                bStartVibNow = true;
+                m_bStartVib  = false;
+            }
+        }
+        
+        if(bStartVibNow || m_vibHandle >= 0)
+        {
+            if(self.IsNamedTactilePlaying(m_vibHandle, "tactile/NUKEWINDUPLOOP1B.bnvib") == false)
+            {
+                m_vibHandle = self.PlayTactile("tactile/NUKEWINDUPLOOP1B.bnvib", kexVibrationPlayer::CHANNEL_BODY, kexVibrationPlayer::POSITION_NEUTRAL);
+            }
+        }
+        
+        int animID = self.AnimTrackComponent().PlayingID();
+        
+        if(animID == ANIM_WPN_CHARGE)
+        {
+            m_spinRotVel = Math::IncMax(m_spinRotVel, 0.025f, 8);
+        }
+        else if(animID == ANIM_WPN_IDLE || animID == ANIM_WPN_RUN)
+        {
+            m_spinRotVel = Math::IncMax(m_spinRotVel, Math::Deg2Rad(0.375f) * GAME_FRAME_UNIT, 2);
+        }
+        else
+        {
+            return;
+        }
+        
+        self.RenderMeshComponent().SetRotationOffset(1, Math::Deg2Rad(m_spinAngle), 0, 1, 0);
+        self.RenderMeshComponent().SetRotationOffset(12, Math::Deg2Rad(-m_spinAngle*2), 0, 1, 0);
+        
+        m_spinAngle += m_spinRotVel;
+    }
+    
+    /*
+    ==============================================================
+    OnLower
+    ==============================================================
+    */
+    
+    void OnLower(void)
+    {
+        m_spinAngle = 0;
+        self.RenderMeshComponent().SetRotationOffset(1, Math::Deg2Rad(0), 0, 1, 0);
+        self.RenderMeshComponent().SetRotationOffset(12, Math::Deg2Rad(0), 0, 1, 0);
+        if(m_vibHandle >= 0)
+        {
+            self.StopTactile(m_vibHandle);
+            m_vibHandle = -1;
+            m_bStartVib = false;
+        }
+    }
+    
+    void OnFiredParticleFromAnim(kParticle@ particle) 
+    {
+        if(m_vibHandle >= 0)
+        {
+            self.StopTactile(m_vibHandle);
+            m_vibHandle = -1;
+            m_bStartVib = false;
+        }
+        self.PlayTactile("tactile/NUKEFIREMIX02B.bnvib", kexVibrationPlayer::CHANNEL_WEAPON, kexVibrationPlayer::POSITION_RIGHT);
+		
+		TurokWeapon::OnFiredParticleFromAnim(particle); // Rando
+    }
+    
+    /*
+    ==============================================================
+    OnRaise
+    ==============================================================
+    */
+    
+    void OnRaise(void)
+    {
+        m_spinRotVel = 0;
+    }
+}

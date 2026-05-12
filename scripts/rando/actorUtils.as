@@ -225,14 +225,26 @@ void TryGetInventoryItems(int &in actorId, int &in count)
 //---------------------------
 // Some items (primagen keys, level keys, etc) will disappear when you use them.
 // We want to track these still, so give a version of them that's offset.
+//
+// If called directly, we also want to add weapon pickups here to handle extra
+// ammo consumption settings.
 void HandleTrackInventoryItems(int &in actorId, kDictMem@ itemDef = null)
 {
 	if (itemDef is null)
 	{
+		if (!OPTION_RANDOMIZE_WEAPONS)
+		{
+			return;
+		}
+	
 		@itemDef = TryGetActorDefWithClass(actorId, "kexInventoryPickup", true);
 		if (itemDef is null)
 		{
-			return;
+			@itemDef = TryGetActorDefWithClass(actorId, "kexWeaponPickup", true);
+			if (itemDef is null)
+			{
+				return;
+			}
 		}
 	}
 	

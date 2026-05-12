@@ -5,10 +5,12 @@
 //---------------------------
 // Given the actor id, simulates the player picking up a weapon.
 // They are given the ammo amount even if they own the weapon.
+// Also handles tracking the ammo upgrades for weapons.
 bool TryGivePlayerWeapon(
 	int &in actorId, 
 	int &in ammoAmount = 1000,
-	bool &in skipNotifications = false)
+	bool &in skipNotifications = false,
+	bool &in isAmmoOnly = false)
 {
 	WeaponInfo@ weaponInfo = GetWeaponInfo(actorId);
 	if (weaponInfo is null)
@@ -19,13 +21,24 @@ bool TryGivePlayerWeapon(
 	
 	bool ownsWeapon = LocalPlayer.HasWeapon(weaponInfo.weaponDef);
 	LocalPlayer.GiveWeapon(weaponInfo.weaponDef, ammoAmount);
-	
+
+	bool hasAllAmmoUpgrades = true;
+	if (!isAmmoOnly)
+	{
+		int unobtainedUpgrades = OPTION_PROGRESSIVE_AMMO_COUNT - GetInventoryItemCollectedTotal(actorId);
+		if (unobtainedUpgrades > 0)
+		{
+			hasAllAmmoUpgrades = false;
+			HandleTrackInventoryItems(actorId);
+		}
+	}
+
 	if (skipNotifications)
 	{
 		return true;
 	}
 	
-	if (ownsWeapon)
+	if (isAmmoOnly || (ownsWeapon && hasAllAmmoUpgrades))
 	{
 		PlayPickupNotificationSoundAndMessage(weaponInfo);
 	}
@@ -107,7 +120,7 @@ void GetAmmoInRandomWeapon()
 	// Get the ammo!
 	float ammoPercent = RandomInt(OPTION_RANDOM_AMMO_MIN, OPTION_RANDOM_AMMO_MAX) / 100.0;
 	int standardAmmoAmount = int(Math::Ceil(weaponToGetAmmoFor.maxAmmo * ammoPercent));
-	TryGivePlayerWeapon(weaponToGetAmmoFor.pickupId, standardAmmoAmount);
+	TryGivePlayerWeapon(weaponToGetAmmoFor.pickupId, standardAmmoAmount, false, true);
 	
 	if (weaponToGetAmmoFor.maxAltAmmo > 0)
 	{

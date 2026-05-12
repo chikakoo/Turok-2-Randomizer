@@ -5,6 +5,8 @@
 // Called in UserEvent to get the script object back
 #define RANDO_MSG_GET_SCRIPT 100
 
+// ---------
+// Ammo
 #define kActor_Item_APItemProgression 100000
 #define kActor_Item_APItemUseful 100001
 #define kActor_Item_APItemNonProgression 100002
