@@ -55,12 +55,4 @@ class RandoPrimagenKeyTrigger : ScriptObject
 	void OnSerialize(kDict& out dict)
 	{
 	}
-	
-	// --------------------------
-	// Remove on a deserialize, as they are created on spawn
-	// This prevents multiple of these from existing at a time
-	void OnDeserialize(kDict& in dict)
-	{			
-		self.Remove();
-	}
 }

@@ -546,7 +546,7 @@ void RemoveAllGenerators(void)
 // Places generators for random ammo and full health.
 void DoHubModifications(const int16 &in mapId)
 {
-	if (mapId != kLevel_Hub)
+	if (mapId != kLevel_Hub || LocalPlayer.Actor().CastToActor().Deserialized())
 	{
 		return;
 	}

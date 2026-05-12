@@ -68,12 +68,4 @@ class RandoLevel1Barrier : ScriptActor
 	void OnSerialize(kDict& out dict)
 	{
 	}
-	
-	// --------------------------
-	// Remove on a deserialize, as they are created on spawn
-	// This prevents multiple barriers from existing at a time
-	void OnDeserialize(kDict& in dict)
-	{			
-		self.Remove();
-	}
 }
