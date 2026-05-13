@@ -62,10 +62,4 @@ class RandoLevel1Barrier : ScriptActor
 			self.Remove();
 		}
 	}
-	
-	// --------------------------
-	// Needs to exist with OnDeserialize to prevent errors
-	void OnSerialize(kDict& out dict)
-	{
-	}
 }

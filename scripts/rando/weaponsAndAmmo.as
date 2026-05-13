@@ -21,6 +21,10 @@ bool TryGivePlayerWeapon(
 	
 	bool ownsWeapon = LocalPlayer.HasWeapon(weaponInfo.weaponDef);
 	LocalPlayer.GiveWeapon(weaponInfo.weaponDef, ammoAmount);
+	if (!ownsWeapon)
+	{
+		ComputeNumberOfOwnedProgressionWeapons();
+	}
 
 	bool hasAllAmmoUpgrades = true;
 	if (!isAmmoOnly)
@@ -32,7 +36,7 @@ bool TryGivePlayerWeapon(
 			HandleTrackInventoryItems(actorId);
 		}
 	}
-
+	
 	if (skipNotifications)
 	{
 		return true;

@@ -170,6 +170,9 @@ class RandoPlayerObject : ScriptObject
 		
 		// Show level progress on spawn as a convenience
 		DisplayCollectedLocationsForCurrentMap();
+		
+		// Recompute owned weapons in case of desyncs
+		ComputeNumberOfOwnedProgressionWeapons();
 	}
 	
 	//---------------------------
@@ -435,4 +438,48 @@ int16 GetNumberOfFinishedLevels(void)
 	if (GetInventoryItemCurrentTotal(kActor_InventoryItem_FinishedLevel6) > 0) { finishedLevels++; }
 	
 	return finishedLevels;
+}
+
+//---------------------------
+// A cache of all weapon ids that are considered progression.
+// These are all weapons excluding the Talon, Bow, Nuke, Harpoon Gun, and Torpedo Launcher.
+array<int> g_progressionWeaponIds = {
+	kWpn_Blade,
+	kWpn_TekBow,
+	kWpn_Pistol,
+	kWpn_Magnum,
+	kWpn_Tranq,
+	kWpn_ChargeDart,
+	kWpn_Shotgun,
+	kWpn_Shredder,
+	kWpn_PlasmaRifle,
+	kWpn_Firestorm,
+	kWpn_SunfirePod,
+	kWpn_Bore,
+	kWpn_PFM,
+	kWpn_GrenadeLauncher,
+	kWpn_MissileLauncher,
+	kWpn_FlameThrower,
+	kWpn_RazorWind
+};
+
+//---------------------------
+// A variable storing the number of owned progression weapons.
+// This is recalculated when a new weapon is received, and when the player spawns.
+int g_numberOfOwnedProgressionWeapons = 0;
+
+//---------------------------
+// Computes the number of owned progression weapons and stores it in the global.
+// These are all weapons excluding the Talon, Bow, and Nuke
+void ComputeNumberOfOwnedProgressionWeapons(void)
+{
+	int count = 0;
+	for (uint i = 0; i < g_progressionWeaponIds.length(); i++)
+	{
+		if (LocalPlayer.HasWeapon(g_progressionWeaponIds[i]))
+		{
+			count++;
+		}
+	}
+	g_numberOfOwnedProgressionWeapons = count;
 }

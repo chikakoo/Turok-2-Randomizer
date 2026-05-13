@@ -1,20 +1,18 @@
 // --------------------------
 // An actor for blocking players getting to warps to support progressive warp portals.
 //---------------------------
-class RandoWarpBarrier : ScriptActor
+class RandoWeaponBarrier : ScriptActor
 {
 	int m_messageCooldown = 0;
 	int m_progressMenuDisplayTime = 330;
-	
-	int progressiveWarpItemId = -1;
-	int progressiveWarpsNeeded = 99;
+	int m_numberOfWeaponsNeeded = 0;
 	
 	bool hasWarpBack = false;
 	int warpBackRegion;
-	
+
 	//---------------------------
 	// Constructor - turns on the collision callback and turns off damage
-	RandoWarpBarrier(kActor @actor) 
+	RandoWeaponBarrier(kActor @actor) 
 	{ 
 		super(@actor);
 		self.WorldComponent().Flags() |= WCF_INVOKE_COLLIDE_CALLBACK;
@@ -22,11 +20,10 @@ class RandoWarpBarrier : ScriptActor
 	}
 	
 	//---------------------------
-	// Sets the barrier info so it can be removed when the items are in inventory.
-	void SetBarrierInfo(const int &in itemId, const int &in needed)
+	// Sets the barrier info so it can be removed when the weapon requirement is met.
+	void SetBarrierInfo(const int &in numberOfWeaponsNeeded)
 	{
-		progressiveWarpItemId = itemId;
-		progressiveWarpsNeeded = needed;
+		m_numberOfWeaponsNeeded = numberOfWeaponsNeeded;
 	}
 	
 	//---------------------------
@@ -48,22 +45,14 @@ class RandoWarpBarrier : ScriptActor
 	}
 	
 	//---------------------------
-	// The count of progressive warps needed.
-	// This is affected by the progressive warp setting, which can make it less than the raw value.
-	int GetProgressiveWarpsLeftToEnter()
+	// Gets the number of weapons the player needs to get to enter the barrier.
+	int GetNumberOfWeaponsLeftToEnter()
 	{
-		int progressiveWarpStrength = OPTION_PROGRESSIVE_WARPS;
-		if (progressiveWarpStrength <= 0)
-		{
-			return 0;
-		}
-		
-		int numberNeeded = int(Math::Ceil(float(progressiveWarpsNeeded) / float(progressiveWarpStrength)));
-		return numberNeeded - GetInventoryItemCurrentTotal(progressiveWarpItemId);
-	}
+		return m_numberOfWeaponsNeeded - g_numberOfOwnedProgressionWeapons;
+	} 
 	
 	//---------------------------
-	// Prints a message for the player indicating how many warps they need to pass.
+	// Prints a message for the player indicating how many weapons they need to pass.
 	void OnTouch(kActor@ pInstigator)
 	{	
 		if (m_messageCooldown <= 0 && pInstigator.InstanceOf("kexPuppet"))
@@ -91,21 +80,18 @@ class RandoWarpBarrier : ScriptActor
 	}
 	
 	//---------------------------
-	// Tries printing the progressive warp message.
+	// Tries printing the weapons needed message.
 	// Resets the cooldown timer if it does print it.
 	void TryPrintWarpMessage()
 	{
-		if (m_messageCooldown <= 0)
+		int weaponsLeftToEnter = GetNumberOfWeaponsLeftToEnter();
+		if (weaponsLeftToEnter > 0)
 		{
-			int progressiveWarpsLeftToEnter = GetProgressiveWarpsLeftToEnter();
-			if (progressiveWarpsLeftToEnter > 0)
-			{
-				kStr warpString = progressiveWarpsLeftToEnter == 1 ? "warp" : "warps";
-				Hud.AddMessage(
-					"You need " + progressiveWarpsLeftToEnter + " more progressive " + warpString + " to enter here!",
-					m_progressMenuDisplayTime);
-				m_messageCooldown = 360;
-			}
+			kStr weaponString = weaponsLeftToEnter == 1 ? "weapon" : "weapons";
+			Hud.AddMessage(
+				"You need " + weaponsLeftToEnter + " more unique " + weaponString + " to enter here!",
+				m_progressMenuDisplayTime);
+			m_messageCooldown = 360;
 		}
 	}
 	
@@ -118,7 +104,7 @@ class RandoWarpBarrier : ScriptActor
 			m_messageCooldown--;
 		}
 		
-		if (progressiveWarpItemId != -1 && GetProgressiveWarpsLeftToEnter() <= 0)
+		if (GetNumberOfWeaponsLeftToEnter() <= 0)
 		{
 			self.Remove();
 		}
