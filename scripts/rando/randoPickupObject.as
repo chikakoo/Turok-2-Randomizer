@@ -25,7 +25,8 @@ class RandoPickupObject : ScriptObject
 		self.WorldComponent().Flags() |= WCF_NONSOLID;
 		
 		// These aren't showing as important for some reason when they should
-		if (self.Type() == kActor_MissionItem_BeaconPowerCell)
+		if (self.Type() == kActor_MissionItem_BeaconPowerCell ||
+			self.Type() == kActor_MissionItem_IonCapacitor)
 		{
 			self.Flags() |= AF_IMPORTANT;
 		}

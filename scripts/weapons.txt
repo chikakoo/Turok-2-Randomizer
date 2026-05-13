@@ -42,8 +42,6 @@ class TurokWeapon : ScriptObject
     void OnHoldster(void) {}
     void OnFiredParticleFromAnim(kParticle@ particle) 
 	{
-		Hud.AddMessage("PARTICLE TYPE: " + particle.ParticleType());
-	
 		// Rando
 		// Consume additional ammo based on the particle that was fired
 		//
