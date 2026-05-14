@@ -41,6 +41,7 @@ WpnBow kActor_Item_WpnBow
     pickup.weapon.definition    kWpn_Bow
     pickup.weapon.giveAmmo      0
     pickup.pickupMessage        "$str_138"
+	rando.ammoMessage			"Arrows"
 }
 
 WpnTekBow kActor_Item_WpnTekBow
@@ -53,6 +54,7 @@ WpnTekBow kActor_Item_WpnTekBow
     pickup.weapon.giveAmmo      10
     pickup.pickupMessage        "$str_139"
     pickup.callout              kVoice_Weapon02
+	rando.ammoMessage			"Arrows and Tek Arrows"
     
     initialScale              "0.5 0.5 0.5"
     Begin_Component "kexWorldComponent"
@@ -78,6 +80,7 @@ WpnPistol kActor_Item_WpnPistol
     pickup.weapon.giveAmmo      50
     pickup.pickupMessage        "$str_140"
     pickup.callout              kVoice_Weapon03
+	rando.ammoMessage			"Bullets"
     
     initialScale              "0.5 0.5 0.5"
     Begin_Component "kexWorldComponent"
@@ -103,6 +106,7 @@ WpnMag60 kActor_Item_WpnMag60
     pickup.weapon.giveAmmo      50
     pickup.pickupMessage        "$str_141"
     pickup.callout              kVoice_Weapon04
+	rando.ammoMessage			"Bullets"
     
     initialScale              "0.5 0.5 0.5"
     Begin_Component "kexWorldComponent"
@@ -128,6 +132,7 @@ WpnTranq kActor_Item_WpnTranq
     pickup.weapon.giveAmmo      15
     pickup.pickupMessage        "$str_142"
     pickup.callout              kVoice_Weapon07
+	rando.ammoMessage			"Tranquilizer Darts"
     
     initialScale              "0.5 0.5 0.5"
     Begin_Component "kexWorldComponent"
@@ -153,6 +158,7 @@ WpnChargeDart kActor_Item_WpnChargeDart
     pickup.weapon.giveAmmo      30
     pickup.pickupMessage        "$str_143"
     pickup.callout              kVoice_Weapon08
+	rando.ammoMessage			"Charge Darts"
     
     initialScale              "0.5 0.5 0.5"
     Begin_Component "kexWorldComponent"
@@ -178,6 +184,7 @@ WpnShotgun kActor_Item_WpnShotgun
     pickup.weapon.giveAmmo      20
     pickup.pickupMessage        "$str_144"
     pickup.callout              kVoice_Weapon05
+	rando.ammoMessage			"Shotgun Shells"
     
     initialScale              "0.5 0.5 0.5"
     Begin_Component "kexWorldComponent"
@@ -203,6 +210,7 @@ WpnScatter kActor_Item_WpnScatter
     pickup.weapon.giveAmmo      20
     pickup.pickupMessage        "$str_145"
     pickup.callout              kVoice_Weapon06
+	rando.ammoMessage			"Shotgun Shells"
     
     initialScale              "0.5 0.5 0.5"
     Begin_Component "kexWorldComponent"
@@ -228,6 +236,7 @@ WpnPlasmaRifle kActor_Item_WpnPlasmaRifle
     pickup.weapon.giveAmmo      150
     pickup.pickupMessage        "$str_146"
     pickup.callout              kVoice_Weapon09
+	rando.ammoMessage			"Plasma Rounds"
     
     initialScale              "0.5 0.5 0.5"
     Begin_Component "kexWorldComponent"
@@ -253,6 +262,7 @@ WpnFireStorm kActor_Item_WpnFireStorm
     pickup.weapon.giveAmmo      150
     pickup.pickupMessage        "$str_147"
     pickup.callout              kVoice_Weapon10
+	rando.ammoMessage			"Plasma Rounds"
     
     initialScale              "0.5 0.5 0.5"
     Begin_Component "kexWorldComponent"
@@ -278,6 +288,7 @@ WpnSunfirePod kActor_Item_WpnSunfirePod
     pickup.weapon.giveAmmo      6
     pickup.pickupMessage        "$str_148"
     pickup.callout              kVoice_Weapon21
+	rando.ammoMessage			"Sunfire Pods"
     
     initialScale              "0.5 0.5 0.5"
     Begin_Component "kexWorldComponent"
@@ -304,6 +315,7 @@ WpnCerebralBore kActor_Item_WpnCerebralBore
     pickup.weapon.giveAmmoMP    1
     pickup.pickupMessage        "$str_150"
     pickup.callout              kVoice_Weapon13
+	rando.ammoMessage			"Bores"
     
     initialScale              "0.5 0.5 0.5"
     Begin_Component "kexWorldComponent"
@@ -329,6 +341,7 @@ WpnPFMLayer kActor_Item_WpnPFMLayer
     pickup.weapon.giveAmmo      10
     pickup.pickupMessage        "$str_151"
     pickup.callout              kVoice_Weapon11
+	rando.ammoMessage			"Mines"
     
     initialScale              "0.5 0.5 0.5"
     Begin_Component "kexWorldComponent"
@@ -354,6 +367,7 @@ WpnGrenadeLauncher kActor_Item_WpnGrenadeLauncher
     pickup.weapon.giveAmmo      10
     pickup.pickupMessage        "$str_152"
     pickup.callout              kVoice_Weapon12
+	rando.ammoMessage			"Grenades"
     
     initialScale              "0.5 0.5 0.5"
     Begin_Component "kexWorldComponent"
@@ -380,6 +394,7 @@ WpnMissileLauncher kActor_Item_WpnMissileLauncher
     pickup.weapon.giveAmmoMP    4
     pickup.pickupMessage        "$str_153"
     pickup.callout              kVoice_Weapon23
+	rando.ammoMessage			"Scorpion Missiles"
     
     initialScale              "0.5 0.5 0.5"
     Begin_Component "kexWorldComponent"
@@ -405,6 +420,7 @@ WpnSpearGun kActor_Item_WpnSpearGun
     pickup.weapon.giveAmmo      12
     pickup.pickupMessage        "$str_154"
     pickup.callout              kVoice_Weapon17
+	rando.ammoMessage			"Spears"
     
     initialScale              "0.5 0.5 0.5"
     Begin_Component "kexWorldComponent"
@@ -430,6 +446,7 @@ WpnTorpedoLauncher kActor_Item_WpnTorpedoLauncher
     pickup.weapon.giveAmmo      3
     pickup.pickupMessage        "$str_155"
     pickup.callout              kVoice_Weapon18
+	rando.ammoMessage			"Torpedos"
     
     initialScale              "0.5 0.5 0.5"
     Begin_Component "kexWorldComponent"
@@ -455,6 +472,7 @@ WpnFlameThrower kActor_Item_WpnFlameThrower
     pickup.weapon.giveAmmo      50
     pickup.pickupMessage        "$str_158"
     pickup.callout              kVoice_Weapon14
+	rando.ammoMessage			"Flame Thrower Fuel"
     
     initialScale              "0.5 0.5 0.5"
     Begin_Component "kexWorldComponent"
@@ -506,6 +524,7 @@ WpnNuke kActor_Item_WpnNuke
     pickup.weapon.giveAmmoMP    1
     pickup.pickupMessage        "$str_160"
     pickup.callout              kVoice_Weapon16
+	rando.ammoMessage			"Nuke Ammo"
     
     initialScale              "0.5 0.5 0.5"
     Begin_Component "kexWorldComponent"

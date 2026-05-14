@@ -36,13 +36,18 @@ bool TryGivePlayerWeapon(
 			HandleTrackInventoryItems(actorId);
 		}
 	}
+	else
+	{
+		PlayPickupNotification(weaponInfo.pickupSound, weaponInfo.ammoPickupMessage);
+		return true;
+	}
 	
 	if (skipNotifications)
 	{
 		return true;
 	}
 	
-	if (isAmmoOnly || (ownsWeapon && hasAllAmmoUpgrades))
+	if (ownsWeapon && hasAllAmmoUpgrades)
 	{
 		PlayPickupNotificationSoundAndMessage(weaponInfo);
 	}
