@@ -320,6 +320,41 @@ int GenerateRandomEnemy(const bool &in isFromSpawner = false)
 }
 
 //----------------------------------
+// Generate a random enemy for enemy traps.
+int GenerateRandomEnemyForEnemyTrap()
+{
+	int16 mapId = Game.ActiveMapID();
+
+	// If using a level enemy type, but not in a level, choose randomly
+	if (OPTION_ENEMY_TRAP_POOL == ENEMY_TRAP_SAME_LEVEL ||
+		OPTION_ENEMY_TRAP_POOL == ENEMY_TRAP_SAME_LEVEL_INCLUDE_OBLIVION ||
+		OPTION_ENEMY_TRAP_POOL == ENEMY_TRAP_SIMILAR_DIFFICULTY)
+	{
+		if (GetLevelNumberFromMapId(mapId) == LEVEL_UNMAPPED)
+		{
+			return RandomInt(g_allEnemies);
+		}
+	}
+
+	switch (OPTION_ENEMY_TRAP_POOL)
+	{
+		case ENEMY_TRAP_SAME_LEVEL:
+			return GetEnemyForCurrentLevel(false);
+		case ENEMY_TRAP_SAME_LEVEL_INCLUDE_OBLIVION:
+			return GetEnemyForCurrentLevel(true);
+		case ENEMY_TRAP_SIMILAR_DIFFICULTY:
+			return GetSimilarEnemyForLevel(GetLevelNumberFromMapId(mapId));
+		case ENEMY_TRAP_SCALE_TO_WEAPONS:
+			return GetEnemyScaledToWeapons();
+		case ENEMY_TRAP_CHAOS:
+			return RandomInt(g_allEnemies);
+	}
+			
+	Sys.Print("ERROR: Unknown enemy trap setting: " + OPTION_ENEMY_TRAP_POOL);
+	return RandomInt(g_allEnemies);
+}
+
+//----------------------------------
 // Gets an enemy belonging the current level.
 // Will include oblivion enemies if the flag is passed.
 int GetEnemyForCurrentLevel(const bool &in includeOblivion)

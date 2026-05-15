@@ -4,6 +4,14 @@
 // More trap ideas: 
 // - ammo traps (self.ConsumeAmmo/ConsumeAltAmmo)
 //------------------------------
+enum EnemyTrapType
+{
+	ENEMY_TRAP_SAME_LEVEL = 0,
+	ENEMY_TRAP_SAME_LEVEL_INCLUDE_OBLIVION = 1,
+	ENEMY_TRAP_SIMILAR_DIFFICULTY = 2,
+	ENEMY_TRAP_SCALE_TO_WEAPONS = 3,
+	ENEMY_TRAP_CHAOS = 4
+}
 
 //------------------------------
 // Triggers the trap for the given actor id.
@@ -56,17 +64,7 @@ void HandleEnemyTrap()
 	}
 	else 
 	{
-		array<int> possibleEnemies = {
-			kActor_AI_Raptoid,
-			kActor_AI_Endtrail,
-			kActor_AI_Raptor,
-			kActor_AI_SwampWasp,
-			kActor_AI_CaveWorm,
-			kActor_AI_Grub,
-			kActor_AI_Drone,
-			kActor_AI_Leaper
-		};
-		selectedActor = RandomInt(possibleEnemies);
+		selectedActor = GenerateRandomEnemyForEnemyTrap();
 	}
 
 	for (int i = 0; i < numberToSpawn; i++)
@@ -79,7 +77,7 @@ void HandleEnemyTrap()
 // Damages the player by 10% of their current health, rounded up.
 void HandleDamageTrap()
 {
-	Hud.AddMessage("It's a trap!");
+	Hud.AddMessage("Ow!");
 	
 	kActor@ player = LocalPlayer.Actor().CastToActor();
 	float currentHealth = player.Health();
