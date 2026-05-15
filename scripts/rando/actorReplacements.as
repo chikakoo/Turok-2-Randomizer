@@ -459,6 +459,14 @@ void ReplaceAllActors(const int16 &in mapId)
 			actorsToRemove.insertLast(actor);
 		}
 		
+		else if (OPTION_ENEMIZER &&
+			!LocalPlayer.Actor().CastToActor().Deserialized() &&
+			!actor.IsMarked() && 
+			actor.EnemyAIComponent() !is null)
+		{
+			ReplaceEnemyActor(actor);
+		}
+		
 		else if (ShouldReplaceActor(actor, posStr))
 		{
 			if (TryGetReplacement(mapId, posStr, replacement))
@@ -536,6 +544,45 @@ void ReplaceActor(kActor@ initialActor, ReplacementEntry@ replacement)
 	}
 	
 	initialActor.Remove();
+}
+
+//----------------------------------
+// Replaces an enemy actor
+void ReplaceEnemyActor(kActor@ initialActor)
+{
+	// If there's no script here, then we don't want to replace this actor
+	RandoEnemy@ initialActorScript = cast<RandoEnemy@>(GetScript(initialActor));
+	if (initialActorScript is null)
+	{
+		return;
+	}
+	
+	kWorldComponent@ worldComponent = initialActor.WorldComponent();
+	kEnemyAIComponent@ enemyAIComponent = initialActor.EnemyAIComponent();
+	kActor@ replacedActor = ActorFactory.Spawn(
+		kActor_AI_Gunner, // TODO: compute what this SHOULD be
+		initialActor.Origin(),
+		initialActor.Yaw(),
+		initialActor.Pitch(),
+		initialActor.Roll(),
+		true, // Unknown - always set to true
+		worldComponent.RegionIndex());
+
+	replacedActor.TID() = initialActor.TID();
+		
+	kWorldComponent@ newWorldComponent = replacedActor.WorldComponent();
+	newWorldComponent.Flags() = worldComponent.Flags();
+	
+	kEnemyAIComponent@ newEnemyAIComponent = replacedActor.EnemyAIComponent();
+	newEnemyAIComponent.SpawnFlags() = enemyAIComponent.SpawnFlags();
+	
+	RandoEnemy@ enemyScript = cast<RandoEnemy@>(GetScript(replacedActor));
+	if (enemyScript !is null)
+	{
+		enemyScript.SetIsReplacedActor(true);
+		enemyScript.SetOriginalActor(initialActor);
+		enemyScript.SetIsNotYetShown((initialActor.Flags() & AF_HIDDEN) != 0);
+	}
 }
 
 //----------------------------------
