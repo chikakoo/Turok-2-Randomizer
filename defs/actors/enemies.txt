@@ -1,4 +1,84 @@
 #include "defs/common.txt"
+#include "defs/randoConstants.as"
+
+// Rando
+// Added missing enemies
+LordOfTheDead kActor_AI_LordOfTheDead
+{
+    className                 "kexActor"
+    placeable                 TRUE
+    health                    80
+    initialScale              "0.500000 0.500000 0.500000"
+    Begin_Component "kexRenderMeshComponent"
+        mesh                  "char/Lord_Of_The_Dead.skinnedmesh"
+        anim                  "anims/Lord_Of_The_Dead.anim"
+    End_Component
+    Begin_Component "kexWorldComponent"
+        radius                30.72
+        wallRadius            51.12
+        height                143.36
+        deadHeight            20.480000
+        heightOffset          0.000000
+        bTrackGround          TRUE
+    End_Component
+    Begin_Component "kexEnemyAIComponent"
+        commonFlags           538772
+        startHealth           80
+        startAnimID           0
+        startSoundID          0
+        painSoundID           0
+        deathItemDropFlags1   0
+        deathItemDropFlags2   0
+        leashRadius           3072.000000
+        aggressionLevel       0
+        tranqHealth           20
+        flags                 0
+        attackCombatRadius    71.68
+        attackLeapRadius      163.839996
+        attackDartRadius      163.839996
+        attackProjectileRadius 1024.0
+        attackWeaponRadius    1024.0
+        groundBehavior        1
+        airBehavior           0
+        underwaterBehavior    0
+        extremeDeathModelIndex 1
+        explodeDeathModelIndex -1
+        headBlownDeathModelIndex -1
+        leftArmBlownDeathModelIndex -1
+        rightArmBlownDeathModelIndex -1
+        bodyHoleDeathModelIndex -1
+        extremeDeathAnimID    7300
+        explodeDeathAnimID    0
+        headBlownDeathAnimID  0
+        leftArmBlownDeathAnimID 0
+        rightArmBlownDeathAnimID 0
+        bodyHoleDeathAnimID   0
+        idleAnimFlags         1057
+        moveAnimFlags         1057
+        patrolAnimFlags       1056
+        evadeAnimFlags        0
+        combatAnimFlags       1
+        leapAnimFlags         0
+        dartAnimFlags         0
+        projectileAnimFlags   1
+        weaponAnimFlags       1
+        comboAnimFlags        0
+        normalDeathAnimFlags  1057
+        movingDeathAnimFlags  0
+        violentDeathAnimFlags 1
+        explosiveDeathAnimFlags 1
+        alertAnimFlags        1
+        takeCoverAnimFlags    0
+        leftArmWoundAnimFlags 0
+        rightArmWoundAnimFlags 0
+        fleeAnimFlags         0
+    End_Component
+	Begin_Component "kexScriptComponent"
+        scriptClass           "RandoEnemy"
+    End_Component
+}
+
+// end
 
 Raptoid kActor_AI_Raptoid
 {

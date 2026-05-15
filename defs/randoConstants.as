@@ -110,3 +110,7 @@
 #define RANDO_UI_TEXTURE_TEXT_LEFT 25
 #define RANDO_UI_TEXTURE_WARP_HUB 26
 #define RANDO_UI_TEXTURE_WARP_BOSS 27
+
+// ---------
+// Missing enemies
+#define kActor_AI_LordOfTheDead          803
