@@ -325,7 +325,7 @@ int GenerateRandomEnemy(const bool &in isFromSpawner = false)
 int GetEnemyForCurrentLevel(const bool &in includeOblivion)
 {
 	int16 mapId = Game.ActiveMapID();
-	if (IsOblivionMap(mapId))
+	if (!includeOblivion && IsOblivionMap(mapId))
 	{
 		return PickWeightedEnemy(g_oblivionEnemyPool);
 	}
