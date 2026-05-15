@@ -11,6 +11,9 @@ class RandoEnemy : ScriptActor
 	// Whether the original actor wouldn't be visible
 	// Used to show the replacement when necessary
 	bool isNotYetShown;
+	
+	// Whether this was a spawn that we processed
+	bool processedSpawn;
 
 	//----------------------------------
 	// Constructor
@@ -51,6 +54,7 @@ class RandoEnemy : ScriptActor
     {
 		SERIALIZE(isReplacedActor);
 		SERIALIZE(isNotYetShown);
+		SERIALIZE(processedSpawn);
 	}
 	
 	//----------------------------------
@@ -60,6 +64,8 @@ class RandoEnemy : ScriptActor
     {
 		DESERIALIZE_BOOL(isReplacedActor);
 		DESERIALIZE_BOOL(isNotYetShown);
+		DESERIALIZE_BOOL(processedSpawn);
+		
 		if (!isReplacedActor)
 		{
 			return;
@@ -108,6 +114,26 @@ class RandoEnemy : ScriptActor
 	// - Else, set the original to hidden if it's ever shown for some reason
 	void OnTick(void)
 	{
+		if (!OPTION_ENEMIZER)
+		{
+			return;
+		}
+		
+		if (self.TID() <= 0)
+		{
+			// This is a spawned enemy, which we can just ignore here as
+			// they'll never trigger anything
+			if (processedSpawn || isReplacedActor)
+			{
+				return;
+			}
+			
+			processedSpawn = true;
+			ReplaceEnemyActor(self);
+			self.Flags() |= AF_HIDDEN;
+			return;
+		}
+		
 		if (!isReplacedActor || originalActor is null)
 		{
 			return;

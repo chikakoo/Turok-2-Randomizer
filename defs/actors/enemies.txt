@@ -221,6 +221,9 @@ Raptor kActor_AI_Raptor
         rightArmWoundAnimFlags 0
         fleeAnimFlags         0
     End_Component
+	Begin_Component "kexScriptComponent"
+        scriptClass           "RandoEnemy"
+    End_Component
 }
 
 Leaper kActor_AI_Leaper
@@ -293,6 +296,9 @@ Leaper kActor_AI_Leaper
         rightArmWoundAnimFlags 0
         fleeAnimFlags         0
     End_Component
+	Begin_Component "kexScriptComponent"
+        scriptClass           "RandoEnemy"
+    End_Component
 }
 
 SwampWasp kActor_AI_SwampWasp
@@ -363,6 +369,9 @@ SwampWasp kActor_AI_SwampWasp
         leftArmWoundAnimFlags 0
         rightArmWoundAnimFlags 0
         fleeAnimFlags         0
+    End_Component
+	Begin_Component "kexScriptComponent"
+        scriptClass           "RandoEnemy"
     End_Component
 }
 
@@ -438,6 +447,9 @@ SpiderHatchling kActor_AI_SpiderHatchling
         rightArmWoundAnimFlags 0
         fleeAnimFlags         0
     End_Component
+	Begin_Component "kexScriptComponent"
+        scriptClass           "RandoEnemy"
+    End_Component
 }
 
 Deadman kActor_AI_Deadman
@@ -511,6 +523,9 @@ Deadman kActor_AI_Deadman
         rightArmWoundAnimFlags 0
         fleeAnimFlags         0
     End_Component
+	Begin_Component "kexScriptComponent"
+        scriptClass           "RandoEnemy"
+    End_Component
 }
 
 Deadman_Half kActor_AI_DeadmanHalf
@@ -581,6 +596,9 @@ Deadman_Half kActor_AI_DeadmanHalf
         leftArmWoundAnimFlags 0
         rightArmWoundAnimFlags 0
         fleeAnimFlags         0
+    End_Component
+	Begin_Component "kexScriptComponent"
+        scriptClass           "RandoEnemy"
     End_Component
 }
 
@@ -729,6 +747,9 @@ Purlin_Juggernaut kActor_AI_Juggernaut
         rightArmWoundAnimFlags 0
         fleeAnimFlags         0
     End_Component
+	Begin_Component "kexScriptComponent"
+        scriptClass           "RandoEnemy"
+    End_Component
 }
 
 Blind_Guardian kActor_AI_Guardian
@@ -800,6 +821,9 @@ Blind_Guardian kActor_AI_Guardian
         leftArmWoundAnimFlags 1
         rightArmWoundAnimFlags 1
         fleeAnimFlags         1
+    End_Component
+	Begin_Component "kexScriptComponent"
+        scriptClass           "RandoEnemy"
     End_Component
 }
 
@@ -873,6 +897,9 @@ Blind_Sentinel kActor_AI_Sentinel
         rightArmWoundAnimFlags 1
         fleeAnimFlags         1
     End_Component
+	Begin_Component "kexScriptComponent"
+        scriptClass           "RandoEnemy"
+    End_Component
 }
 
 Grub kActor_AI_Grub
@@ -944,6 +971,9 @@ Grub kActor_AI_Grub
         leftArmWoundAnimFlags 0
         rightArmWoundAnimFlags 0
         fleeAnimFlags         0
+    End_Component
+	Begin_Component "kexScriptComponent"
+        scriptClass           "RandoEnemy"
     End_Component
 }
 
@@ -1017,6 +1047,9 @@ FleshWorm kActor_AI_FleshWorm
         rightArmWoundAnimFlags 0
         fleeAnimFlags         0
     End_Component
+	Begin_Component "kexScriptComponent"
+        scriptClass           "RandoEnemy"
+    End_Component
 }
 
 CaveWorm kActor_AI_CaveWorm
@@ -1088,6 +1121,9 @@ CaveWorm kActor_AI_CaveWorm
         leftArmWoundAnimFlags 1
         rightArmWoundAnimFlags 0
         fleeAnimFlags         0
+    End_Component
+	Begin_Component "kexScriptComponent"
+        scriptClass           "RandoEnemy"
     End_Component
 }
 
@@ -1161,6 +1197,9 @@ Mite kActor_AI_Mite
         rightArmWoundAnimFlags 0
         fleeAnimFlags         0
     End_Component
+	Begin_Component "kexScriptComponent"
+        scriptClass           "RandoEnemy"
+    End_Component
 }
 
 Drone kActor_AI_Drone
@@ -1232,6 +1271,9 @@ Drone kActor_AI_Drone
         leftArmWoundAnimFlags 0
         rightArmWoundAnimFlags 0
         fleeAnimFlags         0
+    End_Component
+	Begin_Component "kexScriptComponent"
+        scriptClass           "RandoEnemy"
     End_Component
 }
 
