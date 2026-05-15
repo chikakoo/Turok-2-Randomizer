@@ -124,13 +124,13 @@ class RandoEnemy : ScriptActor
 		{
 			// This is a spawned enemy, which we can just ignore here as
 			// they'll never trigger anything
-			if (!OPTION_ENEMIZER_SPAWNERS || processedSpawn || isReplacedActor)
+			if (OPTION_ENEMIZER_SPAWNERS == ENEMIZER_SPAWNER_NONE || processedSpawn || isReplacedActor)
 			{
 				return;
 			}
 			
 			processedSpawn = true;
-			ReplaceEnemyActor(self);
+			ReplaceEnemyActor(self, true);
 			self.Flags() |= AF_HIDDEN;
 			return;
 		}

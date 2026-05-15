@@ -11,6 +11,13 @@ enum EnemizerType
 	ENEMIZER_CHAOS = 5
 }
 
+enum EnemizerSpawnerType
+{
+	ENEMIZER_SPAWNER_NONE = 0,
+	ENEMIZER_SPAWNER_USE_ENEMIZER_VALUE = 1,
+	ENEMIZER_SPAWNER_EASY_ONLY = 2
+}
+
 class EnemyWeight
 {
     int actor;
@@ -271,10 +278,26 @@ array<int> g_allEnemies = {
 	kActor_AI_LordOfTheFlesh
 };
 
+array<int> g_easySpawnerEnemies = {
+	kActor_AI_Compy,
+	kActor_AI_SwampWasp,
+	kActor_AI_FleshWorm,
+	kActor_AI_Grub,
+	kActor_AI_Mite,
+	kActor_AI_Worker
+};
+
 //----------------------------------
 // Generate a random enemy based on the enemizer setting.
-int GenerateRandomEnemy()
+int GenerateRandomEnemy(const bool &in isFromSpawner = false)
 {
+	if (isFromSpawner &&
+		OPTION_ENEMIZER > 0 && 
+		OPTION_ENEMIZER_SPAWNERS == ENEMIZER_SPAWNER_EASY_ONLY)
+	{
+		return RandomInt(g_easySpawnerEnemies);
+	}
+
 	switch (OPTION_ENEMIZER)
 	{
 		case ENEMIZER_NONE:
