@@ -1,8 +1,87 @@
 #include "defs/common.txt"
 #include "defs/randoConstants.as"
 
-// Rando
-// Added missing enemies
+//----------------------------------
+// Rando - missing enemies
+//----------------------------------
+
+// Level 1
+Compy kActor_AI_Compy
+{
+    className                 "kexActor"
+    placeable                 TRUE
+    health                    1
+    initialScale              "0.500000 0.500000 0.500000"
+    Begin_Component "kexRenderMeshComponent"
+        mesh                  "char/Leaper_0081.skinnedmesh"
+        anim                  "anims/Leaper_0081.anim"
+    End_Component
+    Begin_Component "kexWorldComponent"
+        radius                20.48
+        wallRadius            20.48
+        height                61.44
+        deadHeight            20.480000
+        heightOffset          5.308359
+        bTrackGround          TRUE
+    End_Component
+    Begin_Component "kexEnemyAIComponent"
+        commonFlags           120852
+        startHealth           1
+        startAnimID           2
+        startSoundID          0
+        painSoundID           0
+        deathItemDropFlags1   0
+        deathItemDropFlags2   0
+        leashRadius           1024.0
+        aggressionLevel       0
+        tranqHealth           20
+        flags                 0
+        attackCombatRadius    154.0
+        attackLeapRadius      307.2
+        attackDartRadius      245.76
+        attackProjectileRadius 409.6
+        attackWeaponRadius    409.6
+        groundBehavior        1
+        airBehavior           0
+        underwaterBehavior    0
+        extremeDeathModelIndex 0
+        explodeDeathModelIndex -1
+        headBlownDeathModelIndex -1
+        leftArmBlownDeathModelIndex -1
+        rightArmBlownDeathModelIndex -1
+        bodyHoleDeathModelIndex -1
+        extremeDeathAnimID    0
+        explodeDeathAnimID    0
+        headBlownDeathAnimID  0
+        leftArmBlownDeathAnimID 0
+        rightArmBlownDeathAnimID 0
+        bodyHoleDeathAnimID   0
+        idleAnimFlags         1058
+        moveAnimFlags         1057
+        patrolAnimFlags       1057
+        evadeAnimFlags        0
+        combatAnimFlags       1
+        leapAnimFlags         0
+        dartAnimFlags         0
+        projectileAnimFlags   0
+        weaponAnimFlags       0
+        comboAnimFlags        0
+        normalDeathAnimFlags  1057
+        movingDeathAnimFlags  0
+        violentDeathAnimFlags 0
+        explosiveDeathAnimFlags 0
+        alertAnimFlags        0
+        takeCoverAnimFlags    0
+        leftArmWoundAnimFlags 0
+        rightArmWoundAnimFlags 0
+        fleeAnimFlags         0
+    End_Component
+	Begin_Component "kexScriptComponent"
+        scriptClass           "RandoEnemy"
+    End_Component
+}
+
+// Level 2
 LordOfTheDead kActor_AI_LordOfTheDead
 {
     className                 "kexActor"
@@ -15,7 +94,7 @@ LordOfTheDead kActor_AI_LordOfTheDead
     End_Component
     Begin_Component "kexWorldComponent"
         radius                30.72
-        wallRadius            51.12
+        wallRadius            51.2
         height                143.36
         deadHeight            20.480000
         heightOffset          0.000000
@@ -78,7 +157,987 @@ LordOfTheDead kActor_AI_LordOfTheDead
     End_Component
 }
 
-// end
+SisterOfDespair kActor_AI_SisterOfDespair
+{
+    className                 "kexActor"
+    placeable                 TRUE
+    health                    50
+    initialScale              "1.000000 1.000000 1.000000"
+    Begin_Component "kexRenderMeshComponent"
+        mesh                  "char/Demon_Witch.skinnedmesh"
+        anim                  "anims/Demon_Witch.anim"
+    End_Component
+    Begin_Component "kexWorldComponent"
+        radius                40.96
+        wallRadius            51.2
+        height                102.4
+        deadHeight            20.480000
+        heightOffset          0.000000
+        bTrackGround          TRUE
+    End_Component
+    Begin_Component "kexEnemyAIComponent"
+        commonFlags           6164
+        startHealth           50
+        startAnimID           0
+        startSoundID          0
+        painSoundID           0
+        deathItemDropFlags1   0
+        deathItemDropFlags2   0
+        leashRadius           16384.000000
+        aggressionLevel       0
+        tranqHealth           20
+        flags                 51
+        attackCombatRadius    143.36
+        attackLeapRadius      163.839996
+        attackDartRadius      163.839996
+        attackProjectileRadius 409.6
+        attackWeaponRadius    3072.0
+        groundBehavior        1
+        airBehavior           0
+        underwaterBehavior    0
+        extremeDeathModelIndex -1
+        explodeDeathModelIndex -1
+        headBlownDeathModelIndex -1
+        leftArmBlownDeathModelIndex -1
+        rightArmBlownDeathModelIndex -1
+        bodyHoleDeathModelIndex -1
+        extremeDeathAnimID    0
+        explodeDeathAnimID    0
+        headBlownDeathAnimID  0
+        leftArmBlownDeathAnimID 0
+        rightArmBlownDeathAnimID 0
+        bodyHoleDeathAnimID   0
+        idleAnimFlags         1056
+        moveAnimFlags         1057
+        patrolAnimFlags       1056
+        evadeAnimFlags        33
+        combatAnimFlags       33
+        leapAnimFlags         0
+        dartAnimFlags         0
+        projectileAnimFlags   0
+        weaponAnimFlags       235
+        comboAnimFlags        0
+        normalDeathAnimFlags  1057
+        movingDeathAnimFlags  0
+        violentDeathAnimFlags 0
+        explosiveDeathAnimFlags 0
+        alertAnimFlags        0
+        takeCoverAnimFlags    0
+        leftArmWoundAnimFlags 0
+        rightArmWoundAnimFlags 0
+        fleeAnimFlags         0
+    End_Component
+	Begin_Component "kexScriptComponent"
+        scriptClass           "RandoEnemy"
+    End_Component
+}
+
+// Level 3
+WarClub kActor_AI_WarClub
+{
+    className                 "kexActor"
+    placeable                 TRUE
+    health                    50
+    initialScale              "0.500000 0.500000 0.500000"
+    Begin_Component "kexRenderMeshComponent"
+        mesh                  "char/War_Club.skinnedmesh"
+        anim                  "anims/War_Club.anim"
+    End_Component
+    Begin_Component "kexWorldComponent"
+        radius                61.44
+        wallRadius            71.68
+        height                133.12
+        deadHeight            40.96
+        heightOffset          0.000000
+        bTrackGround          TRUE
+    End_Component
+    Begin_Component "kexEnemyAIComponent"
+        commonFlags           48020
+        startHealth           50
+        startAnimID           0
+        startSoundID          0
+        painSoundID           0
+        deathItemDropFlags1   0
+        deathItemDropFlags2   0
+        leashRadius           3072.000000
+        aggressionLevel       0
+        tranqHealth           3
+        flags                 6144
+        attackCombatRadius    153.6
+        attackLeapRadius      245.76
+        attackDartRadius      245.76
+        attackProjectileRadius 409.6
+        attackWeaponRadius    409.6
+        groundBehavior        1
+        airBehavior           0
+        underwaterBehavior    0
+        extremeDeathModelIndex 1
+        explodeDeathModelIndex 2
+        headBlownDeathModelIndex 5
+        leftArmBlownDeathModelIndex 3
+        rightArmBlownDeathModelIndex 4
+        bodyHoleDeathModelIndex 1
+        extremeDeathAnimID    7300
+        explodeDeathAnimID    7325
+        headBlownDeathAnimID  7001
+        leftArmBlownDeathAnimID 7345
+        rightArmBlownDeathAnimID 7345
+        bodyHoleDeathAnimID   7300
+        idleAnimFlags         1057
+        moveAnimFlags         1057
+        patrolAnimFlags       1057
+        evadeAnimFlags        0
+        combatAnimFlags       3
+        leapAnimFlags         1
+        dartAnimFlags         0
+        projectileAnimFlags   0
+        weaponAnimFlags       1
+        comboAnimFlags        0
+        normalDeathAnimFlags  1059
+        movingDeathAnimFlags  1
+        violentDeathAnimFlags 1
+        explosiveDeathAnimFlags 0
+        alertAnimFlags        1
+        takeCoverAnimFlags    0
+        leftArmWoundAnimFlags 1
+        rightArmWoundAnimFlags 1
+        fleeAnimFlags         1
+    End_Component
+	Begin_Component "kexScriptComponent"
+        scriptClass           "RandoEnemy"
+    End_Component
+}
+
+// Level 4
+CaveSpider kActor_AI_CaveSpider
+{
+    className                 "kexActor"
+    placeable                 TRUE
+    health                    150
+    initialScale              "0.500000 0.500000 0.500000"
+    Begin_Component "kexRenderMeshComponent"
+        mesh                  "char/Spider_Adult.skinnedmesh"
+        anim                  "anims/Spider_Adult.anim"
+    End_Component
+    Begin_Component "kexWorldComponent"
+        radius                61.44
+        wallRadius            92.16
+        height                112.64
+        deadHeight            61.44
+        heightOffset          -1.835213
+        bTrackGround          TRUE
+    End_Component
+    Begin_Component "kexEnemyAIComponent"
+        commonFlags           6420
+        startHealth           150
+        startAnimID           0
+        startSoundID          0
+        painSoundID           841
+        deathItemDropFlags1   0
+        deathItemDropFlags2   0
+        leashRadius           2560.000000
+        aggressionLevel       0
+        tranqHealth           20
+        flags                 0
+        attackCombatRadius    204.8
+        attackLeapRadius      163.839996
+        attackDartRadius      163.839996
+        attackProjectileRadius 921.6
+        attackWeaponRadius    1843.2
+        groundBehavior        1
+        airBehavior           0
+        underwaterBehavior    0
+        extremeDeathModelIndex -1
+        explodeDeathModelIndex -1
+        headBlownDeathModelIndex -1
+        leftArmBlownDeathModelIndex -1
+        rightArmBlownDeathModelIndex -1
+        bodyHoleDeathModelIndex -1
+        extremeDeathAnimID    0
+        explodeDeathAnimID    0
+        headBlownDeathAnimID  0
+        leftArmBlownDeathAnimID 0
+        rightArmBlownDeathAnimID 0
+        bodyHoleDeathAnimID   0
+        idleAnimFlags         1057
+        moveAnimFlags         1057
+        patrolAnimFlags       1056
+        evadeAnimFlags        0
+        combatAnimFlags       1
+        leapAnimFlags         0
+        dartAnimFlags         0
+        projectileAnimFlags   0
+        weaponAnimFlags       1
+        comboAnimFlags        0
+        normalDeathAnimFlags  1057
+        movingDeathAnimFlags  0
+        violentDeathAnimFlags 0
+        explosiveDeathAnimFlags 1
+        alertAnimFlags        0
+        takeCoverAnimFlags    0
+        leftArmWoundAnimFlags 0
+        rightArmWoundAnimFlags 0
+        fleeAnimFlags         0
+    End_Component
+	Begin_Component "kexScriptComponent"
+        scriptClass           "RandoEnemy"
+    End_Component
+}
+
+Nala kActor_AI_Nala
+{
+    className                 "kexActor"
+    placeable                 TRUE
+    health                    30
+    initialScale              "0.75 0.75 0.75"
+    Begin_Component "kexRenderMeshComponent"
+        mesh                  "char/Nala_normal.skinnedmesh"
+        anim                  "anims/Nala_normal.anim"
+    End_Component
+    Begin_Component "kexWorldComponent"
+        radius                10.24
+        wallRadius            51.2
+        height                71.68
+        deadHeight            20.48
+        heightOffset          0.000000
+        bTrackGround          TRUE
+    End_Component
+    Begin_Component "kexEnemyAIComponent"
+        commonFlags           7956
+        startHealth           30
+        startAnimID           0
+        startSoundID          0
+        painSoundID           0
+        deathItemDropFlags1   0
+        deathItemDropFlags2   0
+        leashRadius           2560.000000
+        aggressionLevel       0
+        tranqHealth           20
+        flags                 0
+        attackCombatRadius    81.92
+        attackLeapRadius      163.839996
+        attackDartRadius      163.839996
+        attackProjectileRadius 1024.0
+        attackWeaponRadius    409.6
+        groundBehavior        1
+        airBehavior           0
+        underwaterBehavior    0
+        extremeDeathModelIndex 1
+        explodeDeathModelIndex 1
+        headBlownDeathModelIndex 1
+        leftArmBlownDeathModelIndex -1
+        rightArmBlownDeathModelIndex -1
+        bodyHoleDeathModelIndex 1
+        extremeDeathAnimID    7300
+        explodeDeathAnimID    7300
+        headBlownDeathAnimID  7300
+        leftArmBlownDeathAnimID 0
+        rightArmBlownDeathAnimID 0
+        bodyHoleDeathAnimID   7300
+        idleAnimFlags         1057
+        moveAnimFlags         1059
+        patrolAnimFlags       1056
+        evadeAnimFlags        0
+        combatAnimFlags       0
+        leapAnimFlags         0
+        dartAnimFlags         0
+        projectileAnimFlags   1
+        weaponAnimFlags       0
+        comboAnimFlags        0
+        normalDeathAnimFlags  1057
+        movingDeathAnimFlags  0
+        violentDeathAnimFlags 0
+        explosiveDeathAnimFlags 0
+        alertAnimFlags        0
+        takeCoverAnimFlags    0
+        leftArmWoundAnimFlags 0
+        rightArmWoundAnimFlags 0
+        fleeAnimFlags         0
+    End_Component
+	Begin_Component "kexScriptComponent"
+        scriptClass           "RandoEnemy"
+    End_Component
+}
+
+Fireborn kActor_AI_Fireborn
+{
+    className                 "kexActor"
+    placeable                 TRUE
+    health                    60
+    initialScale              "0.5 0.5 0.5"
+    Begin_Component "kexRenderMeshComponent"
+        mesh                  "char/Fireborn.skinnedmesh"
+        anim                  "anims/Fireborn.anim"
+    End_Component
+    Begin_Component "kexWorldComponent"
+        radius                40.96
+        wallRadius            51.2
+        height                122.88
+        deadHeight            20.48
+        heightOffset          0.000000
+        bTrackGround          TRUE
+    End_Component
+    Begin_Component "kexEnemyAIComponent"
+        commonFlags           8084
+        startHealth           60
+        startAnimID           0
+        startSoundID          0
+        painSoundID           620
+        deathItemDropFlags1   0
+        deathItemDropFlags2   0
+        leashRadius           2048.000000
+        aggressionLevel       0
+        tranqHealth           3
+        flags                 17072176
+        attackCombatRadius    163.839996
+        attackLeapRadius      307.2
+        attackDartRadius      245.76
+        attackProjectileRadius 358.4
+        attackWeaponRadius    304.127991
+        groundBehavior        0
+        airBehavior           0
+        underwaterBehavior    0
+        extremeDeathModelIndex 1
+        explodeDeathModelIndex 1
+        headBlownDeathModelIndex 1
+        leftArmBlownDeathModelIndex 2
+        rightArmBlownDeathModelIndex 3
+        bodyHoleDeathModelIndex -1
+        extremeDeathAnimID    7315
+        explodeDeathAnimID    7310
+        headBlownDeathAnimID  7310
+        leftArmBlownDeathAnimID 7345
+        rightArmBlownDeathAnimID 7345
+        bodyHoleDeathAnimID   0
+        idleAnimFlags         33
+        moveAnimFlags         8452
+        patrolAnimFlags       1056
+        evadeAnimFlags        0
+        combatAnimFlags       8449
+        leapAnimFlags         0
+        dartAnimFlags         0
+        projectileAnimFlags   4
+        weaponAnimFlags       0
+        comboAnimFlags        0
+        normalDeathAnimFlags  8452
+        movingDeathAnimFlags  4
+        violentDeathAnimFlags 0
+        explosiveDeathAnimFlags 1
+        alertAnimFlags        1
+        takeCoverAnimFlags    1
+        leftArmWoundAnimFlags 1
+        rightArmWoundAnimFlags 1
+        fleeAnimFlags         1
+    End_Component
+	Begin_Component "kexScriptComponent"
+        scriptClass           "RandoEnemy"
+    End_Component
+}
+
+// Level 5
+Worker kActor_AI_Worker // They defined the constant, but not the def!
+{
+	className                 "kexActor"
+    placeable                 TRUE
+    health                    30
+    initialScale              "0.500000 0.500000 0.500000"
+    Begin_Component "kexRenderMeshComponent"
+        mesh                  "char/Worker.skinnedmesh"
+        anim                  "anims/Worker.anim"
+    End_Component
+    Begin_Component "kexWorldComponent"
+        radius                30.72
+        wallRadius            40.96
+        height                104.447998
+        deadHeight            25.6
+        heightOffset          0.0
+        bTrackGround          TRUE
+    End_Component
+    Begin_Component "kexEnemyAIComponent"
+        commonFlags           56724
+        startHealth           30
+        startAnimID           0
+        startSoundID          0
+        painSoundID           0
+        deathItemDropFlags1   0
+        deathItemDropFlags2   0
+        leashRadius           3072.000000
+        aggressionLevel       0
+        tranqHealth           20
+        flags                 0
+        attackCombatRadius    102.4
+        attackLeapRadius      102.4
+        attackDartRadius      245.76
+        attackProjectileRadius 409.6
+        attackWeaponRadius    409.6
+        groundBehavior        1
+        airBehavior           0
+        underwaterBehavior    0
+        extremeDeathModelIndex -1
+        explodeDeathModelIndex -1
+        headBlownDeathModelIndex -1
+        leftArmBlownDeathModelIndex -1
+        rightArmBlownDeathModelIndex -1
+        bodyHoleDeathModelIndex -1
+        extremeDeathAnimID    0
+        explodeDeathAnimID    0
+        headBlownDeathAnimID  0
+        leftArmBlownDeathAnimID 0
+        rightArmBlownDeathAnimID 0
+        bodyHoleDeathAnimID   0
+        idleAnimFlags         1057
+        moveAnimFlags         1057
+        patrolAnimFlags       1057
+        evadeAnimFlags        0
+        combatAnimFlags       1
+        leapAnimFlags         0
+        dartAnimFlags         0
+        projectileAnimFlags   0
+        weaponAnimFlags       0
+        comboAnimFlags        0
+        normalDeathAnimFlags  1057
+        movingDeathAnimFlags  0
+        violentDeathAnimFlags 0
+        explosiveDeathAnimFlags 1
+        alertAnimFlags        1
+        takeCoverAnimFlags    0
+        leftArmWoundAnimFlags 0
+        rightArmWoundAnimFlags 0
+        fleeAnimFlags         0
+    End_Component
+	Begin_Component "kexScriptComponent"
+        scriptClass           "RandoEnemy"
+    End_Component
+}
+
+Soldier kActor_AI_Soldier
+{
+    className                 "kexActor"
+    placeable                 TRUE
+    health                    150
+    initialScale              "0.500000 0.500000 0.500000"
+    Begin_Component "kexRenderMeshComponent"
+        mesh                  "char/Soldier.skinnedmesh"
+        anim                  "anims/Soldier.anim"
+    End_Component
+    Begin_Component "kexWorldComponent"
+        radius                122.88
+        wallRadius            97.28
+        height                204.8
+        deadHeight            51.2
+        heightOffset          0.0
+        bTrackGround          TRUE
+    End_Component
+    Begin_Component "kexEnemyAIComponent"
+        commonFlags           40340
+        startHealth           150
+        startAnimID           1
+        startSoundID          0
+        painSoundID           0
+        deathItemDropFlags1   524288
+        deathItemDropFlags2   0
+        leashRadius           3072.000000
+        aggressionLevel       0
+        tranqHealth           20
+        flags                 0
+        attackCombatRadius    184.32
+        attackLeapRadius      716.8
+        attackDartRadius      245.76
+        attackProjectileRadius 409.6
+        attackWeaponRadius    2048.0
+        groundBehavior        0
+        airBehavior           0
+        underwaterBehavior    0
+        extremeDeathModelIndex 1
+        explodeDeathModelIndex 1
+        headBlownDeathModelIndex -1
+        leftArmBlownDeathModelIndex -1
+        rightArmBlownDeathModelIndex -1
+        bodyHoleDeathModelIndex -1
+        extremeDeathAnimID    7100
+        explodeDeathAnimID    7100
+        headBlownDeathAnimID  0
+        leftArmBlownDeathAnimID 0
+        rightArmBlownDeathAnimID 0
+        bodyHoleDeathAnimID   0
+        idleAnimFlags         1057
+        moveAnimFlags         1057
+        patrolAnimFlags       1057
+        evadeAnimFlags        0
+        combatAnimFlags       1
+        leapAnimFlags         0
+        dartAnimFlags         0
+        projectileAnimFlags   0
+        weaponAnimFlags       3
+        comboAnimFlags        0
+        normalDeathAnimFlags  1057
+        movingDeathAnimFlags  0
+        violentDeathAnimFlags 1
+        explosiveDeathAnimFlags 1
+        alertAnimFlags        1
+        takeCoverAnimFlags    0
+        leftArmWoundAnimFlags 0
+        rightArmWoundAnimFlags 0
+        fleeAnimFlags         0
+    End_Component
+	Begin_Component "kexScriptComponent"
+        scriptClass           "RandoEnemy"
+    End_Component
+}
+
+// Level 6
+Trooper kActor_AI_Trooper
+{
+    className                 "kexActor"
+    placeable                 TRUE
+    health                    60
+    initialScale              "0.714286 0.714286 0.714286"
+    Begin_Component "kexRenderMeshComponent"
+        mesh                  "char/Trooper.skinnedmesh"
+        anim                  "anims/Trooper.anim"
+    End_Component
+    Begin_Component "kexWorldComponent"
+        radius                40.96
+        wallRadius            40.96
+        height                174.08
+        deadHeight            40.96
+        heightOffset          -2.799522
+        bTrackGround          TRUE
+    End_Component
+    Begin_Component "kexEnemyAIComponent"
+        commonFlags           40852
+        startHealth           60
+        startAnimID           0
+        startSoundID          0
+        painSoundID           0
+        deathItemDropFlags1   0
+        deathItemDropFlags2   0
+        leashRadius           2560.000000
+        aggressionLevel       0
+        tranqHealth           20
+        flags                 0
+        attackCombatRadius    225.28
+        attackLeapRadius      256.0
+        attackDartRadius      163.839996
+        attackProjectileRadius 409.6
+        attackWeaponRadius    3072.0
+        groundBehavior        0
+        airBehavior           0
+        underwaterBehavior    0
+        extremeDeathModelIndex 1
+        explodeDeathModelIndex 4
+        headBlownDeathModelIndex 5
+        leftArmBlownDeathModelIndex 2
+        rightArmBlownDeathModelIndex 3
+        bodyHoleDeathModelIndex -1
+        extremeDeathAnimID    7300
+        explodeDeathAnimID    7325
+        headBlownDeathAnimID  7335
+        leftArmBlownDeathAnimID 7345
+        rightArmBlownDeathAnimID 7345
+        bodyHoleDeathAnimID   0
+        idleAnimFlags         1057
+        moveAnimFlags         1057
+        patrolAnimFlags       1057
+        evadeAnimFlags        1
+        combatAnimFlags       1
+        leapAnimFlags         0
+        dartAnimFlags         0
+        projectileAnimFlags   0
+        weaponAnimFlags       1
+        comboAnimFlags        0
+        normalDeathAnimFlags  1057
+        movingDeathAnimFlags  0
+        violentDeathAnimFlags 1
+        explosiveDeathAnimFlags 2
+        alertAnimFlags        1
+        takeCoverAnimFlags    0
+        leftArmWoundAnimFlags 0
+        rightArmWoundAnimFlags 0
+        fleeAnimFlags         0
+    End_Component
+	Begin_Component "kexScriptComponent"
+        scriptClass           "RandoEnemy"
+    End_Component
+}
+
+BioBot kActor_AI_BioBot
+{
+    className                 "kexActor"
+    placeable                 TRUE
+    health                    40
+    initialScale              "0.5 0.5 0.5"
+    Begin_Component "kexRenderMeshComponent"
+        mesh                  "char/Bio-Bot.skinnedmesh"
+        anim                  "anims/Bio-Bot.anim"
+    End_Component
+    Begin_Component "kexWorldComponent"
+        radius                71.68
+        wallRadius            40.96
+        height                81.92
+        deadHeight            30.72
+        heightOffset          -17.282360
+        bTrackGround          TRUE
+    End_Component
+    Begin_Component "kexEnemyAIComponent"
+        commonFlags           530692
+        startHealth           40
+        startAnimID           0
+        startSoundID          0
+        painSoundID           0
+        deathItemDropFlags1   8192
+        deathItemDropFlags2   0
+        leashRadius           2560.000000
+        aggressionLevel       0
+        tranqHealth           20
+        flags                 0
+        attackCombatRadius    307.2
+        attackLeapRadius      614.84
+        attackDartRadius      163.839996
+        attackProjectileRadius 409.6
+        attackWeaponRadius    2560.0
+        groundBehavior        1
+        airBehavior           0
+        underwaterBehavior    0
+        extremeDeathModelIndex 3
+        explodeDeathModelIndex -1
+        headBlownDeathModelIndex 3
+        leftArmBlownDeathModelIndex 1
+        rightArmBlownDeathModelIndex 2
+        bodyHoleDeathModelIndex -1
+        extremeDeathAnimID    7300
+        explodeDeathAnimID    0
+        headBlownDeathAnimID  7300
+        leftArmBlownDeathAnimID 7345
+        rightArmBlownDeathAnimID 7345
+        bodyHoleDeathAnimID   0
+        idleAnimFlags         1072
+        moveAnimFlags         1057
+        patrolAnimFlags       1057
+        evadeAnimFlags        0
+        combatAnimFlags       1
+        leapAnimFlags         0
+        dartAnimFlags         0
+        projectileAnimFlags   0
+        weaponAnimFlags       1
+        comboAnimFlags        0
+        normalDeathAnimFlags  1057
+        movingDeathAnimFlags  0
+        violentDeathAnimFlags 0
+        explosiveDeathAnimFlags 1
+        alertAnimFlags        0
+        takeCoverAnimFlags    0
+        leftArmWoundAnimFlags 0
+        rightArmWoundAnimFlags 0
+        fleeAnimFlags         0
+    End_Component
+	Begin_Component "kexScriptComponent"
+        scriptClass           "RandoEnemy"
+    End_Component
+}
+
+EliteGuard kActor_AI_EliteGuard
+{
+    className                 "kexActor"
+    placeable                 TRUE
+    health                    100
+    initialScale              "0.6 0.6 0.6"
+    Begin_Component "kexRenderMeshComponent"
+        mesh                  "char/Elite_Guard.skinnedmesh"
+        anim                  "anims/Elite_Guard.anim"
+    End_Component
+    Begin_Component "kexWorldComponent"
+        radius                51.2
+        wallRadius            51.2
+        height                174.08
+        deadHeight            51.2
+        heightOffset          -2.526283
+        bTrackGround          TRUE
+    End_Component
+    Begin_Component "kexEnemyAIComponent"
+        commonFlags           40324
+        startHealth           100
+        startAnimID           0
+        startSoundID          0
+        painSoundID           0
+        deathItemDropFlags1   33554432
+        deathItemDropFlags2   0
+        leashRadius           2560.000000
+        aggressionLevel       0
+        tranqHealth           20
+        flags                 0
+        attackCombatRadius    225.28
+        attackLeapRadius      358.4
+        attackDartRadius      163.839996
+        attackProjectileRadius 409.6
+        attackWeaponRadius    2048.0
+        groundBehavior        0
+        airBehavior           0
+        underwaterBehavior    0
+        extremeDeathModelIndex 1
+        explodeDeathModelIndex 5
+        headBlownDeathModelIndex 4
+        leftArmBlownDeathModelIndex 2
+        rightArmBlownDeathModelIndex 3
+        bodyHoleDeathModelIndex -1
+        extremeDeathAnimID    7300
+        explodeDeathAnimID    7325
+        headBlownDeathAnimID  7335
+        leftArmBlownDeathAnimID 7100
+        rightArmBlownDeathAnimID 7100
+        bodyHoleDeathAnimID   0
+        idleAnimFlags         1057
+        moveAnimFlags         1057
+        patrolAnimFlags       1057
+        evadeAnimFlags        0
+        combatAnimFlags       1
+        leapAnimFlags         1
+        dartAnimFlags         0
+        projectileAnimFlags   0
+        weaponAnimFlags       3
+        comboAnimFlags        0
+        normalDeathAnimFlags  1057
+        movingDeathAnimFlags  0
+        violentDeathAnimFlags 1
+        explosiveDeathAnimFlags 0
+        alertAnimFlags        1
+        takeCoverAnimFlags    0
+        leftArmWoundAnimFlags 0
+        rightArmWoundAnimFlags 0
+        fleeAnimFlags         0
+    End_Component
+	Begin_Component "kexScriptComponent"
+        scriptClass           "RandoEnemy"
+    End_Component
+}
+
+// Oblivion
+FleshSentinel kActor_AI_FleshSentinel
+{
+    className                 "kexActor"
+    placeable                 TRUE
+    health                    30
+    initialScale              "0.500000 0.500000 0.500000"
+    Begin_Component "kexRenderMeshComponent"
+        mesh                  "char/Sentinel.skinnedmesh"
+        anim                  "anims/Sentinel.anim"
+    End_Component
+    Begin_Component "kexWorldComponent"
+        radius                10.24
+        wallRadius            51.12
+        height                117.76
+        deadHeight            20.480000
+        heightOffset          0.000000
+        bTrackGround          TRUE
+    End_Component
+    Begin_Component "kexEnemyAIComponent"
+        commonFlags           8084
+        startHealth           30
+        startAnimID           0
+        startSoundID          0
+        painSoundID           0
+        deathItemDropFlags1   0
+        deathItemDropFlags2   0
+        leashRadius           2560.000000
+        aggressionLevel       0
+        tranqHealth           2
+        flags                 2
+        attackCombatRadius    81.92
+        attackLeapRadius      163.839996
+        attackDartRadius      163.839996
+        attackProjectileRadius 1024.0
+        attackWeaponRadius    409.6
+        groundBehavior        0
+        airBehavior           0
+        underwaterBehavior    0
+        extremeDeathModelIndex 3
+        explodeDeathModelIndex 5
+        headBlownDeathModelIndex 4
+        leftArmBlownDeathModelIndex 1
+        rightArmBlownDeathModelIndex 2
+        bodyHoleDeathModelIndex -1
+        extremeDeathAnimID    7300
+        explodeDeathAnimID    7201
+        headBlownDeathAnimID  7335
+        leftArmBlownDeathAnimID 7345
+        rightArmBlownDeathAnimID 7345
+        bodyHoleDeathAnimID   0
+        idleAnimFlags         1057
+        moveAnimFlags         1057
+        patrolAnimFlags       1056
+        evadeAnimFlags        3
+        combatAnimFlags       3
+        leapAnimFlags         0
+        dartAnimFlags         0
+        projectileAnimFlags   1
+        weaponAnimFlags       0
+        comboAnimFlags        0
+        normalDeathAnimFlags  1057
+        movingDeathAnimFlags  1
+        violentDeathAnimFlags 1
+        explosiveDeathAnimFlags 3
+        alertAnimFlags        0
+        takeCoverAnimFlags    1
+        leftArmWoundAnimFlags 1
+        rightArmWoundAnimFlags 1
+        fleeAnimFlags         1
+    End_Component
+	Begin_Component "kexScriptComponent"
+        scriptClass           "RandoEnemy"
+    End_Component
+}
+
+DeathGuard kActor_AI_DeathGuard
+{
+    className                 "kexActor"
+    placeable                 TRUE
+    health                    50
+    initialScale              "0.500000 0.500000 0.500000"
+    Begin_Component "kexRenderMeshComponent"
+        mesh                  "char/Death_Guard.skinnedmesh"
+        anim                  "anims/Death_Guard.anim"
+    End_Component
+    Begin_Component "kexWorldComponent"
+        radius                20.48
+        wallRadius            61.44
+        height                112.64
+        deadHeight            20.480000
+        heightOffset          0.000000
+        bTrackGround          TRUE
+    End_Component
+    Begin_Component "kexEnemyAIComponent"
+        commonFlags           8084
+        startHealth           50
+        startAnimID           0
+        startSoundID          0
+        painSoundID           0
+        deathItemDropFlags1   0
+        deathItemDropFlags2   0
+        leashRadius           2560.000000
+        aggressionLevel       0
+        tranqHealth           3
+        flags                 2
+        attackCombatRadius    81.92
+        attackLeapRadius      163.839996
+        attackDartRadius      163.839996
+        attackProjectileRadius 1024.0
+        attackWeaponRadius    1843.2
+        groundBehavior        0
+        airBehavior           0
+        underwaterBehavior    0
+        extremeDeathModelIndex 3
+        explodeDeathModelIndex 4
+        headBlownDeathModelIndex 5
+        leftArmBlownDeathModelIndex 1
+        rightArmBlownDeathModelIndex 2
+        bodyHoleDeathModelIndex -1
+        extremeDeathAnimID    7300
+        explodeDeathAnimID    7200
+        headBlownDeathAnimID  7335
+        leftArmBlownDeathAnimID 7345
+        rightArmBlownDeathAnimID 7345
+        bodyHoleDeathAnimID   0
+        idleAnimFlags         1057
+        moveAnimFlags         1057
+        patrolAnimFlags       1056
+        evadeAnimFlags        3
+        combatAnimFlags       7
+        leapAnimFlags         0
+        dartAnimFlags         0
+        projectileAnimFlags   1
+        weaponAnimFlags       1
+        comboAnimFlags        0
+        normalDeathAnimFlags  1057
+        movingDeathAnimFlags  1
+        violentDeathAnimFlags 1
+        explosiveDeathAnimFlags 3
+        alertAnimFlags        0
+        takeCoverAnimFlags    1
+        leftArmWoundAnimFlags 1
+        rightArmWoundAnimFlags 1
+        fleeAnimFlags         1
+    End_Component
+	Begin_Component "kexScriptComponent"
+        scriptClass           "RandoEnemy"
+    End_Component
+}
+
+LordOfTheFlesh kActor_AI_LordOfTheFlesh
+{
+    className                 "kexActor"
+    placeable                 TRUE
+    health                    80
+    initialScale              "0.500000 0.500000 0.500000"
+    Begin_Component "kexRenderMeshComponent"
+        mesh                  "char/Lord_Of_The_Flesh.skinnedmesh"
+        anim                  "anims/Lord_Of_The_Flesh.anim"
+    End_Component
+    Begin_Component "kexWorldComponent"
+        radius                20.48
+        wallRadius            61.44
+        height                122.88
+        deadHeight            20.480000
+        heightOffset          0.000000
+        bTrackGround          TRUE
+    End_Component
+    Begin_Component "kexEnemyAIComponent"
+        commonFlags           40852
+        startHealth           80
+        startAnimID           0
+        startSoundID          0
+        painSoundID           0
+        deathItemDropFlags1   0
+        deathItemDropFlags2   0
+        leashRadius           2560.000000
+        aggressionLevel       0
+        tranqHealth           5
+        flags                 0
+        attackCombatRadius    81.92
+        attackLeapRadius      163.839996
+        attackDartRadius      163.839996
+        attackProjectileRadius 409.6
+        attackWeaponRadius    1843.2
+        groundBehavior        0
+        airBehavior           0
+        underwaterBehavior    0
+        extremeDeathModelIndex 1
+        explodeDeathModelIndex 5
+        headBlownDeathModelIndex 4
+        leftArmBlownDeathModelIndex 2
+        rightArmBlownDeathModelIndex 3
+        bodyHoleDeathModelIndex -1
+        extremeDeathAnimID    7300
+        explodeDeathAnimID    7500
+        headBlownDeathAnimID  7000
+        leftArmBlownDeathAnimID 7345
+        rightArmBlownDeathAnimID 7345
+        bodyHoleDeathAnimID   0
+        idleAnimFlags         1057
+        moveAnimFlags         1057
+        patrolAnimFlags       1057
+        evadeAnimFlags        0
+        combatAnimFlags       1
+        leapAnimFlags         0
+        dartAnimFlags         0
+        projectileAnimFlags   0
+        weaponAnimFlags       6
+        comboAnimFlags        0
+        normalDeathAnimFlags  1057
+        movingDeathAnimFlags  1
+        violentDeathAnimFlags 1
+        explosiveDeathAnimFlags 1
+        alertAnimFlags        1
+        takeCoverAnimFlags    1
+        leftArmWoundAnimFlags 1
+        rightArmWoundAnimFlags 1
+        fleeAnimFlags         1
+    End_Component
+	Begin_Component "kexScriptComponent"
+        scriptClass           "RandoEnemy"
+    End_Component
+}
+
+//----------------------------------
 
 Raptoid kActor_AI_Raptoid
 {
@@ -676,9 +1735,6 @@ Deadman_Half kActor_AI_DeadmanHalf
         leftArmWoundAnimFlags 0
         rightArmWoundAnimFlags 0
         fleeAnimFlags         0
-    End_Component
-	Begin_Component "kexScriptComponent"
-        scriptClass           "RandoEnemy"
     End_Component
 }
 
@@ -1427,6 +2483,9 @@ MotherGrub kActor_AI_MotherGrub
         leftArmWoundAnimFlags 0
         rightArmWoundAnimFlags 0
         fleeAnimFlags         0
+    End_Component
+	Begin_Component "kexScriptComponent"
+        scriptClass           "RandoEnemy"
     End_Component
 }
 

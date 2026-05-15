@@ -263,6 +263,23 @@ int GetLevelNumberFromMapId(const int &in mapId)
 }
 
 //------------------------------
+// Returns whether the given map is an oblivion map.
+bool IsOblivionMap(const int &in mapId)
+{
+	switch(mapId)
+	{
+		case kLevel_PortOfAdia_OBL:
+		case kLevel_RiverOfSouls_OBL:
+		case kLevel_DeathMarsh_OBL:
+		case kLevel_BlindLair_OBL:
+		case kLevel_Hive_OBL:
+		case kLevel_LightShip_OBL:
+			return true;
+	}
+	return false;
+}
+
+//------------------------------
 // Gets the boss level of the given map.
 // Returns 0 if there is none.
 //

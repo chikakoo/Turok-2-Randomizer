@@ -113,4 +113,23 @@
 
 // ---------
 // Missing enemies
-#define kActor_AI_LordOfTheDead          803
+#define kActor_AI_Compy 5000
+
+#define kActor_AI_LordOfTheDead 803
+#define kActor_AI_SisterOfDespair 804
+
+#define kActor_AI_WarClub 600
+
+#define kActor_AI_CaveSpider 503
+#define kActor_AI_Nala 507
+#define kActor_AI_Fireborn 203
+
+#define kActor_AI_Soldier 710
+
+#define kActor_AI_Trooper 900
+#define kActor_AI_BioBot 901
+#define kActor_AI_EliteGuard 902
+
+#define kActor_AI_FleshSentinel 400
+#define kActor_AI_DeathGuard 401
+#define kActor_AI_LordOfTheFlesh 402

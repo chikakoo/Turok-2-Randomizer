@@ -83,6 +83,7 @@ bool DeserializeBool(kDict& in dict, const kStr& in key)
 #include "scripts/rando/actorReplacements.as"
 #include "scripts/rando/apProcessing.as"
 #include "scripts/rando/randoEnemy.as"
+#include "scripts/rando/enemizer.as"
 #include "scripts/rando/randoPickupObject.as"
 #include "scripts/rando/randoWarpBarrier.as"
 #include "scripts/rando/randoLevel1Barrier.as"

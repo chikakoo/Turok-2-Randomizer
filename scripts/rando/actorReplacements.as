@@ -459,7 +459,7 @@ void ReplaceAllActors(const int16 &in mapId)
 			actorsToRemove.insertLast(actor);
 		}
 		
-		else if (OPTION_ENEMIZER &&
+		else if (OPTION_ENEMIZER > 0 &&
 			!LocalPlayer.Actor().CastToActor().Deserialized() &&
 			!actor.IsMarked() && 
 			actor.EnemyAIComponent() !is null)
@@ -560,7 +560,7 @@ void ReplaceEnemyActor(kActor@ initialActor)
 	kWorldComponent@ worldComponent = initialActor.WorldComponent();
 	kEnemyAIComponent@ enemyAIComponent = initialActor.EnemyAIComponent();
 	kActor@ replacedActor = ActorFactory.Spawn(
-		kActor_AI_Gunner, // TODO: compute what this SHOULD be
+		GenerateRandomEnemy(),
 		initialActor.Origin(),
 		initialActor.Yaw(),
 		initialActor.Pitch(),

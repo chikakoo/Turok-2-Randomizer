@@ -1,5 +1,6 @@
 //----------------------------------
 // A script for all enemies that can be randomized.
+//----------------------------------
 class RandoEnemy : ScriptActor
 {
 	// The original actor (that this one replaced; null if not replaced)
@@ -114,7 +115,7 @@ class RandoEnemy : ScriptActor
 	// - Else, set the original to hidden if it's ever shown for some reason
 	void OnTick(void)
 	{
-		if (!OPTION_ENEMIZER)
+		if (OPTION_ENEMIZER == 0)
 		{
 			return;
 		}
@@ -123,7 +124,7 @@ class RandoEnemy : ScriptActor
 		{
 			// This is a spawned enemy, which we can just ignore here as
 			// they'll never trigger anything
-			if (processedSpawn || isReplacedActor)
+			if (!OPTION_ENEMIZER_SPAWNERS || processedSpawn || isReplacedActor)
 			{
 				return;
 			}

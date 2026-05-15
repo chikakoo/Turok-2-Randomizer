@@ -1,6 +1,5 @@
 //------------------------------
 // Utility functions that don't fit elsewhere.
-// Currently just functions for randomization (rename the file?)
 //------------------------------
 
 //------------------------------
@@ -46,4 +45,17 @@ WeaponInfo@ RandomWeaponInfo(array<WeaponInfo@>@ weaponInfoArray)
 	
 	int indexToChoose = RandomInt(0, weaponInfoArray.length() - 1);
     return weaponInfoArray[indexToChoose];
+}
+
+//------------------------------
+// Gets a random EnemyWeight value from the given array.
+EnemyWeight@ RandomEnemyWeight(array<EnemyWeight@>@ enemyWeightArray)
+{
+	if (enemyWeightArray.length() == 0)
+    {
+        return null;
+    }
+	
+	int indexToChoose = RandomInt(0, enemyWeightArray.length() - 1);
+    return enemyWeightArray[indexToChoose];
 }
