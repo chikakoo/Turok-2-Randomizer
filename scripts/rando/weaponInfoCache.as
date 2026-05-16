@@ -25,6 +25,7 @@ class WeaponInfo
 	kStr pickupMessage;
 	kStr pickupSound;
 	kStr ammoPickupMessage;
+	kStr altAmmoPickupMessage;
 	int callout;
 	int weaponDef;
 	int maxAmmo;
@@ -139,6 +140,11 @@ void InitWeaponInfoCache()
 		weaponInfo.ammoPickupMessage = weaponPickupDict.GetString("rando.ammoMessage", ammoPickupMessage)
 			? ammoPickupMessage
 			: pickupMessage;
+			
+		kStr altAmmoPickupMessage;
+		weaponInfo.altAmmoPickupMessage = weaponPickupDict.GetString("rando.altAmmoMessage", altAmmoPickupMessage)
+			? altAmmoPickupMessage
+			: "";
 		
 		// Ammo info
 		int weaponDefId;

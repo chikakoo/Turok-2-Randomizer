@@ -54,7 +54,8 @@ WpnTekBow kActor_Item_WpnTekBow
     pickup.weapon.giveAmmo      10
     pickup.pickupMessage        "$str_139"
     pickup.callout              kVoice_Weapon02
-	rando.ammoMessage			"Arrows and Tek Arrows"
+	rando.ammoMessage			"Arrows"
+	rando.altAmmoMessage		"Tek Arrows"
     
     initialScale              "0.5 0.5 0.5"
     Begin_Component "kexWorldComponent"
@@ -185,6 +186,7 @@ WpnShotgun kActor_Item_WpnShotgun
     pickup.pickupMessage        "$str_144"
     pickup.callout              kVoice_Weapon05
 	rando.ammoMessage			"Shotgun Shells"
+	rando.altAmmoMessage		"Explosive Shells"
     
     initialScale              "0.5 0.5 0.5"
     Begin_Component "kexWorldComponent"
@@ -211,6 +213,7 @@ WpnScatter kActor_Item_WpnScatter
     pickup.pickupMessage        "$str_145"
     pickup.callout              kVoice_Weapon06
 	rando.ammoMessage			"Shotgun Shells"
+	rando.altAmmoMessage		"Explosive Shells"
     
     initialScale              "0.5 0.5 0.5"
     Begin_Component "kexWorldComponent"

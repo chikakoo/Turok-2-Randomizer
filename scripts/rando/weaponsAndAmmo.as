@@ -10,7 +10,8 @@ bool TryGivePlayerWeapon(
 	int &in actorId, 
 	int &in ammoAmount = 1000,
 	bool &in skipNotifications = false,
-	bool &in isAmmoOnly = false)
+	bool &in isAmmoOnly = false,
+	kStr &in ammoMessage = "")
 {
 	WeaponInfo@ weaponInfo = GetWeaponInfo(actorId);
 	if (weaponInfo is null)
@@ -38,7 +39,7 @@ bool TryGivePlayerWeapon(
 	}
 	else
 	{
-		PlayPickupNotification(weaponInfo.pickupSound, weaponInfo.ammoPickupMessage);
+		PlayPickupNotification(weaponInfo.pickupSound, ammoMessage);
 		return true;
 	}
 	
@@ -129,11 +130,11 @@ void GetAmmoInRandomWeapon()
 	// Get the ammo!
 	float ammoPercent = RandomInt(OPTION_RANDOM_AMMO_MIN, OPTION_RANDOM_AMMO_MAX) / 100.0;
 	int standardAmmoAmount = int(Math::Ceil(weaponToGetAmmoFor.maxAmmo * ammoPercent));
-	TryGivePlayerWeapon(weaponToGetAmmoFor.pickupId, standardAmmoAmount, false, true);
-	
+	kStr ammoMessage = "" + standardAmmoAmount + " " + weaponToGetAmmoFor.ammoPickupMessage;
 	if (weaponToGetAmmoFor.maxAltAmmo > 0)
 	{
 		int altAmmoAmount = int(Math::Ceil(weaponToGetAmmoFor.maxAltAmmo * ammoPercent));
+		ammoMessage += " - " + altAmmoAmount + " " + weaponToGetAmmoFor.altAmmoPickupMessage;
 		
 		// We mapped the flare to use explosive rounds!
 		if (weaponToGetAmmoFor.pickupId == kActor_Item_WpnShotgun ||
@@ -149,4 +150,6 @@ void GetAmmoInRandomWeapon()
 			LocalPlayer.GiveWeapon(kWpn_Bow, altAmmoAmount);
 		}
 	}
+	
+	TryGivePlayerWeapon(weaponToGetAmmoFor.pickupId, standardAmmoAmount, false, true, ammoMessage);
 }
