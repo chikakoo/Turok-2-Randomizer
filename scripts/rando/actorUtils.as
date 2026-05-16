@@ -227,7 +227,7 @@ void TryGetInventoryItems(int &in actorId, int &in count)
 // We want to track these still, so give a version of them that's offset.
 //
 // If called directly, we also want to add weapon pickups here to handle extra
-// ammo consumption settings.
+// ammo consumption settings. We'll also recompute max progressive weapons.
 void HandleTrackInventoryItems(int &in actorId, kDictMem@ itemDef = null)
 {
 	if (itemDef is null)
@@ -245,6 +245,8 @@ void HandleTrackInventoryItems(int &in actorId, kDictMem@ itemDef = null)
 			{
 				return;
 			}
+			
+			ComputeNumberOfOwnedProgressionWeapons();
 		}
 	}
 	
