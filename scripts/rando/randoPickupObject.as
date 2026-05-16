@@ -81,7 +81,7 @@ class RandoPickupObject : ScriptObject
 	
 	//----------------------------------
 	// Called every tick to see if the player is touching the pickup
-	// Note that health and ammo ARE sent to AP still when touched
+	// Note that health/ammo/weapon upgrades ARE sent to AP still when touched
 	// so that it knows you could have received it.
 	void OnTick()
 	{	
@@ -122,6 +122,20 @@ class RandoPickupObject : ScriptObject
 			
 			// Try to trigger events from the item being picked up
 			TryTriggerActors(m_position);
+			
+			// If we're randomizing weapons, always collect the weapon pickup
+			if (OPTION_RANDOMIZE_WEAPONS)
+			{
+				kDictMem@ itemDef = TryGetActorDefWithClass(self.Type(), "kexWeaponPickup", true);
+				if (itemDef is null)
+				{
+					return;
+				}
+				
+				TryGivePlayerWeapon(self.Type());
+				CollectLocation(m_id, Game.ActiveMapID());
+				self.Remove();
+			}
 		}
 	}
 	
@@ -144,7 +158,14 @@ class RandoPickupObject : ScriptObject
 				TryTriggerActors(m_position);
 			}
 		}
-			
+		
+		// If this item is an inventory item, do this to track the total you've ever received
+		// Wrapped in this flag in case we fake collected it already (can happen for weapons)
+		if (!m_wasSentToAP)
+		{
+			HandleTrackInventoryItems(self.Type());
+		}
+		
 		if (m_id > 0)
 		{
 			CollectLocation(m_id, Game.ActiveMapID());
@@ -191,8 +212,5 @@ class RandoPickupObject : ScriptObject
 			// Not doing so can lead to soft-locks
 			TryTriggerActors(m_position);
 		}
-		
-		// If this item is an inventory item, do this to track the total you've ever received
-		HandleTrackInventoryItems(self.Type());
 	}
 }
