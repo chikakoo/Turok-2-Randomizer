@@ -165,11 +165,8 @@ class RandoPickupObject : ScriptObject
 		}
 		
 		// If this item is an inventory item, do this to track the total you've ever received
-		// Wrapped in this flag in case we fake collected it already (can happen for weapons)
-		if (!m_wasSentToAP)
-		{
-			HandleTrackInventoryItems(self.Type());
-		}
+		// Don't do this for weapons if it was sent to AP already (third param)
+		HandleTrackInventoryItems(self.Type(), null, m_wasSentToAP);
 		
 		if (m_id > 0)
 		{

@@ -228,7 +228,10 @@ void TryGetInventoryItems(int &in actorId, int &in count)
 //
 // If called directly, we also want to add weapon pickups here to handle extra
 // ammo consumption settings. We'll also recompute max progressive weapons.
-void HandleTrackInventoryItems(int &in actorId, kDictMem@ itemDef = null)
+void HandleTrackInventoryItems(
+	const int &in actorId, 
+	kDictMem@ itemDef = null, 
+	const bool &in ignoreWeapons = false)
 {
 	if (itemDef is null)
 	{
@@ -241,7 +244,7 @@ void HandleTrackInventoryItems(int &in actorId, kDictMem@ itemDef = null)
 		if (itemDef is null)
 		{
 			@itemDef = TryGetActorDefWithClass(actorId, "kexWeaponPickup", true);
-			if (itemDef is null)
+			if (itemDef is null || ignoreWeapons)
 			{
 				return;
 			}
