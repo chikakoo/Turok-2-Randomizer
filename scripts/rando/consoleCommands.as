@@ -117,6 +117,7 @@ void Help(void)
 	Sys.Print("Ammo");
 	Sys.Print("-----------------");
 	Sys.Print("GetAmmoInRandomWeapon");
+	Sys.Print("FillAmmoInAllWeapons");
 	Sys.Print("");
 	Sys.Print("-----------------");
 	Sys.Print("Traps");

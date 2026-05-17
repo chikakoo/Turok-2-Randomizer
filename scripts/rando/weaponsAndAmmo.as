@@ -153,3 +153,37 @@ void GetAmmoInRandomWeapon()
 	
 	TryGivePlayerWeapon(weaponToGetAmmoFor.pickupId, standardAmmoAmount, false, true, ammoMessage);
 }
+
+//---------------------------
+// Fully restores ammo in all owned weapons.
+void FillAmmoInAllWeapons()
+{
+	for (uint i = 0; i < g_weaponPickups.length(); i++)
+	{
+		int weaponPickupId = g_weaponPickups[i];
+		WeaponInfo@ weaponInfo = GetWeaponInfo(weaponPickupId);
+		if (weaponInfo is null || 
+			!weaponInfo.hasAmmo ||
+			!LocalPlayer.HasWeapon(weaponInfo.weaponDef))
+		{
+			continue;
+		}
+		
+		LocalPlayer.GiveWeapon(weaponInfo.weaponDef, 1000);
+		
+		// Alt ammo: explosive rounds (mapped to flare)
+		// Normal arrows (in case we ever make the bow not always starting)
+		if (weaponPickupId == kActor_Item_WpnShotgun ||
+			weaponPickupId == kActor_Item_WpnScatter)
+		{
+			LocalPlayer.GiveWeapon(kWpn_Flare, 1000);
+		}
+		else if (weaponPickupId == kActor_Item_WpnTekBow)
+		{
+			LocalPlayer.GiveWeapon(kWpn_Bow, 1000);
+		}
+	}
+	
+	LocalPlayer.Actor().PlaySound("sounds/shaders/Ammo Pickup.ksnd");
+	Hud.AddMessage("Max Ammo Pack");
+}

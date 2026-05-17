@@ -144,11 +144,16 @@ class RandoPickupObject : ScriptObject
 	// Marks it as collected so it won't respawn.
 	void OnTouch(kActor@ pInstigator)
 	{
-		//Sys.Print(m_position);
-		
 		if (self.Type() == kActor_Item_RandomAmmo)
 		{
-			GetAmmoInRandomWeapon();
+			if (Game.ActiveMapID() == kLevel_Hub)
+			{
+				FillAmmoInAllWeapons();
+			}
+			else
+			{
+				GetAmmoInRandomWeapon();
+			}
 			
 			// This is a non-AP item ammo replacement, so we should still mark it as collected
 			// We should also still try to trigger its actors too in case there's a pickup trigger
