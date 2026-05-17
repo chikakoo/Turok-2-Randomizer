@@ -753,7 +753,7 @@ void Resync()
 // We can get the map (M) part with some simple math.
 int ConvertMapIdFromApId(const int &in apId)
 {
-	return apId / 1000;
+	return Math::Abs(apId) / 1000;
 }
 
 //------------------------------
