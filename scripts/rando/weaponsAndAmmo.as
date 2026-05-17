@@ -130,11 +130,10 @@ void GetAmmoInRandomWeapon()
 	// Get the ammo!
 	float ammoPercent = RandomInt(OPTION_RANDOM_AMMO_MIN, OPTION_RANDOM_AMMO_MAX) / 100.0;
 	int standardAmmoAmount = int(Math::Ceil(weaponToGetAmmoFor.maxAmmo * ammoPercent));
-	kStr ammoMessage = "" + standardAmmoAmount + " " + weaponToGetAmmoFor.ammoPickupMessage;
+	
 	if (weaponToGetAmmoFor.maxAltAmmo > 0)
 	{
 		int altAmmoAmount = int(Math::Ceil(weaponToGetAmmoFor.maxAltAmmo * ammoPercent));
-		ammoMessage += " - " + altAmmoAmount + " " + weaponToGetAmmoFor.altAmmoPickupMessage;
 		
 		// We mapped the flare to use explosive rounds!
 		if (weaponToGetAmmoFor.pickupId == kActor_Item_WpnShotgun ||
@@ -149,8 +148,11 @@ void GetAmmoInRandomWeapon()
 		{
 			LocalPlayer.GiveWeapon(kWpn_Bow, altAmmoAmount);
 		}
+		
+		Hud.AddMessage("" + altAmmoAmount + " " + weaponToGetAmmoFor.altAmmoPickupMessage);
 	}
 	
+	kStr ammoMessage = "" + standardAmmoAmount + " " + weaponToGetAmmoFor.ammoPickupMessage;
 	TryGivePlayerWeapon(weaponToGetAmmoFor.pickupId, standardAmmoAmount, false, true, ammoMessage);
 }
 
