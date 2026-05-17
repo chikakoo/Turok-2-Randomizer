@@ -129,9 +129,16 @@ class RandoEnemy : ScriptActor
 		
 		if (self.TID() <= 0)
 		{
-			// This is a spawned enemy, which we can just ignore here as
-			// they'll never trigger anything
-			if (OPTION_ENEMIZER_SPAWNERS == ENEMIZER_SPAWNER_NONE || processedSpawn || isReplacedActor)
+			// This is a processed enemy, so no need to replace them
+			if (processedSpawn || isReplacedActor)
+			{
+				return;
+			}
+			
+			// If we're not processing spawned enemies, don't replace them
+			// Totems will be replaced based on the enemizer setting itself, so handle that separately
+			if (OPTION_ENEMIZER_SPAWNERS == ENEMIZER_SPAWNER_NONE &&
+				!IsTotemLevel(Game.ActiveMapID()))
 			{
 				return;
 			}

@@ -291,9 +291,12 @@ array<int> g_easySpawnerEnemies = {
 // Generate a random enemy based on the enemizer setting.
 int GenerateRandomEnemy(const bool &in isFromSpawner = false)
 {
-	if (isFromSpawner &&
-		OPTION_ENEMIZER > 0 && 
-		OPTION_ENEMIZER_SPAWNERS == ENEMIZER_SPAWNER_EASY_ONLY)
+	int16 mapId = Game.ActiveMapID();
+
+	if (!IsTotemLevel(mapId) && // Totem levels will always pull from the enemizer setting
+		isFromSpawner &&
+		OPTION_ENEMIZER > 0 &&
+		(OPTION_ENEMIZER_SPAWNERS == ENEMIZER_SPAWNER_EASY_ONLY || IsBossLevel(mapId)))
 	{
 		return RandomInt(g_easySpawnerEnemies);
 	}
@@ -308,7 +311,7 @@ int GenerateRandomEnemy(const bool &in isFromSpawner = false)
 		case ENEMIZER_SAME_LEVEL_INCLUDE_OBLIVION:
 			return GetEnemyForCurrentLevel(true);
 		case ENEMIZER_SIMILAR_DIFFICULTY:
-			return GetSimilarEnemyForLevel(GetLevelNumberFromMapId(Game.ActiveMapID()));
+			return GetSimilarEnemyForLevel(GetLevelNumberFromMapId(mapId));
 		case ENEMIZER_SCALE_TO_WEAPONS:
 			return GetEnemyScaledToWeapons();
 		case ENEMIZER_CHAOS:

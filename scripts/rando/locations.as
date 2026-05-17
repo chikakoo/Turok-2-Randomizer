@@ -264,7 +264,7 @@ int GetLevelNumberFromMapId(const int &in mapId)
 
 //------------------------------
 // Returns whether the given map is an oblivion map.
-bool IsOblivionMap(const int &in mapId)
+bool IsOblivionMap(const int16 &in mapId)
 {
 	switch(mapId)
 	{
@@ -280,11 +280,42 @@ bool IsOblivionMap(const int &in mapId)
 }
 
 //------------------------------
+// Gets whether the given map is a totem level.
+bool IsTotemLevel(const int16 &in mapId)
+{
+	switch(mapId)
+	{
+		case kLevel_PortOfAdia_Totem:
+		case kLevel_RiverOfSouls_Totem:
+		case kLevel_DeathMarsh_Totem:
+		case kLevel_BlindLair_Totem:
+		case kLevel_Hive_Totem:
+			return true;
+	}
+	return false;
+}
+
+//------------------------------
+// Gets whether the given map is a boss level.
+bool IsBossLevel(const int16 &in mapId)
+{
+	switch(mapId)
+	{
+		case kLevel_BlindOneBoss:
+		case kLevel_QueenBoss:
+		case kLevel_MotherBoss:
+		case kLevel_PrimagenBoss:
+			return true;
+	}
+	return false;
+}
+
+//------------------------------
 // Gets the boss level of the given map.
 // Returns 0 if there is none.
 //
 // TODO: This may need to be done for totems as well
-int16 GetBossLevelOfMap(const int &in mapId)
+int16 GetBossLevelOfMap(const int16 &in mapId)
 {
 	switch(GetLevelNumberFromMapId(mapId))
 	{
@@ -301,7 +332,7 @@ int16 GetBossLevelOfMap(const int &in mapId)
 
 //------------------------------
 // Gets the map display name from the given map id.
-kStr GetMapDisplayName(const int &in mapId)
+kStr GetMapDisplayName(const int16 &in mapId)
 {
 	switch(mapId)
 	{
