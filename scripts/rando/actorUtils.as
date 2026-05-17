@@ -300,7 +300,13 @@ void SpawnActorNearPlayer(int &in actorId)
 	int16 regionIdx = actor.WorldComponent()
 		.GetNearPositionAndRegionIndex(origin1, origin2);
 	
-	ActorFactory.Spawn(actorId, origin3, 0, 0, 0, true, regionIdx);
+	// Set processed spawn so we don't re-randomize the enemy
+	kActor@ enemy = ActorFactory.Spawn(actorId, origin3, 0, 0, 0, true, regionIdx);
+	RandoEnemy@ enemyScript = cast<RandoEnemy@>(GetScript(enemy));
+	if (enemyScript !is null)
+	{
+		enemyScript.SetProcessedSpawn(true);
+	}
 }
 
 //---------------------------

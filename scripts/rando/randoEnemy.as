@@ -26,7 +26,7 @@ class RandoEnemy : ScriptActor
 	
 	//----------------------------------
 	// Sets whether this is the replaced actor
-	void SetIsReplacedActor(bool &in isReplacedActor)
+	void SetIsReplacedActor(const bool &in isReplacedActor)
 	{
 		this.isReplacedActor = isReplacedActor;
 	}
@@ -39,8 +39,15 @@ class RandoEnemy : ScriptActor
 	}
 	
 	//----------------------------------
+	// Sets whether this is a processed spawn
+	void SetProcessedSpawn(const bool &in processedSpawn)
+	{
+		this.processedSpawn = processedSpawn;
+	}
+	
+	//----------------------------------
 	// Sets whether the original actor wouldn't yet be visible to the player
-	void SetIsNotYetShown(bool &in isNotYetShown)
+	void SetIsNotYetShown(const bool &in isNotYetShown)
 	{
 		this.isNotYetShown = isNotYetShown;
 		if (isNotYetShown)
