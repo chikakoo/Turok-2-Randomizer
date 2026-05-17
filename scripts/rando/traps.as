@@ -52,7 +52,7 @@ bool TryTriggerTrap(const int &in trapId)
 void HandleEnemyTrap()
 {
 	Hud.AddMessage("It's a trap!");
-	int numberToSpawn = RandomInt(6, 6);
+	int numberToSpawn = RandomInt(1, 3);
 	
 	// If the player is using the Leap of Faith or Whispers, spawn a non-blocking enemy
     // to prevent softlocking from falling somewhere they shouldn't be able to fall from
