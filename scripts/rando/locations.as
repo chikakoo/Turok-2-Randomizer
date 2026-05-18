@@ -430,9 +430,7 @@ kStr GetMapDisplayName(const int16 &in mapId)
 
 //------------------------------
 // Whether the player is in a totem or boss level.
-// These can't be teleported out of via the UI menu.
-//
-// Excludes the Primagen, as we have a way to deal with that now.
+// Excludes the Primagen.
 bool IsInTotemOrBossLevel()
 {
     switch(Game.ActiveMapID())
@@ -450,7 +448,6 @@ bool IsInTotemOrBossLevel()
     
     return false;
 }
-
 //------------------------------
 // Tries to get the replacement array for the given map id.
 // If not found, locations is null and returns false.

@@ -58,12 +58,11 @@ void AddBarriers(const int16 &in mapId)
 			AddWarpBarrier(kVec3(5222.4, 1331.2, 0), kActor_InventoryItem_ProgressiveWarpL1, 8);
 			break;
 		case kLevel_PortOfAdia_8: // Gated City
-			AddWarpAndWeaponBarrier(
-				kVec3(1843.2, 102.4, 0), 
-				kActor_InventoryItem_ProgressiveWarpL1, 9,
-				OPTION_WEAPON_BARRIER_1_END);
+			AddWarpBarrier(kVec3(1843.2, 102.4, 0), kActor_InventoryItem_ProgressiveWarpL1, 9);
 			break;
-		// Catwalks is the last map
+		case kLevel_PortOfAdia_9: // Catwalks
+			AddWeaponBarrier(kVec3(-10188.8, 5017.6, -307.2), OPTION_WEAPON_BARRIER_1_END);
+			break;
 			
 		// River of Souls
 		case kLevel_RiverOfSouls_1: // Start
@@ -100,10 +99,8 @@ void AddBarriers(const int16 &in mapId)
 			AddWarpBarrier(kVec3(3072, -3635.2, 716.8), kActor_InventoryItem_ProgressiveWarpL2, 10);
 			break;
 		case kLevel_RiverOfSouls_8: // Last Map
-			AddWarpAndWeaponBarrier(
-				kVec3(745.576, -1540.403, 716.8),
-				kActor_InventoryItem_ProgressiveWarpL2, 11,
-				OPTION_WEAPON_BARRIER_2_END);
+			AddWarpBarrier(kVec3(745.576, -1540.403, 716.8),kActor_InventoryItem_ProgressiveWarpL2, 11);
+			AddWeaponBarrier(kVec3(-155.588, 4630.277, 788.48), OPTION_WEAPON_BARRIER_2_END);
 			break;
 		// Graveyard 2/3 are the other maps, and they don't lead anywhere
 		
@@ -136,16 +133,13 @@ void AddBarriers(const int16 &in mapId)
 			AddWarpBarrier(kVec3(3225.6, -307.2, -614.4), kActor_InventoryItem_ProgressiveWarpL3, 7);
 			break;
 		case kLevel_DeathMarsh_7: // Ammo 3 and Exit
-			AddWarpAndWeaponBarrier(
-				kVec3(-2319.356, 3483.491, 0), 
-				kActor_InventoryItem_ProgressiveWarpL3, 8,
-				OPTION_WEAPON_BARRIER_3_END);
-			AddWarpAndWeaponBarrier(
-				kVec3(-3440.40, 829.756, 0),
-				kActor_InventoryItem_ProgressiveWarpL3, 8,
-				OPTION_WEAPON_BARRIER_3_END);
+			AddWarpBarrier(kVec3(-2319.356, 3483.491, 0), kActor_InventoryItem_ProgressiveWarpL3, 8);
+			AddWarpBarrier(kVec3(-3440.40, 829.756, 0), kActor_InventoryItem_ProgressiveWarpL3, 8);
 			break;
-		// Other maps are the ammo maps and the end Raptor battle
+		case kLevel_DeathMarsh_8: // Raptor map
+			AddWeaponBarrier(kVec3(-2148.166, -5070.606, 0), OPTION_WEAPON_BARRIER_3_END);
+			break;
+		// Other maps are the ammo facility maps
 		
 		// Lair of the Blind Ones
 		case kLevel_BlindLair_1: // Start (Prim key + progress)
@@ -176,8 +170,9 @@ void AddBarriers(const int16 &in mapId)
 			AddWarpBarrier(kVec3(3891.2, 3328, -3379.2), kActor_InventoryItem_ProgressiveWarpL4, 5);
 			AddWarpBarrier(kVec3(2355.2, -3891.2, -3072), kActor_InventoryItem_ProgressiveWarpL4, 5);
 			break;
-		case kLevel_BlindLair_6:  // Small Lava
+		case kLevel_BlindLair_6:  // Small Lava & Exit
 			AddWarpBarrier(kVec3(2354, -800, -3338.24), kActor_InventoryItem_ProgressiveWarpL4, 6);
+			AddWeaponBarrier(kVec3(-10434.009, -149.323, -3686.4), OPTION_WEAPON_BARRIER_4_END);
 			break;
 		case kLevel_BlindLair_7:  // Big Lava
 			AddWarpBarrier(kVec3(-1187, -5435.04, -4628.48), kActor_InventoryItem_ProgressiveWarpL4, 7);
@@ -188,10 +183,7 @@ void AddBarriers(const int16 &in mapId)
 				kActor_InventoryItem_ProgressiveWarpL4, 
 				8,
 				1297);
-			AddWarpAndWeaponBarrier(
-				kVec3(2928.64, 2355.2, -2539.52),
-				kActor_InventoryItem_ProgressiveWarpL4, 10,
-				OPTION_WEAPON_BARRIER_4_END);
+			AddWarpBarrier(kVec3(2928.64, 2355.2, -2539.52), kActor_InventoryItem_ProgressiveWarpL4, 10);
 			break;
 		case kLevel_BlindLair_11: // Vent 3
 			AddWarpBarrier(kVec3(0, -4761.6, -2457.6), kActor_InventoryItem_ProgressiveWarpL4, 9);
@@ -233,22 +225,11 @@ void AddBarriers(const int16 &in mapId)
 			AddWarpBarrier(kVec3(-3686.4, -2764.8, 0), kActor_InventoryItem_ProgressiveWarpL5, 9);
 			break;
 		case kLevel_Hive_8: // Exit Map (embryo 2, 3, master computer, prim key)
-			AddWarpAndWeaponBarrier(
-				kVec3(-152.6, 4454.4, 0), 
-				kActor_InventoryItem_ProgressiveWarpL5, 10,
-				OPTION_WEAPON_BARRIER_5_END);
-			AddWarpAndWeaponBarrier(
-				kVec3(3532.8, -3840, 614.4), 
-				kActor_InventoryItem_ProgressiveWarpL5, 10,
-				OPTION_WEAPON_BARRIER_5_END);
-			AddWarpAndWeaponBarrier(
-				kVec3(-614.4, -1382.4, 614.4), 
-				kActor_InventoryItem_ProgressiveWarpL5, 10,
-				OPTION_WEAPON_BARRIER_5_END);
-			AddWarpAndWeaponBarrier(
-				kVec3(3993.6, 0, 614.4), 
-				kActor_InventoryItem_ProgressiveWarpL5, 10,
-				OPTION_WEAPON_BARRIER_5_END);
+			AddWarpBarrier(kVec3(-152.6, 4454.4, 0), kActor_InventoryItem_ProgressiveWarpL5, 10);
+			AddWarpBarrier(kVec3(3532.8, -3840, 614.4), kActor_InventoryItem_ProgressiveWarpL5, 10);
+			AddWarpBarrier(kVec3(-614.4, -1382.4, 614.4), kActor_InventoryItem_ProgressiveWarpL5, 10);
+			AddWarpBarrier(kVec3(3993.6, 0, 614.4), kActor_InventoryItem_ProgressiveWarpL5, 10);
+			AddWeaponBarrier(kVec3(2764.8, -7526.4, -626.962), OPTION_WEAPON_BARRIER_5_END);
 			break;
 		// The rest are maps that lead back to existing ones, or are dead ends
 		
@@ -261,6 +242,7 @@ void AddBarriers(const int16 &in mapId)
 				6,
 				OPTION_WEAPON_BARRIER_6_MID);
 			AddWarpBarrierForL6(kVec3(4217.492, -2917.491, 0), 9);
+			AddWeaponBarrier(kVec3(1.922, 6220.679, -307.873), OPTION_WEAPON_BARRIER_6_END);
 			break;
 		case kLevel_Lightship_2: // Wing 1 Start
 			AddWarpAndWeaponBarrierForL6(
@@ -290,10 +272,7 @@ void AddBarriers(const int16 &in mapId)
 			AddWarpBarrierForL6(kVec3(-614.715, -3302.234, 307.207), 12);
 			break;
 		case kLevel_Lightship_10: // Assembly 3
-			AddWarpAndWeaponBarrierForL6(
-				kVec3(-1616.721, -767.995, 6.814),
-				13,
-				OPTION_WEAPON_BARRIER_6_END);
+			AddWarpBarrierForL6(kVec3(-1616.721, -767.995, 6.814), 13);
 			break;
 	}
 }

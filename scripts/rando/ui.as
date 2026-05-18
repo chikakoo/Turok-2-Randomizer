@@ -166,12 +166,6 @@ class RandoUI
 		{
 			return false;
 		}
-		
-		if (IsInTotemOrBossLevel())
-        {
-            Hud.AddMessage("You can't open the UI here!");
-            return false;
-        }
 	
 		@owner = LocalPlayer.Actor().CastToActor();
 		kPuppet@ puppet = owner.CastToPuppet();
