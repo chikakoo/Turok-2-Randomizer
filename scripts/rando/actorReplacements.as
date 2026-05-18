@@ -789,15 +789,6 @@ bool AreLevelRequirementsUsed()
 }
 
 //---------------------------
-// Whether Primagen requirements are being used and are met.
-bool ArePrimagenRequirementsUsedAndMet(const int &in mapId)
-{
-	return (OPTION_GOAL_PRIMAGEN_LAIR && mapId == kLevel_PrimagenBoss) ||
-		(OPTION_GOAL_DEFEAT_PRIMAGEN && 
-			(mapId == kLevel_Ending || mapId == kLevel_EndingB));
-}
-
-//---------------------------
 // Whether Primagen requirements are being used.
 bool ArePrimagenRequirementsUsed()
 {

@@ -24,6 +24,9 @@
 
 // Dumb way to detect that you should be able to warp back to bosses if you leave
 #define kActor_InventoryItem_VisitedPrimagen 202000
+#define kActor_InventoryItem_VisitedL1Boss 202001
+#define kActor_InventoryItem_VisitedL2Boss 202002
+#define kActor_InventoryItem_VisitedL3Boss 202003
 #define kActor_InventoryItem_VisitedL4Boss 202004
 #define kActor_InventoryItem_VisitedL5Boss 202005
 #define kActor_InventoryItem_VisitedL6Boss 202006

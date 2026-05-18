@@ -66,107 +66,64 @@ class RandoPlayerObject : ScriptObject
 		}
 		
 		int16 mapId = Game.ActiveMapID();
-	
-		// If the map is the intro map, it's a new game, so reset everything
-		if (mapId == kLevel_Level1Intro_1)
+		switch(mapId)
 		{
-			// IsCollected and IsSentToAP should be false for every location
-			ResetCollectedStatuses();
+			// If the map is the intro map, it's a new game, so reset everything
+			case kLevel_Level1Intro_1:
+				HandleNewGame();
+				break;
+				
+			// Handle goals that are checked at the hub
+			case kLevel_Hub:
+				HandleHubGoals();
+				break;
+				
+			// Show the riding gun warning, if necessary
+			case kLevel_RiverOfSouls_1:
+				TryShowRidingGunWarning();
+				break;
+				
+			// Set the boss entry flags so it can be re-entered later
+			case kLevel_PortOfAdia_Totem:
+				OnBossEntry(kActor_InventoryItem_VisitedL1Boss);
+				break;
+			case kLevel_RiverOfSouls_Totem:
+				OnBossEntry(kActor_InventoryItem_VisitedL2Boss);
+				break;
+			case kLevel_DeathMarsh_Totem:
+				OnBossEntry(kActor_InventoryItem_VisitedL3Boss);
+				break;
+			case kLevel_BlindLair_Totem:
+				OnBossEntry(kActor_InventoryItem_VisitedL4Boss);
+				break;
+			case kLevel_Hive_Totem:
+				OnBossEntry(kActor_InventoryItem_VisitedL5Boss);
+				break;
+			case kLevel_MotherBoss:
+				OnBossEntry(kActor_InventoryItem_VisitedL6Boss);
+				break;
+			case kLevel_PrimagenBoss:
+				OnBossEntry(kActor_InventoryItem_VisitedPrimagen);
+				
+				// If the goal is to get to the lair, then it was reached
+				if (OPTION_GOAL_PRIMAGEN_LAIR)
+				{
+					g_AP.IsGoalReached = 1;
+				}
+				break;
 			
-			// Reset the messages in flight and unset the queue
-			g_outgoingMessageInFlight = false;
-			g_outgoingMessageQueue.resize(0);
-			g_AP.IsGoalReached = 0;
-			
-			// Set outgoing index to 0 to receive all items from AP
-			ResetAPForLoadData(0);
-			
-			// Give max explosive shells to allow the Flare Gun to be 
-			// used and to prevent depots from spawning it prematurely
-			LocalPlayer.GiveWeapon(kWpn_Flare, 1000);
-			
-			// Give the starting inventory
-			array<int> startingInventoryItems = { OPTION_STARTING_INVENTORY_ITEMS };
-			for (uint i = 0; i < startingInventoryItems.length(); i++)
-			{
-				TryGetInventoryItem(startingInventoryItems[i], true);
-			}
-			
-			array<int> startingWeapons = { OPTION_STARTING_WEAPONS };
-			for (uint i = 0; i < startingWeapons.length(); i++)
-			{
-				TryGivePlayerWeapon(startingWeapons[i], 1000, true);
-			}
-			
-			CinemaPlayer.StopCinema();
-			DoPlayerWarp(0, 10099, kLevel_Hub, false);
-		}
-		else if (mapId == kLevel_PrimagenBoss)
-		{
-			OnBossEntry(kActor_InventoryItem_VisitedPrimagen, 0);
-		}
-		else if (mapId == kLevel_BlindOneBoss)
-		{
-			OnBossEntry(kActor_InventoryItem_VisitedL4Boss, OPTION_BOSS_WEAPON_4);
-		}
-		else if (mapId == kLevel_QueenBoss)
-		{
-			OnBossEntry(kActor_InventoryItem_VisitedL5Boss, OPTION_BOSS_WEAPON_5);
-		}
-		else if (mapId == kLevel_MotherBoss)
-		{
-			OnBossEntry(kActor_InventoryItem_VisitedL6Boss, OPTION_BOSS_WEAPON_6);
-		}
-		
-		//-------------------------
-		// Goals!
-		
-		// Check whether levels give primagen keys
-		// Only give them once
-		if (mapId == kLevel_Hub &&
-			OPTION_GOAL_LEVELS_GIVE_PRIMAGEN_KEYS &&
-			AreLevelRequirementsUsedAndMet() &&
-			GetInventoryItemCollectedTotal(kActor_PrimagenKey_1) == 0)
-		{
-			AllPrimagenKeys();
-		}
-		
-		// If the Primagen goal is active, check that for the goal
-		// Any level requirement will be covered already becuase the
-		// player can't place the key if it isn't met
-		if (ArePrimagenRequirementsUsed())
-		{
-			if (ArePrimagenRequirementsUsedAndMet(mapId))
-			{
-				g_AP.IsGoalReached = 1;
-			}
-		}
-		
-		// Else, check whether the level goal is met
-		// We must check the level here because we don't want to goal before bosses are defeated
-		else if (mapId == kLevel_Hub &&
-			AreLevelRequirementsUsed() && 
-			AreLevelRequirementsUsedAndMet())
-		{
-			g_AP.IsGoalReached = 1;
+			// Check if the goal was to defeat the primagen, and set it if so
+			case kLevel_Ending:
+			case kLevel_EndingB:
+				if (OPTION_GOAL_DEFEAT_PRIMAGEN)
+				{
+					g_AP.IsGoalReached = 1;
+				}
+				break;
 		}
 		
 		// Handle the actor replacements
 		DoActorReplacementsOnPlayerSpawn();
-		
-		// Show a warning for the riding Gun
-		if (mapId == kLevel_RiverOfSouls_1)
-		{
-			kStr autoSwitchValue;
-			if (Sys.GetCvarValue("g_autoswitchnewweapon", autoSwitchValue))
-			{
-				if (autoSwitchValue == "1")
-				{
-					Hud.AddMessage("!!! If softlocked, press Tilde, then type warp 125 !!!", 600);
-					Hud.AddMessage("!!! Disable Auto-Switch new weapon before getting on the mount !!!", 600);
-				}
-			}
-		}
 		
 		// Show level progress on spawn as a convenience
 		DisplayCollectedLocationsForCurrentMap();
@@ -176,19 +133,84 @@ class RandoPlayerObject : ScriptObject
 	}
 	
 	//---------------------------
+	// Reset everything on a new game.
+	void HandleNewGame()
+	{
+		// IsCollected and IsSentToAP should be false for every location
+		ResetCollectedStatuses();
+		
+		// Reset the messages in flight and unset the queue
+		g_outgoingMessageInFlight = false;
+		g_outgoingMessageQueue.resize(0);
+		g_AP.IsGoalReached = 0;
+		
+		// Set outgoing index to 0 to receive all items from AP
+		ResetAPForLoadData(0);
+		
+		// Give max explosive shells to allow the Flare Gun to be 
+		// used and to prevent depots from spawning it prematurely
+		LocalPlayer.GiveWeapon(kWpn_Flare, 1000);
+		
+		// Give the starting inventory
+		array<int> startingInventoryItems = { OPTION_STARTING_INVENTORY_ITEMS };
+		for (uint i = 0; i < startingInventoryItems.length(); i++)
+		{
+			TryGetInventoryItem(startingInventoryItems[i], true);
+		}
+		
+		array<int> startingWeapons = { OPTION_STARTING_WEAPONS };
+		for (uint i = 0; i < startingWeapons.length(); i++)
+		{
+			TryGivePlayerWeapon(startingWeapons[i], 1000, true);
+		}
+		
+		CinemaPlayer.StopCinema();
+		DoPlayerWarp(0, 10099, kLevel_Hub, false);
+	}
+	
+	//---------------------------
+	// Give all Primagen keys if set to all keys and level requirements are met
+	// If the goal is only level requirements, check whether the goal is reached and set it if so
+	void HandleHubGoals()
+	{
+		bool levelRequirementsUsedAndMet = AreLevelRequirementsUsedAndMet();
+			
+		if (OPTION_GOAL_LEVELS_GIVE_PRIMAGEN_KEYS &&
+			levelRequirementsUsedAndMet &&
+			GetInventoryItemCollectedTotal(kActor_PrimagenKey_1) == 0)
+		{
+			AllPrimagenKeys();
+		}
+		
+		if (!ArePrimagenRequirementsUsed() && levelRequirementsUsedAndMet)
+		{
+			g_AP.IsGoalReached = 1;
+		}
+	}
+	
+	//---------------------------
+	// If auto switch new weapon is off, show the riding gun warning.
+	void TryShowRidingGunWarning()
+	{
+		kStr autoSwitchValue;
+		if (Sys.GetCvarValue("g_autoswitchnewweapon", autoSwitchValue))
+		{
+			if (autoSwitchValue == "1")
+			{
+				Hud.AddMessage("!!! If softlocked, press Tilde, then type warp 125 !!!", 600);
+				Hud.AddMessage("!!! Disable Auto-Switch new weapon before getting on the mount !!!", 600);
+			}
+		}
+	}
+	
+	//---------------------------
 	// Give a "token" indicating whether you've visited the associated map.
 	// This is so we know whether to allow the player to re-enter boss fights.
-	//
-	// Also gives the player the given weapon id, to help with the boss fight.
-	void OnBossEntry(const int &in inventoryItem, const int &in weaponToGive)
+	void OnBossEntry(const int &in inventoryItem)
 	{
 		if (!LocalPlayer.Inventory().HasBeenPickedUpBefore(inventoryItem))
 		{
 			LocalPlayer.Inventory().Give(inventoryItem);
-			if (weaponToGive != 0)
-			{
-				TryGivePlayerWeapon(weaponToGive);
-			}
 		}
 	}
 	

@@ -410,42 +410,35 @@ class TurokTotem : ScriptObject
                 break;
             }
         }
+	
+		//---------------------
+		// Rando block
+		switch(Game.ActiveMapID())
+		{
+			case kLevel_PortOfAdia_Totem:
+				DoPlayerWarp(0, 17100, -1, true);
+				return;
+			case kLevel_RiverOfSouls_Totem:
+				DoPlayerWarp(0, 17200, -1, true);
+				return;
+			case kLevel_DeathMarsh_Totem:
+				DoPlayerWarp(0, 17300, -1, true);
+				return;
+			case kLevel_BlindLair_Totem:
+				DoPlayerWarp(0, 17400, -1, true);
+				return;
+			case kLevel_Hive_Totem:
+				DoPlayerWarp(0, 17500, -1, true);
+				return;
+				
+			// This is bad, do the default code to prevent softlocks!
+			default:
+				break;
+		}
+		//---------------------
         
         if(bAllDead)
-        {
-			//---------------------
-			// Rando block
-			if (OPTION_GOAL_LEVELS > 0)
-			{
-				switch(Game.ActiveMapID())
-				{
-					case kLevel_PortOfAdia_Totem:
-						DoPlayerWarp(0, 17100, kLevel_PortOfAdia_Totem, true);
-						return;
-						
-					case kLevel_RiverOfSouls_Totem:
-						DoPlayerWarp(0, 17200, kLevel_RiverOfSouls_Totem, true);
-						return;
-						
-					case kLevel_DeathMarsh_Totem:
-						DoPlayerWarp(0, 17300, kLevel_DeathMarsh_Totem, true);
-						return;
-						
-					case kLevel_BlindLair_Totem:
-						DoPlayerWarp(0, 17400, kLevel_BlindLair_Totem, true);
-						return;
-						
-					case kLevel_Hive_Totem:
-						DoPlayerWarp(0, 17500, kLevel_Hive_Totem, true);
-						return;
-						
-					// This is bad, do the default code to prevent softlocks!
-					default:
-						break;
-				}
-			}
-			//---------------------
-			
+        {			
             WarpTimerUpdate();
         }
     }

@@ -46,9 +46,8 @@ const int UI_OFFSET_NUKE_Y = 539;
 const int UI_WARP_BUTTON_WIDTH = 157;
 const int UI_WARP_BUTTON_HEIGHT = 28;
 
-//const int UI_OFFSET_WARP_HUB_X = 130;
-//const int UI_OFFSET_WARP_BOSS_X = 336;
-const int UI_OFFSET_WARP_HUB_X = 250;
+const int UI_OFFSET_WARP_HUB_X = 130;
+const int UI_OFFSET_WARP_BOSS_X = 336;
 const int UI_OFFSET_WARP_BUTTON_Y = 528;
 
 const int UI_LEFT_NUMBER_SIZE = 16;
@@ -326,15 +325,12 @@ class RandoUI
 			UI_WARP_BUTTON_HEIGHT);
 		@hubButton.onSelect = UIElementSelectCallBack(OnWarpHubClicked);
 		
-		/***
-		// Boss warp disabled until we can figure out how to actually warp back...
 		RandoUIElement@ bossButton = AddImage(
 			RANDO_UI_TEXTURE_WARP_BOSS, 
 			PositionPixelToUI(UI_OFFSET_WARP_BOSS_X, UI_OFFSET_WARP_BUTTON_Y),
 			UI_WARP_BUTTON_WIDTH,
 			UI_WARP_BUTTON_HEIGHT);
 		@bossButton.onSelect = UIElementSelectCallBack(OnWarpBossClicked);
-		*/
 	}
 	
 	// --------------------------
@@ -389,45 +385,49 @@ class RandoUI
 		switch(bossLevelId)
 		{
 			case kLevel_PortOfAdia_Totem:
-				warpId = 17100;
+				warpId = GetWarpIdIfLevelVisited(kActor_InventoryItem_VisitedL1Boss, 17100);
 				break;
-		
-			case kLevel_BlindOneBoss:
-				warpId = 0;
-				if (GetInventoryItemCurrentTotal(kActor_InventoryItem_VisitedL4Boss) > 0)
-				{
-					warpId = 17401;
-				}
+			case kLevel_RiverOfSouls_Totem:
+				warpId = GetWarpIdIfLevelVisited(kActor_InventoryItem_VisitedL2Boss, 17200);
 				break;
-			case kLevel_QueenBoss:
-				warpId = 0;
-				if (GetInventoryItemCurrentTotal(kActor_InventoryItem_VisitedL5Boss) > 0)
-				{
-					warpId = 17501;
-				}
+			case kLevel_DeathMarsh_Totem:
+				warpId = GetWarpIdIfLevelVisited(kActor_InventoryItem_VisitedL3Boss, 17300);
+				break;
+			case kLevel_BlindLair_Totem:
+				warpId = GetWarpIdIfLevelVisited(kActor_InventoryItem_VisitedL4Boss, 17400);
+				break;
+			case kLevel_Hive_Totem:
+				warpId = GetWarpIdIfLevelVisited(kActor_InventoryItem_VisitedL5Boss, 17500);
 				break;
 			case kLevel_MotherBoss:
-				warpId = 0;
-				if (GetInventoryItemCurrentTotal(kActor_InventoryItem_VisitedL6Boss) > 0)
-				{
-					warpId = 17601;
-				}
+				warpId = GetWarpIdIfLevelVisited(kActor_InventoryItem_VisitedL6Boss, 17601);
 				break;
+			default:
+				Hud.AddMessage("Error getting boss warp id... contact the dev!");
+				return;
 		}
 		
-		if (warpId == -1)
-		{
-			Hud.AddMessage("Error getting boss warp id... contact the dev!");
-			return;
-		}
-		else if (warpId == 0)
+		if (warpId == 0)
 		{
 			Hud.AddMessage("You can only warp to bosses you've visited before!");
 			return;
 		}
 		
 		Deactivate();
-		DoPlayerWarp(0, warpId, bossLevelId, true);
+		
+		// Passing the level id will send you to the hub if you've been there before
+		// This is why we're passing in -1 instead!
+		DoPlayerWarp(0, warpId, -1, true); 
+	}
+	
+	// --------------------------
+	// If the player has the given item, returns the given warp Id.
+	// Else, returns 0.
+	int GetWarpIdIfLevelVisited(const int &in visitedItem, const int &in warpId)
+	{
+		return GetInventoryItemCurrentTotal(visitedItem) > 0
+			? warpId
+			: 0;
 	}
 	
 	// --------------------------

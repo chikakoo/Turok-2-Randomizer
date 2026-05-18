@@ -312,17 +312,21 @@ bool IsBossLevel(const int16 &in mapId)
 
 //------------------------------
 // Gets the boss level of the given map.
-// Returns 0 if there is none.
-//
-// TODO: This may need to be done for totems as well
+// This is the totem map for levels 1-5 and the Mother fight for level 6.
 int16 GetBossLevelOfMap(const int16 &in mapId)
 {
 	switch(GetLevelNumberFromMapId(mapId))
 	{
+		case LEVEL_PORT_OF_ADIA:
+			return kLevel_PortOfAdia_Totem;
+		case LEVEL_RIVER_OF_SOULS:
+			return kLevel_RiverOfSouls_Totem;
+		case LEVEL_DEATH_MARSHES:
+			return kLevel_DeathMarsh_Totem;
 		case LEVEL_LAIR_OF_THE_BLIND_ONES:
-			return kLevel_BlindOneBoss;
+			return kLevel_BlindLair_Totem;
 		case LEVEL_HIVE_OF_THE_MANTIDS:
-			return kLevel_QueenBoss;
+			return kLevel_Hive_Totem;
 		case LEVEL_PRIMAGENS_LIGHTSHIP:
 			return kLevel_MotherBoss;
 	}

@@ -30,12 +30,6 @@ class RandoPickupObject : ScriptObject
 		{
 			self.Flags() |= AF_IMPORTANT;
 		}
-		
-		// Hack to increase the touch radius of the previously missable Level 4 boss pickup
-		else if (m_position == "1_-2611_0_972")
-		{
-			self.WorldComponent().Radius() = 100.0f;
-		}
     }
 	
 	//----------------------------------
