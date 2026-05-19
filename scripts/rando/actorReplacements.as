@@ -571,10 +571,10 @@ bool DoMapSpecificEdits(kActor@ actor, const int &in mapId)
 {
 	switch(mapId)
 	{
-		// Edit the Primagen Key turn-ins to handle level requirements
+		// Edit the Primagen Key turn-ins to handle level/weapon requirements
 		case kLevel_Hub:
-			if (!AreLevelRequirementsUsed() ||
-				AreLevelRequirementsUsedAndMet())
+			if ((!AreLevelRequirementsUsed() || AreLevelRequirementsUsedAndMet()) &&
+				OPTION_WEAPON_BARRIER_PRIMAGEN - g_numberOfOwnedProgressionWeapons <= 0)
 			{
 				break;
 			}
@@ -726,7 +726,8 @@ void DoHubModifications(const int16 &in mapId)
 	// Spawn the primagen key trigger if we need to be able to warp back there
 	// Or if we haven't met level requirements and need to show the message
 	if (LocalPlayer.Inventory().HasBeenPickedUpBefore(kActor_InventoryItem_VisitedPrimagen) ||
-		(AreLevelRequirementsUsed() && !AreLevelRequirementsUsedAndMet()))
+		(AreLevelRequirementsUsed() && !AreLevelRequirementsUsedAndMet()) ||
+		OPTION_WEAPON_BARRIER_PRIMAGEN > 0)
 	{
 		ActorFactory.Spawn(
 			kActor_Hub_PrimagenKeyTrigger,
