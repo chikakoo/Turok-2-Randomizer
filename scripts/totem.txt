@@ -53,14 +53,35 @@ class TurokTotem : ScriptObject
         m_enemiesGoingAfterPlayer = 1;
         m_fTime = 0.0f;
         m_status = TOTEM_STATUS_INCOMPLETE;
+		
+		// --------
+		// Rando change
+		// If using enemizer, double the total enemies since the original is killed with the dup
+		// --------
+		if (OPTION_ENEMIZER > 0)
+		{
+			m_dwRemainingEnemies *= 2;
+		}
     }
     
     // ------------------------------------------
     void OnSpawn(void)
     {
-        Hud.SetBar(0, 50, 255, 50, 255, TOTEM_TIME);
-        Hud.SetBar(1, 255, 50, 50, 255, TOTEM_TOTAL_ENEMIES);
-        
+		Hud.SetBar(0, 50, 255, 50, 255, TOTEM_TIME);
+	
+		// --------
+		// Rando change
+		// If using enemizer, double the total enemies since the original is killed with the dup
+		// --------
+		int totalEnemies = TOTEM_TOTAL_ENEMIES;
+		if (OPTION_ENEMIZER > 0)
+		{
+			totalEnemies *= 2;
+		}
+		
+		Hud.SetBar(1, 255, 50, 50, 255, totalEnemies);
+		// --------
+	
         if(!self.Deserialized())
         {
             Game.PlayMusic(kVoice_SaveTotem);
@@ -98,6 +119,16 @@ class TurokTotem : ScriptObject
     // ------------------------------------------
     bool ActorTypeValid(kActor@ pActor)
     {
+	    // --------
+		// Rando change
+		// All enemies with AI should be valid... this makes it work with enemizer
+		// --------
+		if (pActor.EnemyAIComponent() !is null)
+		{
+			return true;
+		}
+		// --------
+	
         switch(pActor.Type())
         {
         case kActor_AI_Raptoid:
