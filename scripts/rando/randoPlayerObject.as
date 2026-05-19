@@ -65,6 +65,9 @@ class RandoPlayerObject : ScriptObject
 			ui.Deactivate();
 		}
 		
+		// Show level progress on spawn as a convenience
+		DisplayCollectedLocationsForCurrentMap();
+		
 		int16 mapId = Game.ActiveMapID();
 		switch(mapId)
 		{
@@ -124,9 +127,6 @@ class RandoPlayerObject : ScriptObject
 		
 		// Handle the actor replacements
 		DoActorReplacementsOnPlayerSpawn();
-		
-		// Show level progress on spawn as a convenience
-		DisplayCollectedLocationsForCurrentMap();
 		
 		// Recompute owned weapons in case of desyncs
 		ComputeNumberOfOwnedProgressionWeapons();
