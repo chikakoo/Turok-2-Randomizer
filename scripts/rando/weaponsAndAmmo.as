@@ -130,10 +130,12 @@ void GetAmmoInRandomWeapon()
 	// Get the ammo!
 	float ammoPercent = RandomInt(OPTION_RANDOM_AMMO_MIN, OPTION_RANDOM_AMMO_MAX) / 100.0;
 	int standardAmmoAmount = int(Math::Ceil(weaponToGetAmmoFor.maxAmmo * ammoPercent));
+	kStr ammoMessage = "" + standardAmmoAmount + " " + weaponToGetAmmoFor.ammoPickupMessage;
 	
 	if (weaponToGetAmmoFor.maxAltAmmo > 0)
 	{
 		int altAmmoAmount = int(Math::Ceil(weaponToGetAmmoFor.maxAltAmmo * ammoPercent));
+		kStr altAmmoMessage = "" + altAmmoAmount + " " + weaponToGetAmmoFor.altAmmoPickupMessage;
 		
 		// We mapped the flare to use explosive rounds!
 		if (weaponToGetAmmoFor.pickupId == kActor_Item_WpnShotgun ||
@@ -147,12 +149,16 @@ void GetAmmoInRandomWeapon()
 		else if (weaponToGetAmmoFor.pickupId == kActor_Item_WpnTekBow)
 		{
 			LocalPlayer.GiveWeapon(kWpn_Bow, altAmmoAmount);
+			
+			// Swap the alt and standard amount messages so the correct ones are displayed
+			// (Since the tek bow specifically swaps the ammo types here)
+			ammoMessage = "" + altAmmoAmount + " " + weaponToGetAmmoFor.ammoPickupMessage;
+			altAmmoMessage = "" + standardAmmoAmount + " " + weaponToGetAmmoFor.altAmmoPickupMessage;
 		}
 		
-		Hud.AddMessage("" + altAmmoAmount + " " + weaponToGetAmmoFor.altAmmoPickupMessage);
+		Hud.AddMessage(altAmmoMessage);
 	}
 	
-	kStr ammoMessage = "" + standardAmmoAmount + " " + weaponToGetAmmoFor.ammoPickupMessage;
 	TryGivePlayerWeapon(weaponToGetAmmoFor.pickupId, standardAmmoAmount, false, true, ammoMessage);
 }
 
