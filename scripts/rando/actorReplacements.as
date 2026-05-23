@@ -529,6 +529,12 @@ void ReplaceActor(kActor@ initialActor, ReplacementEntry@ replacement)
 // Replaces an enemy actor
 void ReplaceEnemyActor(kActor@ initialActor, const bool &in isFromSpawner = false)
 {
+	// Sisters of despair will glitch out the mission objective, so don't randomize them
+	if (initialActor.Type() == kActor_AI_SisterOfDespair)
+	{
+		return;
+	}
+	
 	// If there's no script here, then we don't want to replace this actor
 	RandoEnemy@ initialActorScript = cast<RandoEnemy@>(GetScript(initialActor));
 	if (initialActorScript is null)
