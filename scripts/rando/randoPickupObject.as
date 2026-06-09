@@ -190,22 +190,18 @@ class RandoPickupObject : ScriptObject
 			
 			// If using level key packs, give the rest of the keys
 			// The game will have given one already, so give the rest!
-			else if (OPTION_LEVEL_KEY_PACKS && (
-				self.Type() == kActor_InventoryItem_Level1Key ||
-				self.Type() == kActor_InventoryItem_Level2Key ||
-				self.Type() == kActor_InventoryItem_Level3Key ||
-				self.Type() == kActor_InventoryItem_Level4Key ||
-				self.Type() == kActor_InventoryItem_Level5Key ||
-				self.Type() == kActor_InventoryItem_Level6Key
-			))
+			else if (OPTION_UNLOCK_METHOD_ONE_KEY && IsLevelKey(self.Type()))
 			{
 				int count = self.Type() == kActor_InventoryItem_Level6Key ? 5 : 2;
 				TryGetInventoryItems(self.Type(), count);
 			}
 			
+			// Only gives the keys if necessary
+			TryGiveAllLevelKeysForWarp(self.Type());
+			
 			// Try to trigger events from the item being picked up
 			// Done here as well to make absolutely sure that it's triggered
-			// Not doing so can lead to soft-locks
+			// Not doing so can lead to softlocks
 			TryTriggerActors(m_position);
 		}
 	}
