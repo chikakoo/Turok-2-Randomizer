@@ -433,7 +433,7 @@ void ReplaceAllActors(const int16 &in mapId)
 			int(position.y) + "_" +
 			int(position.z);
 
-		if (DoMapSpecificEdits(actor, mapId))
+		if (DoMapSpecificEdits(actor, posStr, mapId))
 		{
 			actorsToRemove.insertLast(actor);
 		}
@@ -573,7 +573,7 @@ void ReplaceEnemyActor(kActor@ initialActor, const bool &in isFromSpawner = fals
 //----------------------------------
 // Actor edits specific to maps.
 // Returns whether to remove the actor.
-bool DoMapSpecificEdits(kActor@ actor, const int &in mapId)
+bool DoMapSpecificEdits(kActor@ actor, const kStr &in position, const int &in mapId)
 {
 	switch(mapId)
 	{
@@ -614,6 +614,27 @@ bool DoMapSpecificEdits(kActor@ actor, const int &in mapId)
 				actor.EnableComponent("kexModeStateComponent", false);
 			}
 			break;
+			
+		case kLevel_DeathMarsh_2:
+			if (
+				// Grenade Launcher
+				position == "62_2095_1138_0" ||
+				
+				// LF10 by Grenade Launcher
+				position == "62_2196_1176_0" ||
+				position == "62_2047_1033_0" ||
+				
+				// LF1 by Ladder
+				position == "62_2068_355_0" ||
+				position == "62_2044_288_0" ||
+				position == "62_2016_212_0" ||
+				position == "62_1999_129_0" ||
+				
+				// Ultra Health on Cage
+				position == "62_2704_352_300")
+			{
+				return true;
+			}
 	}
 	
 	return false;
