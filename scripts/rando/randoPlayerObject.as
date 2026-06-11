@@ -436,6 +436,11 @@ class RandoPlayerObject : ScriptObject
         }
 		ui.OnTick();
 		
+		if (g_pickupMessageCooldown > 0)
+		{
+			g_pickupMessageCooldown--;
+		}
+		
 		TryDisplayProgressMenu();
 	}
 }

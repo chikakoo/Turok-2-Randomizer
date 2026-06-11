@@ -1,6 +1,7 @@
 //----------------------------------
 // ScriptObject placed on every pickup that AP cares about.
 // Used to handle whether we've collected and sent pickup checks to AP.
+int g_pickupMessageCooldown;
 class RandoPickupObject : ScriptObject
 {
 	// Used in ReplaceActor to copy the position properties
@@ -11,6 +12,9 @@ class RandoPickupObject : ScriptObject
 	kStr m_actorName;
 	kStr m_displayString;
 	bool m_wasSentToAP;
+	
+	bool m_isOverRiver;
+	bool m_isOverLava;
 	
 	//----------------------------------
 	// Constructor
@@ -29,6 +33,11 @@ class RandoPickupObject : ScriptObject
 			self.Type() == kActor_MissionItem_IonCapacitor)
 		{
 			self.Flags() |= AF_IMPORTANT;
+		}
+		
+		if (m_id > 0 && !m_wasSentToAP)
+		{
+			SetRiverAndLavaProperties();
 		}
     }
 	
@@ -73,12 +82,48 @@ class RandoPickupObject : ScriptObject
 		}
 	}
 	
+	void SetRiverAndLavaProperties(void)
+	{
+		switch(m_id)
+		{
+			// 3-1 Starting jump
+			case 61068:
+			case 61069:
+			case 61070:
+			case 61071:
+			case 61072:
+			
+			// 3-1 Single river log
+			case 61094:
+			case 61095:
+			case 61096:
+			case 61097:
+			
+			// 3-3 Starting jump
+			case 63054:
+			case 63055:
+			case 63056:
+			case 63057:
+			case 63058:
+			
+			// 3-3 By checkpoint ladder
+			case 63068:
+			case 63069:
+			case 63070:
+			case 63071:
+				m_isOverRiver = true;
+				break;
+				
+			// TODO: the lava locations
+		}
+	}
+	
 	//----------------------------------
 	// Called every tick to see if the player is touching the pickup
 	// Note that health/ammo/weapon upgrades ARE sent to AP still when touched
 	// so that it knows you could have received it.
 	void OnTick()
-	{	
+	{		
 		if (m_id > 0 && !m_wasSentToAP)
 		{
 			kPuppet@ player = LocalPlayer.Actor();
@@ -86,6 +131,10 @@ class RandoPickupObject : ScriptObject
 			{
 				return;
 			}
+			
+			// Disable OnTouch until we know it can be collected
+			float touchRadius = self.WorldComponent().TouchRadius();
+			self.WorldComponent().TouchRadius() = 0;
 			
 			// Check if it's close enough - calculations without using a sqrt
 			kVec3 delta = self.Origin() - player.Origin();
@@ -99,13 +148,13 @@ class RandoPickupObject : ScriptObject
 			}
 			float triggerDistSq = triggerDistance * triggerDistance;
 			
-			
-			if (distSq > triggerDistSq)
+			if (distSq > triggerDistSq || !CanCollectPickup())
 			{
 				return;
 			}
-		
+			
 			// If close enough, we're good to pick it up
+			self.WorldComponent().TouchRadius() = touchRadius;
 			SendCheckToAP(m_id);
 			m_wasSentToAP = true;
 			
@@ -130,6 +179,44 @@ class RandoPickupObject : ScriptObject
 				CollectLocation(m_id, Game.ActiveMapID());
 				self.Remove();
 			}
+		}
+	}
+	
+	//----------------------------------
+	// Checks the appropriate flags for river/lava talismans.
+	// Displays a message reminding the player that it is not collectable.
+	bool CanCollectPickup()
+	{
+		if (m_isOverRiver && OPTION_DISABLE_PICKUPS_OVER_RIVER)
+		{
+			if (GetInventoryItemCurrentTotal(kActor_Talisman_BreathOfLife) == 0)
+			{
+				TryDisplayPickupMessage("Breath of Life is required to collect this.");
+				return false;
+			}
+		}
+		
+		else if (m_isOverLava && OPTION_DISABLE_PICKUPS_OVER_LAVA)
+		{
+			if (GetInventoryItemCurrentTotal(kActor_Talisman_HeartOfFire) == 0)
+			{
+				TryDisplayPickupMessage("Heart of Fire is required to collect this.");
+				return false;
+			}
+		}
+	
+		return true;
+	}
+	
+	//----------------------------------
+	// Tries to display the given pickup message.
+	// Sets the cooldown if it does display it.
+	void TryDisplayPickupMessage(const kStr &in message)
+	{
+		if (g_pickupMessageCooldown <= 0)
+		{
+			Hud.AddMessage(message, 360);
+			g_pickupMessageCooldown = 420;
 		}
 	}
 	
