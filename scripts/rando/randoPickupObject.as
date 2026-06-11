@@ -82,39 +82,114 @@ class RandoPickupObject : ScriptObject
 		}
 	}
 	
+	//----------------------------------
+	// Sets the river/lava properties based on the pickup id.
+	// Some of these are just safeties in case the player can get them.
 	void SetRiverAndLavaProperties(void)
 	{
 		switch(m_id)
 		{
-			// 3-1 Starting jump
-			case 61068:
+			// 3-1 - in logic if setting is on
+			case 61068: // Breath of Life trail
 			case 61069:
 			case 61070:
 			case 61071:
 			case 61072:
-			
-			// 3-1 Single river log
-			case 61094:
+			case 61094: // Single river log
 			case 61095:
 			case 61096:
 			case 61097:
 			
-			// 3-3 Starting jump
-			case 63054:
-			case 63055:
+			// 3-1 - NOT in logic if setting is on (for safety)
+			case 61080: // Left path by LF10 ledge
+			case 61081: // Left path by crane drop
+			case 61082: // Left path by platforms
+			case 61083: // Left path by Grenade Launcher
+			case 61085: // Left corner jump at the start
+			case 61086:
+			case 61087: // Corner jump after platforming
+			case 61088: // Corner jump by ladder
+			case 61089: // Corner jump off sloped bridge
+			case 61090:
+			case 61091: // Jump after broken bridge
+			case 61092:
+			case 61093:
+			case 61102: // Double river log
+			
+			// 3-3 - in logic if setting is on
+			case 63054: // Starting jump
 			case 63056:
 			case 63057:
-			case 63058:
-			
-			// 3-3 By checkpoint ladder
-			case 63068:
+			case 63068: // Checkpoint ladder
 			case 63069:
 			case 63070:
-			case 63071:
+			case 63071: 
+			
+			// 3-3 - NOT in logic if setting is on (for safety)
+			case 63055: // Start of Primagen Key tunnel
+			case 63058: // Starting trail, but too far to jump to
+			case 63060: // Dead end before marsh area
+			case 63061:
+			case 63062: // Marsh area wall corner
+			case 63063:
+			case 63064: // Corners by watchtower
+			case 63065:
+			case 63066:
+			case 63072: // Corner by checkpoint ladder
+			case 63073: // Dead end by checkpoint
+			case 63074:
+			case 63075:
 				m_isOverRiver = true;
 				break;
 				
-			// TODO: the lava locations
+			// 4-7
+			case 104007: // Small lava
+			case 104008:
+			case 104009:
+			case 104010:
+			case 104011:
+			case 104012:
+			case 104016: // Big lava start left
+			case 104017:
+			case 104018:
+			case 104019:
+			case 104020:
+			case 104021:
+			case 104022:
+			case 104023: // Big lava back Left
+			case 104024:
+			case 104025:
+			case 104026:
+			case 104027: // Big lava back
+			case 104028:
+			case 104029:
+			case 104030:
+			case 104031:
+			
+			// 5-9
+			case 91036:
+			case 91037:
+			case 91038:
+			case 91039:
+			case 91040:
+			case 91041:
+			case 91042:
+			case 91043:
+			case 91044:
+			case 91045:
+			
+			// 5-E3
+			case 96021:
+			case 96022:
+			case 96023:
+			case 96024:
+			case 96025:
+			case 96026:
+			case 96027:
+			case 96028:
+			case 96029:
+				m_isOverLava = true;
+				break;
 		}
 	}
 	
@@ -126,8 +201,9 @@ class RandoPickupObject : ScriptObject
 	{		
 		if (m_id > 0 && !m_wasSentToAP)
 		{
+			// Prevent a dead player puppet from collecting stuff (this isn't normally possible)
 			kPuppet@ player = LocalPlayer.Actor();
-			if (player is null)
+			if (player is null || (player.Health() <= 0 || (player.Flags() & AF_DEAD) != 0))
 			{
 				return;
 			}
