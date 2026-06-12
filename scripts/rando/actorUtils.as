@@ -344,7 +344,6 @@ void GetNukePart(void)
 	}
 }
 
-
 //---------------------------
 // Spawns the given actor id near the player.
 // Meant to be used for enemy traps.
