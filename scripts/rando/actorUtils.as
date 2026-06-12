@@ -351,13 +351,20 @@ void GetNukePart(void)
 void SpawnActorNearPlayer(int &in actorId)
 {
 	kActor @actor = LocalPlayer.Actor().CastToActor();
-	kVec3 origin1 = kVec3(actor.Origin());
-	kVec3 origin2 = kVec3(actor.Origin());
+	kVec3 initialOrigin = kVec3(actor.Origin());
+	
+	// Adjust the position to a random point around the player
+	float distance = Math::RandRange(300.0f, 500.0f);
+	float angle = Math::RandFloat() * Math::pi * 2.0f;
+	initialOrigin.x += Math::Cos(angle) * distance;
+	initialOrigin.y += Math::Sin(angle) * distance;
+	
+	kVec3 newOrigin;
 	int16 regionIdx = actor.WorldComponent()
-		.GetNearPositionAndRegionIndex(origin1, origin2);
+		.GetNearPositionAndRegionIndex(initialOrigin, newOrigin);
 	
 	// Set processed spawn so we don't re-randomize the enemy
-	kActor@ enemy = ActorFactory.Spawn(actorId, origin2, 0, 0, 0, true, regionIdx);
+	kActor@ enemy = ActorFactory.Spawn(actorId, newOrigin, 0, 0, 0, true, regionIdx);
 	RandoEnemy@ enemyScript = cast<RandoEnemy@>(GetScript(enemy));
 	if (enemyScript !is null)
 	{
