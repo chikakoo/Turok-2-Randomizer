@@ -353,12 +353,11 @@ void SpawnActorNearPlayer(int &in actorId)
 	kActor @actor = LocalPlayer.Actor().CastToActor();
 	kVec3 origin1 = kVec3(actor.Origin());
 	kVec3 origin2 = kVec3(actor.Origin());
-	kVec3 origin3 = kVec3(actor.Origin());
 	int16 regionIdx = actor.WorldComponent()
 		.GetNearPositionAndRegionIndex(origin1, origin2);
 	
 	// Set processed spawn so we don't re-randomize the enemy
-	kActor@ enemy = ActorFactory.Spawn(actorId, origin3, 0, 0, 0, true, regionIdx);
+	kActor@ enemy = ActorFactory.Spawn(actorId, origin2, 0, 0, 0, true, regionIdx);
 	RandoEnemy@ enemyScript = cast<RandoEnemy@>(GetScript(enemy));
 	if (enemyScript !is null)
 	{
