@@ -253,7 +253,7 @@ void AllPrimagenKeys(void)
 // Nuke parts
 void NukePart(void)
 {
-	GetNukePart();
+	TryGetInventoryItem(kActor_InventoryItem_NukePart);
 }
 
 //---------------------------
