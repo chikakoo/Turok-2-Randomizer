@@ -57,6 +57,19 @@ class RandoEnemy : ScriptActor
 	}
 	
 	//----------------------------------
+	// Shows the important indicator if the enemy is currently an AP check.
+	// TODO: how to show this at the right times...
+	void TryShowImportantIndicator()
+	{
+		ActionObjectEntry@ actionObjectEntry;
+		TryGetActionObjectEntryForCurrentMap(self.TID(), actionObjectEntry);
+		if (actionObjectEntry !is null && !actionObjectEntry.isSentToAP && actionObjectEntry.apId > 0)
+		{
+			self.Flags() |= AF_IMPORTANT;
+		}
+	}
+	
+	//----------------------------------
 	// Serializes the instance data
 	void OnSerialize(kDict &out dict)
     {
@@ -101,6 +114,25 @@ class RandoEnemy : ScriptActor
 	// Simply setting Health to 0 does not work
 	void OnDeath(kDamageInfo& in dmgInfo)
 	{
+		if (self.TID() > 0)
+		{
+			Sys.Print("" + Game.ActiveMapID() + "_" + self.TID());
+			Hud.AddMessage("" + Game.ActiveMapID() + "_" + self.TID());
+			
+			if (((self.Flags() & (1 << 10)) == 0) || // easy
+				((self.Flags() & (1 << 11)) == 0) || // normal
+				((self.Flags() & (1 << 12)) == 0) || // hard
+				((self.Flags() & (1 << 13)) == 0)) // hardcore
+			{
+				Sys.Print("NOT AVAILABLE IN ALL DIFFICULTIES!!!!!");
+				Hud.AddMessage("NOT AVAILABLE IN ALL DIFFICULTIES!!!!!");
+			}
+			
+			// TODO: Keep this line, delete the above
+			TrySendActionObjectToAP(self.TID());
+			self.Flags() &= ~AF_IMPORTANT;
+		}
+
 		if (!isReplacedActor)
 		{
 			return;
