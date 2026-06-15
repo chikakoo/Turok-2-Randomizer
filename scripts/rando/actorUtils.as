@@ -169,12 +169,12 @@ bool TryGivePlayerHealth(int &in actorId)
 // Gets the given item and adds it to your inventory.
 // Will add the item AND the inventory offset.
 // Handles level key packs.
-bool TryGetInventoryItem(int &in actorId, bool &in skipNotifications = false)
+void TryGetInventoryItem(int &in actorId, bool &in skipNotifications = false)
 {
 	kDictMem@ itemDef = TryGetActorDefWithClass(actorId, "kexInventoryPickup");
 	if (itemDef is null)
 	{
-		return false;
+		return;
 	}
 	
 	if (!skipNotifications)
@@ -193,8 +193,19 @@ bool TryGetInventoryItem(int &in actorId, bool &in skipNotifications = false)
 		LocalPlayer.Inventory().Give(actorId);
 		HandleTrackInventoryItems(actorId, itemDef);
 	}
+	
+	// Handles giving the nuke if you have 6 parts since the game only does so
+	// if you get the 6th part locally
+	if (actorId == kActor_InventoryItem_NukePart)
+	{
+		if (!LocalPlayer.HasWeapon(kActor_Wpn_Nuke) &&
+			LocalPlayer.Inventory().GetCount(kActor_InventoryItem_NukePart) >= 6)
+		{
+			LocalPlayer.GiveWeapon(kWpn_Nuke, 1000);
+		}
+	}
 
-	return true;
+	return;
 }
 
 //---------------------------
@@ -328,20 +339,6 @@ int GetInventoryItemCurrentTotal(int &in actorId)
 int GetInventoryItemCollectedTotal(int &in actorId)
 {
 	return LocalPlayer.Inventory().GetCount(actorId + RANDO_INVENTORY_ITEM_OFFSET);
-}
-
-//---------------------------
-// Void get nuke part - also handles giving the nuke if you have 6
-// since it doesn't do this unless all specific level ones exist.
-void GetNukePart(void)
-{
-	TryGetInventoryItem(kActor_InventoryItem_NukePart);
-	
-	if (!LocalPlayer.HasWeapon(kActor_Wpn_Nuke) &&
-		LocalPlayer.Inventory().GetCount(kActor_InventoryItem_NukePart) >= 6)
-	{
-		LocalPlayer.GiveWeapon(kWpn_Nuke, 1000);
-	}
 }
 
 //---------------------------
