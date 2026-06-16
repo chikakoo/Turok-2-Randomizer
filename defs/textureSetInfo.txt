@@ -34,6 +34,8 @@
 	texture_25 "textures/ui/text_left.png"
 	texture_26 "textures/ui/warp_hub.png"
 	texture_27 "textures/ui/warp_boss.png"
+	texture_28 "textures/ui/toggle_important_pickups.png"
+	texture_29 "textures/ui/toggle_important_enemies.png"
 }
 
 // ------------------------------

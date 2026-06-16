@@ -181,7 +181,10 @@ class RandoEnemy : ScriptActor
 	void OnTick(void)
 	{
 		// If this enemy is a check, show the important indicator when it's visible
-		if (!importantShown && apEntry !is null && ((self.Flags() & AF_HIDDEN) == 0))
+		if (g_markEnemies &&
+			!importantShown &&
+			apEntry !is null &&
+			((self.Flags() & AF_HIDDEN) == 0))
 		{
 			self.Flags() |= AF_IMPORTANT;
 			importantShown = true;

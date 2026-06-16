@@ -4,6 +4,10 @@ enum RandoUndefinedPlayerFlags
 	PF_NOWEAPON = 1 << 21
 };
 
+// Settings to be serialized on the player
+bool g_markPickups;
+bool g_markEnemies;
+
 class RandoPlayerObject : ScriptObject
 {
     kActor@ self;
@@ -138,6 +142,10 @@ class RandoPlayerObject : ScriptObject
 	{
 		// IsCollected and IsSentToAP should be false for every location
 		ResetCollectedStatuses();
+		
+		// Set the default settings
+		g_markPickups = OPTION_MARK_PICKUPS;
+		g_markEnemies = OPTION_MARK_ENEMIES;
 		
 		// Reset the messages in flight and unset the queue
 		g_outgoingMessageInFlight = false;
@@ -288,6 +296,9 @@ class RandoPlayerObject : ScriptObject
 	
 		SERIALIZE(g_AP.OutgoingLastProcessedItemIdx);
 		//Sys.Print("Saved last processed index: " + g_AP.OutgoingLastProcessedItemIdx);
+		
+		SERIALIZE(g_markPickups);
+		SERIALIZE(g_markEnemies);
 	}
 
 	//---------------------------
@@ -319,6 +330,9 @@ class RandoPlayerObject : ScriptObject
 		ResetAPForLoadData(g_AP.OutgoingLastProcessedItemIdx);
 		
 		//Sys.Print("Loaded last processed index: " + g_AP.OutgoingLastProcessedItemIdx);
+		
+		DESERIALIZE_BOOL(g_markPickups);
+		DESERIALIZE_BOOL(g_markEnemies);
 	}
 	
 	//---------------------------

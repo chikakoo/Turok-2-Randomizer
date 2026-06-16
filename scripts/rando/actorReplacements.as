@@ -517,7 +517,7 @@ void ReplaceActor(kActor@ initialActor, ReplacementEntry@ replacement)
 	
 	// Flag the actor as important so it can be found easier
 	// If it was already sent to AP, do not do this since it was "collected" already
-	if (!replacement.isSentToAP && replacement.apId > 0)
+	if (g_markPickups && !replacement.isSentToAP && replacement.apId > 0)
 	{
 		replacedActor.Flags() |= AF_IMPORTANT;
 	}

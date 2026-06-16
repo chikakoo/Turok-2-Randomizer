@@ -4,6 +4,8 @@
 int g_messageCooldown = 0;
 int g_uiCooldown = 0;
 int g_bossMessageCooldown = 0;
+int g_toggleImportantPickupsCooldown = 0;
+int g_toggleImportantEnemiesCooldown = 0;
 int g_progressMenuDisplayTime = 330;
 
 // --------------------------
@@ -46,9 +48,16 @@ const int UI_OFFSET_NUKE_Y = 539;
 const int UI_WARP_BUTTON_WIDTH = 157;
 const int UI_WARP_BUTTON_HEIGHT = 28;
 
-const int UI_OFFSET_WARP_HUB_X = 130;
-const int UI_OFFSET_WARP_BOSS_X = 336;
+const int UI_OFFSET_WARP_HUB_X = 84;
+const int UI_OFFSET_WARP_BOSS_X = 244;
 const int UI_OFFSET_WARP_BUTTON_Y = 528;
+
+const int UI_TOGGLE_IMPORTANT_BUTTON_WIDTH = 120;
+const int UI_TOGGLE_IMPORTANT_BUTTON_HEIGHT = 18;
+
+const int UI_OFFSET_TOGGLE_IMPORTANT_BUTTON_X = 393;
+const int UI_OFFSET_TOGGLE_IMPORTANT_PICKUPS_Y = 519;
+const int UI_OFFSET_TOGGLE_IMPORTANT_ENEMIES_Y = 538;
 
 const int UI_LEFT_NUMBER_SIZE = 16;
 const int UI_LEFT_TEXT_WIDTH = 28;
@@ -204,6 +213,8 @@ class RandoUI
 		lastMouseY = 0.0f;
 		closeTime = 0.0f;
 		g_bossMessageCooldown = 0;
+		g_toggleImportantPickupsCooldown = 0;
+		g_toggleImportantEnemiesCooldown = 0;
 		
 		isActive = true;
 		uiOrigin = owner.Origin();
@@ -325,6 +336,20 @@ class RandoUI
 			UI_WARP_BUTTON_WIDTH,
 			UI_WARP_BUTTON_HEIGHT);
 		@bossButton.onSelect = UIElementSelectCallBack(OnWarpBossClicked);
+		
+		RandoUIElement@ toggleImportantPickupsButton = AddImage(
+			RANDO_UI_TEXTURE_TOGGLE_IMPORTANT_PICKUPS, 
+			PositionPixelToUI(UI_OFFSET_TOGGLE_IMPORTANT_BUTTON_X, UI_OFFSET_TOGGLE_IMPORTANT_PICKUPS_Y),
+			UI_TOGGLE_IMPORTANT_BUTTON_WIDTH,
+			UI_TOGGLE_IMPORTANT_BUTTON_HEIGHT);
+		@toggleImportantPickupsButton.onSelect = UIElementSelectCallBack(OnToggleImportantPickupsButton);
+		
+		RandoUIElement@ toggleImportantEnemiesButton = AddImage(
+			RANDO_UI_TEXTURE_TOGGLE_IMPORTANT_ENEMIES, 
+			PositionPixelToUI(UI_OFFSET_TOGGLE_IMPORTANT_BUTTON_X, UI_OFFSET_TOGGLE_IMPORTANT_ENEMIES_Y),
+			UI_TOGGLE_IMPORTANT_BUTTON_WIDTH,
+			UI_TOGGLE_IMPORTANT_BUTTON_HEIGHT);
+		@toggleImportantEnemiesButton.onSelect = UIElementSelectCallBack(OnToggleImportantEnemiesButton);
 	}
 	
 	// --------------------------
@@ -422,6 +447,52 @@ class RandoUI
 		return GetInventoryItemCurrentTotal(visitedItem) > 0
 			? warpId
 			: 0;
+	}
+	
+	// --------------------------
+	// Toggles the pickup important (!) indicator.
+	void OnToggleImportantPickupsButton()
+	{
+		if (g_toggleImportantPickupsCooldown > 0)
+		{
+			return;
+		}
+		g_toggleImportantPickupsCooldown = 130;
+		
+		g_markPickups = !g_markPickups;
+		
+		Hud.AddMessage("Changes will take place after the next warp.");
+		if (g_markPickups)
+		{
+			Hud.AddMessage("Pickup indicators on.");
+		}
+		else
+		{
+			Hud.AddMessage("Pickup indicators off.");
+		}
+	}
+	
+	// --------------------------
+	// Toggles the enemy important (!) indicator.
+	void OnToggleImportantEnemiesButton()
+	{
+		if (g_toggleImportantEnemiesCooldown > 0)
+		{
+			return;
+		}
+		g_toggleImportantEnemiesCooldown = 130;
+		
+		g_markEnemies = !g_markEnemies;
+		
+		Hud.AddMessage("Changes will take place after the next warp.");
+		if (g_markEnemies)
+		{
+			Hud.AddMessage("Enemy indicators on.");
+		}
+		else
+		{
+			Hud.AddMessage("Enemy indicators off.");
+		}
 	}
 	
 	// --------------------------
@@ -784,6 +855,14 @@ class RandoUI
 		if (g_bossMessageCooldown > 0)
 		{
 			g_bossMessageCooldown--;
+		}
+		if (g_toggleImportantPickupsCooldown > 0)
+		{
+			g_toggleImportantPickupsCooldown--;
+		}
+		if (g_toggleImportantEnemiesCooldown > 0)
+		{
+			g_toggleImportantEnemiesCooldown--;
 		}
 		
 		lastPlayerHealth = owner.Health();
