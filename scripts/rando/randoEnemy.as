@@ -72,11 +72,18 @@ class RandoEnemy : ScriptActor
 	//
 	// We'll only use AP entries for replacements when enemizer is in use so the important icon
 	// is only placed on enemies that are visible.
+	//
+	// We'll also only use AP entries for enemies that are available for all difficulties.
 	void SetApEntry()
 	{
 		@apEntry = null;
 		
-		if ((OPTION_ENEMIZER != 0 && !isReplacedActor) || processedSpawn)
+		if ((OPTION_ENEMIZER != 0 && !isReplacedActor) || 
+			processedSpawn ||
+			((self.Flags() & (1 << 10)) == 0) || // easy
+			((self.Flags() & (1 << 11)) == 0) || // normal
+			((self.Flags() & (1 << 12)) == 0) || // hard
+			((self.Flags() & (1 << 13)) == 0)) // hardcore
 		{
 			return;
 		}
@@ -139,8 +146,8 @@ class RandoEnemy : ScriptActor
 	// Simply setting Health to 0 does not work
 	void OnDeath(kDamageInfo& in dmgInfo)
 	{
-		
-		if (apEntry !is null)
+		// TODO: delete me
+		if (self.TID() > 0 && apEntry is null)
 		{
 			Sys.Print("" + Game.ActiveMapID() + "_" + self.TID());
 			Hud.AddMessage("" + Game.ActiveMapID() + "_" + self.TID());
@@ -154,9 +161,15 @@ class RandoEnemy : ScriptActor
 				Hud.AddMessage("NOT AVAILABLE IN ALL DIFFICULTIES!!!!!");
 			}
 			
+			self.Flags() &= ~AF_IMPORTANT;
+		}
+		
+		if (apEntry !is null)
+		{		
 			// TODO: Keep this, delete the above
 			TrySendActionObjectToAP(self.TID());
 			self.Flags() &= ~AF_IMPORTANT;
+			@apEntry = null;
 		}
 
 		if (!isReplacedActor)
@@ -181,13 +194,21 @@ class RandoEnemy : ScriptActor
 	void OnTick(void)
 	{
 		// If this enemy is a check, show the important indicator when it's visible
-		if (g_markEnemies &&
+		if (
+			self.TID() > 0 && //TODO; delete this line
+			//g_markEnemies && // TODO: re-enable this line
 			!importantShown &&
-			apEntry !is null &&
+			//apEntry !is null && // TODO: re-enable this line
 			((self.Flags() & AF_HIDDEN) == 0))
 		{
 			self.Flags() |= AF_IMPORTANT;
 			importantShown = true;
+		}
+		
+		// Handles linked enemies
+		if (apEntry !is null && apEntry.isSentToAP)
+		{
+			self.Flags() &= ~AF_IMPORTANT;
 		}
 	
 		if (OPTION_ENEMIZER == 0)
