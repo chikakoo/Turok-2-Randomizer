@@ -6,6 +6,10 @@ class RandoEnemy : ScriptActor
 	// The original actor (that this one replaced; null if not replaced)
 	kActor@ originalActor;
 	
+	// The action object entry this is associated with
+	// If null, either enemysanity is off, or this isn't a check anymore
+	ActionObjectEntry@ apEntry;
+	
 	// Whether this is the replaced actor (i.e. not the original)
 	bool isReplacedActor;
 	
@@ -15,6 +19,10 @@ class RandoEnemy : ScriptActor
 	
 	// Whether this was a spawn that we processed
 	bool processedSpawn;
+	
+	// Whether the important indicator was shown
+	// Used for performance reasons
+	bool importantShown;
 
 	//----------------------------------
 	// Constructor
@@ -22,20 +30,18 @@ class RandoEnemy : ScriptActor
     RandoEnemy(kActor @actor)
     {
 		super(@actor);
+		SetApEntry();
 	}
 	
 	//----------------------------------
-	// Sets whether this is the replaced actor
-	void SetIsReplacedActor(const bool &in isReplacedActor)
-	{
-		this.isReplacedActor = isReplacedActor;
-	}
-	
-	//----------------------------------
-	// Sets a pointer to the original actor
+	// Sets a pointer to the original actor.
+	// Marks this one as replaced.
+	// Unsets the AP entry from the original actor so the kill/important marker can be properly handled.
 	void SetOriginalActor(kActor@ actor)
 	{
 		@originalActor = actor;
+		this.isReplacedActor = true;
+		SetApEntry();
 	}
 	
 	//----------------------------------
@@ -43,6 +49,10 @@ class RandoEnemy : ScriptActor
 	void SetProcessedSpawn(const bool &in processedSpawn)
 	{
 		this.processedSpawn = processedSpawn;
+		if (processedSpawn)
+		{
+			@apEntry = null;
+		}
 	}
 	
 	//----------------------------------
@@ -57,15 +67,25 @@ class RandoEnemy : ScriptActor
 	}
 	
 	//----------------------------------
-	// Shows the important indicator if the enemy is currently an AP check.
-	// TODO: how to show this at the right times...
-	void TryShowImportantIndicator()
+	// Looks up the AP entry so it can be processed when the enemy dies.
+	// Sets to null if it's already checked or there is no entry.
+	//
+	// We'll only use AP entries for replacements when enemizer is in use so the important icon
+	// is only placed on enemies that are visible.
+	void SetApEntry()
 	{
+		@apEntry = null;
+		
+		if ((OPTION_ENEMIZER != 0 && !isReplacedActor) || processedSpawn)
+		{
+			return;
+		}
+		
 		ActionObjectEntry@ actionObjectEntry;
 		TryGetActionObjectEntryForCurrentMap(self.TID(), actionObjectEntry);
 		if (actionObjectEntry !is null && !actionObjectEntry.isSentToAP && actionObjectEntry.apId > 0)
 		{
-			self.Flags() |= AF_IMPORTANT;
+			@apEntry = actionObjectEntry;
 		}
 	}
 	
@@ -75,17 +95,22 @@ class RandoEnemy : ScriptActor
     {
 		SERIALIZE(isReplacedActor);
 		SERIALIZE(isNotYetShown);
+		SERIALIZE(isNotYetShown);
 		SERIALIZE(processedSpawn);
+		SERIALIZE(importantShown);
 	}
 	
 	//----------------------------------
-	// Deserializes the instance data
-	// Also finds the original actor based on the tag ids
+	// Deserializes the instance data.
+	// Finds the AP entry.
+	// Finds the original actor based on the tag ids.
 	void OnDeserialize(kDict &in dict)
     {
 		DESERIALIZE_BOOL(isReplacedActor);
 		DESERIALIZE_BOOL(isNotYetShown);
 		DESERIALIZE_BOOL(processedSpawn);
+		DESERIALIZE_BOOL(importantShown);
+		SetApEntry();
 		
 		if (!isReplacedActor)
 		{
@@ -114,7 +139,8 @@ class RandoEnemy : ScriptActor
 	// Simply setting Health to 0 does not work
 	void OnDeath(kDamageInfo& in dmgInfo)
 	{
-		if (self.TID() > 0)
+		
+		if (apEntry !is null)
 		{
 			Sys.Print("" + Game.ActiveMapID() + "_" + self.TID());
 			Hud.AddMessage("" + Game.ActiveMapID() + "_" + self.TID());
@@ -128,7 +154,7 @@ class RandoEnemy : ScriptActor
 				Hud.AddMessage("NOT AVAILABLE IN ALL DIFFICULTIES!!!!!");
 			}
 			
-			// TODO: Keep this line, delete the above
+			// TODO: Keep this, delete the above
 			TrySendActionObjectToAP(self.TID());
 			self.Flags() &= ~AF_IMPORTANT;
 		}
@@ -154,6 +180,13 @@ class RandoEnemy : ScriptActor
 	// - Else, set the original to hidden if it's ever shown for some reason
 	void OnTick(void)
 	{
+		// If this enemy is a check, show the important indicator when it's visible
+		if (!importantShown && apEntry !is null && ((self.Flags() & AF_HIDDEN) == 0))
+		{
+			self.Flags() |= AF_IMPORTANT;
+			importantShown = true;
+		}
+	
 		if (OPTION_ENEMIZER == 0)
 		{
 			return;

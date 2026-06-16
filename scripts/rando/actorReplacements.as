@@ -564,7 +564,6 @@ void ReplaceEnemyActor(kActor@ initialActor, const bool &in isFromSpawner = fals
 	RandoEnemy@ enemyScript = cast<RandoEnemy@>(GetScript(replacedActor));
 	if (enemyScript !is null)
 	{
-		enemyScript.SetIsReplacedActor(true);
 		enemyScript.SetOriginalActor(initialActor);
 		enemyScript.SetIsNotYetShown((initialActor.Flags() & AF_HIDDEN) != 0);
 	}
