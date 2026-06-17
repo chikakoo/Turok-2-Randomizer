@@ -105,8 +105,12 @@ class RandoEnemy : ScriptActor
 		{
 			return;
 		}
-	
-		if (originalActor !is null)
+		
+		// Don't kill the original actor if it's dead already
+		// This can actually end up crashing the game!
+		if (originalActor !is null &&
+			originalActor.Health() > 0 &&
+			(originalActor.Flags() & AF_DEAD) == 0)
 		{
 			kDamageInfo damageInfo;
 			damageInfo.hits = originalActor.Health() * 10.0f;
