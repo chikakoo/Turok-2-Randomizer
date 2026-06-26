@@ -857,6 +857,12 @@ bool IsActorToTrigger(
 {
 	switch(mapId)
 	{
+		// Level key trap
+		case kLevel_RiverOfSouls_8:
+			return tagId == 200005 ||
+				tagId == 200006 ||
+				tagId == 200007;
+	
 		// Full Health behind buildings trap
 		case kLevel_DeathMarsh_2:
 			return tagId == 200009;
@@ -938,6 +944,14 @@ void TryTriggerActors(const kStr &in position)
 {
 	switch(Game.ActiveMapID())
 	{
+		// Level key trap
+		case kLevel_RiverOfSouls_8:
+			if (position == "132_2044_-255_1361")
+			{
+				TriggerActors();
+			}
+			break;
+	
 		// Full Health and Box of Shells enemy traps
 		case kLevel_DeathMarsh_2:
 			if (position == "62_900_5451_8")
