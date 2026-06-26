@@ -857,6 +857,10 @@ bool IsActorToTrigger(
 {
 	switch(mapId)
 	{
+		// Full Health Raptor Pagoda
+		case kLevel_RiverOfSouls_6:
+			return tagId == 200040 || tagId == 200041;
+	
 		// Level key trap
 		case kLevel_RiverOfSouls_8:
 			return tagId == 200005 ||
@@ -944,6 +948,14 @@ void TryTriggerActors(const kStr &in position)
 {
 	switch(Game.ActiveMapID())
 	{
+		// Full Health Raptor Pagoda
+		case kLevel_RiverOfSouls_6:
+			if (position == "130_2508_3788_0")
+			{
+				TriggerActors();
+			}
+			break;
+		
 		// Level key trap
 		case kLevel_RiverOfSouls_8:
 			if (position == "132_2044_-255_1361")
