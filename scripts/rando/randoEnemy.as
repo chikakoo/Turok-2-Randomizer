@@ -227,10 +227,9 @@ class RandoEnemy : ScriptActor
 			
 			// If we're not processing spawned enemies, don't replace them
 			// Totems will be replaced based on the enemizer setting itself, so handle that separately
-			// Also, the mother boss seem to crash randomly, so we won't include these either
 			int16 mapId = Game.ActiveMapID();
-			if ((OPTION_ENEMIZER_SPAWNERS == ENEMIZER_SPAWNER_NONE && !IsTotemLevel(mapId)) ||
-				Game.ActiveMapID() == kLevel_MotherBoss)
+			if (OPTION_ENEMIZER_SPAWNERS == ENEMIZER_SPAWNER_NONE && 
+				!IsTotemLevel(mapId))
 			{
 				processedSpawn = true;
 				return;
