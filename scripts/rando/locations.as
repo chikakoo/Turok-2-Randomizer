@@ -866,10 +866,23 @@ bool IsActorToTrigger(
 			return tagId == 200005 ||
 				tagId == 200006 ||
 				tagId == 200007;
+				
+		// Ultra Health GY3
+		case kLevel_RiverOfSouls_11:
+			return tagId == 200029 || 
+				tagId == 200030 || 
+				tagId == 200031 || 
+				tagId == 200032;
+				
+		// Mag 60 and tek arrows in swamp traps
+		case kLevel_DeathMarsh_1:
+			return tagId == 200000 || 
+				tagId == 200016 ||
+				tagId == 200017;
 	
-		// Full Health behind buildings trap
+		// Shredder and Full Health traps
 		case kLevel_DeathMarsh_2:
-			return tagId == 200009;
+			return tagId == 200008 || tagId == 200009;
 			
 		// Oblivion City Pickup Trap
 		case kLevel_DeathMarsh_3:
@@ -963,14 +976,44 @@ void TryTriggerActors(const kStr &in position)
 				TriggerActors();
 			}
 			break;
-	
-		// Full Health and Box of Shells enemy traps
-		case kLevel_DeathMarsh_2:
-			if (position == "62_900_5451_8")
+		
+		// Ultra Health GY3
+		case kLevel_RiverOfSouls_11:
+			if (position == "135_482_6727_461")
 			{
 				TriggerActors();
 			}
 			break;
+			
+		// Mag 60 and tek arrows in swamp traps
+		case kLevel_DeathMarsh_1:
+			if (position == "61_-1382_-1840_924")
+			{
+				TriggerActors(0, 1); // Just the first one
+			}
+			else if (position == "61_5913_-5756_-431")
+			{
+				TriggerActors(1, 2); // Just the second one
+			}
+			else if (position == "61_4710_-3635_-430")
+			{
+				TriggerActors(2); // The third one and beyond
+			}
+			break;
+	
+		// Shredder and Full Health traps
+		case kLevel_DeathMarsh_2:
+			if (position == "62_-2086_-3904_225")
+			{
+				TriggerActors(0, 1); // Just the first one
+			}
+			else if (position == "62_900_5451_8")
+			{
+				TriggerActors(1); // Second one and beyond
+			}
+			break;
+		
+		// Box of shells trap
 		case kLevel_DeathMarsh_3:
 			if (position == "63_-1839_-991_0")
 			{

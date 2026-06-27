@@ -200,7 +200,7 @@ class RandoPickupObject : ScriptObject
 	// so that it knows you could have received it.
 	void OnTick()
 	{		
-		if (m_id > 0 && !m_wasSentToAP)
+		if (!m_wasSentToAP)
 		{
 			// Prevent a dead player puppet from collecting stuff (this isn't normally possible)
 			kPuppet@ player = LocalPlayer.Actor();
@@ -232,6 +232,17 @@ class RandoPickupObject : ScriptObject
 			
 			// If close enough, we're good to pick it up
 			self.WorldComponent().TouchRadius() = touchRadius;
+			
+			// Try to trigger events from the item being picked up
+			// We do this with non-AP items to trigger traps without needing certain health/weapons
+			TryTriggerActors(m_position);
+			
+			// Non-AP items don't need to send to AP, so return here
+			if (m_id <= 0)
+			{
+				return;
+			}
+			
 			SendCheckToAP(m_id);
 			m_wasSentToAP = true;
 			
@@ -239,9 +250,6 @@ class RandoPickupObject : ScriptObject
 			
 			// Turn the important flag off now, since we already sent the check
 			self.Flags() &= ~AF_IMPORTANT;
-			
-			// Try to trigger events from the item being picked up
-			TryTriggerActors(m_position);
 			
 			// If we're randomizing weapons, always collect the weapon pickup
 			if (OPTION_RANDOMIZE_WEAPONS)
