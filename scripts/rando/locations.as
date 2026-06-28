@@ -886,7 +886,7 @@ bool IsActorToTrigger(
 			
 		// Oblivion City Pickup Trap
 		case kLevel_DeathMarsh_3:
-			return tagId == 200009;
+			return tagId == 200009 || tagId == 200014;
 		
 		// Raptor Rooms
 		case kLevel_DeathMarsh_8:
@@ -1017,7 +1017,11 @@ void TryTriggerActors(const kStr &in position)
 		case kLevel_DeathMarsh_3:
 			if (position == "63_-1839_-991_0")
 			{
-				TriggerActors();
+				TriggerActors(0, 1); // Just the first one
+			}
+			else if (position == "63_-1719_5578_-283")
+			{
+				TriggerActors(1); // Second one and beyond
 			}
 			break;
 			
