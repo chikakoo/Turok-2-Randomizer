@@ -907,6 +907,18 @@ bool IsActorToTrigger(
 				tagId == 200013 ||
 				tagId == 200014 ||
 				tagId == 200015;
+		
+		case kLevel_BlindLair_6:
+			return 
+				// Worm trap
+				tagId == 200014 || 
+				tagId == 200015 ||
+				
+				// Level Key Trap 3
+				tagId == 200031 || 
+				tagId == 200032 ||
+				tagId == 200033 || 
+				tagId == 200034;
 				
 		// Level Key Trap 2
 		case kLevel_BlindLair_8:
@@ -918,14 +930,6 @@ bool IsActorToTrigger(
 				tagId == 200037 ||
 				tagId == 200038;
 				
-		// Level Key Trap 3
-		case kLevel_BlindLair_6:
-			return tagId == 200031 || 
-				tagId == 200032 ||
-				tagId == 200033 || 
-				tagId == 200034;
-		
-
 		case kLevel_Hive_3:
 			// Flame Thrower Tank
 			return tagId == 200005 ||
@@ -1046,14 +1050,21 @@ void TryTriggerActors(const kStr &in position)
 				TriggerActors(2); // Everything after the first two actors
 			}
 			break;
-		case kLevel_BlindLair_8:
-			if (position == "105_-5429_-3174_-2734")
+		case kLevel_BlindLair_6: 
+			// Worm trap
+			if (position == "103_2048_-3532_-3686")
 			{
-				TriggerActors();
+				TriggerActors(0, 2); // First two actors
+			}
+			// Level Key trap 3
+			else if (position == "103_-8652_-149_-3604")
+			{
+				TriggerActors(2); // Everything after the first two actors
 			}
 			break;
-		case kLevel_BlindLair_6:
-			if (position == "103_-8652_-149_-3604")
+		case kLevel_BlindLair_8:
+			// Level Key trap 2
+			if (position == "105_-5429_-3174_-2734")
 			{
 				TriggerActors();
 			}
