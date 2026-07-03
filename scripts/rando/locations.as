@@ -957,6 +957,13 @@ bool IsActorToTrigger(
 				tagId == 200024 ||
 				tagId == 200025;
 				
+		// Level Key Trap
+		case kLevel_Hive_6:
+			return tagId == 200029 ||
+				tagId == 200030 ||
+				tagId == 200031 ||
+				tagId == 200032;
+				
 		// Scorpion Launcher Trap
 		case kLevel_Hive_7:
 			return tagId == 200005 ||
@@ -1104,6 +1111,14 @@ void TryTriggerActors(const kStr &in position)
 			else if (position == "88_614_1996_1191")
 			{
 				TriggerActors(1); // Everything after the first actor
+			}
+			break;
+			
+		// Level Key Trap
+		case kLevel_Hive_6:
+			if (position == "89_-2150_-7536_-583")
+			{
+				TriggerActors();
 			}
 			break;
 		
