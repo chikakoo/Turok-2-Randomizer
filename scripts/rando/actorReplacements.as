@@ -535,6 +535,28 @@ void ReplaceEnemyActor(kActor@ initialActor, const bool &in isFromSpawner = fals
 		return;
 	}
 	
+	// Mite waves in the intersection Rooms
+	// We won't randomize these guys because they get stuck easily
+	if (Game.ActiveMapID() == kLevel_Hive_5)
+	{
+		switch(initialActor.TID())
+		{
+			case 40:
+			case 45:
+			case 29:
+			case 30:
+			case 31:
+			case 36:
+			case 37:
+			case 38:
+			case 39:
+			case 41:
+			case 44:
+			case 46:
+				return;
+		}
+	}
+	
 	// If there's no script here, then we don't want to replace this actor
 	RandoEnemy@ initialActorScript = cast<RandoEnemy@>(GetScript(initialActor));
 	if (initialActorScript is null)

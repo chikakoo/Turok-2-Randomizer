@@ -951,7 +951,11 @@ bool IsActorToTrigger(
 			
 				// Full Health Trap;
 				tagId == 200020 ||
-				tagId == 200021;
+				tagId == 200021 ||
+				tagId == 200022 ||
+				tagId == 200023 ||
+				tagId == 200024 ||
+				tagId == 200025;
 				
 		// Scorpion Launcher Trap
 		case kLevel_Hive_7:
