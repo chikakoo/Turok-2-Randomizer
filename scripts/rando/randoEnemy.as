@@ -146,30 +146,8 @@ class RandoEnemy : ScriptActor
 	// Simply setting Health to 0 does not work
 	void OnDeath(kDamageInfo& in dmgInfo)
 	{
-		// TODO: delete me
-		if (self.TID() > 0 && apEntry is null)
-		{
-			Sys.Print("" + Game.ActiveMapID() + "_" + self.TID());
-			Hud.AddMessage("" + Game.ActiveMapID() + "_" + self.TID());
-			
-			if (((self.Flags() & (1 << 10)) == 0) || // easy
-				((self.Flags() & (1 << 11)) == 0) || // normal
-				((self.Flags() & (1 << 12)) == 0) || // hard
-				((self.Flags() & (1 << 13)) == 0)) // hardcore
-			{
-				Sys.Print("NOT AVAILABLE IN ALL DIFFICULTIES!!!!!");
-				Hud.AddMessage("NOT AVAILABLE IN ALL DIFFICULTIES!!!!!");
-			}
-			
-			self.Flags() &= ~AF_IMPORTANT;
-		}
-		else {
-			Hud.AddMessage("" + self.TID());
-		}
-		
 		if (apEntry !is null)
 		{		
-			// TODO: Keep this, delete the above
 			TrySendActionObjectToAP(self.TID());
 			self.Flags() &= ~AF_IMPORTANT;
 			@apEntry = null;
@@ -190,9 +168,6 @@ class RandoEnemy : ScriptActor
 		}
 	}
 	
-	//TODO: remove this
-	bool m_checkedForAPMap;
-	
 	//----------------------------------
 	// Handle visiblity every tick for replacement actors
 	// - If the original wouldn't be visible, check if that changed, and if so,
@@ -200,33 +175,13 @@ class RandoEnemy : ScriptActor
 	// - Else, set the original to hidden if it's ever shown for some reason
 	void OnTick(void)
 	{
-		// TODO: remove this (only enable when testing if a spawn was missed)
-		if (!m_checkedForAPMap && self.TID() > 0 && apEntry is null)
-		{
-			if (((self.Flags() & (1 << 10)) == 0) || // easy
-				((self.Flags() & (1 << 11)) == 0) || // normal
-				((self.Flags() & (1 << 12)) == 0) || // hard
-				((self.Flags() & (1 << 13)) == 0)) // hardcore
-			{
-			}
-			else {
-				Hud.AddMessage("MISSING ENEMY: " + self.TID() + " " + self.Type());
-				Sys.Print("MISSING ENEMY: " + self.TID() + " " + self.Type());
-				self.Flags() |= AF_IMPORTANT;
-				importantShown = true;
-			}
-		}
-		m_checkedForAPMap = true;
-		
 		// If this enemy is a check, show the important indicator when it's visible
-		if (
-			self.TID() > 0 && //TODO; delete this line
-			//g_markEnemies && // TODO: re-enable this line
+		if (g_markEnemies &&
 			!importantShown &&
-			//apEntry !is null && // TODO: re-enable this line
+			apEntry !is null &&
 			((self.Flags() & AF_HIDDEN) == 0))
 		{
-			//self.Flags() |= AF_IMPORTANT; //TODO: reenable this
+			self.Flags() |= AF_IMPORTANT;
 			importantShown = true;
 		}
 		

@@ -631,9 +631,8 @@ void CalculateTotalLocationsCheckedForLevel(
 	array<int>@ mapIds = g_mapLevelNumberToMapIds[levelNumber];
 	for (uint i = 0; i < mapIds.length(); i++)
 	{
-		array<ReplacementEntry@>@ locations = 
-			g_mapReplacements[mapIds[i]];
-		
+		// Pickups
+		array<ReplacementEntry@>@ locations = g_mapReplacements[mapIds[i]];
 		for (uint j = 0; j < locations.length(); j++)
 		{
 			if (locations[j].apId <= 0)
@@ -643,6 +642,22 @@ void CalculateTotalLocationsCheckedForLevel(
 			
 			totalLocations++;
 			if (locations[j].isCollected || locations[j].isSentToAP)
+			{
+				totalCollected++;
+			}
+		}
+		
+		// Switches/missions/enemies
+		array<ActionObjectEntry@>@ actionObjectEntries = g_actionObjectEntries[mapIds[i]];
+		for (uint j = 0; j < actionObjectEntries.length(); j++)
+		{
+			if (actionObjectEntries[j].apId <= 0)
+			{
+				continue;
+			}
+			
+			totalLocations++;
+			if (actionObjectEntries[j].isSentToAP)
 			{
 				totalCollected++;
 			}
@@ -660,48 +675,6 @@ void CalculateTotalLocationsCheckedForLevelFromMap(
 {
 	int levelNumber = GetLevelNumberFromMapId(mapId);
 	CalculateTotalLocationsCheckedForLevel(levelNumber, totalCollected, totalLocations);
-}
-
-//------------------------------
-// Displays a string indicating collection progress for the current level:
-// locations checked / total locations.
-void DisplayCollectedLocationsForGame(const int &in visibleTime = 120)
-{
-	int totalCollected = 0;
-	int totalChecks = 0;
-	
-	int levelCollected;
-	int levelTotal;
-	
-	array<int> levels = {
-		LEVEL_PORT_OF_ADIA,
-		LEVEL_RIVER_OF_SOULS,
-		LEVEL_DEATH_MARSHES,
-		LEVEL_LAIR_OF_THE_BLIND_ONES,
-		LEVEL_HIVE_OF_THE_MANTIDS,
-		LEVEL_PRIMAGENS_LIGHTSHIP
-	};
-	
-	kStr output = "Levels: ";
-	
-	for (uint i = 0; i < levels.length(); i++)
-	{
-		CalculateTotalLocationsCheckedForLevel(levels[i], levelCollected, levelTotal);
-		totalCollected += levelCollected;
-        totalChecks += levelTotal;
-		
-        if (i > 0)
-        {
-            output += " - ";
-        }
-
-        output += "" + levelCollected + "/" + levelTotal;
-	}
-	
-	Hud.AddMessage(output, visibleTime);
-	Hud.AddMessage(
-		"Total Checks: " + totalCollected + "/" + totalChecks,
-		visibleTime);
 }
 
 //------------------------------
