@@ -45,6 +45,8 @@ void PrintAPMemory()
 	Sys.Print("OutgoingLastProcessedItemIdx: " + g_AP.OutgoingLastProcessedItemIdx);
 	
 	Sys.Print("IsGoalReached: " + g_AP.IsGoalReached);
+	
+	Sys.Print("CurrentMapId: " + g_AP.CurrentMapId);
 }
 
 // A global for all outgoing location checks - this is here in case we cannot send out

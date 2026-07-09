@@ -143,12 +143,18 @@ class RandoPlayerObject : ScriptObject
 	void SetCurrentMapId(const int16 &in mapId)
 	{
 		int16 modifier = 0;
-		kVec3 origin = LocalPlayer.Actor().Origin();
+		int regionIndex = LocalPlayer.Actor().WorldComponent().RegionIndex();
 		
 		switch(mapId)
 		{
+			case kLevel_PortOfAdia_2:
+				if (regionIndex == 1302 || regionIndex == 1115) // From 1-3/1-4
+				{
+					modifier = 1;
+				}
+				break;
 			case kLevel_PortOfAdia_3:
-				if (int(origin.x) == 1536 && int(origin.y) == 1884 && int(origin.z) == 307)
+				if (regionIndex == 605) // From 1-2b
 				{
 					modifier = 1;
 				}
