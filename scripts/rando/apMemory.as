@@ -21,6 +21,9 @@ class APMemory
 	
 	// Goal reached - AP will think it is done if this is set to anything above 0
 	int IsGoalReached;
+	
+	// Used by the client to send to the poptracker
+	int CurrentMapId;
 }
 
 APMemory g_AP;
@@ -103,6 +106,8 @@ void InitAP()
 	g_AP.OutgoingLastProcessedItemIdx = 0;
 	
 	g_AP.IsGoalReached = 0;
+	
+	g_AP.CurrentMapId = 0;
 }
 
 void ResetAPForLoadData(int& in outgoingLastProcessedItemIdx)

@@ -73,6 +73,8 @@ class RandoPlayerObject : ScriptObject
 		DisplayCollectedLocationsForCurrentMap();
 		
 		int16 mapId = Game.ActiveMapID();
+		g_AP.CurrentMapId = mapId * 100; // TODO: We'll eventually add on the offset for submaps (1-3F/B = 5200, 5201)
+		
 		switch(mapId)
 		{
 			// If the map is the intro map, it's a new game, so reset everything
