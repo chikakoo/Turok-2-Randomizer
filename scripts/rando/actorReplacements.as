@@ -20,6 +20,7 @@ void DoActorReplacementsOnPlayerSpawn()
 	ReplaceAllActors(mapId);
 	DoHubModifications(mapId);
 	AddBarriers(mapId);
+	AddMapDetectors(mapId);
 }
 
 //---------------------------
@@ -408,6 +409,31 @@ void AddWeaponBarrierForL6(
 	{
 		barrierScript.SetRadii(280.0f);
 	}
+}
+
+//---------------------------
+// Adds map detectors for the given map
+void AddMapDetectors(const int16 &in mapId)
+{
+	switch(mapId)
+	{
+		case kLevel_PortOfAdia_3:
+			AddMapDetector(5300, kVec3(-3681.044, 1444.892, 0), 200);
+			AddMapDetector(5301, kVec3(-3684.889, 1868.271, 0), 200);
+			break;
+	}
+}
+
+void AddMapDetector(const int &in mapIdToSend, const kVec3 &in pos, const float &in radius = 140)
+{
+	kActor@ detector = ActorFactory.Spawn(
+		kActor_Collider_MapDetection,
+		pos,
+		0, 0, 0
+	);
+	RandoMapDetection@ detectorScript = cast<RandoMapDetection@>(GetScript(detector));
+	detectorScript.SetMapId(mapIdToSend);
+	detectorScript.SetRadius(radius);
 }
 
 //----------------------------------

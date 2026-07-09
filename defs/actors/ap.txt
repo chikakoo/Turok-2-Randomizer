@@ -287,6 +287,32 @@ WeaponBarrier kActor_ProgressionBlocker_WeaponBarrier
 }
 
 //------------------------------
+// Actor used to set the current map id on maps with multiple sections
+MapDetection kActor_Collider_MapDetection
+{
+	className				  "kexActor"
+	placeable                 TRUE
+	flags.noDamage            TRUE
+	flags.allowTracking       FALSE
+	
+    Begin_Component "kexWorldComponent"
+        radius                150.0
+		touchRadius			  150.0
+		height				  300.0
+		bNonSolid             TRUE
+    End_Component
+	Begin_Component "kexScriptComponent"
+        scriptClass           "RandoMapDetection"
+    End_Component
+	
+	
+	Begin_Component "kexParticleEmitterComponent"
+        particle                "particles/rando_weapon_barrier.particle"
+        offset                  "0.0 0.0 0.0"
+    End_Component
+}
+
+//------------------------------
 // Random ammo pickup for AP - see GetAmmoInRandomWeapon
 RandomAmmo kActor_Item_RandomAmmo
 {

@@ -73,7 +73,7 @@ class RandoPlayerObject : ScriptObject
 		DisplayCollectedLocationsForCurrentMap();
 		
 		int16 mapId = Game.ActiveMapID();
-		g_AP.CurrentMapId = mapId * 100; // TODO: We'll eventually add on the offset for submaps (1-3F/B = 5200, 5201)
+		SetCurrentMapId(mapId);
 		
 		switch(mapId)
 		{
@@ -136,6 +136,26 @@ class RandoPlayerObject : ScriptObject
 		
 		// Recompute owned weapons in case of desyncs
 		ComputeNumberOfOwnedProgressionWeapons();
+	}
+	
+	//---------------------------
+	// Sets the current map id based on the map id and player position
+	void SetCurrentMapId(const int16 &in mapId)
+	{
+		int16 modifier = 0;
+		kVec3 origin = LocalPlayer.Actor().Origin();
+		
+		switch(mapId)
+		{
+			case kLevel_PortOfAdia_3:
+				if (int(origin.x) == 1536 && int(origin.y) == 1884 && int(origin.z) == 307)
+				{
+					modifier = 1;
+				}
+				break;
+		}
+			
+		g_AP.CurrentMapId = (mapId * 100) + modifier;
 	}
 	
 	//---------------------------
@@ -301,6 +321,7 @@ class RandoPlayerObject : ScriptObject
 		
 		SERIALIZE(g_markPickups);
 		SERIALIZE(g_markEnemies);
+		SERIALIZE(g_AP.CurrentMapId);
 	}
 
 	//---------------------------
@@ -335,6 +356,7 @@ class RandoPlayerObject : ScriptObject
 		
 		DESERIALIZE_BOOL(g_markPickups);
 		DESERIALIZE_BOOL(g_markEnemies);
+		DESERIALIZE_INT(g_AP.CurrentMapId);
 	}
 	
 	//---------------------------
