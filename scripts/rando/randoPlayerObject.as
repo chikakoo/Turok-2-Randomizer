@@ -142,6 +142,12 @@ class RandoPlayerObject : ScriptObject
 	// Sets the current map id based on the map id and player position
 	void SetCurrentMapId(const int16 &in mapId)
 	{
+		// Don't set the map id on deserialize or we'll overwrite our value
+		if (LocalPlayer.Actor().Deserialized())
+		{
+			return;
+		}
+		
 		int16 modifier = 0;
 		int regionIndex = LocalPlayer.Actor().WorldComponent().RegionIndex();
 		
