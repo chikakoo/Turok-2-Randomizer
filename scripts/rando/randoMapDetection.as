@@ -1,5 +1,6 @@
 // --------------------------
-// An actor for blocking players getting to warps to support progressive warp portals.
+// An actor for detecting when players walk to certain parts of the map.
+// This is used for auto-tabbing in trackers.
 //---------------------------
 class RandoMapDetection : ScriptActor
 {
@@ -29,6 +30,13 @@ class RandoMapDetection : ScriptActor
 	{
 		self.WorldComponent().Radius() = radius;
 		self.WorldComponent().TouchRadius() = radius;
+	}
+	
+	//---------------------------
+	// Sets the height
+	void SetHeight(const float &in height)
+	{
+		self.WorldComponent().Height() = height;
 	}
 	
 	//---------------------------

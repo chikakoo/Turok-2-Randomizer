@@ -165,6 +165,12 @@ class RandoPlayerObject : ScriptObject
 					modifier = 1;
 				}
 				break;
+			case kLevel_PortOfAdia_9: // From 1-O
+				if (regionIndex == 710)
+				{
+					modifier = 1;
+				}
+				break;
 		}
 			
 		g_AP.CurrentMapId = (mapId * 100) + modifier;

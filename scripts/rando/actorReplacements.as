@@ -421,10 +421,20 @@ void AddMapDetectors(const int16 &in mapId)
 			AddMapDetector(5300, kVec3(-3681.044, 1444.892, 0), 200);
 			AddMapDetector(5301, kVec3(-3684.889, 1868.271, 0), 200);
 			break;
+		case kLevel_PortOfAdia_9:
+			AddMapDetector(5900, kVec3(143.922, 1949.251, 0), 140, 1000);
+			AddMapDetector(5901, kVec3(-288.023, 1949.683, 0), 140, 1000);
+			break;
 	}
 }
 
-void AddMapDetector(const int &in mapIdToSend, const kVec3 &in pos, const float &in radius = 140)
+//---------------------------
+// Adds a map detector for the given map, position, and optional radius/height
+void AddMapDetector(
+	const int &in mapIdToSend, 
+	const kVec3 &in pos, 
+	const float &in radius = 140,
+	const float &in height = 300)
 {
 	kActor@ detector = ActorFactory.Spawn(
 		kActor_Collider_MapDetection,
@@ -434,6 +444,7 @@ void AddMapDetector(const int &in mapIdToSend, const kVec3 &in pos, const float 
 	RandoMapDetection@ detectorScript = cast<RandoMapDetection@>(GetScript(detector));
 	detectorScript.SetMapId(mapIdToSend);
 	detectorScript.SetRadius(radius);
+	detectorScript.SetHeight(height);
 }
 
 //----------------------------------
