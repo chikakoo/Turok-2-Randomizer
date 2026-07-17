@@ -171,6 +171,18 @@ class RandoPlayerObject : ScriptObject
 					modifier = 1;
 				}
 				break;
+				
+			case kLevel_RiverOfSouls_6:
+				// 2-6b, from 2-6a and 2-GY1
+				if (regionIndex == 1395 || regionIndex == 3381)
+				{
+					modifier = 1;
+				}
+				// 2-6c, from 2-GY1 and 2-7
+				else if (regionIndex == 3814 || regionIndex == 358)
+				{
+					modifier = 2;
+				}
 		}
 			
 		g_AP.CurrentMapId = (mapId * 100) + modifier;
