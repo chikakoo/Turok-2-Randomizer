@@ -69,7 +69,7 @@
 #define kActor_InventoryItem_Level5Key 4340
 #define kActor_InventoryItem_Level6Key 4350
 
-#define kActor_MissionItem_BeaconPowerCell 4200
+#define kActor_MissionItem_PowerCell 4200
 #define kActor_MissionItem_GateKey 4030
 #define kActor_MissionItem_GraveyardKey 4025
 #define kActor_MissionItem_CaveDoorKey 4020

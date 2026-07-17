@@ -30,7 +30,7 @@ class RandoPickupObject : ScriptObject
 		
 		// These aren't showing as important for some reason when they should
 		// These are vanilla and should always be marked!
-		if (self.Type() == kActor_MissionItem_BeaconPowerCell ||
+		if (self.Type() == kActor_MissionItem_PowerCell ||
 			self.Type() == kActor_MissionItem_IonCapacitor)
 		{
 			self.Flags() |= AF_IMPORTANT;

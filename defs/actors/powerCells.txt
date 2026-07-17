@@ -7,7 +7,7 @@
 //-----------------------------------------------------------------------------
 
 
-Actor kActor_MissionItem_BeaconPowerCell
+Actor kActor_MissionItem_PowerCell
 { 
 	className "kexInventoryPickup" 
 	placeable TRUE 

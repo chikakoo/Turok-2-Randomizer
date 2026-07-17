@@ -1,0 +1,42 @@
+desiredLevel = "levels/Adon_SavePortal.map"
+gameObjectTID = 5
+type = 400
+bTargetCentered = 0
+bPlayerCentered = 0
+bSkippable = 0
+bSendPlayerBack = 0
+beginTime = 0.000000
+endTime = 0.000000
+drawDistance = 30720.000000
+letterboxRatio = 2.200000
+overrideSound = 1
+overrideMusic = 1
+
+data =
+{
+    paths =
+    {
+        {
+            pathPoints : 0 =
+            {
+                { 569.826111 6989.105469 88.470772 } 0.0 // Camera at Adon
+            }
+            targetPoints : 0 =
+            {
+                { 571.044922 7101.242188 75.258003 } 0.0 // Camera at Adon
+            }
+        }
+    }
+    fades =
+    {
+    }
+    events =
+    {
+        // adon shots
+        { 0 100004 } 0.0 // Show Adon
+        { 0 100005 } 0.0 // Hide Turok
+    }
+    fov =
+    {
+    }
+}

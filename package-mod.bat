@@ -3,7 +3,7 @@
 @echo off
 setlocal enabledelayedexpansion
 
-set "allFolders=anims char defs gfx materials models particles scripts textures"
+set "allFolders=anims cinemas char defs gfx localization materials models particles scripts textures"
 
 :: Create an output directory to work in
 set "outputDir=output"

@@ -112,47 +112,7 @@ class RandoUI
 	// - Location collection progress for the entire Level
 	void DisplayLevelProgress()
 	{
-		int16 mapId = Game.ActiveMapID();
-		switch(GetLevelNumberFromMapId(mapId))
-		{
-			case LEVEL_PORT_OF_ADIA:
-				Hud.AddMessage(
-					"Power Cells: " + GetInventoryMessage(kActor_MissionItem_BeaconPowerCell),
-					g_progressMenuDisplayTime);
-				break;
-			case LEVEL_RIVER_OF_SOULS:
-				Hud.AddMessage(
-					"Gate Keys: " + GetInventoryMessage(kActor_MissionItem_GateKey) +
-					"  -  Graveyard Keys: " + GetInventoryMessage(kActor_MissionItem_GraveyardKey),
-					g_progressMenuDisplayTime);
-				break;
-			case LEVEL_DEATH_MARSHES:
-				Hud.AddMessage(
-					"Satchel Charges: " + GetInventoryMessage(kActor_MissionItem_L3SatchelCharge),
-					g_progressMenuDisplayTime);
-				break;
-			case LEVEL_LAIR_OF_THE_BLIND_ONES:
-				Hud.AddMessage(
-					"Satchel Charges: " + GetInventoryMessage(kActor_MissionItem_L4SatchelCharge) +
-					"  -  Cave Door Keys: " + GetInventoryMessage(kActor_MissionItem_CaveDoorKey),
-					g_progressMenuDisplayTime);
-				break;
-			case LEVEL_HIVE_OF_THE_MANTIDS:
-				Hud.AddMessage(
-					"Satchel Charges: " + GetInventoryMessage(kActor_MissionItem_L5SatchelCharge),
-					g_progressMenuDisplayTime);
-				break;
-			case LEVEL_PRIMAGENS_LIGHTSHIP:
-				Hud.AddMessage(
-					"Ion Caps: " + GetInventoryMessage(kActor_MissionItem_IonCapacitor) + 
-					"  -  Blue Laser Cells: " + GetInventoryMessage(kActor_MissionItem_BlueLaserCell) + 
-					"  -  Red Laser Cells: " + GetInventoryMessage(kActor_MissionItem_RedLaserCell),
-					g_progressMenuDisplayTime);
-				break;
-			default:
-				return;
-		}
-		
+		int16 mapId = Game.ActiveMapID();		
 		DisplayCollectedLocationsForLevel(mapId, "Level Checks", g_progressMenuDisplayTime);
 		DisplayCollectedLocationsForCurrentMap(g_progressMenuDisplayTime);
 	}
@@ -588,7 +548,7 @@ class RandoUI
 		switch(level)
 		{
 			case 1:
-				DisplayMissionItem(isExcluded, levelHeightOffset, UI_OFFSET_MISSION_ITEM_1, kActor_MissionItem_BeaconPowerCell, 3);
+				DisplayMissionItem(isExcluded, levelHeightOffset, UI_OFFSET_MISSION_ITEM_1, kActor_MissionItem_PowerCell, 3);
 				break;
 			case 2:
 				DisplayMissionItem(isExcluded, levelHeightOffset, UI_OFFSET_MISSION_ITEM_2, kActor_MissionItem_GateKey, 2);

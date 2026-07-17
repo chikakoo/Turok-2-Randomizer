@@ -21,6 +21,9 @@
 !char/
 !char/**
 
+!cinemas/
+!cinemas/**
+
 !anims/
 !anims/**
 
@@ -38,5 +41,8 @@
 
 !layeredImages/
 !layeredImages/**
+
+!localization/
+!localization/**
 
 !package-mod.bat

@@ -77,7 +77,7 @@ void Help(void)
 	Sys.Print("-----------------");
 	Sys.Print("Mission Items");
 	Sys.Print("-----------------");
-	Sys.Print("BeaconPowerCell");
+	Sys.Print("PowerCell");
 	Sys.Print("GateKey");
 	Sys.Print("GraveyardKey");
 	Sys.Print("L3SatchelCharge");
@@ -419,9 +419,9 @@ void Nuke(void)
 
 //---------------------------
 // Mission Items
-void BeaconPowerCell(void)
+void PowerCell(void)
 {
-	TryGetInventoryItem(kActor_MissionItem_BeaconPowerCell);
+	TryGetInventoryItem(kActor_MissionItem_PowerCell);
 }
 
 void GateKey(void)
