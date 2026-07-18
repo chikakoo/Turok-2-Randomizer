@@ -160,7 +160,7 @@ class RandoPlayerObject : ScriptObject
 				}
 				break;
 			case kLevel_PortOfAdia_3:
-				if (regionIndex == 605) // From 1-2b
+				if (regionIndex == 487 || regionIndex == 605) // From Checkpoint/1-2b
 				{
 					modifier = 1;
 				}
