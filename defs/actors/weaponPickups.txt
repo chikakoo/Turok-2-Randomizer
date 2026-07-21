@@ -449,7 +449,7 @@ WpnTorpedoLauncher kActor_Item_WpnTorpedoLauncher
     pickup.weapon.giveAmmo      3
     pickup.pickupMessage        "$str_155"
     pickup.callout              kVoice_Weapon18
-	rando.ammoMessage			"Torpedos"
+	rando.ammoMessage			"Torpedoes"
     
     initialScale              "0.5 0.5 0.5"
     Begin_Component "kexWorldComponent"
