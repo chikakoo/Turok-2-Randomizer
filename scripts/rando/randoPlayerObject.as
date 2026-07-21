@@ -76,7 +76,16 @@ class RandoPlayerObject : ScriptObject
 		SetCurrentMapId(mapId);
 		
 		switch(mapId)
-		{
+		{			
+			// Stop all intro cinemas early (level 1 is handled in new game)
+			case kLevel_Intro_RiverOfSouls:
+			case kLevel_Intro_DeathMarshes:
+			case kLevel_Intro_Blind:
+			case kLevel_Intro_Hive:
+			case kLevel_Intro_Lightship:
+				SkipCutscene(mapId);
+				break;
+		
 			// If the map is the intro map, it's a new game, so reset everything
 			case kLevel_Level1Intro_1:
 				HandleNewGame();
@@ -189,6 +198,48 @@ class RandoPlayerObject : ScriptObject
 	}
 	
 	//---------------------------
+	// Skips the current cutscene for the given map
+	// Warps the player instantly to the given warp id on that map
+	// Does nothing if the map is not handled
+	void SkipCutscene(const int16 &in mapId)
+	{
+		// Use the hub as a fallback
+		int warpId = Warp_Id_HubCheckpoint;
+		int warpMapId = kLevel_Hub;
+		switch (mapId)
+		{
+			case kLevel_Hub:
+				break;
+			case kLevel_Intro_RiverOfSouls:
+				warpId = Warp_Id_RiverOfSoulsStart;
+				warpMapId = kLevel_RiverOfSouls_1;
+				break;
+			case kLevel_Intro_DeathMarshes:
+				warpId = Warp_Id_DeathMarshesStart;
+				warpMapId = kLevel_DeathMarsh_1;
+				break;
+			case kLevel_Intro_Blind:
+				warpId = Warp_Id_BlindStart;
+				warpMapId = kLevel_BlindLair_1;
+				break;
+			case kLevel_Intro_Hive:
+				warpId = Warp_Id_HiveStart;
+				warpMapId = kLevel_HiveTop;
+				break;
+			case kLevel_Intro_Lightship:
+				warpId = Warp_Id_LightshipStart;
+				warpMapId = kLevel_Lightship_1;
+				break;
+			default:
+				Sys.Print("WARNING: Tried to skip cutscene on unexpected map: " + mapId);
+				return;
+		}
+		
+		CinemaPlayer.StopCinema();
+		DoPlayerWarp(0, warpId, warpMapId, false);
+	}
+	
+	//---------------------------
 	// Reset everything on a new game.
 	void HandleNewGame()
 	{
@@ -224,8 +275,7 @@ class RandoPlayerObject : ScriptObject
 			TryGivePlayerWeapon(startingWeapons[i], 1000, true);
 		}
 		
-		CinemaPlayer.StopCinema();
-		DoPlayerWarp(0, 10099, kLevel_Hub, false);
+		SkipCutscene(kLevel_Hub);
 	}
 	
 	//---------------------------

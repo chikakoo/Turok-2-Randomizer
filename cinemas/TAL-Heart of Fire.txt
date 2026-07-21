@@ -1,0 +1,35 @@
+desiredLevel = "levels/Blind_Talisman.map"
+gameObjectTID = 7
+type = 0
+bTargetCentered = 0
+bPlayerCentered = 0
+bSkippable = 0
+bSendPlayerBack = 0
+beginTime = 0.000000
+endTime = 0.000000
+drawDistance = 0.000000
+letterboxRatio = 2.200000
+overrideSound = 0
+overrideMusic = 1
+
+data =
+{
+    paths =
+    {
+    }
+    fades =
+    {
+    }
+    events =
+    {
+        { 0 100012 } 0.0
+        { 0 100013 } 0.0
+        { 0 100002 } 0.0
+        { 0 100003 } 0.0
+        { 0 100010 } 0.0
+        { 0 100014 } 0.0
+    }
+    fov =
+    {
+    }
+}

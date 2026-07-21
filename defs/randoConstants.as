@@ -139,3 +139,20 @@
 #define kActor_AI_FleshSentinel 400
 #define kActor_AI_DeathGuard 401
 #define kActor_AI_LordOfTheFlesh 402
+
+// ---------
+// Map intros without constants
+#define kLevel_Intro_RiverOfSouls 34
+#define kLevel_Intro_DeathMarshes 12
+#define kLevel_Intro_Blind 18
+#define kLevel_Intro_Hive 31
+#define kLevel_Intro_Lightship 138
+
+// ---------
+// Warp IDs
+#define Warp_Id_HubCheckpoint 10099
+#define Warp_Id_RiverOfSoulsStart 12000
+#define Warp_Id_DeathMarshesStart 13000
+#define Warp_Id_BlindStart 14000
+#define Warp_Id_HiveStart 15000
+#define Warp_Id_LightshipStart 16000
