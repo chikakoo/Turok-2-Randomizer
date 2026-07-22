@@ -572,8 +572,16 @@ void ReplaceEnemyActor(kActor@ initialActor, const bool &in isFromSpawner = fals
 		return;
 	}
 	
+	// If there's no script here, then we don't want to replace this actor
+	RandoEnemy@ initialActorScript = cast<RandoEnemy@>(GetScript(initialActor));
+	if (initialActorScript is null)
+	{
+		return;
+	}
+	
 	// Mite waves in the intersection Rooms
 	// We won't randomize these guys because they get stuck easily
+	bool forceMite = false;
 	if (Game.ActiveMapID() == kLevel_Hive_5)
 	{
 		switch(initialActor.TID())
@@ -590,21 +598,19 @@ void ReplaceEnemyActor(kActor@ initialActor, const bool &in isFromSpawner = fals
 			case 41:
 			case 44:
 			case 46:
-				return;
+				forceMite = true;
+				break;
 		}
 	}
 	
-	// If there's no script here, then we don't want to replace this actor
-	RandoEnemy@ initialActorScript = cast<RandoEnemy@>(GetScript(initialActor));
-	if (initialActorScript is null)
-	{
-		return;
-	}
+	int randomEnemy = forceMite
+		? kActor_AI_Mite
+		: GenerateRandomEnemy(isFromSpawner);
 	
 	kWorldComponent@ worldComponent = initialActor.WorldComponent();
 	kEnemyAIComponent@ enemyAIComponent = initialActor.EnemyAIComponent();
 	kActor@ replacedActor = ActorFactory.Spawn(
-		GenerateRandomEnemy(isFromSpawner),
+		randomEnemy,
 		initialActor.Origin(),
 		initialActor.Yaw(),
 		initialActor.Pitch(),
