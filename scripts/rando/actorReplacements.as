@@ -566,22 +566,23 @@ void ReplaceActor(kActor@ initialActor, ReplacementEntry@ replacement)
 // Replaces an enemy actor
 void ReplaceEnemyActor(kActor@ initialActor, const bool &in isFromSpawner = false)
 {
-	// Sisters of despair will glitch out the mission objective, so don't randomize them
-	if (initialActor.Type() == kActor_AI_SisterOfDespair)
-	{
-		return;
-	}
-	
 	// If there's no script here, then we don't want to replace this actor
 	RandoEnemy@ initialActorScript = cast<RandoEnemy@>(GetScript(initialActor));
 	if (initialActorScript is null)
 	{
 		return;
 	}
+
+	// Sisters of despair will glitch out the mission objective, so don't randomize them
+	// Since they are never replaced, set the flag here too so enemysanity can work with them
+	if (initialActor.Type() == kActor_AI_SisterOfDespair)
+	{
+		initialActorScript.SetNeverReplacedActor(true);
+		return;
+	}
 	
 	// Mite waves in the intersection Rooms
 	// We won't randomize these guys because they get stuck easily
-	bool forceMite = false;
 	if (Game.ActiveMapID() == kLevel_Hive_5)
 	{
 		switch(initialActor.TID())
@@ -598,19 +599,15 @@ void ReplaceEnemyActor(kActor@ initialActor, const bool &in isFromSpawner = fals
 			case 41:
 			case 44:
 			case 46:
-				forceMite = true;
-				break;
+				initialActorScript.SetNeverReplacedActor(true);
+				return;
 		}
 	}
-	
-	int randomEnemy = forceMite
-		? kActor_AI_Mite
-		: GenerateRandomEnemy(isFromSpawner);
 	
 	kWorldComponent@ worldComponent = initialActor.WorldComponent();
 	kEnemyAIComponent@ enemyAIComponent = initialActor.EnemyAIComponent();
 	kActor@ replacedActor = ActorFactory.Spawn(
-		randomEnemy,
+		GenerateRandomEnemy(isFromSpawner),
 		initialActor.Origin(),
 		initialActor.Yaw(),
 		initialActor.Pitch(),

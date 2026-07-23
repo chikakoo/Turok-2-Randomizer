@@ -13,6 +13,10 @@ class RandoEnemy : ScriptActor
 	// Whether this is the replaced actor (i.e. not the original)
 	bool isReplacedActor;
 	
+	// Whether this is an actor that is never replaced in enemizer
+	// Used by some Mites in level 5 and Sisters of Despair in level 2
+	bool neverReplacedActor;
+	
 	// Whether the original actor wouldn't be visible
 	// Used to show the replacement when necessary
 	bool isNotYetShown;
@@ -67,6 +71,15 @@ class RandoEnemy : ScriptActor
 	}
 	
 	//----------------------------------
+	// Sets whether the actor is never replaced in enemizer
+	// Also tries to set the ApEntry, because this would change whether this gets a value
+	void SetNeverReplacedActor(const bool &in neverReplacedActor)
+	{
+		this.neverReplacedActor = neverReplacedActor;
+		SetApEntry();
+	}
+	
+	//----------------------------------
 	// Looks up the AP entry so it can be processed when the enemy dies.
 	// Sets to null if it's already checked or there is no entry.
 	//
@@ -77,13 +90,16 @@ class RandoEnemy : ScriptActor
 	void SetApEntry()
 	{
 		@apEntry = null;
-		
-		if ((OPTION_ENEMIZER != 0 && !isReplacedActor) || 
-			processedSpawn ||
-			((self.Flags() & (1 << 10)) == 0) || // easy
-			((self.Flags() & (1 << 11)) == 0) || // normal
-			((self.Flags() & (1 << 12)) == 0) || // hard
-			((self.Flags() & (1 << 13)) == 0)) // hardcore
+		if (!neverReplacedActor && ( // Always try to look up the entry if it's never replaced
+				(OPTION_ENEMIZER != 0 && !isReplacedActor) ||  // Skip original enemizer enemies
+				processedSpawn || // Already processed, so there'll be no entry
+				
+				// Only process enemies present in all difficulties
+				((self.Flags() & (1 << 10)) == 0) || // easy
+				((self.Flags() & (1 << 11)) == 0) || // normal
+				((self.Flags() & (1 << 12)) == 0) || // hard
+				((self.Flags() & (1 << 13)) == 0)) // hardcore
+			)
 		{
 			return;
 		}
@@ -104,6 +120,7 @@ class RandoEnemy : ScriptActor
 		SERIALIZE(isNotYetShown);
 		SERIALIZE(isNotYetShown);
 		SERIALIZE(processedSpawn);
+		SERIALIZE(neverReplacedActor);
 		SERIALIZE(importantShown);
 	}
 	
@@ -116,6 +133,7 @@ class RandoEnemy : ScriptActor
 		DESERIALIZE_BOOL(isReplacedActor);
 		DESERIALIZE_BOOL(isNotYetShown);
 		DESERIALIZE_BOOL(processedSpawn);
+		DESERIALIZE_BOOL(neverReplacedActor);
 		DESERIALIZE_BOOL(importantShown);
 		SetApEntry();
 		
@@ -148,7 +166,7 @@ class RandoEnemy : ScriptActor
 	{
 		if (apEntry !is null)
 		{		
-			TrySendActionObjectToAP(self.TID());
+			apEntry.SendCheckToAP();
 			self.Flags() &= ~AF_IMPORTANT;
 			@apEntry = null;
 		}
