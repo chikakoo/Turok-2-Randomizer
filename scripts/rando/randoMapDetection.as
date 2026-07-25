@@ -52,8 +52,6 @@ class RandoMapDetection : ScriptActor
 		{
 			g_AP.CurrentMapId = mapId;
 		}
-		
-		Hud.AddMessage("Map set to: " + mapId);
 	}
 	
 	//--------------------------

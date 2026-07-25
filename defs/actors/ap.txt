@@ -304,12 +304,6 @@ MapDetection kActor_Collider_MapDetection
 	Begin_Component "kexScriptComponent"
         scriptClass           "RandoMapDetection"
     End_Component
-	
-	
-	Begin_Component "kexParticleEmitterComponent"
-        particle                "particles/rando_weapon_barrier.particle"
-        offset                  "0.0 0.0 0.0"
-    End_Component
 }
 
 //------------------------------
