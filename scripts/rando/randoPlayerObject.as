@@ -182,7 +182,6 @@ class RandoPlayerObject : ScriptObject
 					modifier = 1;
 				}
 				break;
-				
 			case kLevel_RiverOfSouls_6:
 				if (regionIndex == WarpIndex_Level2_6aTo6b ||
 					regionIndex == WarpIndex_Level2_GY1To6b)
