@@ -163,35 +163,38 @@ class RandoPlayerObject : ScriptObject
 		switch(mapId)
 		{
 			case kLevel_PortOfAdia_2:
-				if (regionIndex == 1302 || regionIndex == 1115) // From 1-3/1-4
+				if (regionIndex == WarpIndex_Level1_3To2b || 
+					regionIndex == WarpIndex_Level1_4To2b)
 				{
 					modifier = 1;
 				}
 				break;
 			case kLevel_PortOfAdia_3:
-				if (regionIndex == 487 || regionIndex == 605) // From Checkpoint/1-2b
+				if (regionIndex == WarpIndex_Level1_CheckpointTo3 || 
+					regionIndex == WarpIndex_Level1_2bTo3)
 				{
 					modifier = 1;
 				}
 				break;
-			case kLevel_PortOfAdia_9: // From 1-O
-				if (regionIndex == 710)
+			case kLevel_PortOfAdia_9:
+				if (regionIndex == WarpIndex_Level1_OTo9)
 				{
 					modifier = 1;
 				}
 				break;
 				
 			case kLevel_RiverOfSouls_6:
-				// 2-6b, from 2-6a and 2-GY1
-				if (regionIndex == 1395 || regionIndex == 3381)
+				if (regionIndex == WarpIndex_Level2_6aTo6b ||
+					regionIndex == WarpIndex_Level2_GY1To6b)
 				{
 					modifier = 1;
 				}
-				// 2-6c, from 2-GY1 and 2-7
-				else if (regionIndex == 3814 || regionIndex == 358)
+				else if (regionIndex == WarpIndex_Level2_GY1To6c ||
+					regionIndex == WarpIndex_Level2_7To6c)
 				{
 					modifier = 2;
 				}
+				break;
 		}
 			
 		g_AP.CurrentMapId = (mapId * 100) + modifier;
