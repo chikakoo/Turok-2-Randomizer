@@ -7,6 +7,7 @@ from PIL import Image
 
 """
 Hue shifts textures used in Turok 2 for a different experience.
+Can also adjust saturation and brightness, for more cursed textures.
 Note that you'll need to replace the mod files if you want to completely undo these changes!
 This also includes undoing changes for any of the DIRECTORIES_TO_HUE_SHIFT directories.
 
@@ -28,11 +29,29 @@ The directory to start look for the textures. This should be set to the name of 
 files to.
 """
 
-SHIFT_RANGE = 359
+HUE_RANGE = 359
 """
 Inclusive value between 0 and 359, representing the hue shift values that can be rolled.
 For example, if set to 20, then each texture will be shifted from a random value from 0-20 degrees.
 In general, lower values produce images that look similar to the original ones.
+"""
+
+SATURATION_RANGE = 0
+"""
+Inclusive value between 0 and 100, representing the % saturation that can be rolled.
+For example, a value of 25 will adjust between -25% and 25% saturation.
+A value of 100 can produce completely grayscale images.
+
+Recommended to not go above 25 if you don't want textures to be too cursed.
+"""
+
+BRIGHTNESS_RANGE = 0
+"""
+Inclusive value between 0 and 100, representing the % saturation that can be rolled.
+For example, a value of 25 will adjust between -25% and 25% brightness.
+A value of 100 can produce completely black images.
+
+Recommended to not go above 25 if you don't want textures to be too cursed.
 """
 
 REPLACE_IN_MODS_FOLDER = True
@@ -73,7 +92,7 @@ def validate():
     """
     Validates the input parameters. This currently means...
     - GAME_DIRECTORY is a valid directory
-    - SHIFT_RANGE should be a value between 0 and 259
+    - HUE_RANGE should be a value between 0 and 259
     - REPLACE_IN_MODS_FOLDER is a boolean
 
     This also validates that every directory in DIRECTORIES_TO_HUE_SHIFT exists
@@ -81,8 +100,14 @@ def validate():
     if not Path(GAME_DIRECTORY).is_dir():
         raise ValueError(f"GAME_DIRECTORY path does not exist (set to {GAME_DIRECTORY})")
 
-    if not (0 <= SHIFT_RANGE < 360):
-        raise ValueError(f"SHIFT_RANGE should be an inclusive value between 0 and 359, but got {SHIFT_RANGE}") 
+    if not (0 <= HUE_RANGE < 360):
+        raise ValueError(f"HUE_RANGE should be an inclusive value between 0 and 359, but got {HUE_RANGE}") 
+
+    if not (0 <= SATURATION_RANGE <= 100):
+        raise ValueError(f"SATURATION_RANGE should be an inclusive value between 0 and 100, but got {SATURATION_RANGE}")
+
+    if not (0 <= BRIGHTNESS_RANGE <= 100):
+        raise ValueError(f"BRIGHTNESS_RANGE should be an inclusive value between 0 and 100, but got {BRIGHTNESS_RANGE}")
 
     if not (isinstance(REPLACE_IN_MODS_FOLDER, bool)):
         raise ValueError(f"REPLACE_IN_MODS_FOLDER should be a boolean (True or False), but got {REPLACE_IN_MODS_FOLDER}")
@@ -92,13 +117,16 @@ def validate():
         if not directory_path.is_dir():
             raise ValueError(f"Directory to hue shift does not exist: {directory_path}")
 
-def shift_png_hue(input_path):
+def shift_png(input_path):
     """
-    Shifts the hue of a PNG image, preserving alpha. 
-    Uses a random value between 0 and SHIFT_RANGE.
+    Shifts the hue/saturation/brightness of a PNG image, preserving alpha. 
+    Uses a random values defined by the X_RANGE constants.
     """
-    hue_shift = random.randint(0, SHIFT_RANGE)
+    hue_shift = random.randint(0, HUE_RANGE)
     hue_amount = round(hue_shift * 255 / 360)
+
+    saturation_shift = random.uniform(-SATURATION_RANGE, SATURATION_RANGE) / 100
+    brightness_shift = random.uniform(-BRIGHTNESS_RANGE, BRIGHTNESS_RANGE) / 100
 
     # Open image and convert to RGBA to ensure an alpha channel
     img = Image.open(input_path).convert('RGBA')
@@ -108,8 +136,10 @@ def shift_png_hue(input_path):
     alpha = img.getchannel("A")
     h, s, v = rgb.convert("HSV").split()
 
-    # Perform the hue shift on the hue channel
+    # Perform the hue/saturation/brightness shifts
     h = h.point(lambda value: (value + hue_amount) % 256)
+    s = s.point(lambda value: int(max(0, min(255, value * (1 + saturation_shift)))))
+    v = v.point(lambda value: int(max(0, min(255, value * (1 + brightness_shift)))))
 
     # Now put everything back together and return it
     shifted_rgb = Image.merge("HSV", (h, s, v)).convert("RGB")
@@ -180,7 +210,7 @@ def convert_textures():
             image_path = Path(*file_path.parts[1:])
             archive_name = image_path.parts[0]
 
-            shifted_img = shift_png_hue(file_path)
+            shifted_img = shift_png(file_path)
 
             if REPLACE_IN_MODS_FOLDER:
                 shifted_bytes = image_to_bytes(shifted_img)
