@@ -37,19 +37,19 @@ In general, lower values produce images that look similar to the original ones.
 
 REPLACE_IN_MODS_FOLDER = True
 """
-Boolean value indicating whether the created images should be packaged up and placed in the /mods directory,
+Boolean value indicating whether the created images should be packaged up and placed in the MODS_DIRECTORY,
 ready to be used. Otherwise, they will be placed in the specified HUE_SHIFTER_OUTPUT_DIRECTORY.
-"""
-
-HUE_SHIFTER_OUTPUT_DIRECTORY = "hue_shifter_output"
-""" 
-The directory to use if REPLACE_IN_MODS_FOLDER is False.
 """
 
 MODS_DIRECTORY = "mods"
 """
 The directory to use if REPLACE_IN_MODS_FOLDER is True. This will place the images into the kpf
 archives, and overwrite any existing ones in them as well. It will NOT delete files that are not being shifted.
+"""
+
+HUE_SHIFTER_OUTPUT_DIRECTORY = "hue_shifter_output"
+""" 
+The directory to use if REPLACE_IN_MODS_FOLDER is False.
 """
 
 DIRECTORIES_TO_HUE_SHIFT = [
