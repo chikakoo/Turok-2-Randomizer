@@ -1,9 +1,11 @@
 # Whitelisting directories - start by ignoring all
 *
 
-# Except these two
+# Except these
 !.gitignore
 !README.md
+!package-mod.bat
+!hue_shifter.py
 
 # And these directories
 !defs/
@@ -44,5 +46,3 @@
 
 !localization/
 !localization/**
-
-!package-mod.bat
