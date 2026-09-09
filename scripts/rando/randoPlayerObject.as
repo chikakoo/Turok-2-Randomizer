@@ -194,6 +194,13 @@ class RandoPlayerObject : ScriptObject
 					modifier = 2;
 				}
 				break;
+			case kLevel_Hive_8:
+				if (regionIndex == WarpIndex_Level5_10To9 ||
+					regionIndex == WarpIndex_Level5_E3To9)
+				{
+					modifier = 1;
+				}
+				break;
 		}
 			
 		g_AP.CurrentMapId = (mapId * 100) + modifier;

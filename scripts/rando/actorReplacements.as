@@ -428,11 +428,15 @@ void AddMapDetectors(const int16 &in mapId)
 		case kLevel_RiverOfSouls_5:
 			// To river area
 			AddMapDetector(12900, kVec3(-297.007, 3682.914, -613.711));
-			AddMapDetector(12901, kVec3(381.003,3676.046,-614.414));
+			AddMapDetector(12901, kVec3(381.003, 3676.046, -614.414));
 		
 			// Mag 60 platform back down (one-way)
 			AddMapDetector(12900, kVec3(-298.967, 912.112, -460.810), 140, 1000);
 			AddMapDetector(12900, kVec3(903.677, 916.493, 0), 140, 1000);
+			break;
+		case kLevel_Hive_8:
+			AddMapDetector(9100, kVec3(108.738, 67.577, -661.728), 500, 1000);
+			AddMapDetector(9101, kVec3(915.936, -763.767, -307.207), 300, 1000);
 			break;
 	}
 }
