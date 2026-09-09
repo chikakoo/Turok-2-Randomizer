@@ -196,7 +196,9 @@ class RandoPlayerObject : ScriptObject
 				break;
 			case kLevel_Hive_8:
 				if (regionIndex == WarpIndex_Level5_10To9 ||
-					regionIndex == WarpIndex_Level5_E3To9)
+					regionIndex == WarpIndex_Level5_E3To9 ||
+					regionIndex == WarpIndex_Level5_9BottomTo9Top ||
+					regionIndex == WarpIndex_Level5_9TopTo9Bottom)
 				{
 					modifier = 1;
 				}

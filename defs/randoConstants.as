@@ -170,3 +170,5 @@
 #define WarpIndex_Level2_7To6c 358
 #define WarpIndex_Level5_10To9 718
 #define WarpIndex_Level5_E3To9 1323
+#define WarpIndex_Level5_9BottomTo9Top 585
+#define WarpIndex_Level5_9TopTo9Bottom 265
