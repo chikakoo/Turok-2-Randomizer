@@ -194,6 +194,12 @@ class RandoPlayerObject : ScriptObject
 					modifier = 2;
 				}
 				break;
+			case kLevel_BlindLair_6:
+				if (regionIndex == WarpIndex_Level4_8And6aTo6b)
+				{
+					modifier = 1;
+				}
+				break;
 			case kLevel_Hive_8:
 				if (regionIndex == WarpIndex_Level5_10To9 ||
 					regionIndex == WarpIndex_Level5_E3To9 ||
