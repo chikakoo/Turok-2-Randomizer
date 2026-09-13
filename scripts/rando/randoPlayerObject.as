@@ -475,9 +475,7 @@ class RandoPlayerObject : ScriptObject
 		{
 			int8 c = data[i];
 			if (c == "|"[0])
-			{		
-				Sys.Print(current);
-			
+			{
 				int apId = current.Atoi();
 				int mapId = ConvertMapIdFromApId(apId);
 				if (key == "collectedLocations")
@@ -515,9 +513,7 @@ class RandoPlayerObject : ScriptObject
 		{
 			int8 c = data[i];
 			if (c == "|"[0])
-			{		
-				Sys.Print(current);
-			
+			{
 				int apId = current.Atoi();
 				int mapId = ConvertMapIdFromApId(apId);
 				MarkActionObjectSentToAP(apId, mapId);
