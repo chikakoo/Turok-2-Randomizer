@@ -103,6 +103,8 @@ main
 void main(void)
 {
 	InitAP();
+	g_AP.ValidationSeed = AP_VALIDATION_SEED;
+	
 	InitMapReplacements();
 	InitDefManager();
 	InitWeaponInfoCache();
@@ -116,5 +118,5 @@ void main(void)
     InitBlindBossModeTable();
     InitQueenBossModeTable();
     InitMotherBossModeTable();
-    InitPrimagenBossModeTable();
+    InitPrimagenBossModeTable();	
 }

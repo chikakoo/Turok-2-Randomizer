@@ -1,3 +1,6 @@
+#define AP_VALIDATION_SEED 1234
+#define AP_SLOT_NAME "Testrock"
+
 #define OPTION_MARK_PICKUPS true
 #define OPTION_MARK_ENEMIES true
 
