@@ -177,7 +177,11 @@ class RandoEnemy : ScriptActor
 		}
 		
 		// Don't kill the original actor if it's stale to avoid crashes
-		if (originalActor !is null && !originalActor.IsStale())
+		// Also check for other death conditions, just in case
+		if (originalActor !is null && 
+			!originalActor.IsStale() &&
+			originalActor.Health() > 0 && 
+			((originalActor.Flags() & AF_DEAD) != 0))
 		{
 			kDamageInfo damageInfo;
 			damageInfo.hits = originalActor.Health() * 10.0f;
