@@ -181,7 +181,7 @@ class RandoEnemy : ScriptActor
 		if (originalActor !is null && 
 			!originalActor.IsStale() &&
 			originalActor.Health() > 0 && 
-			((originalActor.Flags() & AF_DEAD) != 0))
+			((originalActor.Flags() & AF_DEAD) == 0))
 		{
 			kDamageInfo damageInfo;
 			damageInfo.hits = originalActor.Health() * 10.0f;
