@@ -5,8 +5,16 @@ enum RandoUndefinedPlayerFlags
 };
 
 // Settings to be serialized on the player
+// The player seems to be recreated, so we can't really set these as properties
+//---------------------------
 bool g_markPickups;
 bool g_markEnemies;
+
+// The validation seed the file was saved with (matched against the patch file)
+int g_savedValidationSeed;
+
+// Whether there is a seed/slot mismatch (not serialized)
+bool g_seedError;
 
 class RandoPlayerObject : ScriptObject
 {
@@ -69,12 +77,19 @@ class RandoPlayerObject : ScriptObject
 			ui.Deactivate();
 		}
 		
+		// On a seed error, don't continue
+		// But also, ignore seed errors if starting a new game
+		int16 mapId = Game.ActiveMapID();
+		if (g_seedError && mapId != kLevel_Level1Intro_1)
+		{
+			g_errorMessageCooldown = 0;
+			return;
+		}
+		
 		// Show level progress on spawn as a convenience
 		DisplayCollectedLocationsForCurrentMap();
 		
-		int16 mapId = Game.ActiveMapID();
 		SetCurrentMapId(mapId);
-		
 		switch(mapId)
 		{			
 			// Stop all intro cinemas early (level 1 is handled in new game)
@@ -163,35 +178,52 @@ class RandoPlayerObject : ScriptObject
 		switch(mapId)
 		{
 			case kLevel_PortOfAdia_2:
-				if (regionIndex == 1302 || regionIndex == 1115) // From 1-3/1-4
+				if (regionIndex == WarpIndex_Level1_3To2b || 
+					regionIndex == WarpIndex_Level1_4To2b)
 				{
 					modifier = 1;
 				}
 				break;
 			case kLevel_PortOfAdia_3:
-				if (regionIndex == 487 || regionIndex == 605) // From Checkpoint/1-2b
+				if (regionIndex == WarpIndex_Level1_CheckpointTo3 || 
+					regionIndex == WarpIndex_Level1_2bTo3)
 				{
 					modifier = 1;
 				}
 				break;
-			case kLevel_PortOfAdia_9: // From 1-O
-				if (regionIndex == 710)
+			case kLevel_PortOfAdia_9:
+				if (regionIndex == WarpIndex_Level1_OTo9)
 				{
 					modifier = 1;
 				}
 				break;
-				
 			case kLevel_RiverOfSouls_6:
-				// 2-6b, from 2-6a and 2-GY1
-				if (regionIndex == 1395 || regionIndex == 3381)
+				if (regionIndex == WarpIndex_Level2_6aTo6b ||
+					regionIndex == WarpIndex_Level2_GY1To6b)
 				{
 					modifier = 1;
 				}
-				// 2-6c, from 2-GY1 and 2-7
-				else if (regionIndex == 3814 || regionIndex == 358)
+				else if (regionIndex == WarpIndex_Level2_GY1To6c ||
+					regionIndex == WarpIndex_Level2_7To6c)
 				{
 					modifier = 2;
 				}
+				break;
+			case kLevel_BlindLair_6:
+				if (regionIndex == WarpIndex_Level4_8And6aTo6b)
+				{
+					modifier = 1;
+				}
+				break;
+			case kLevel_Hive_8:
+				if (regionIndex == WarpIndex_Level5_10To9 ||
+					regionIndex == WarpIndex_Level5_E3To9 ||
+					regionIndex == WarpIndex_Level5_9BottomTo9Top ||
+					regionIndex == WarpIndex_Level5_9TopTo9Bottom)
+				{
+					modifier = 1;
+				}
+				break;
 		}
 			
 		g_AP.CurrentMapId = (mapId * 100) + modifier;
@@ -243,6 +275,9 @@ class RandoPlayerObject : ScriptObject
 	// Reset everything on a new game.
 	void HandleNewGame()
 	{
+		// No seed errors on a new game
+		g_seedError = false;
+	
 		// IsCollected and IsSentToAP should be false for every location
 		ResetCollectedStatuses();
 		
@@ -402,6 +437,9 @@ class RandoPlayerObject : ScriptObject
 		SERIALIZE(g_markPickups);
 		SERIALIZE(g_markEnemies);
 		SERIALIZE(g_AP.CurrentMapId);
+		
+		// Serialize the patch file value, as that's what we'll check against
+		dict.Add("g_savedValidationSeed", "" + AP_VALIDATION_SEED);
 	}
 
 	//---------------------------
@@ -437,6 +475,16 @@ class RandoPlayerObject : ScriptObject
 		DESERIALIZE_BOOL(g_markPickups);
 		DESERIALIZE_BOOL(g_markEnemies);
 		DESERIALIZE_INT(g_AP.CurrentMapId);
+		
+		DESERIALIZE_INT(g_savedValidationSeed);
+		g_seedError = g_savedValidationSeed != AP_VALIDATION_SEED;
+		
+		if (g_seedError)
+		{
+			Sys.Print("!!! UNMATCHING SEED LOADED !!!");
+			Sys.Print("Expected: " + AP_VALIDATION_SEED + " (" + AP_SLOT_NAME + ")");
+			Sys.Print("Deserialized: " + g_savedValidationSeed);
+		}
 	}
 	
 	//---------------------------
@@ -458,9 +506,7 @@ class RandoPlayerObject : ScriptObject
 		{
 			int8 c = data[i];
 			if (c == "|"[0])
-			{		
-				Sys.Print(current);
-			
+			{
 				int apId = current.Atoi();
 				int mapId = ConvertMapIdFromApId(apId);
 				if (key == "collectedLocations")
@@ -498,9 +544,7 @@ class RandoPlayerObject : ScriptObject
 		{
 			int8 c = data[i];
 			if (c == "|"[0])
-			{		
-				Sys.Print(current);
-			
+			{
 				int apId = current.Atoi();
 				int mapId = ConvertMapIdFromApId(apId);
 				MarkActionObjectSentToAP(apId, mapId);
@@ -543,11 +587,28 @@ class RandoPlayerObject : ScriptObject
 	}
 
 	//---------------------------
-	// Checks for incoming and outgoing messages
+	// Checks for incoming and outgoing messages if there's no seed error, where it will
+	// instead continuously display error messages.
+	//
+	// Also handles UI display.
 	void OnTick(void)
 	{
-		if (!CinemaPlayer.Playing())
-		{		
+		if (g_seedError)
+		{
+			if (g_errorMessageCooldown > 0)
+			{
+				g_errorMessageCooldown--;
+			}
+			else 
+			{
+				Hud.AddMessage("Expected slot name: " + AP_SLOT_NAME, 360);
+				Hud.AddMessage("Check that you loaded the correct save/patch file.", 360);
+				Hud.AddMessage("Seed mismatch! Not processing AP checks...", 360);
+				g_errorMessageCooldown = 360;
+			}
+		}
+		else if (!CinemaPlayer.Playing())
+		{	
 			ProcessIncomingMessages();
 			ProcessOutgoingMessages();
 		}

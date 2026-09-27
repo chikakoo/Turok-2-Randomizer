@@ -156,3 +156,20 @@
 #define Warp_Id_BlindStart 14000
 #define Warp_Id_HiveStart 15000
 #define Warp_Id_LightshipStart 16000
+
+// ---------
+// Warp Indexes
+#define WarpIndex_Level1_3To2b 1302
+#define WarpIndex_Level1_4To2b 1115
+#define WarpIndex_Level1_CheckpointTo3 487
+#define WarpIndex_Level1_2bTo3 605
+#define WarpIndex_Level1_OTo9 710
+#define WarpIndex_Level2_6aTo6b 1395
+#define WarpIndex_Level2_GY1To6b 3381
+#define WarpIndex_Level2_GY1To6c 3814
+#define WarpIndex_Level2_7To6c 358
+#define WarpIndex_Level4_8And6aTo6b 4
+#define WarpIndex_Level5_10To9 718
+#define WarpIndex_Level5_E3To9 1323
+#define WarpIndex_Level5_9BottomTo9Top 585
+#define WarpIndex_Level5_9TopTo9Bottom 265

@@ -24,6 +24,9 @@ class APMemory
 	
 	// Used by the client to send to the poptracker
 	int CurrentMapId;
+	
+	// Used by the client for seed/patch file validation
+	int ValidationSeed;
 }
 
 APMemory g_AP;
@@ -47,6 +50,8 @@ void PrintAPMemory()
 	Sys.Print("IsGoalReached: " + g_AP.IsGoalReached);
 	
 	Sys.Print("CurrentMapId: " + g_AP.CurrentMapId);
+	
+	Sys.Print("ValidationSeed: " + g_AP.ValidationSeed);
 }
 
 // A global for all outgoing location checks - this is here in case we cannot send out
@@ -94,7 +99,7 @@ enum APMessageType
 void InitAP()
 {
 	g_AP.Magic = 0x4150524B; // APRK
-    g_AP.Version = 5;
+    g_AP.Version = 6;
 	g_AP.Signature1 = 0x43110DAD;
 	g_AP.Signature2 = 0x1337BEEF;
 
