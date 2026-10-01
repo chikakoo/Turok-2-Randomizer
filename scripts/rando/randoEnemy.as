@@ -35,6 +35,7 @@ class RandoEnemy : ScriptActor
     {
 		super(@actor);
 		SetApEntry();
+		RandomizeScale(@actor);
 	}
 	
 	//----------------------------------
@@ -109,6 +110,33 @@ class RandoEnemy : ScriptActor
 		if (actionObjectEntry !is null && !actionObjectEntry.isSentToAP && actionObjectEntry.apId > 0)
 		{
 			@apEntry = actionObjectEntry;
+		}
+	}
+	
+	//----------------------------------
+	// Randomizes the scale of the given actor based on the settings
+	// 0: No adjustment
+	// 1: Proportional
+	// 2: Random proportions
+	void RandomizeScale(kActor@ actor)
+	{
+		if (OPTION_RANDOMIZE_ENEMY_SIZES == 0)
+		{
+			return;
+		}
+		
+		kVec3 scale = actor.Scale();
+		if (OPTION_RANDOMIZE_ENEMY_SIZES == 1)
+		{
+			float multiplier = RandomPercentageMultiplier(OPTION_ENEMY_SIZE_MAX_PERCENTAGE);
+			actor.Scale().Set(scale.x * multiplier, scale.y * multiplier, scale.z * multiplier);
+		}
+		else if (OPTION_RANDOMIZE_ENEMY_SIZES == 2)
+		{
+			actor.Scale().Set(
+				scale.x * RandomPercentageMultiplier(OPTION_ENEMY_SIZE_MAX_PERCENTAGE),
+				scale.y * RandomPercentageMultiplier(OPTION_ENEMY_SIZE_MAX_PERCENTAGE),
+				scale.z * RandomPercentageMultiplier(OPTION_ENEMY_SIZE_MAX_PERCENTAGE));
 		}
 	}
 	

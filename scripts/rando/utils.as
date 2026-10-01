@@ -59,3 +59,20 @@ EnemyWeight@ RandomEnemyWeight(array<EnemyWeight@>@ enemyWeightArray)
 	int indexToChoose = RandomInt(0, enemyWeightArray.length() - 1);
     return enemyWeightArray[indexToChoose];
 }
+
+//------------------------------
+// Gets a random multiplier for a given percentage range which can be used
+// used to modify a value by multiplying by it.
+//
+// For example, a value of 10 will return a value between 0.9 and 1.1, meaning
+// the value can be adjusted by +/- 10%.
+float RandomPercentageMultiplier(const float &in range)
+{
+	if (range < 0 || range >= 100)
+	{
+		Sys.Print("ERROR: Tried to get random multiplier for: " + range);
+		return 1;
+	}
+
+	return Math::RandRange(100 - range, 100 + range) / 100.0f;
+}
