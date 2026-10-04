@@ -24,8 +24,8 @@ class WeaponInfo
 	int pickupId;
 	kStr pickupMessage;
 	kStr pickupSound;
-	kStr ammoPickupMessage;
-	kStr altAmmoPickupMessage;
+	kStr ammoType;
+	kStr altAmmoType;
 	int callout;
 	int weaponDef;
 	int maxAmmo;
@@ -136,16 +136,6 @@ void InitWeaponInfoCache()
 		weaponInfo.callout = callout;
 		weaponInfo.weaponDef = weaponDefinition;
 		
-		kStr ammoPickupMessage;
-		weaponInfo.ammoPickupMessage = weaponPickupDict.GetString("rando.ammoMessage", ammoPickupMessage)
-			? ammoPickupMessage
-			: pickupMessage;
-			
-		kStr altAmmoPickupMessage;
-		weaponInfo.altAmmoPickupMessage = weaponPickupDict.GetString("rando.altAmmoMessage", altAmmoPickupMessage)
-			? altAmmoPickupMessage
-			: "";
-		
 		// Ammo info
 		int weaponDefId;
 		weaponPickupDict.GetInt("pickup.weapon.definition", weaponDefId);
@@ -156,21 +146,24 @@ void InitWeaponInfoCache()
 			continue;
 		}
 		
-		kStr ammoDefKey;
+		kStr standardAmmoType = "";
 		int maxAmmo = 0;
-		if (weaponDef.GetString("ammo", ammoDefKey))
+		if (weaponDef.GetString("ammo", standardAmmoType))
 		{
-			kDictMem@ ammoDef = g_defManager.GetEntry(ammoDefKey);
+			weaponInfo.ammoType = standardAmmoType;
+			kDictMem@ ammoDef = g_defManager.GetEntry(standardAmmoType);
 			if (ammoDef !is null)
 			{
 				ammoDef.GetInt("max", maxAmmo);
 			}
 		}
 		
+		kStr altAmmoType = "";
 		int maxAltAmmo = 0;
-		if (weaponDef.GetString("altAmmo", ammoDefKey))
+		if (weaponDef.GetString("altAmmo", altAmmoType))
 		{
-			kDictMem@ ammoDef = g_defManager.GetEntry(ammoDefKey);
+			weaponInfo.altAmmoType = altAmmoType;
+			kDictMem@ ammoDef = g_defManager.GetEntry(altAmmoType);
 			if (ammoDef !is null)
 			{
 				ammoDef.GetInt("max", maxAltAmmo);

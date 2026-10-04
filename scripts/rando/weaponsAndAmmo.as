@@ -129,18 +129,101 @@ void GetAmmoInRandomWeapon()
 	
 	// Get the ammo!
 	float ammoPercent = RandomInt(OPTION_RANDOM_AMMO_MIN, OPTION_RANDOM_AMMO_MAX) / 100.0;
-	int standardAmmoAmount = int(Math::Ceil(weaponToGetAmmoFor.maxAmmo * ammoPercent));
-	kStr ammoMessage = "" + standardAmmoAmount + " " + weaponToGetAmmoFor.ammoPickupMessage;
-	
 	if (weaponToGetAmmoFor.maxAltAmmo > 0)
 	{
 		int altAmmoAmount = int(Math::Ceil(weaponToGetAmmoFor.maxAltAmmo * ammoPercent));
-		kStr altAmmoMessage = "" + altAmmoAmount + " " + weaponToGetAmmoFor.altAmmoPickupMessage;
-		GiveAltAmmo(weaponToGetAmmoFor.pickupId);
-		Hud.AddMessage(altAmmoMessage);
+		GiveAltAmmo(weaponToGetAmmoFor.pickupId, altAmmoAmount);
+		Hud.AddMessage(GetAmmoMessage(weaponToGetAmmoFor.altAmmoType, altAmmoAmount));
 	}
 	
+	int standardAmmoAmount = int(Math::Ceil(weaponToGetAmmoFor.maxAmmo * ammoPercent));
+	kStr ammoMessage = GetAmmoMessage(weaponToGetAmmoFor.ammoType, standardAmmoAmount);
 	TryGivePlayerWeapon(weaponToGetAmmoFor.pickupId, standardAmmoAmount, false, true, ammoMessage);
+}
+
+//---------------------------
+// Gets the ammo message given the type and amount.
+kStr GetAmmoMessage(const kStr &in ammoType, const int &in amount)
+{
+	kStr pluralSuffix = "s";
+	kStr ammoTypeStr = "Unknown Ammo";
+	if (ammoType == "Ammo_Arrow")
+	{
+		ammoTypeStr = "Arrow";
+	} 
+	else if (ammoType == "Ammo_TekArrow")
+	{
+		ammoTypeStr = "Tek Arrow";
+	}
+	else if (ammoType == "Ammo_Bullet")
+	{
+		ammoTypeStr = "Bullet";
+	}
+	else if (ammoType == "Ammo_Dart")
+	{
+		ammoTypeStr = "Tranquilizer Dart";
+	}
+	else if (ammoType == "Ammo_ChargeDart")
+	{
+		ammoTypeStr = "Charge Dart";
+	}
+	else if (ammoType == "Ammo_Shell")
+	{
+		ammoTypeStr = "Shotgun Shell";
+	}
+	else if (ammoType == "Ammo_ExpShells")
+	{
+		ammoTypeStr = "Explosive Shell";
+	}
+	else if (ammoType == "Ammo_Plasma")
+	{
+		ammoTypeStr = "Plasma Round";
+	}
+	else if (ammoType == "Ammo_SunfirePod")
+	{
+		ammoTypeStr = "Sunfire Pod";
+	}
+	else if (ammoType == "Ammo_Bore")
+	{
+		ammoTypeStr = "Bore";
+	}
+	else if (ammoType == "Ammo_Mine")
+	{
+		ammoTypeStr = "Mine";
+	}
+	else if (ammoType == "Ammo_Grenades")
+	{
+		ammoTypeStr = "Grenade";
+	}
+	else if (ammoType == "Ammo_Rockets")
+	{
+		ammoTypeStr = "Scorpion Missile";
+	}
+	else if (ammoType == "Ammo_Spears")
+	{
+		ammoTypeStr = "Spear";
+	}
+	else if (ammoType == "Ammo_Torpedos")
+	{
+		ammoTypeStr = "Torpedo";
+		pluralSuffix = "es";
+	}
+	else if (ammoType == "Ammo_Fuel")
+	{
+		ammoTypeStr = "Flame Thrower Fuel";
+		pluralSuffix = "";
+	}
+	else if (ammoType == "Ammo_Nuke")
+	{
+		ammoTypeStr = "Nuke Ammo";
+		pluralSuffix = "";
+	}
+	else
+	{
+		pluralSuffix = "";
+	}
+	
+	return "" + amount + " " + ammoTypeStr + (amount == 1 ? "" : pluralSuffix);
 }
 
 //---------------------------
