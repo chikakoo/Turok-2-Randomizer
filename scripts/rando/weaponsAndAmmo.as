@@ -136,26 +136,7 @@ void GetAmmoInRandomWeapon()
 	{
 		int altAmmoAmount = int(Math::Ceil(weaponToGetAmmoFor.maxAltAmmo * ammoPercent));
 		kStr altAmmoMessage = "" + altAmmoAmount + " " + weaponToGetAmmoFor.altAmmoPickupMessage;
-		
-		// We mapped the flare to use explosive rounds!
-		if (weaponToGetAmmoFor.pickupId == kActor_Item_WpnShotgun ||
-			weaponToGetAmmoFor.pickupId == kActor_Item_WpnScatter)
-		{
-			LocalPlayer.GiveWeapon(kWpn_Flare, altAmmoAmount);
-		}
-		
-		// Normal arrows are the alt ammo for the tek bow
-		// You start with the bow, so this isn't a problem
-		else if (weaponToGetAmmoFor.pickupId == kActor_Item_WpnTekBow)
-		{
-			LocalPlayer.GiveWeapon(kWpn_Bow, altAmmoAmount);
-			
-			// Swap the alt and standard amount messages so the correct ones are displayed
-			// (Since the tek bow specifically swaps the ammo types here)
-			ammoMessage = "" + altAmmoAmount + " " + weaponToGetAmmoFor.ammoPickupMessage;
-			altAmmoMessage = "" + standardAmmoAmount + " " + weaponToGetAmmoFor.altAmmoPickupMessage;
-		}
-		
+		GiveAltAmmo(weaponToGetAmmoFor.pickupId);
 		Hud.AddMessage(altAmmoMessage);
 	}
 	
@@ -178,20 +159,28 @@ void FillAmmoInAllWeapons()
 		}
 		
 		LocalPlayer.GiveWeapon(weaponInfo.weaponDef, 1000);
-		
-		// Alt ammo: explosive rounds (mapped to flare)
-		// Normal arrows (in case we ever make the bow not always starting)
-		if (weaponPickupId == kActor_Item_WpnShotgun ||
-			weaponPickupId == kActor_Item_WpnScatter)
-		{
-			LocalPlayer.GiveWeapon(kWpn_Flare, 1000);
-		}
-		else if (weaponPickupId == kActor_Item_WpnTekBow)
-		{
-			LocalPlayer.GiveWeapon(kWpn_Bow, 1000);
-		}
+		GiveAltAmmo(weaponPickupId);
 	}
 	
 	LocalPlayer.Actor().PlaySound("sounds/shaders/Ammo Pickup.ksnd");
 	Hud.AddMessage("Max Ammo Pack");
+}
+
+//---------------------------
+// Gives the given amount of alt ammo for the given pickup
+// Defaults to max ammo
+void GiveAltAmmo(const int &in pickupId, const int &in altAmmoAmount = 1000)
+{
+	switch(pickupId)
+	{
+		case kActor_Item_WpnShotgun:
+			LocalPlayer.GiveWeapon(kWpn_ShotgunAlt, altAmmoAmount);
+			break;
+		case kActor_Item_WpnScatter:
+			LocalPlayer.GiveWeapon(kWpn_ShredderAlt, altAmmoAmount);
+			break;
+		case kActor_Item_WpnTekBow:
+			LocalPlayer.GiveWeapon(kWpn_TekBowAlt, altAmmoAmount);
+			break;
+	}
 }

@@ -5,6 +5,10 @@
 // Called in UserEvent to get the script object back
 #define RANDO_MSG_GET_SCRIPT 100
 
+#define kWpn_ShotgunAlt 23 //kWpn_RaptorClaws
+#define kWpn_ShredderAlt 24 //kWpn_Crossbow_MP
+#define kWpn_TekBowAlt 25 //kWpn_Plasma_MP
+
 // ---------
 // Ammo
 #define kActor_Item_APItemProgression 100000

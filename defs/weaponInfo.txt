@@ -1,4 +1,5 @@
 #include "defs/common.txt"
+#include "defs/randoConstants.as"
 
 Weapon kWpn_Talon
 {
@@ -481,7 +482,7 @@ Weapon kWpn_Flare
     allowLand               TRUE
     allowMultiplayer        FALSE
     icon                    "gfx/hud/weapons/h_w_flare.png"
-	ammo                    "Ammo_ExpShells"
+    ammo                    "Ammo_Battery"
     projectileParticle      kParticle_Flare
     charMeshIndex           NONE
     priority                100000
@@ -490,30 +491,31 @@ Weapon kWpn_Flare
     tactileFire             "tactile/pistl3ap.bnvib"
 }
 
-Weapon kWpn_RaptorClaws
+Weapon kWpn_RaptorClaws //kWpn_ShotgunAlt
 {
     offset                  "12 8 12"
     actor                   kActor_Wpn_RaptorClaws
     defaultWeapon           FALSE
     owned                   FALSE
-    allowUnderwater         TRUE
-    allowLand               TRUE
+    allowUnderwater         FALSE //TRUE
+    allowLand               FALSE //TRUE
     allowMultiplayer        TRUE
     noCheatGiveWeapons      TRUE
     icon                    "gfx/hud/weapons/h_w_raptorclaws.png"
     maxRoll                 0.1
     charMeshIndex           NONE
     priority                -1
+	ammo                    "Ammo_ExpShells"
 }
 
-Weapon kWpn_Crossbow_MP
+Weapon kWpn_Crossbow_MP //kWpn_ShredderAlt
 {
     offset                  "6 4.5 10"
     actor                   kActor_Wpn_Crossbow_MP
     defaultWeapon           TRUE
     owned                   TRUE
-    allowUnderwater         TRUE
-    allowLand               TRUE
+    allowUnderwater         FALSE //TRUE
+    allowLand               FALSE //TRUE
     allowMultiplayer        TRUE
     onlyMultiplayer         TRUE
     noCheatGiveWeapons      TRUE
@@ -524,21 +526,22 @@ Weapon kWpn_Crossbow_MP
     slot                    2
     quickslot               1
     tactileFire             "tactile/CROSSBOWMIX02.bnvib"
+	ammo                    "Ammo_ExpShells"
 }
 
-Weapon kWpn_Plasma_MP
+Weapon kWpn_Plasma_MP //kWpn_TekBowAlt
 {
     offset                  "6 6 10"
     actor                   kActor_Wpn_PlasmaRifle_MP
     defaultWeapon           FALSE
     owned                   FALSE
     allowUnderwater         FALSE
-    allowLand               TRUE
+    allowLand               FALSE //TRUE
     allowMultiplayer        TRUE
     onlyMultiplayer         TRUE
     noCheatGiveWeapons      TRUE
     icon                    "gfx/hud/weapons/h_w_plasmarifle.png"
-    ammo                    "Ammo_Plasma"
+    ammo                    "Ammo_Arrow"
     ammoConsumption         5
     projectileParticle      kParticle_Multiplayer9
     charMeshIndex           kWpnChar_AssaultRifle
