@@ -1,5 +1,6 @@
 #include "defs/common.txt"
 #include "defs/randoConstants.as"
+#include "rando/apSettings.as"
 
 Weapon kWpn_Talon
 {
@@ -71,8 +72,8 @@ Weapon kWpn_TekBow
     allowMultiplayer        TRUE
     maxRoll                 0.1
     icon                    "gfx/hud/weapons/h_w_tekbow.png"
-    ammo                    "Ammo_TekArrow"
-    altAmmo                 "Ammo_Arrow"
+    ammo                    OPTION_AMMO_TYPE_TEK_BOW
+    altAmmo                 OPTION_AMMO_TYPE_TEK_BOW_ALT
     initialAltAmmoAmount    10
     hasScope                1
     overlayModel            "models/Turok_Eye_Piece.staticmesh"
@@ -102,7 +103,7 @@ Weapon kWpn_Pistol
     allowLand               TRUE
     allowMultiplayer        TRUE
     icon                    "gfx/hud/weapons/h_w_pistol.png"
-    ammo                    "Ammo_Bullet"
+    ammo                    OPTION_AMMO_TYPE_PISTOL
     ammoConsumption         1
     projectileParticle      kParticle_Bullet
     charMeshIndex           kWpnChar_Pistol
@@ -122,7 +123,7 @@ Weapon kWpn_Magnum
     allowLand               TRUE
     allowMultiplayer        TRUE
     icon                    "gfx/hud/weapons/h_w_mag60.png"
-    ammo                    "Ammo_Bullet"
+    ammo                    OPTION_AMMO_TYPE_MAG60
     ammoConsumption         1
     projectileParticle      kParticle_MagnumBullet
     charMeshIndex           kWpnChar_Mag60
@@ -142,7 +143,7 @@ Weapon kWpn_Tranq
     allowLand               TRUE
     allowMultiplayer        TRUE
     icon                    "gfx/hud/weapons/h_w_tranq.png"
-    ammo                    "Ammo_Dart"
+    ammo                    OPTION_AMMO_TYPE_TRANQUILIZER_GUN
     ammoConsumption         1
     projectileParticle      kParticle_TranqDart
     charMeshIndex           NONE
@@ -162,7 +163,7 @@ Weapon kWpn_ChargeDart
     allowLand               TRUE
     allowMultiplayer        TRUE
     icon                    "gfx/hud/weapons/h_w_shockdart.png"
-    ammo                    "Ammo_ChargeDart"
+    ammo                    OPTION_AMMO_TYPE_CHARGE_DART_RIFLE
     ammoConsumption         0   // special case - see script
     projectileParticle      kParticle_ChargeDart
     charMeshIndex           kWpnChar_ChargeDart
@@ -182,8 +183,8 @@ Weapon kWpn_Shotgun
     allowLand               TRUE
     allowMultiplayer        TRUE
     icon                    "gfx/hud/weapons/h_w_shotgun.png"
-    ammo                    "Ammo_Shell"
-    altAmmo                 "Ammo_ExpShells"
+    ammo                    OPTION_AMMO_TYPE_SHOTGUN
+    altAmmo                 OPTION_AMMO_TYPE_SHOTGUN_ALT
     projectileParticle      kParticle_ShotgunBullet
     altProjectileParticle   kParticle_ExpShotgunBullet
     projectileOffset        "-1.5 4 2"
@@ -205,8 +206,8 @@ Weapon kWpn_Shredder
     allowLand               TRUE
     allowMultiplayer        TRUE
     icon                    "gfx/hud/weapons/h_w_shredder.png"
-    ammo                    "Ammo_Shell"
-    altAmmo                 "Ammo_ExpShells"
+    ammo                    OPTION_AMMO_TYPE_SHREDDER
+    altAmmo                 OPTION_AMMO_TYPE_SHREDDER_ALT
     projectileParticle      kParticle_ScatterRound
     altProjectileParticle   kParticle_ExpScatterRound
     ammoConsumption         1
@@ -228,7 +229,7 @@ Weapon kWpn_PlasmaRifle
     allowLand               TRUE
     allowMultiplayer        TRUE
     icon                    "gfx/hud/weapons/h_w_plasmarifle.png"
-    ammo                    "Ammo_Plasma"
+    ammo                    OPTION_AMMO_TYPE_PLASMA_RIFLE
     hasScope                1
     overlayModel            "models/Plasma_Eye_Piece.staticmesh"
     scopeOffset             "290 404.0 184.0"
@@ -255,7 +256,7 @@ Weapon kWpn_Firestorm
     allowLand               TRUE
     allowMultiplayer        TRUE
     icon                    "gfx/hud/weapons/h_w_firestorm.png"
-    ammo                    "Ammo_Plasma"
+    ammo                    OPTION_AMMO_TYPE_FIRESTORM_CANNON
     ammoConsumption         1
     charMeshIndex           kWpnChar_Firestorm
     priority                6100
@@ -274,7 +275,7 @@ Weapon kWpn_SunfirePod
     allowLand               TRUE
     allowMultiplayer        FALSE
     icon                    "gfx/hud/weapons/h_w_sunfirepod.png"
-    ammo                    "Ammo_SunfirePod"
+    ammo                    OPTION_AMMO_TYPE_SUNFIRE_POD
     ammoConsumption         1
     charMeshIndex           NONE
     priority                20300
@@ -294,7 +295,7 @@ Weapon kWpn_Bore
     icon                    "gfx/hud/weapons/h_w_bore.png"
     trackingCrosshair       "gfx/hud/crosshair_bore_track.png"
     lockonCrosshair         "gfx/hud/crosshair_bore_lock.png"
-    ammo                    "Ammo_Bore"
+    ammo                    OPTION_AMMO_TYPE_CEREBRAL_BORE
     allowTracking           TRUE
     allowTrackingMulti      TRUE
     fireOnlyIfTracking      TRUE
@@ -318,7 +319,7 @@ Weapon kWpn_PFM
     allowLand               TRUE
     allowMultiplayer        TRUE
     icon                    "gfx/hud/weapons/h_w_pfm.png"
-    ammo                    "Ammo_Mine"
+    ammo                    OPTION_AMMO_TYPE_PFM_LAYER
     ammoConsumption         1
     projectileParticle      kParticle_PFM
     charMeshIndex           kWpnChar_PFM
@@ -339,7 +340,7 @@ Weapon kWpn_GrenadeLauncher
     allowLand               TRUE
     allowMultiplayer        TRUE
     icon                    "gfx/hud/weapons/h_w_grenadelauncher.png"
-    ammo                    "Ammo_Grenades"
+    ammo                    OPTION_AMMO_TYPE_GRENADE_LAUNCHER
     ammoConsumption         1
     projectileParticle      kParticle_Grenade
     charMeshIndex           kWpnChar_Grenade
@@ -362,7 +363,7 @@ Weapon kWpn_MissileLauncher
     icon                    "gfx/hud/weapons/h_w_missilelauncher_quad.png"
     trackingCrosshair       "gfx/hud/crosshair_missile_track.png"
     lockonCrosshair         "gfx/hud/crosshair_missile_lock.png"
-    ammo                    "Ammo_Rockets"
+    ammo                    OPTION_AMMO_TYPE_SCORPION_LAUNCHER
     allowTracking           1
     maxTrackingDegrees      25.0
     ammoConsumption         0   // special case - see script
@@ -384,7 +385,7 @@ Weapon kWpn_HarpoonGun
     allowLand               FALSE
     allowMultiplayer        TRUE
     icon                    "gfx/hud/weapons/h_w_harpoon.png"
-    ammo                    "Ammo_Spears"
+    ammo                    OPTION_AMMO_TYPE_HARPOON_GUN
     ammoConsumption         1
     projectileParticle      kParticle_Spear
     charMeshIndex           kWpnChar_Harpoon
@@ -404,7 +405,7 @@ Weapon kWpn_TorpedoLauncher
     allowLand               FALSE
     allowMultiplayer        TRUE
     icon                    "gfx/hud/weapons/h_w_torpedo.png"
-    ammo                    "Ammo_Torpedos"
+    ammo                    OPTION_AMMO_TYPE_TORPEDO_LAUNCHER
     ammoConsumption         1
     posture.swimmingDef     "Player_Swimming_Torpedo"
     charMeshIndex           kWpnChar_Torpedo
@@ -424,7 +425,7 @@ Weapon kWpn_FlameThrower
     allowLand               TRUE
     allowMultiplayer        TRUE
     icon                    "gfx/hud/weapons/h_w_flamethrower.png"
-    ammo                    "Ammo_Fuel"
+    ammo                    OPTION_AMMO_TYPE_FLAME_THROWER
     maxRoll                 0.1
     ammoConsumption         0   // special case - see script
     projectileParticle      kParticle_FlameThrower
@@ -462,7 +463,7 @@ Weapon kWpn_Nuke
     allowLand               TRUE
     allowMultiplayer        TRUE
     icon                    "gfx/hud/weapons/h_w_nuke.png"
-    ammo                    "Ammo_Nuke"
+    ammo                    OPTION_AMMO_TYPE_NUKE
     ammoConsumption         1
     projectileParticle      kParticle_Nuke
     charMeshIndex           kWpnChar_Nuke
@@ -505,7 +506,7 @@ Weapon kWpn_RaptorClaws //kWpn_ShotgunAlt
     maxRoll                 0.1
     charMeshIndex           NONE
     priority                -1
-	ammo                    "Ammo_ExpShells"
+	ammo                    OPTION_AMMO_TYPE_SHOTGUN_ALT
 }
 
 Weapon kWpn_Crossbow_MP //kWpn_ShredderAlt
@@ -526,7 +527,7 @@ Weapon kWpn_Crossbow_MP //kWpn_ShredderAlt
     slot                    2
     quickslot               1
     tactileFire             "tactile/CROSSBOWMIX02.bnvib"
-	ammo                    "Ammo_ExpShells"
+	ammo                    OPTION_AMMO_TYPE_SHREDDER_ALT
 }
 
 Weapon kWpn_Plasma_MP //kWpn_TekBowAlt
@@ -541,7 +542,7 @@ Weapon kWpn_Plasma_MP //kWpn_TekBowAlt
     onlyMultiplayer         TRUE
     noCheatGiveWeapons      TRUE
     icon                    "gfx/hud/weapons/h_w_plasmarifle.png"
-    ammo                    "Ammo_Arrow"
+    ammo                    OPTION_AMMO_TYPE_TEK_BOW_ALT
     ammoConsumption         5
     projectileParticle      kParticle_Multiplayer9
     charMeshIndex           kWpnChar_AssaultRifle
