@@ -1,4 +1,6 @@
+//---------------------------
 // Archipelago bridge - do not move where this is
+//---------------------------
 class APMemory
 {
     int Magic;
@@ -27,6 +29,10 @@ class APMemory
 	
 	// Used by the client for seed/patch file validation
 	int ValidationSeed;
+	
+	// Death link info
+	int SendDeathType; // APDeathLinkType
+	int ReceivedDeath; // 0 or 1
 }
 
 APMemory g_AP;
@@ -52,6 +58,9 @@ void PrintAPMemory()
 	Sys.Print("CurrentMapId: " + g_AP.CurrentMapId);
 	
 	Sys.Print("ValidationSeed: " + g_AP.ValidationSeed);
+	
+	Sys.Print("SendDeathType: " + g_AP.SendDeathType);
+	Sys.Print("ReceivedDeath: " + g_AP.ReceivedDeath);
 }
 
 // A global for all outgoing location checks - this is here in case we cannot send out
@@ -96,6 +105,25 @@ enum APMessageType
 	AP_OUT_MSGTYPE_SEND_CHECK
 }
 
+//---------------------------
+// Used with death links to communicate that we died and how.
+enum APDeathType
+{
+	AP_DEATH_NONE = 0,
+	AP_DEATH_TEST1 = 1,
+	AP_DEATH_TEST2 = 2
+}
+
+//---------------------------
+// When receiving a death link, this indicates what we should do with it.
+enum APDeathLinkType
+{
+	AP_DEATHLINK_NONE = -1,
+	AP_DEATHLINK_DEATH = 0,
+	AP_DEATHLINK_HALF_HEALTH = 1,
+	AP_DEATHLINK_LOW_HEALTH = 2
+}
+
 void InitAP()
 {
 	g_AP.Magic = 0x4150524B; // APRK
@@ -115,6 +143,9 @@ void InitAP()
 	g_AP.IsGoalReached = 0;
 	
 	g_AP.CurrentMapId = 0;
+	
+	g_AP.SendDeathType = AP_DEATH_NONE;
+	g_AP.ReceivedDeath = 0;
 }
 
 void ResetAPForLoadData(int& in outgoingLastProcessedItemIdx)
@@ -131,6 +162,9 @@ void ResetAPForLoadData(int& in outgoingLastProcessedItemIdx)
 
     g_AP.OutgoingMessageData = 0;
 	g_AP.OutgoingLastProcessedItemIdx = outgoingLastProcessedItemIdx;
+	
+	g_AP.SendDeathType = AP_DEATH_NONE;
+	g_AP.ReceivedDeath = 0;
 	
 	// Now we're ready to receive
 	g_AP.IncomingStatus = AP_READY;

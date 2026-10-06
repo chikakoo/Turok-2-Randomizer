@@ -507,3 +507,10 @@ void PrintPlayerPosition(void)
 	Sys.Print("" + origin.x + "," + origin.y + "," + origin.z);
 	Sys.Print("REGION: " + LocalPlayer.Actor().WorldComponent().RegionIndex());
 }
+
+//---------------------------
+// Tests sending a death link
+void SendDeathLink(void)
+{
+	g_AP.ReceivedDeath = 1;
+}

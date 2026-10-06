@@ -1,9 +1,3 @@
-enum RandoUndefinedPlayerFlags
-{
-	PF_FLOATCAM = 1 << 11,
-	PF_NOWEAPON = 1 << 21
-};
-
 // Settings to be serialized on the player
 // The player seems to be recreated, so we can't really set these as properties
 //---------------------------
@@ -611,6 +605,7 @@ class RandoPlayerObject : ScriptObject
 		{	
 			ProcessIncomingMessages();
 			ProcessOutgoingMessages();
+			ProcessDeathLink();
 		}
 		
 		if (ui is null)
@@ -625,6 +620,23 @@ class RandoPlayerObject : ScriptObject
 		}
 		
 		TryDisplayProgressMenu();
+	}
+	
+	//---------------------------
+	// Used to send death links if the setting is on.
+	// We will always set it in case the client is overriding the setting.
+	void OnDeath(kDamageInfo& in damageInfo)
+	{
+		if ((damageInfo.flags & DF_DEATHLINK) != 0)
+		{
+			Sys.Print("DEATH LINK DEATH!");
+			return;
+		}
+
+		//TODO: compute the type based on the damageInfo
+		g_AP.SendDeathType = AP_DEATH_TEST1;
+		
+		Sys.Print("DEATH TYPE USED: " + g_AP.SendDeathType);
 	}
 }
 

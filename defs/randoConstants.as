@@ -1,3 +1,9 @@
+// Undefined flags
+#define PF_NOWEAPON 1 << 21
+
+// Custom flags
+#define DF_DEATHLINK 1 << 10
+
 // Inventory items add 400000 to the existing id to get
 // the "how many have I ever collected" value
 #define RANDO_INVENTORY_ITEM_OFFSET 400000

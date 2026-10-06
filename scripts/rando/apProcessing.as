@@ -184,3 +184,39 @@ void ProcessOutgoingMessages(void)
 	// Mark as in-flight, but don't remove yet
 	g_outgoingMessageInFlight = true;
 }
+
+//----------------------------------
+// Processes any pending death links.
+// We don't queue these up. The most recent one received will be used if there are
+// multiple sent before they can all be processed.
+void ProcessDeathLink()
+{
+	if (g_AP.ReceivedDeath == 0)
+	{
+		return;
+	}
+	
+	kActor@ player = LocalPlayer.Actor().CastToActor();
+	kDamageInfo damageInfo;
+	switch(OPTION_DEATH_LINK_TYPE)
+	{
+		case AP_DEATHLINK_DEATH:
+			damageInfo.flags |= DF_NORMAL | DF_DEATHLINK;
+			@damageInfo.target = @LocalPlayer.Actor().CastToActor();
+			damageInfo.hits = player.Health() * 10;
+			Hud.AddMessage("A myserious force has killed you!");
+			break;
+		case AP_DEATHLINK_HALF_HEALTH:
+			player.Health() = Math::Max(player.Health() / 2, 1);
+			Hud.AddMessage("A myserious force has damaged you!");
+			break;
+		case AP_DEATHLINK_LOW_HEALTH:
+			player.Health() = 1;
+			Hud.AddMessage("A myserious force has damaged you!");
+			break;
+	}
+	
+	// Only plays the damage sound if not actually dying
+	player.InflictDamage(damageInfo);
+	g_AP.ReceivedDeath = 0;
+}
