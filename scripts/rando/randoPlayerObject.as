@@ -629,14 +629,63 @@ class RandoPlayerObject : ScriptObject
 	{
 		if ((damageInfo.flags & DF_DEATHLINK) != 0)
 		{
-			Sys.Print("DEATH LINK DEATH!");
 			return;
 		}
 
-		//TODO: compute the type based on the damageInfo
-		g_AP.SendDeathType = AP_DEATH_TEST1;
+		// No source doesn't usually happen... use a generic message
+		if (damageInfo.source is null)
+		{
+			g_AP.SendDeathType = AP_DEATH_GENERIC;
+			return;
+		}
+
+		if (damageInfo.source.Type() == kActor_Player)
+		{
+			// Specific player deaths
+			if ((damageInfo.flags & DF_LAVA) != 0)
+			{
+				g_AP.SendDeathType = AP_DEATH_LAVA;
+				return;
+			}
+			if ((damageInfo.flags & DF_VOID) != 0)
+			{
+				g_AP.SendDeathType = AP_DEATH_VOID;
+				return;
+			}
+			if ((damageInfo.flags & DF_DROWN) != 0)
+			{
+				// River of souls is covered here too
+				g_AP.SendDeathType = AP_DEATH_WATER;
+				return;
+			}
+			if ((damageInfo.flags & DF_SWAMP) != 0)
+			{
+				g_AP.SendDeathType = AP_DEATH_SWAMP;
+				return;
+			}
+			
+			g_AP.SendDeathType = AP_DEATH_PLAYER_GENERIC;
+			return;
+		}
 		
-		Sys.Print("DEATH TYPE USED: " + g_AP.SendDeathType);
+		if (damageInfo.particle !is null)
+		{
+			switch(damageInfo.particle.ParticleType())
+			{
+				case 256:
+					g_AP.SendDeathType = AP_DEATH_EMBER;
+					return;
+				case 259:
+					g_AP.SendDeathType = AP_DEATH_ROCK;
+					return;
+			}
+			
+			g_AP.SendDeathType = AP_DEATH_ENEMY_SHOT;
+			return;
+		}
+		
+		// Source not a player without a particle = melee death
+		g_AP.SendDeathType = AP_DEATH_ENEMY_MELEE;
 	}
 }
 
