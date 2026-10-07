@@ -638,34 +638,37 @@ class RandoPlayerObject : ScriptObject
 			g_AP.SendDeathType = AP_DEATH_GENERIC;
 			return;
 		}
-
-		if (damageInfo.source.Type() == kActor_Player)
+		
+		switch (damageInfo.source.Type())
 		{
-			// Specific player deaths
-			if ((damageInfo.flags & DF_LAVA) != 0)
-			{
-				g_AP.SendDeathType = AP_DEATH_LAVA;
+			case kActor_Player:
+				if ((damageInfo.flags & DF_LAVA) != 0)
+				{
+					g_AP.SendDeathType = AP_DEATH_LAVA;
+					return;
+				}
+				if ((damageInfo.flags & DF_VOID) != 0)
+				{
+					g_AP.SendDeathType = AP_DEATH_VOID;
+					return;
+				}
+				if ((damageInfo.flags & DF_DROWN) != 0)
+				{
+					// River of souls is covered here too
+					g_AP.SendDeathType = AP_DEATH_WATER;
+					return;
+				}
+				if ((damageInfo.flags & DF_SWAMP) != 0)
+				{
+					g_AP.SendDeathType = AP_DEATH_SWAMP;
+					return;
+				}
+				
+				g_AP.SendDeathType = AP_DEATH_PLAYER_GENERIC;
 				return;
-			}
-			if ((damageInfo.flags & DF_VOID) != 0)
-			{
-				g_AP.SendDeathType = AP_DEATH_VOID;
+			case kActor_Misc_Turret:
+				g_AP.SendDeathType = AP_DEATH_TURRET;
 				return;
-			}
-			if ((damageInfo.flags & DF_DROWN) != 0)
-			{
-				// River of souls is covered here too
-				g_AP.SendDeathType = AP_DEATH_WATER;
-				return;
-			}
-			if ((damageInfo.flags & DF_SWAMP) != 0)
-			{
-				g_AP.SendDeathType = AP_DEATH_SWAMP;
-				return;
-			}
-			
-			g_AP.SendDeathType = AP_DEATH_PLAYER_GENERIC;
-			return;
 		}
 		
 		if (damageInfo.particle !is null)
