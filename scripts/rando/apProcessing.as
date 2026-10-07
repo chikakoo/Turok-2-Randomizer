@@ -204,15 +204,15 @@ void ProcessDeathLink()
 			damageInfo.flags |= DF_NORMAL | DF_DEATHLINK;
 			@damageInfo.target = @LocalPlayer.Actor().CastToActor();
 			damageInfo.hits = player.Health() * 10;
-			Hud.AddMessage("A myserious force has killed you!");
+			Hud.AddMessage("A mysterious force has killed you!");
 			break;
 		case AP_DEATHLINK_HALF_HEALTH:
 			player.Health() = Math::Max(player.Health() / 2, 1);
-			Hud.AddMessage("A myserious force has damaged you!");
+			Hud.AddMessage("A mysterious force has damaged you!");
 			break;
 		case AP_DEATHLINK_LOW_HEALTH:
 			player.Health() = 1;
-			Hud.AddMessage("A myserious force has damaged you!");
+			Hud.AddMessage("A mysterious force has damaged you!");
 			break;
 	}
 	
