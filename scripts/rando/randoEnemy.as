@@ -135,16 +135,20 @@ class RandoEnemy : ScriptActor
 			return true;
 		}
 		
+		int enemyType = self.Type();
+		if (isReplacedActor && originalActor !is null)
+		{
+			enemyType = originalActor.Type();
+		}
+		
 		bool hadLicenseBefore = hasLicense;
-		hasLicense = GetInventoryItemCollectedTotal(self.Type()) > 0;
+		hasLicense = GetInventoryItemCollectedTotal(enemyType) > 0;
 		if (hasLicense && !hadLicenseBefore)
 		{
-			self.Flags() &= ~AF_NODAMAGE;
 			self.Flags() |= AF_ALLOWTRACKING; 
 		} 
 		else if (!hasLicense && initialCall)
 		{
-			self.Flags() |= AF_NODAMAGE;
 			self.Flags() &= ~AF_ALLOWTRACKING; 
 		}
 		
@@ -167,7 +171,7 @@ class RandoEnemy : ScriptActor
 		}
 		else 
 		{
-			self.RunFxEvent("InvincibleFlash");
+			self.RunFxEvent("InvincibleFade");
 			m_selectCooldown = 120;
 		}
 	}
@@ -243,6 +247,18 @@ class RandoEnemy : ScriptActor
 					return;
 				}
 			}
+		}
+	}
+	
+	//----------------------------------
+	// If you don't have the license to kill the enemy, set the damage value to 0
+	// and show the FxEffect indicating they can't take damage.
+	void OnPreDamage(kDamageInfo& in dmgInfo)
+	{
+		if (!hasLicense)
+		{
+			dmgInfo.hits = 0.0f;
+			self.RunFxEvent("InvincibleFlash");
 		}
 	}
 	
