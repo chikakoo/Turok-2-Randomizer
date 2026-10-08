@@ -10,7 +10,7 @@ InvincibleFade
 InvincibleFlash
 {
     $color ({0 0 0}, 0)
-    $fade_color ({255 255 255}, 255, 2.0)
+    $fade_color ({255 255 255}, 180, 2.0)
     $fade_color ({255 255 255}, 0, 8.0)
     $color ({0 0 0}, 0)
     $wait (0.25)

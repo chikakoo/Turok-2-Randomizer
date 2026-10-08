@@ -50,17 +50,10 @@ class RandoPlayerObject : ScriptObject
 			ui.DisplayLevelProgress();
 			g_messageCooldown = g_progressMenuDisplayTime + 30;
 		}
-		
-		if (g_uiCooldown > 0)
+	
+		if (LocalPlayer.ButtonHeldTime(8) == 1 && !IsScoped())
 		{
-			g_uiCooldown--;
-		}
-		else if ((LocalPlayer.Buttons() & BC_SCOPEZOOMIN) != 0 && !IsScoped())
-		{
-			if (!ui.Activate())
-			{
-				g_uiCooldown = 30;
-			}
+			ui.Activate();
 		}
 	}
 	

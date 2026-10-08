@@ -4,10 +4,10 @@
 
 "textures/ui/white.png"
 {
-    speed 1
-    animated 0
+	speed 1
+	animated 0
 
-    texture_1 "gfx/cursor.png"
+	texture_1 "gfx/cursor.png"
 	texture_2 "textures/ui/background.png"
 	texture_3 "textures/ui/incomplete.png"
 	texture_4 "gfx/hud/h_objective_checkmark_complete.png"
@@ -36,6 +36,7 @@
 	texture_27 "textures/ui/warp_boss.png"
 	texture_28 "textures/ui/toggle_important_pickups.png"
 	texture_29 "textures/ui/toggle_important_enemies.png"
+	texture_30 "textures/ui/license_background.png"
 }
 
 // ------------------------------

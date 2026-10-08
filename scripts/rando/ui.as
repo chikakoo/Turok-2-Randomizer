@@ -2,7 +2,6 @@
 // UI constants for opening menus
 //---------------------------
 int g_messageCooldown = 0;
-int g_uiCooldown = 0;
 int g_bossMessageCooldown = 0;
 int g_toggleImportantPickupsCooldown = 0;
 int g_toggleImportantEnemiesCooldown = 0;
@@ -75,6 +74,8 @@ class RandoUI
 	float lastPlayerHealth;
 	
 	// UI Properties
+	bool showingLicensePage;
+	
 	kVec3 uiOrigin;
 	int uiRegion;
 	float uiYaw;
@@ -192,6 +193,7 @@ class RandoUI
 		rightDir = kVec3(1.0f, 0.0f, 0.0f) * ownerRot;
 		upDir = kVec3(0.0f, 0.0f, 1.0f) * ownerRot;
 
+		showingLicensePage = false;
 		SetUpUIScreen();
 		
 		return true;
@@ -312,6 +314,15 @@ class RandoUI
 			UI_TOGGLE_IMPORTANT_BUTTON_WIDTH,
 			UI_TOGGLE_IMPORTANT_BUTTON_HEIGHT);
 		@toggleImportantEnemiesButton.onSelect = UIElementSelectCallBack(OnToggleImportantEnemiesButton);
+	}
+	
+	// --------------------------
+	// Sets up the UI screen for enemy licenses
+	void SetUpUIEnemyLicenseScreen()
+	{
+		AddBackgroundImage(RANDO_UI_TEXTURE_LICENSE_BACKGROUND);
+		
+		// TODO: add the checkboxes for licenses you have
 	}
 	
 	// --------------------------
@@ -493,7 +504,7 @@ class RandoUI
 		int levelKeys = GetInventoryItemCollectedTotal(levelKeyActor);
 		bool useGreenLevelKeyText = levelKeys >= maxKeys;
 		AddNumberImage(
-			levelKeys, 
+			levelKeys,
 			PositionPixelToUI(UI_OFFSET_LEVEL_KEY, levelHeightOffset),
 			isExcluded || useGreenLevelKeyText);
 			
@@ -811,6 +822,22 @@ class RandoUI
 		if (!isActive)
 		{
 			mouse.self.Flags() |= AF_HIDDEN;
+			return;
+		}
+		
+		if ((LocalPlayer.ButtonHeldTime(4)) == 1 ||
+			(LocalPlayer.ButtonHeldTime(5)) == 1)
+		{
+			Clear();
+			showingLicensePage = !showingLicensePage;
+			if (showingLicensePage)
+			{
+				SetUpUIEnemyLicenseScreen();
+			}
+			else 
+			{
+				SetUpUIScreen();
+			}
 			return;
 		}
 		
