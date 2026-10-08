@@ -141,17 +141,7 @@ class RandoEnemy : ScriptActor
 			enemyType = originalActor.Type();
 		}
 		
-		bool hadLicenseBefore = hasLicense;
 		hasLicense = GetInventoryItemCollectedTotal(enemyType) > 0;
-		if (hasLicense && !hadLicenseBefore)
-		{
-			self.Flags() |= AF_ALLOWTRACKING; 
-		} 
-		else if (!hasLicense && initialCall)
-		{
-			self.Flags() &= ~AF_ALLOWTRACKING; 
-		}
-		
 		return hasLicense;
 	}
 	
