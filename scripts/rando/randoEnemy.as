@@ -3,6 +3,8 @@
 //----------------------------------
 class RandoEnemy : ScriptActor
 {
+	int m_selectCooldown = 0;
+	
 	// The original actor (that this one replaced; null if not replaced)
 	kActor@ originalActor;
 	
@@ -38,12 +40,8 @@ class RandoEnemy : ScriptActor
     {
 		super(@actor);
 		SetApEntry();
+		CheckForLicenseAndUpdateFlags(true);
 		RandomizeScale();
-		
-		// TODO: have a function to give the enemy inventory items
-		//       if received, set the values of all the loaded enemies
-		hasLicense = GetInventoryItemCollectedTotal(self.Type()) > 0;
-		SetLicenseFlags();
 	}
 	
 	//----------------------------------
@@ -122,6 +120,59 @@ class RandoEnemy : ScriptActor
 	}
 	
 	//----------------------------------
+	// Sets the flags based on the whether the player has the "license to kill" that actor.
+	// If no license, make the actor unable to die.
+	// Also, bores kill them still, so don't allow tracking.
+	//
+	// If the player has the license set the flags to be able to kill the enemy if necessary.
+	// Else, if it's the initial call, set the flags to not be able to kill the enemy.
+	//
+	// Returns whether the player should be able to kill the enemy.
+	bool CheckForLicenseAndUpdateFlags(const bool &in initialCall = false)
+	{
+		if (!OPTION_ENEMY_LICENSES)
+		{
+			return true;
+		}
+		
+		bool hadLicenseBefore = hasLicense;
+		hasLicense = GetInventoryItemCollectedTotal(self.Type()) > 0;
+		if (hasLicense && !hadLicenseBefore)
+		{
+			self.Flags() &= ~AF_NODAMAGE;
+			self.Flags() |= AF_ALLOWTRACKING; 
+		} 
+		else if (!hasLicense && initialCall)
+		{
+			self.Flags() |= AF_NODAMAGE;
+			self.Flags() &= ~AF_ALLOWTRACKING; 
+		}
+		
+		return hasLicense;
+	}
+	
+	//----------------------------------
+	// Updates license flags if necessary.
+	// If there is no license, play the FxEffect on a cooldown.
+	void HandleLicenseUpdates()
+	{
+		if (CheckForLicenseAndUpdateFlags())
+		{
+			return;
+		}
+
+		if (m_selectCooldown > 0)
+		{
+			m_selectCooldown--;
+		}
+		else 
+		{
+			self.RunFxEvent("InvincibleFlash");
+			m_selectCooldown = 120;
+		}
+	}
+	
+	//----------------------------------
 	// Randomizes the scale of the given actor based on the settings
 	// 0: No adjustment
 	// 1: Proportional
@@ -145,19 +196,6 @@ class RandoEnemy : ScriptActor
 				scale.x * RandomPercentageMultiplier(OPTION_ENEMY_SIZE_MAX_PERCENTAGE),
 				scale.y * RandomPercentageMultiplier(OPTION_ENEMY_SIZE_MAX_PERCENTAGE),
 				scale.z * RandomPercentageMultiplier(OPTION_ENEMY_SIZE_MAX_PERCENTAGE));
-		}
-	}
-	
-	//----------------------------------
-	// Sets the flags based on the whether the player has the "license to kill" that actor.
-	// If no license, make the actor unable to die.
-	// Also, bores kill them still, so don't allow tracking.
-	void SetLicenseFlags()
-	{
-		if (!hasLicense)
-		{
-			self.Flags() |= AF_NODAMAGE;
-			self.Flags() &= ~AF_ALLOWTRACKING; 
 		}
 	}
 	
@@ -259,15 +297,7 @@ class RandoEnemy : ScriptActor
 	{
 		if ((self.Flags() & AF_HIDDEN) == 0)
 		{
-			if (!hasLicense && (self.Flags() & AF_DEAD) == 0)
-			{
-				ParticleFactory.Spawn(
-					kParticle_EnemyInvincible, 
-					self,
-					self.Origin(),
-					kQuat(0, 0, 0),
-					Math::vecZero);
-			}
+			HandleLicenseUpdates();
 			
 			// If this enemy is a check, show the important indicator when it's visible
 			if (g_markEnemies && !importantShown && apEntry !is null)

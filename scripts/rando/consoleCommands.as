@@ -521,3 +521,10 @@ void RaptoidLicense(void)
 {
 	LocalPlayer.Inventory().Give(kActor_AI_Raptoid + RANDO_INVENTORY_ITEM_OFFSET);
 }
+
+//---------------------------
+// Gives the spider hatchling license
+void SpiderHatchlingLicense(void)
+{
+	LocalPlayer.Inventory().Give(kActor_AI_SpiderHatchling + RANDO_INVENTORY_ITEM_OFFSET);
+}
