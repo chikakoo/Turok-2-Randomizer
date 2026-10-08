@@ -10,6 +10,9 @@ int g_savedValidationSeed;
 // Whether there is a seed/slot mismatch (not serialized)
 bool g_seedError;
 
+// Used to know whether to show the reconnected message
+bool g_wasDisconnected;
+
 class RandoPlayerObject : ScriptObject
 {
     kActor@ self;
@@ -586,23 +589,14 @@ class RandoPlayerObject : ScriptObject
 	//
 	// Also handles UI display.
 	void OnTick(void)
-	{
+	{	
 		if (g_seedError)
 		{
-			if (g_errorMessageCooldown > 0)
-			{
-				g_errorMessageCooldown--;
-			}
-			else 
-			{
-				Hud.AddMessage("Expected slot name: " + AP_SLOT_NAME, 360);
-				Hud.AddMessage("Check that you loaded the correct save/patch file.", 360);
-				Hud.AddMessage("Seed mismatch! Not processing AP checks...", 360);
-				g_errorMessageCooldown = 360;
-			}
+			HandleSeedError();
 		}
 		else if (!CinemaPlayer.Playing())
 		{	
+			HandleClientPing();
 			ProcessIncomingMessages();
 			ProcessOutgoingMessages();
 			ProcessDeathLink();
@@ -620,6 +614,57 @@ class RandoPlayerObject : ScriptObject
 		}
 		
 		TryDisplayProgressMenu();
+	}
+	
+	//---------------------------
+	// Pings the client by setting g_AP.ClientPingPending to true.
+	// If the client did notand displays an error if it didn't reset the ping flag in time.
+	void HandleClientPing()
+	{
+		if (OPTION_OFFLINE_MODE)
+		{
+			return;
+		}
+		
+		if (g_clientPingWaitTime > 0)
+		{
+			g_clientPingWaitTime--;
+		}
+		else if (g_AP.ClientPingPending == 0)
+		{
+			if (g_wasDisconnected)
+			{
+				g_wasDisconnected = false;
+				Hud.AddMessage("Client connected!", 300);
+			}
+		
+			g_AP.ClientPingPending = 1;
+			g_clientPingWaitTime = 300;
+		}
+		else
+		{
+			g_clientPingWaitTime = 300;
+			g_wasDisconnected = true;
+			Hud.AddMessage("Please connect the Turok 2 AP client.", 300);
+			Hud.AddMessage("Client not responding!", 300);
+		}
+	}
+	
+	//---------------------------
+	// If there's a seed error, display an error message on a cooldown.
+	void HandleSeedError()
+	{
+		if (g_errorMessageCooldown > 0)
+		{
+			g_errorMessageCooldown--;
+		}
+		else 
+		{
+			Hud.AddMessage("Expected slot name: " + AP_SLOT_NAME, 360);
+			Hud.AddMessage("Check that you loaded the correct save/patch file.", 360);
+			Hud.AddMessage("Seed mismatch! Not processing AP checks...", 360);
+			g_errorMessageCooldown = 360;
+		}
 	}
 	
 	//---------------------------

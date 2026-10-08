@@ -514,3 +514,10 @@ void SendDeathLink(void)
 {
 	g_AP.ReceivedDeath = 1;
 }
+
+//---------------------------
+// Gives the raptoid license
+void RaptoidLicense(void)
+{
+	LocalPlayer.Inventory().Give(kActor_AI_Raptoid + RANDO_INVENTORY_ITEM_OFFSET);
+}

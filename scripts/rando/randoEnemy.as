@@ -27,6 +27,9 @@ class RandoEnemy : ScriptActor
 	// Whether the important indicator was shown
 	// Used for performance reasons
 	bool importantShown;
+	
+	// Whether the player has the "license to kill" this enemy
+	bool hasLicense;
 
 	//----------------------------------
 	// Constructor
@@ -35,7 +38,12 @@ class RandoEnemy : ScriptActor
     {
 		super(@actor);
 		SetApEntry();
-		RandomizeScale(@actor);
+		RandomizeScale();
+		
+		// TODO: have a function to give the enemy inventory items
+		//       if received, set the values of all the loaded enemies
+		hasLicense = GetInventoryItemCollectedTotal(self.Type()) > 0;
+		SetLicenseFlags();
 	}
 	
 	//----------------------------------
@@ -118,25 +126,38 @@ class RandoEnemy : ScriptActor
 	// 0: No adjustment
 	// 1: Proportional
 	// 2: Random proportions
-	void RandomizeScale(kActor@ actor)
+	void RandomizeScale()
 	{
 		if (OPTION_RANDOMIZE_ENEMY_SIZES == 0)
 		{
 			return;
 		}
 		
-		kVec3 scale = actor.Scale();
+		kVec3 scale = self.Scale();
 		if (OPTION_RANDOMIZE_ENEMY_SIZES == 1)
 		{
 			float multiplier = RandomPercentageMultiplier(OPTION_ENEMY_SIZE_MAX_PERCENTAGE);
-			actor.Scale().Set(scale.x * multiplier, scale.y * multiplier, scale.z * multiplier);
+			self.Scale().Set(scale.x * multiplier, scale.y * multiplier, scale.z * multiplier);
 		}
 		else if (OPTION_RANDOMIZE_ENEMY_SIZES == 2)
 		{
-			actor.Scale().Set(
+			self.Scale().Set(
 				scale.x * RandomPercentageMultiplier(OPTION_ENEMY_SIZE_MAX_PERCENTAGE),
 				scale.y * RandomPercentageMultiplier(OPTION_ENEMY_SIZE_MAX_PERCENTAGE),
 				scale.z * RandomPercentageMultiplier(OPTION_ENEMY_SIZE_MAX_PERCENTAGE));
+		}
+	}
+	
+	//----------------------------------
+	// Sets the flags based on the whether the player has the "license to kill" that actor.
+	// If no license, make the actor unable to die.
+	// Also, bores kill them still, so don't allow tracking.
+	void SetLicenseFlags()
+	{
+		if (!hasLicense)
+		{
+			self.Flags() |= AF_NODAMAGE;
+			self.Flags() &= ~AF_ALLOWTRACKING; 
 		}
 	}
 	
@@ -188,10 +209,21 @@ class RandoEnemy : ScriptActor
 	}
 	
 	//----------------------------------
-	// When the replacement dies, kill the original actor to trigger any events
-	// Simply setting Health to 0 does not work
+	// When the replacement dies, kill the original actor to trigger any events.
+	// Note that simply setting Health to 0 does not work.
+	//
+	// If the player doesn't have the "license to kill" the actor, "Mark" it with
+	// false so that the actor will persist when the map is reloaded. OnDeath
+	// can be called in this case if the actor falls into a pit; this is a failsafe
+	// for that case.
 	void OnDeath(kDamageInfo& in dmgInfo)
 	{
+		if (!hasLicense)
+		{
+			self.Mark(false);
+			return;
+		}
+		
 		if (apEntry !is null)
 		{		
 			apEntry.SendCheckToAP();
@@ -225,14 +257,24 @@ class RandoEnemy : ScriptActor
 	// - Else, set the original to hidden if it's ever shown for some reason
 	void OnTick(void)
 	{
-		// If this enemy is a check, show the important indicator when it's visible
-		if (g_markEnemies &&
-			!importantShown &&
-			apEntry !is null &&
-			((self.Flags() & AF_HIDDEN) == 0))
+		if ((self.Flags() & AF_HIDDEN) == 0)
 		{
-			self.Flags() |= AF_IMPORTANT;
-			importantShown = true;
+			if (!hasLicense && (self.Flags() & AF_DEAD) == 0)
+			{
+				ParticleFactory.Spawn(
+					kParticle_EnemyInvincible, 
+					self,
+					self.Origin(),
+					kQuat(0, 0, 0),
+					Math::vecZero);
+			}
+			
+			// If this enemy is a check, show the important indicator when it's visible
+			if (g_markEnemies && !importantShown && apEntry !is null)
+			{
+				self.Flags() |= AF_IMPORTANT;
+				importantShown = true;
+			}
 		}
 		
 		// Handles linked enemies

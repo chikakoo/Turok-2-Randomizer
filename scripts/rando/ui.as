@@ -7,6 +7,7 @@ int g_bossMessageCooldown = 0;
 int g_toggleImportantPickupsCooldown = 0;
 int g_toggleImportantEnemiesCooldown = 0;
 int g_errorMessageCooldown = 0;
+int g_clientPingWaitTime = 0;
 int g_progressMenuDisplayTime = 330;
 
 // --------------------------

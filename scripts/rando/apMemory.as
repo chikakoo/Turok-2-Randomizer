@@ -30,6 +30,9 @@ class APMemory
 	// Used by the client for seed/patch file validation
 	int ValidationSeed;
 	
+	// Used to ping the client to check for disconnections
+	int ClientPingPending; // 0 or 1
+	
 	// Death link info
 	int SendDeathType; // APDeathLinkType
 	int ReceivedDeath; // 0 or 1
@@ -58,6 +61,7 @@ void PrintAPMemory()
 	Sys.Print("CurrentMapId: " + g_AP.CurrentMapId);
 	
 	Sys.Print("ValidationSeed: " + g_AP.ValidationSeed);
+	Sys.Print("ClientPingPending: " + g_AP.ClientPingPending);
 	
 	Sys.Print("SendDeathType: " + g_AP.SendDeathType);
 	Sys.Print("ReceivedDeath: " + g_AP.ReceivedDeath);
@@ -153,6 +157,8 @@ void InitAP()
 	
 	g_AP.CurrentMapId = 0;
 	
+	g_AP.ClientPingPending = 0;
+	
 	g_AP.SendDeathType = AP_DEATH_NONE;
 	g_AP.ReceivedDeath = 0;
 }
@@ -171,6 +177,8 @@ void ResetAPForLoadData(int& in outgoingLastProcessedItemIdx)
 
     g_AP.OutgoingMessageData = 0;
 	g_AP.OutgoingLastProcessedItemIdx = outgoingLastProcessedItemIdx;
+	
+	g_AP.ClientPingPending = 0;
 	
 	g_AP.SendDeathType = AP_DEATH_NONE;
 	g_AP.ReceivedDeath = 0;

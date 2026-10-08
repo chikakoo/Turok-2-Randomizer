@@ -1,10 +1,13 @@
 // Undefined flags
 #define PF_NOWEAPON 1 << 21
+#define DF_SWAMP 1 << 8
+#define DF_VOID 1 << 7
 
 // Custom flags
-#define DF_VOID 1 << 7
-#define DF_SWAMP 1 << 8
 #define DF_DEATHLINK 1 << 31
+
+// Custom particles
+#define kParticle_EnemyInvincible 10003
 
 // Inventory items add 400000 to the existing id to get
 // the "how many have I ever collected" value
