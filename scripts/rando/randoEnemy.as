@@ -1,6 +1,13 @@
 //----------------------------------
 // A script for all enemies that can be randomized.
 //----------------------------------
+enum EnemyLicenseType
+{
+	ENEMY_LICENSE_NONE = 0,
+	ENEMY_LICENSE_ALL = 1,
+	ENEMY_LICENSE_EXCLUDE_SPAWNERS = 2
+}
+
 class RandoEnemy : ScriptActor
 {
 	int m_selectCooldown = 0;
@@ -32,6 +39,9 @@ class RandoEnemy : ScriptActor
 	
 	// Whether the player has the "license to kill" this enemy
 	bool hasLicense;
+	
+	// Ignored depending on spawner settings
+	bool ignoreLicense;
 
 	//----------------------------------
 	// Constructor
@@ -40,8 +50,10 @@ class RandoEnemy : ScriptActor
     {
 		super(@actor);
 		SetApEntry();
-		CheckForLicenseAndUpdateFlags(true);
 		RandomizeScale();
+		
+		ignoreLicense = OPTION_ENEMY_LICENSES == ENEMY_LICENSE_NONE;
+		CheckForLicenseAndUpdateFlags();
 	}
 	
 	//----------------------------------
@@ -128,10 +140,22 @@ class RandoEnemy : ScriptActor
 	// Else, if it's the initial call, set the flags to not be able to kill the enemy.
 	//
 	// Returns whether the player should be able to kill the enemy.
-	bool CheckForLicenseAndUpdateFlags(const bool &in initialCall = false)
+	bool CheckForLicenseAndUpdateFlags()
 	{
-		if (!OPTION_ENEMY_LICENSES)
+		if (ignoreLicense)
 		{
+			hasLicense = true;
+			return true;
+		}
+		
+		// If this is a spawned enemy (excluding totems), check the
+		// exclude spawners setting and handle the license accordingly
+		if (self.TID() <= 0 && 
+			OPTION_ENEMY_LICENSES == ENEMY_LICENSE_EXCLUDE_SPAWNERS &&
+			!IsTotemLevel(Game.ActiveMapID()))
+		{
+			hasLicense = true;
+			ignoreLicense = true; // Cache this so we don't recompute every tick
 			return true;
 		}
 		
@@ -203,6 +227,7 @@ class RandoEnemy : ScriptActor
 		SERIALIZE(processedSpawn);
 		SERIALIZE(neverReplacedActor);
 		SERIALIZE(importantShown);
+		SERIALIZE(ignoreLicense);
 	}
 	
 	//----------------------------------
@@ -216,6 +241,7 @@ class RandoEnemy : ScriptActor
 		DESERIALIZE_BOOL(processedSpawn);
 		DESERIALIZE_BOOL(neverReplacedActor);
 		DESERIALIZE_BOOL(importantShown);
+		SERIALIZE(ignoreLicense);
 		SetApEntry();
 		
 		if (!isReplacedActor)
