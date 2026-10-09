@@ -355,7 +355,6 @@ PrimagenKeyTrigger kActor_Hub_PrimagenKeyTrigger
 
 //------------------------------
 // UI actors - for our fake UI
-// TODO - the meshes
 //------------------------------
 UIElement kActor_UI_Element
 {
@@ -661,6 +660,33 @@ TrapUltraHealth kActor_Trap_Spam_Ultra_Health
     End_Component
     Begin_Component "kexStaticMeshComponent"
         mesh                  "models/Pickup_Ultra_Health.staticmesh"
+    End_Component
+    Begin_Component "kexScriptComponent"
+        scriptClass           "RandoPickupObject"
+        triggerRadius         81.92
+    End_Component
+}
+
+//------------------------------
+// Enemy licenses
+//------------------------------
+RaptoidLicense kActor_InventoryItem_RaptoidLicense
+{
+    className                   "kexInventoryPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Ammo Pickup.ksnd"
+	pickup.pickupMessage 		"Raptoid License"
+    
+    initialScale              "0.2 0.2 0.2"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+	Begin_Component "kexRenderMeshComponent"
+        mesh         "char/Raptoid.skinnedmesh"
+		anim         "anims/Raptoid.anim"
     End_Component
     Begin_Component "kexScriptComponent"
         scriptClass           "RandoPickupObject"

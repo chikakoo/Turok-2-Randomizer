@@ -169,7 +169,11 @@ bool TryGivePlayerHealth(int &in actorId)
 // Gets the given item and adds it to your inventory.
 // Will add the item AND the inventory offset.
 // Handles level key packs.
-void TryGetInventoryItem(int &in actorId, bool &in skipNotifications = false)
+// If it's a custom inventory item, does not call HandleTrackInventoryItems.
+void TryGetInventoryItem(
+	int &in actorId,
+	bool &in skipNotifications = false,
+	bool &in isCustomInventoryItem = false)
 {
 	kDictMem@ itemDef = TryGetActorDefWithClass(actorId, "kexInventoryPickup");
 	if (itemDef is null)
@@ -191,7 +195,11 @@ void TryGetInventoryItem(int &in actorId, bool &in skipNotifications = false)
 	{
 		TryGiveAllLevelKeysForWarp(actorId); // Only gives the keys if necessary
 		LocalPlayer.Inventory().Give(actorId);
-		HandleTrackInventoryItems(actorId, itemDef);
+		
+		if (isCustomInventoryItem)
+		{
+			HandleTrackInventoryItems(actorId, itemDef);
+		}
 	}
 	
 	// Handles giving the nuke if you have 6 parts since the game only does so

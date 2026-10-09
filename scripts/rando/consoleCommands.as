@@ -516,14 +516,13 @@ void SendDeathLink(void)
 }
 
 //---------------------------
-// Gives the raptoid license
+// Enemy licenses
 void RaptoidLicense(void)
 {
-	LocalPlayer.Inventory().Give(kActor_AI_Raptoid + RANDO_INVENTORY_ITEM_OFFSET);
+	TryGetInventoryItem(kActor_InventoryItem_RaptoidLicense);
 }
 
-//---------------------------
-// Gives the spider hatchling license
+//TODO
 void SpiderHatchlingLicense(void)
 {
 	LocalPlayer.Inventory().Give(kActor_AI_SpiderHatchling + RANDO_INVENTORY_ITEM_OFFSET);

@@ -157,6 +157,10 @@
 #define kActor_AI_LordOfTheFlesh 402
 
 // ---------
+// Enemy licenses (actor id + RANDO_INVENTORY_ITEM_OFFSET)
+#define kActor_InventoryItem_RaptoidLicense 400200
+
+// ---------
 // Map intros without constants
 #define kLevel_Intro_RiverOfSouls 34
 #define kLevel_Intro_DeathMarshes 12

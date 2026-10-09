@@ -65,6 +65,11 @@ const int UI_LEFT_TEXT_WIDTH = 28;
 const int UI_LEFT_TEXT_HEIGHT = 14;
 const int UI_OFFSET_LEFT_HEIGHT = 45;
 
+const int UI_OFFSET_LICENSE_X = 82;
+const int UI_OFFSET_LICENSE_Y = 82;
+const int UI_OFFSET_HAS_LICENSE_X = 29;
+const int UI_OFFSET_HAS_LICENSE_Y = 95;
+
 class RandoUI
 {
 	// General Properties
@@ -322,7 +327,62 @@ class RandoUI
 	{
 		AddBackgroundImage(RANDO_UI_TEXTURE_LICENSE_BACKGROUND);
 		
-		// TODO: add the checkboxes for licenses you have
+		AddObtainedLicenseIcon(kActor_AI_Raptoid, 0, 0);
+		AddObtainedLicenseIcon(kActor_AI_Endtrail, 1, 0);
+		AddObtainedLicenseIcon(kActor_AI_Compy, 2, 0);
+		AddObtainedLicenseIcon(kActor_AI_Raptor, 3, 0);
+		AddObtainedLicenseIcon(kActor_AI_Leaper, 4, 0);
+		AddObtainedLicenseIcon(kActor_AI_SpiderHatchling, 5, 0);
+
+		AddObtainedLicenseIcon(kActor_AI_Deadman, 0, 1);
+		AddObtainedLicenseIcon(kActor_AI_LordOfTheDead, 1, 1);
+		AddObtainedLicenseIcon(kActor_AI_SisterOfDespair, 2, 1);
+		AddObtainedLicenseIcon(kActor_AI_WarClub, 3, 1);
+		AddObtainedLicenseIcon(kActor_AI_Gunner, 4, 1);
+		AddObtainedLicenseIcon(kActor_AI_Juggernaut, 5, 1);
+
+		AddObtainedLicenseIcon(kActor_AI_CaveWorm, 0, 2);
+		AddObtainedLicenseIcon(kActor_AI_SwampWasp, 1, 2);
+		AddObtainedLicenseIcon(kActor_AI_Sentinel, 2, 2);
+		AddObtainedLicenseIcon(kActor_AI_Guardian, 3, 2);
+		AddObtainedLicenseIcon(kActor_AI_Nala, 4, 2);
+		AddObtainedLicenseIcon(kActor_AI_CaveSpider, 5, 2);
+
+		AddObtainedLicenseIcon(kActor_AI_Fireborn, 0, 3);
+		AddObtainedLicenseIcon(kActor_AI_FleshWorm, 1, 3);
+		AddObtainedLicenseIcon(kActor_AI_Grub, 2, 3);
+		AddObtainedLicenseIcon(kActor_AI_Drone, 3, 3);
+		AddObtainedLicenseIcon(kActor_AI_Worker, 4, 3);
+		AddObtainedLicenseIcon(kActor_AI_Mite, 5, 3);
+
+		AddObtainedLicenseIcon(kActor_AI_Soldier, 0, 4);
+		AddObtainedLicenseIcon(kActor_AI_BioBot, 1, 4);
+		AddObtainedLicenseIcon(kActor_AI_Trooper, 2, 4);
+		AddObtainedLicenseIcon(kActor_AI_EliteGuard, 3, 4);
+		AddObtainedLicenseIcon(kActor_AI_MotherGrub, 4, 4);
+
+		AddObtainedLicenseIcon(kActor_AI_FleshSentinel, 0, 5);
+		AddObtainedLicenseIcon(kActor_AI_DeathGuard, 1, 5);
+		AddObtainedLicenseIcon(kActor_AI_LordOfTheFlesh, 2, 5);
+	}
+	
+	// --------------------------
+	// Adds the icons for obtained licenses.
+	// The x/y positions start at the upper left and are 0-indexed.
+	void AddObtainedLicenseIcon(
+		const int &in enemyActorId,
+		const int &in xPosition,
+		const int &in yPosition)
+	{
+		if (GetInventoryItemCollectedTotal(enemyActorId) > 0)
+		{
+			AddImage(
+				RANDO_UI_TEXTURE_COMPLETE, 
+				PositionPixelToUI(
+					UI_OFFSET_HAS_LICENSE_X + (xPosition * UI_OFFSET_LICENSE_X), 
+					UI_OFFSET_HAS_LICENSE_Y + (yPosition * UI_OFFSET_LICENSE_Y))
+			);
+		}
 	}
 	
 	// --------------------------
