@@ -1,9 +1,9 @@
-//------------------------------
-// Contains trap-related functions.
+//----------------------------------
+// ScriptObject for traps.
 //
 // More trap ideas: 
 // - ammo traps (self.ConsumeAmmo/ConsumeAltAmmo)
-//------------------------------
+//----------------------------------
 enum EnemyTrapType
 {
 	ENEMY_TRAP_SAME_LEVEL = 0,
@@ -13,24 +13,61 @@ enum EnemyTrapType
 	ENEMY_TRAP_CHAOS = 4
 }
 
+class RandoTrap : RandoPickupObject
+{
+	int trapType;
+	RandoTrap(kActor @actor)
+	{
+		super(actor);
+	}
+	
+	//----------------------------------
+	// Triggers the trap based on the type.
+	void AfterReplacementTouched() override
+	{
+		TriggerTrap(trapType);
+	}
+}
+
 //------------------------------
 // Triggers the trap for the given actor id.
 // If this isn't a trap actor, doesn't do anything.
 // This will be the data that AP sends us.
-bool TryTriggerTrap(const int &in trapId)
+bool TryTriggerTrap(const int &in actorId)
 {
-	kDictMem@ actorDef = g_indexDefManager.GetEntry(trapId);
-	if (actorDef is null)
-	{
-		return false;
-	}
-	
 	int trapType;
-	if (!actorDef.GetInt("rando.trapType", trapType))
+	switch(actorId)
 	{
-		return false;
+		case kActor_Trap_Enemy_Silver_Health:
+		case kActor_Trap_Enemy_Blue_Health:
+		case kActor_Trap_Enemy_Full_Health:
+		case kActor_Trap_Enemy_Ultra_Health:
+			trapType = RANDO_TRAP_TYPE_ENEMY;
+			break;
+		case kActor_Trap_Damage_Silver_Health:
+		case kActor_Trap_Damage_Blue_Health:
+		case kActor_Trap_Damage_Full_Health:
+		case kActor_Trap_Damage_Ultra_Health:
+			trapType = RANDO_TRAP_TYPE_DAMAGE;
+			break;
+		case kActor_Trap_Spam_Silver_Health:
+		case kActor_Trap_Spam_Blue_Health:
+		case kActor_Trap_Spam_Full_Health:
+		case kActor_Trap_Spam_Ultra_Health:
+			trapType = RANDO_TRAP_TYPE_SPAM;
+			break;
+		default:
+			return false;
 	}
 	
+	TriggerTrap(trapType);
+	return true;
+}
+
+//------------------------------
+// Triggers the trap, given the trap type.
+void TriggerTrap(const int &in trapType)
+{
 	switch(trapType)
 	{
 		case RANDO_TRAP_TYPE_ENEMY:
@@ -43,8 +80,6 @@ bool TryTriggerTrap(const int &in trapId)
 			HandleSpamTrap();
 			break;
 	}
-	
-	return true;
 }
 
 //------------------------------
@@ -54,19 +89,9 @@ void HandleEnemyTrap()
 	Hud.AddMessage("It's a trap!");
 	int numberToSpawn = RandomInt(1, 3);
 	
-	// If the player is using the Leap of Faith or Whispers, spawn a non-blocking enemy
-    // to prevent softlocking from falling somewhere they shouldn't be able to fall from
-	bool forceSafeEnemy = (LocalPlayer.Actor().MovementComponent().Flags() & MCF_NO_GRAVITY) != 0;
 	for (int i = 0; i < numberToSpawn; i++)
 	{
-		if (forceSafeEnemy)
-		{
-			SpawnActorNearPlayer(kActor_AI_SwampWasp);
-		}
-		else
-		{
-			SpawnActorNearPlayer(GenerateRandomEnemyForEnemyTrap());
-		}
+		SpawnActorNearPlayer(GenerateRandomEnemyForEnemyTrap());
 	}
 }
 

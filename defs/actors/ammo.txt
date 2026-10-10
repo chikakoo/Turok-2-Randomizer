@@ -488,7 +488,7 @@ SunfirePods kActor_Item_AmmoSunfirePods
         mesh                  "models/Pickup_Sunfire_Pod.staticmesh"
     End_Component
 	Begin_Component "kexScriptComponent"
-		scriptClass           "RandoPickupObject"
+		scriptClass           "RandoWeapon"
 		triggerRadius         81.92
 	End_Component
 }

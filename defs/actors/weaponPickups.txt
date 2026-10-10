@@ -25,7 +25,7 @@ WpnWarBlade kActor_Item_WpnWarBlade
         mesh                  "models/Pickup_War_Blade.staticmesh"
     End_Component
 	Begin_Component "kexScriptComponent"
-		scriptClass           "RandoPickupObject"
+		scriptClass           "RandoWeapon"
 		triggerRadius         81.92
 	End_Component
 }
@@ -61,7 +61,7 @@ WpnTekBow kActor_Item_WpnTekBow
         mesh                  "models/Pickup_Tek_Bow.staticmesh"
     End_Component
 	Begin_Component "kexScriptComponent"
-		scriptClass           "RandoPickupObject"
+		scriptClass           "RandoWeapon"
 		triggerRadius         81.92
 	End_Component
 }
@@ -86,7 +86,7 @@ WpnPistol kActor_Item_WpnPistol
         mesh                  "models/Pickup_Pistol.staticmesh"
     End_Component
 	Begin_Component "kexScriptComponent"
-		scriptClass           "RandoPickupObject"
+		scriptClass           "RandoWeapon"
 		triggerRadius         81.92
 	End_Component
 }
@@ -111,7 +111,7 @@ WpnMag60 kActor_Item_WpnMag60
         mesh                  "models/Pickup_Magnum_Pistol.staticmesh"
     End_Component
 	Begin_Component "kexScriptComponent"
-		scriptClass           "RandoPickupObject"
+		scriptClass           "RandoWeapon"
 		triggerRadius         81.92
 	End_Component
 }
@@ -136,7 +136,7 @@ WpnTranq kActor_Item_WpnTranq
         mesh                  "models/Pickup_Tranquilizer_Gun.staticmesh"
     End_Component
 	Begin_Component "kexScriptComponent"
-		scriptClass           "RandoPickupObject"
+		scriptClass           "RandoWeapon"
 		triggerRadius         81.92
 	End_Component
 }
@@ -161,7 +161,7 @@ WpnChargeDart kActor_Item_WpnChargeDart
         mesh                  "models/Pickup_Charge_Dart_Rifle.staticmesh"
     End_Component
 	Begin_Component "kexScriptComponent"
-		scriptClass           "RandoPickupObject"
+		scriptClass           "RandoWeapon"
 		triggerRadius         81.92
 	End_Component
 }
@@ -186,7 +186,7 @@ WpnShotgun kActor_Item_WpnShotgun
         mesh                  "models/Pickup_Shot_Gun.staticmesh"
     End_Component
 	Begin_Component "kexScriptComponent"
-		scriptClass           "RandoPickupObject"
+		scriptClass           "RandoWeapon"
 		triggerRadius         81.92
 	End_Component
 }
@@ -211,7 +211,7 @@ WpnScatter kActor_Item_WpnScatter
         mesh                  "models/Pickup_Shrapnel_Cannon.staticmesh"
     End_Component
 	Begin_Component "kexScriptComponent"
-		scriptClass           "RandoPickupObject"
+		scriptClass           "RandoWeapon"
 		triggerRadius         81.92
 	End_Component
 }
@@ -236,7 +236,7 @@ WpnPlasmaRifle kActor_Item_WpnPlasmaRifle
         mesh                  "models/Pickup_Plasma_Rifle.staticmesh"
     End_Component
 	Begin_Component "kexScriptComponent"
-		scriptClass           "RandoPickupObject"
+		scriptClass           "RandoWeapon"
 		triggerRadius         81.92
 	End_Component
 }
@@ -261,7 +261,7 @@ WpnFireStorm kActor_Item_WpnFireStorm
         mesh                  "models/Pickup_Firestorm_Cannon.staticmesh"
     End_Component
 	Begin_Component "kexScriptComponent"
-		scriptClass           "RandoPickupObject"
+		scriptClass           "RandoWeapon"
 		triggerRadius         81.92
 	End_Component
 }
@@ -286,7 +286,7 @@ WpnSunfirePod kActor_Item_WpnSunfirePod
         mesh                  "models/Pickup_Sunfire_Pod.staticmesh"
     End_Component
 	Begin_Component "kexScriptComponent"
-		scriptClass           "RandoPickupObject"
+		scriptClass           "RandoWeapon"
 		triggerRadius         81.92
 	End_Component
 }
@@ -312,7 +312,7 @@ WpnCerebralBore kActor_Item_WpnCerebralBore
         mesh                  "models/Pickup_Cerebral_Bore.staticmesh"
     End_Component
 	Begin_Component "kexScriptComponent"
-		scriptClass           "RandoPickupObject"
+		scriptClass           "RandoWeapon"
 		triggerRadius         81.92
 	End_Component
 }
@@ -337,7 +337,7 @@ WpnPFMLayer kActor_Item_WpnPFMLayer
         mesh                  "models/Pickup_PFM_Layer.staticmesh"
     End_Component
 	Begin_Component "kexScriptComponent"
-		scriptClass           "RandoPickupObject"
+		scriptClass           "RandoWeapon"
 		triggerRadius         81.92
 	End_Component
 }
@@ -362,7 +362,7 @@ WpnGrenadeLauncher kActor_Item_WpnGrenadeLauncher
         mesh                  "models/Pickup_Grenade_Launcher.staticmesh"
     End_Component
 	Begin_Component "kexScriptComponent"
-		scriptClass           "RandoPickupObject"
+		scriptClass           "RandoWeapon"
 		triggerRadius         81.92
 	End_Component
 }
@@ -388,7 +388,7 @@ WpnMissileLauncher kActor_Item_WpnMissileLauncher
         mesh                  "models/Pickup_Scorpion_Launcher.staticmesh"
     End_Component
 	Begin_Component "kexScriptComponent"
-		scriptClass           "RandoPickupObject"
+		scriptClass           "RandoWeapon"
 		triggerRadius         81.92
 	End_Component
 }
@@ -413,7 +413,7 @@ WpnSpearGun kActor_Item_WpnSpearGun
         mesh                  "models/Pickup_Spear_Gun.staticmesh"
     End_Component
 	Begin_Component "kexScriptComponent"
-		scriptClass           "RandoPickupObject"
+		scriptClass           "RandoWeapon"
 		triggerRadius         81.92
 	End_Component
 }
@@ -438,7 +438,7 @@ WpnTorpedoLauncher kActor_Item_WpnTorpedoLauncher
         mesh                  "models/Pickup_Torpedo_Launcher.staticmesh"
     End_Component
 	Begin_Component "kexScriptComponent"
-		scriptClass           "RandoPickupObject"
+		scriptClass           "RandoWeapon"
 		triggerRadius         81.92
 	End_Component
 }
@@ -463,7 +463,7 @@ WpnFlameThrower kActor_Item_WpnFlameThrower
         mesh                  "models/Pickup_Flame_Thrower.staticmesh"
     End_Component
 	Begin_Component "kexScriptComponent"
-		scriptClass           "RandoPickupObject"
+		scriptClass           "RandoWeapon"
 		triggerRadius         81.92
 	End_Component
 }
@@ -488,7 +488,7 @@ WpnRazorWind kActor_Item_WpnRazorWind
         mesh                  "models/Pickup_Blade.staticmesh"
     End_Component
 	Begin_Component "kexScriptComponent"
-		scriptClass           "RandoPickupObject"
+		scriptClass           "RandoWeapon"
 		triggerRadius         81.92
 	End_Component
 }
@@ -514,7 +514,7 @@ WpnNuke kActor_Item_WpnNuke
         mesh                  "models/Nuke_Part.staticmesh"
     End_Component
 	Begin_Component "kexScriptComponent"
-		scriptClass           "RandoPickupObject"
+		scriptClass           "RandoWeapon"
 		triggerRadius         81.92
 	End_Component
 }

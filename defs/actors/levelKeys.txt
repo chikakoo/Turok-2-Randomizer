@@ -21,7 +21,7 @@ HubKey1 kActor_InventoryItem_Level1Key
         mesh                  "models/Rando_Level_1_Key.staticmesh"
     End_Component
 	Begin_Component "kexScriptComponent"
-        scriptClass           "RandoPickupObject"
+        scriptClass           "RandoLevelKey"
         triggerRadius         81.92
     End_Component
 }
@@ -40,7 +40,7 @@ HubKey2 kActor_InventoryItem_Level2Key
         mesh                  "models/Level_2_Key.staticmesh"
     End_Component
 	Begin_Component "kexScriptComponent"
-        scriptClass           "RandoPickupObject"
+        scriptClass           "RandoLevelKey"
         triggerRadius         81.92
     End_Component
 }
@@ -59,7 +59,7 @@ HubKey3 kActor_InventoryItem_Level3Key
         mesh                  "models/Level_3_Key.staticmesh"
     End_Component
 	Begin_Component "kexScriptComponent"
-        scriptClass           "RandoPickupObject"
+        scriptClass           "RandoLevelKey"
         triggerRadius         81.92
     End_Component
 }
@@ -78,7 +78,7 @@ HubKey4 kActor_InventoryItem_Level4Key
         mesh                  "models/Level_4_Key.staticmesh"
     End_Component
 	Begin_Component "kexScriptComponent"
-        scriptClass           "RandoPickupObject"
+        scriptClass           "RandoLevelKey"
         triggerRadius         81.92
     End_Component
 }
@@ -97,7 +97,7 @@ HubKey5 kActor_InventoryItem_Level5Key
         mesh                  "models/Level_5_Key.staticmesh"
     End_Component
 	Begin_Component "kexScriptComponent"
-        scriptClass           "RandoPickupObject"
+        scriptClass           "RandoLevelKey"
         triggerRadius         81.92
     End_Component
 }
@@ -116,7 +116,7 @@ HubKey6 kActor_InventoryItem_Level6Key
         mesh                  "models/Level_6_Key.staticmesh"
     End_Component
 	Begin_Component "kexScriptComponent"
-        scriptClass           "RandoPickupObject"
+        scriptClass           "RandoLevelKey"
         triggerRadius         81.92
     End_Component
 }

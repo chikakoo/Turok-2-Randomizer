@@ -20,7 +20,7 @@ APItemProgression kActor_Item_APItemProgression
         mesh                  "models/APLogo_Progression.staticmesh"
     End_Component
     Begin_Component "kexScriptComponent"
-        scriptClass           "RandoPickupObject"
+        scriptClass           "RandoAPItem"
         triggerRadius         81.92
     End_Component
 }
@@ -43,7 +43,7 @@ APItemUseful kActor_Item_APItemUseful
         mesh                  "models/APLogo_Useful.staticmesh"
     End_Component
     Begin_Component "kexScriptComponent"
-        scriptClass           "RandoPickupObject"
+        scriptClass           "RandoAPItem"
         triggerRadius         81.92
     End_Component
 }
@@ -66,7 +66,7 @@ APItemNonProgression kActor_Item_APItemNonProgression
         mesh                  "models/APLogo_NonProgression.staticmesh"
     End_Component
     Begin_Component "kexScriptComponent"
-        scriptClass           "RandoPickupObject"
+        scriptClass           "RandoAPItem"
         triggerRadius         81.92
     End_Component
 }
@@ -91,7 +91,7 @@ APProgressiveWarpL1 kActor_InventoryItem_ProgressiveWarpL1
         mesh                  "models/Progressive_Warp_L1.staticmesh"
     End_Component
     Begin_Component "kexScriptComponent"
-        scriptClass           "RandoPickupObject"
+        scriptClass           "RandoProgressiveWarp"
         triggerRadius         81.92
     End_Component
 }
@@ -114,7 +114,7 @@ APProgressiveWarpL2 kActor_InventoryItem_ProgressiveWarpL2
         mesh                  "models/Progressive_Warp_L2.staticmesh"
     End_Component
     Begin_Component "kexScriptComponent"
-        scriptClass           "RandoPickupObject"
+        scriptClass           "RandoProgressiveWarp"
         triggerRadius         81.92
     End_Component
 }
@@ -137,7 +137,7 @@ APProgressiveWarpL3 kActor_InventoryItem_ProgressiveWarpL3
         mesh                  "models/Progressive_Warp_L3.staticmesh"
     End_Component
     Begin_Component "kexScriptComponent"
-        scriptClass           "RandoPickupObject"
+        scriptClass           "RandoProgressiveWarp"
         triggerRadius         81.92
     End_Component
 }
@@ -160,7 +160,7 @@ APProgressiveWarpL4 kActor_InventoryItem_ProgressiveWarpL4
         mesh                  "models/Progressive_Warp_L4.staticmesh"
     End_Component
     Begin_Component "kexScriptComponent"
-        scriptClass           "RandoPickupObject"
+        scriptClass           "RandoProgressiveWarp"
         triggerRadius         81.92
     End_Component
 }
@@ -183,7 +183,7 @@ APProgressiveWarpL5 kActor_InventoryItem_ProgressiveWarpL5
         mesh                  "models/Progressive_Warp_L5.staticmesh"
     End_Component
     Begin_Component "kexScriptComponent"
-        scriptClass           "RandoPickupObject"
+        scriptClass           "RandoProgressiveWarp"
         triggerRadius         81.92
     End_Component
 }
@@ -206,7 +206,7 @@ APProgressiveWarpL6 kActor_InventoryItem_ProgressiveWarpL6
         mesh                  "models/Progressive_Warp_L6.staticmesh"
     End_Component
     Begin_Component "kexScriptComponent"
-        scriptClass           "RandoPickupObject"
+        scriptClass           "RandoProgressiveWarp"
         triggerRadius         81.92
     End_Component
 }
@@ -326,7 +326,7 @@ RandomAmmo kActor_Item_RandomAmmo
         mesh                  "models/APAmmo.staticmesh"
     End_Component
     Begin_Component "kexScriptComponent"
-        scriptClass           "RandoPickupObject"
+        scriptClass           "RandoAmmoPack"
         triggerRadius         81.92
     End_Component
 }
@@ -384,7 +384,6 @@ TrapSilverHealth kActor_Trap_Enemy_Silver_Health
     flags.noDamage              TRUE
     pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
 	pickup.lifeforce.amount     0
-	rando.trapType				RANDO_TRAP_TYPE_ENEMY
     
     initialScale              "0.5 0.5 0.5"
     Begin_Component "kexWorldComponent"
@@ -396,8 +395,9 @@ TrapSilverHealth kActor_Trap_Enemy_Silver_Health
         mesh                  "models/Pickup_Health_2.staticmesh"
     End_Component
     Begin_Component "kexScriptComponent"
-        scriptClass           "RandoPickupObject"
+        scriptClass           "RandoTrap"
         triggerRadius         81.92
+		trapType              RANDO_TRAP_TYPE_ENEMY
     End_Component
 }
 
@@ -408,7 +408,6 @@ TrapBlueHealth kActor_Trap_Enemy_Blue_Health
     placeable                   TRUE
     flags.noDamage              TRUE
     pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
-	rando.trapType				RANDO_TRAP_TYPE_ENEMY
     
     initialScale              "0.5 0.5 0.5"
     Begin_Component "kexWorldComponent"
@@ -420,8 +419,9 @@ TrapBlueHealth kActor_Trap_Enemy_Blue_Health
         mesh                  "models/Pickup_Health_10.staticmesh"
     End_Component
     Begin_Component "kexScriptComponent"
-        scriptClass           "RandoPickupObject"
+        scriptClass           "RandoTrap"
         triggerRadius         81.92
+		trapType              RANDO_TRAP_TYPE_ENEMY
     End_Component
 }
 
@@ -432,7 +432,6 @@ TrapFullHealth kActor_Trap_Enemy_Full_Health
     placeable                   TRUE
     flags.noDamage              TRUE
     pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
-	rando.trapType				RANDO_TRAP_TYPE_ENEMY
 	
     initialScale              "0.5 0.5 0.5"
     Begin_Component "kexWorldComponent"
@@ -444,8 +443,9 @@ TrapFullHealth kActor_Trap_Enemy_Full_Health
         mesh                  "models/Pickup_Full_health.staticmesh"
     End_Component
     Begin_Component "kexScriptComponent"
-        scriptClass           "RandoPickupObject"
+        scriptClass           "RandoTrap"
         triggerRadius         81.92
+		trapType              RANDO_TRAP_TYPE_ENEMY
     End_Component
 }
 
@@ -456,7 +456,6 @@ TrapUltraHealth kActor_Trap_Enemy_Ultra_Health
     placeable                   TRUE
     flags.noDamage              TRUE
     pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
- 	rando.trapType				RANDO_TRAP_TYPE_ENEMY
 	
     initialScale              "0.5 0.5 0.5"
     Begin_Component "kexWorldComponent"
@@ -468,8 +467,9 @@ TrapUltraHealth kActor_Trap_Enemy_Ultra_Health
         mesh                  "models/Pickup_Ultra_Health.staticmesh"
     End_Component
     Begin_Component "kexScriptComponent"
-        scriptClass           "RandoPickupObject"
+        scriptClass           "RandoTrap"
         triggerRadius         81.92
+		trapType              RANDO_TRAP_TYPE_ENEMY
     End_Component
 }
 
@@ -481,7 +481,6 @@ TrapSilverHealth kActor_Trap_Damage_Silver_Health
     flags.noDamage              TRUE
     pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
 	pickup.lifeforce.amount     0
-	rando.trapType				RANDO_TRAP_TYPE_DAMAGE
     
     initialScale              "0.5 0.5 0.5"
     Begin_Component "kexWorldComponent"
@@ -493,8 +492,9 @@ TrapSilverHealth kActor_Trap_Damage_Silver_Health
         mesh                  "models/Pickup_Health_2.staticmesh"
     End_Component
     Begin_Component "kexScriptComponent"
-        scriptClass           "RandoPickupObject"
+        scriptClass           "RandoTrap"
         triggerRadius         81.92
+		trapType              RANDO_TRAP_TYPE_DAMAGE
     End_Component
 }
 
@@ -505,7 +505,6 @@ TrapBlueHealth kActor_Trap_Damage_Blue_Health
     placeable                   TRUE
     flags.noDamage              TRUE
     pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
-	rando.trapType				RANDO_TRAP_TYPE_DAMAGE
     
     initialScale              "0.5 0.5 0.5"
     Begin_Component "kexWorldComponent"
@@ -517,8 +516,9 @@ TrapBlueHealth kActor_Trap_Damage_Blue_Health
         mesh                  "models/Pickup_Health_10.staticmesh"
     End_Component
     Begin_Component "kexScriptComponent"
-        scriptClass           "RandoPickupObject"
+        scriptClass           "RandoTrap"
         triggerRadius         81.92
+		trapType              RANDO_TRAP_TYPE_DAMAGE
     End_Component
 }
 
@@ -529,7 +529,6 @@ TrapFullHealth kActor_Trap_Damage_Full_Health
     placeable                   TRUE
     flags.noDamage              TRUE
     pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
-	rando.trapType				RANDO_TRAP_TYPE_DAMAGE
 	
     initialScale              "0.5 0.5 0.5"
     Begin_Component "kexWorldComponent"
@@ -541,8 +540,9 @@ TrapFullHealth kActor_Trap_Damage_Full_Health
         mesh                  "models/Pickup_Full_health.staticmesh"
     End_Component
     Begin_Component "kexScriptComponent"
-        scriptClass           "RandoPickupObject"
+        scriptClass           "RandoTrap"
         triggerRadius         81.92
+		trapType              RANDO_TRAP_TYPE_DAMAGE
     End_Component
 }
 
@@ -553,7 +553,6 @@ TrapUltraHealth kActor_Trap_Damage_Ultra_Health
     placeable                   TRUE
     flags.noDamage              TRUE
     pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
- 	rando.trapType				RANDO_TRAP_TYPE_DAMAGE
 	
     initialScale              "0.5 0.5 0.5"
     Begin_Component "kexWorldComponent"
@@ -565,8 +564,9 @@ TrapUltraHealth kActor_Trap_Damage_Ultra_Health
         mesh                  "models/Pickup_Ultra_Health.staticmesh"
     End_Component
     Begin_Component "kexScriptComponent"
-        scriptClass           "RandoPickupObject"
+        scriptClass           "RandoTrap"
         triggerRadius         81.92
+		trapType              RANDO_TRAP_TYPE_DAMAGE
     End_Component
 }
 
@@ -578,7 +578,6 @@ TrapSilverHealth kActor_Trap_Spam_Silver_Health
     flags.noDamage              TRUE
     pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
 	pickup.lifeforce.amount     0
-	rando.trapType				RANDO_TRAP_TYPE_SPAM
     
     initialScale              "0.5 0.5 0.5"
     Begin_Component "kexWorldComponent"
@@ -590,8 +589,9 @@ TrapSilverHealth kActor_Trap_Spam_Silver_Health
         mesh                  "models/Pickup_Health_2.staticmesh"
     End_Component
     Begin_Component "kexScriptComponent"
-        scriptClass           "RandoPickupObject"
+        scriptClass           "RandoTrap"
         triggerRadius         81.92
+		trapType              RANDO_TRAP_TYPE_SPAM
     End_Component
 }
 
@@ -602,7 +602,6 @@ TrapBlueHealth kActor_Trap_Spam_Blue_Health
     placeable                   TRUE
     flags.noDamage              TRUE
     pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
-	rando.trapType				RANDO_TRAP_TYPE_SPAM
     
     initialScale              "0.5 0.5 0.5"
     Begin_Component "kexWorldComponent"
@@ -614,8 +613,9 @@ TrapBlueHealth kActor_Trap_Spam_Blue_Health
         mesh                  "models/Pickup_Health_10.staticmesh"
     End_Component
     Begin_Component "kexScriptComponent"
-        scriptClass           "RandoPickupObject"
+        scriptClass           "RandoTrap"
         triggerRadius         81.92
+		trapType              RANDO_TRAP_TYPE_SPAM
     End_Component
 }
 
@@ -626,7 +626,6 @@ TrapFullHealth kActor_Trap_Spam_Full_Health
     placeable                   TRUE
     flags.noDamage              TRUE
     pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
-	rando.trapType				RANDO_TRAP_TYPE_SPAM
 	
     initialScale              "0.5 0.5 0.5"
     Begin_Component "kexWorldComponent"
@@ -638,8 +637,9 @@ TrapFullHealth kActor_Trap_Spam_Full_Health
         mesh                  "models/Pickup_Full_health.staticmesh"
     End_Component
     Begin_Component "kexScriptComponent"
-        scriptClass           "RandoPickupObject"
+        scriptClass           "RandoTrap"
         triggerRadius         81.92
+		trapType              RANDO_TRAP_TYPE_SPAM
     End_Component
 }
 
@@ -650,7 +650,6 @@ TrapUltraHealth kActor_Trap_Spam_Ultra_Health
     placeable                   TRUE
     flags.noDamage              TRUE
     pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
- 	rando.trapType				RANDO_TRAP_TYPE_SPAM
 	
     initialScale              "0.5 0.5 0.5"
     Begin_Component "kexWorldComponent"
@@ -662,8 +661,9 @@ TrapUltraHealth kActor_Trap_Spam_Ultra_Health
         mesh                  "models/Pickup_Ultra_Health.staticmesh"
     End_Component
     Begin_Component "kexScriptComponent"
-        scriptClass           "RandoPickupObject"
+        scriptClass           "RandoTrap"
         triggerRadius         81.92
+		trapType              RANDO_TRAP_TYPE_SPAM
     End_Component
 }
 
@@ -675,21 +675,24 @@ RaptoidLicense kActor_InventoryItem_RaptoidLicense
     className                   "kexInventoryPickup"
     placeable                   TRUE
     flags.noDamage              TRUE
-    pickup.pickupSound          "sounds/shaders/Ammo Pickup.ksnd"
+    pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
 	pickup.pickupMessage 		"Raptoid License"
     
-    initialScale              "0.2 0.2 0.2"
+    initialScale              "10.0 10.0 10.0" //"0.2 0.2 0.2"
     Begin_Component "kexWorldComponent"
         radius                81.92
         height                81.92
         bNonSolid             TRUE
     End_Component
 	Begin_Component "kexRenderMeshComponent"
-        mesh         "char/Raptoid.skinnedmesh"
-		anim         "anims/Raptoid.anim"
+		mesh "char/ui/ui.skinnedmesh"
+		anim "anims/none.anim"
+        //mesh         "char/Raptoid.skinnedmesh"
+		//anim         "anims/Raptoid.anim"
     End_Component
     Begin_Component "kexScriptComponent"
-        scriptClass           "RandoPickupObject"
+        scriptClass           "RandoEnemyLicense"
         triggerRadius         81.92
+		altTexture            2
     End_Component
 }

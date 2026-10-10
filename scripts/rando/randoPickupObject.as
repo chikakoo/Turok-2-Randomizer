@@ -1,6 +1,7 @@
 //----------------------------------
 // ScriptObject placed on every pickup that AP cares about.
 // Used to handle whether we've collected and sent pickup checks to AP.
+//----------------------------------
 int g_pickupMessageCooldown;
 class RandoPickupObject : ScriptObject
 {
@@ -251,20 +252,15 @@ class RandoPickupObject : ScriptObject
 			// Turn the important flag off now, since we already sent the check
 			self.Flags() &= ~AF_IMPORTANT;
 			
-			// If we're randomizing weapons, always collect the weapon pickup
-			if (OPTION_RANDOMIZE_WEAPONS)
-			{
-				kDictMem@ itemDef = TryGetActorDefWithClass(self.Type(), "kexWeaponPickup", true);
-				if (itemDef is null)
-				{
-					return;
-				}
-				
-				TryGivePlayerWeapon(self.Type());
-				CollectLocation(m_id, Game.ActiveMapID());
-				self.Remove();
-			}
+			AfterSentToAP();
 		}
+	}
+	
+	//----------------------------------
+	// Executed after OnTick if the item was sent to AP.
+	// To be overridden by child classes.
+	void AfterSentToAP()
+	{
 	}
 	
 	//----------------------------------
@@ -306,29 +302,15 @@ class RandoPickupObject : ScriptObject
 	}
 	
 	//----------------------------------
+	// Executed at the start of OnTouch. To be overridden by child classes.
+	void BeforeOnTouch() {}
+	
+	//----------------------------------
 	// Called when the actor is collected.
 	// Marks it as collected so it won't respawn.
 	void OnTouch(kActor@ pInstigator)
 	{
-		if (self.Type() == kActor_Item_RandomAmmo)
-		{
-			if (Game.ActiveMapID() == kLevel_Hub)
-			{
-				FillAmmoInAllWeapons();
-			}
-			else
-			{
-				GetAmmoInRandomWeapon();
-			}
-			
-			// This is a non-AP item ammo replacement, so we should still mark it as collected
-			// We should also still try to trigger its actors too in case there's a pickup trigger
-			if (m_id < 0)
-			{
-				CollectLocation(m_id, Game.ActiveMapID());
-				TryTriggerActors(m_position);
-			}
-		}
+		BeforeOnTouch();
 		
 		// If this item is an inventory item, do this to track the total you've ever received
 		// Don't do this for weapons if it was sent to AP already (third param)
@@ -346,30 +328,7 @@ class RandoPickupObject : ScriptObject
 			}
 			m_wasSentToAP = true;
 			
-			// Try to trigger it if it is a trap.
-			// If it isn't, this doesn't do anything.
-			if (TryTriggerTrap(self.Type()))
-			{
-			}
-			
-			// If it's an AP item, display the check
-			else if (self.Type() == kActor_Item_APItemProgression ||
-				self.Type() == kActor_Item_APItemUseful ||
-				self.Type() == kActor_Item_APItemNonProgression)
-			{
-				Hud.AddMessage(m_displayString);
-			}
-			
-			// If using level key packs, give the rest of the keys
-			// The game will have given one already, so give the rest!
-			else if (OPTION_UNLOCK_METHOD_ONE_KEY && IsLevelKey(self.Type()))
-			{
-				int count = self.Type() == kActor_InventoryItem_Level6Key ? 5 : 2;
-				TryGetInventoryItems(self.Type(), count);
-			}
-			
-			// Only gives the keys if necessary
-			TryGiveAllLevelKeysForWarp(self.Type());
+			AfterReplacementTouched();
 			
 			// Try to trigger events from the item being picked up
 			// Done here as well to make absolutely sure that it's triggered
@@ -377,4 +336,9 @@ class RandoPickupObject : ScriptObject
 			TryTriggerActors(m_position);
 		}
 	}
+	
+	//----------------------------------
+	// Executed after OnTouch if this is a replaced pickup.
+	// To be overridden by child classes.
+	void AfterReplacementTouched() {}
 }
