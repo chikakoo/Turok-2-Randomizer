@@ -53,7 +53,7 @@ class TurokWeapon : ScriptObject
 		{
 			case kParticle_TekArrow:
 			case kParticle_TekArrowSnipe:
-				// We defined Tek arrows as the "normal" ammo
+				// Tek arrows are the "normal" ammo
 				ConsumeAdditionalAmmo(kActor_Item_WpnTekBow);
 				break;
 			case kParticle_Bullet:
@@ -112,10 +112,15 @@ class TurokWeapon : ScriptObject
 			return;
 		}
 		
-		int unobtainedUpgrades = OPTION_PROGRESSIVE_AMMO_COUNT - GetInventoryItemCollectedTotal(pickupId);
-		if (unobtainedUpgrades > 0)
+		// Infinite ammo adds an extra upgrade
+		int normalAmmoUpgrades = OPTION_INFINITE_AMMO_UPGRADE 
+			? OPTION_PROGRESSIVE_AMMO_COUNT - 1 
+			: OPTION_PROGRESSIVE_AMMO_COUNT;
+		int unobtainedNormalUpgrades = normalAmmoUpgrades - GetInventoryItemCollectedTotal(pickupId);
+		
+		if (unobtainedNormalUpgrades > 0)
 		{
-			int extraAmmoToConsume = unobtainedUpgrades * multiplier;
+			int extraAmmoToConsume = unobtainedNormalUpgrades * multiplier;
 			if (isAltAmmo)
 			{
 				self.Owner().ConsumeAltAmmo(extraAmmoToConsume);
@@ -123,6 +128,17 @@ class TurokWeapon : ScriptObject
 			else
 			{
 				self.Owner().ConsumeAmmo(extraAmmoToConsume);
+			}
+		}
+		else if (unobtainedNormalUpgrades < 0 && OPTION_INFINITE_AMMO_UPGRADE)
+		{
+			if (isAltAmmo)
+			{
+				self.Owner().ConsumeAltAmmo(-multiplier);
+			}
+			else
+			{
+				self.Owner().ConsumeAmmo(-multiplier);
 			}
 		}
 	}
@@ -432,15 +448,11 @@ final class TurokMag60 : TurokWeapon
                 self.PlayTactile("tactile/MAGMULTIMIX01.bnvib", kexVibrationPlayer::CHANNEL_WEAPON, kexVibrationPlayer::POSITION_RIGHT);
             }
             m_fireCount++;
+			
+			// Rando
+			ConsumeAdditionalAmmo(kActor_Item_WpnMag60);
         }
     }
-	
-	void OnEndFire(void) 
-	{
-		// Rando
-		// We can't do this one in OnFiredParticleFromAnim due to multiple bullets
-		ConsumeAdditionalAmmo(kActor_Item_WpnMag60, 3);
-	}
 }
 
 /*
