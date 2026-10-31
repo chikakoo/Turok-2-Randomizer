@@ -36,7 +36,7 @@
 	texture_27 "textures/ui/warp_boss.png"
 	texture_28 "textures/ui/toggle_important_pickups.png"
 	texture_29 "textures/ui/toggle_important_enemies.png"
-	texture_30 "textures/ui/license_background.png"
+	texture_30 "textures/ui/soul_background.png"
 }
 
 // ------------------------------

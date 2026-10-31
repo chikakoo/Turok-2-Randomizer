@@ -1,10 +1,10 @@
 //----------------------------------
-// ScriptObject for enemy licenses.
+// ScriptObject for enemy souls.
 //----------------------------------
-class RandoEnemyLicense : RandoPickupObject
+class RandoEnemySoul : RandoPickupObject
 {
 	int altTexture;
-	RandoEnemyLicense(kActor @actor)
+	RandoEnemySoul(kActor @actor)
 	{
 		super(actor);
 		

@@ -668,15 +668,15 @@ TrapUltraHealth kActor_Trap_Spam_Ultra_Health
 }
 
 //------------------------------
-// Enemy licenses
+// Enemy souls
 //------------------------------
-RaptoidLicense kActor_InventoryItem_RaptoidLicense
+RaptoidSoul kActor_InventoryItem_RaptoidSoul
 {
     className                   "kexInventoryPickup"
     placeable                   TRUE
     flags.noDamage              TRUE
     pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
-	pickup.pickupMessage 		"Raptoid License"
+	pickup.pickupMessage 		"Raptoid Soul"
     
     initialScale              "10.0 10.0 10.0" //"0.2 0.2 0.2"
     Begin_Component "kexWorldComponent"
@@ -691,7 +691,7 @@ RaptoidLicense kActor_InventoryItem_RaptoidLicense
 		//anim         "anims/Raptoid.anim"
     End_Component
     Begin_Component "kexScriptComponent"
-        scriptClass           "RandoEnemyLicense"
+        scriptClass           "RandoEnemySoul"
         triggerRadius         81.92
 		altTexture            2
     End_Component

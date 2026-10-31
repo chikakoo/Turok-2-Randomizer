@@ -1,16 +1,16 @@
 //----------------------------------
 // A script for all enemies that can be randomized.
 //----------------------------------
-enum EnemyLicenseType
+enum EnemySoulsType
 {
-	ENEMY_LICENSE_NONE = 0,
-	ENEMY_LICENSE_ALL = 1,
-	ENEMY_LICENSE_EXCLUDE_SPAWNERS = 2
+	ENEMY_SOULS_NONE = 0,
+	ENEMY_SOULS_NO_SPAWNS = 1,
+	ENEMY_SOULS_NO_TRIGGERS = 2
 }
 
 class RandoEnemy : ScriptActor
 {
-	int m_selectCooldown = 0;
+	int m_soulFxCooldown = 0;
 	
 	// The original actor (that this one replaced; null if not replaced)
 	kActor@ originalActor;
@@ -37,11 +37,8 @@ class RandoEnemy : ScriptActor
 	// Used for performance reasons
 	bool importantShown;
 	
-	// Whether the player has the "license to kill" this enemy
-	bool hasLicense;
-	
-	// Ignored depending on spawner settings
-	bool ignoreLicense;
+	// Whether the player has this enemy's soul
+	bool hasSoul;
 
 	//----------------------------------
 	// Constructor
@@ -51,9 +48,7 @@ class RandoEnemy : ScriptActor
 		super(@actor);
 		SetApEntry();
 		RandomizeScale();
-		
-		ignoreLicense = OPTION_ENEMY_LICENSES == ENEMY_LICENSE_NONE;
-		CheckForLicenseAndUpdateFlags();
+		InitializeSoul();
 	}
 	
 	//----------------------------------
@@ -132,30 +127,33 @@ class RandoEnemy : ScriptActor
 	}
 	
 	//----------------------------------
-	// Sets the flags based on the whether the player has the "license to kill" that actor.
-	// If no license, make the actor unable to die.
-	// Also, bores kill them still, so don't allow tracking.
-	//
-	// If the player has the license set the flags to be able to kill the enemy if necessary.
-	// Else, if it's the initial call, set the flags to not be able to kill the enemy.
-	//
-	// Returns whether the player should be able to kill the enemy.
-	bool CheckForLicenseAndUpdateFlags()
+	// Initializes the enemy soul flag based on the enemy and settings.
+	// If no soul, remove the actor if set to No Spawn.
+	void InitializeSoul()
 	{
-		if (ignoreLicense)
+		// TODO: handle that one 3-3 enemy...
+		if (OPTION_ENEMY_SOULS == ENEMY_SOULS_NONE || self.TID() <= 0)
 		{
-			hasLicense = true;
-			return true;
+			hasSoul = true;
 		}
-		
-		// If this is a spawned enemy (excluding totems), check the
-		// exclude spawners setting and handle the license accordingly
-		if (self.TID() <= 0 && 
-			OPTION_ENEMY_LICENSES == ENEMY_LICENSE_EXCLUDE_SPAWNERS &&
-			!IsTotemLevel(Game.ActiveMapID()))
+		else if (!CheckForSoulAndUpdateFlags() &&
+			OPTION_ENEMY_SOULS == ENEMY_SOULS_NO_SPAWNS)
 		{
-			hasLicense = true;
-			ignoreLicense = true; // Cache this so we don't recompute every tick
+			if (originalActor !is null)
+			{
+				originalActor.Remove();
+			}
+			self.Remove();
+		}
+	}
+	
+	//----------------------------------
+	// Sets the flags based on the whether the player has the actor's soul.
+	// Returns whether the player has the soul.
+	bool CheckForSoulAndUpdateFlags()
+	{
+		if (hasSoul)
+		{
 			return true;
 		}
 		
@@ -165,28 +163,28 @@ class RandoEnemy : ScriptActor
 			enemyType = originalActor.Type();
 		}
 		
-		hasLicense = GetInventoryItemCollectedTotal(enemyType) > 0;
-		return hasLicense;
+		hasSoul = GetInventoryItemCollectedTotal(enemyType) > 0;
+		return hasSoul;
 	}
 	
 	//----------------------------------
-	// Updates license flags if necessary.
-	// If there is no license, play the FxEffect on a cooldown.
-	void HandleLicenseUpdates()
+	// Updates soul flags if necessary.
+	// If there is no soul, play the FxEffect on a cooldown.
+	void HandleSoulUpdates()
 	{
-		if (CheckForLicenseAndUpdateFlags())
+		if (CheckForSoulAndUpdateFlags())
 		{
 			return;
 		}
 
-		if (m_selectCooldown > 0)
+		if (m_soulFxCooldown > 0)
 		{
-			m_selectCooldown--;
+			m_soulFxCooldown--;
 		}
 		else 
 		{
 			self.RunFxEvent("InvincibleFade");
-			m_selectCooldown = 120;
+			m_soulFxCooldown = 120;
 		}
 	}
 	
@@ -227,7 +225,6 @@ class RandoEnemy : ScriptActor
 		SERIALIZE(processedSpawn);
 		SERIALIZE(neverReplacedActor);
 		SERIALIZE(importantShown);
-		SERIALIZE(ignoreLicense);
 	}
 	
 	//----------------------------------
@@ -241,7 +238,6 @@ class RandoEnemy : ScriptActor
 		DESERIALIZE_BOOL(processedSpawn);
 		DESERIALIZE_BOOL(neverReplacedActor);
 		DESERIALIZE_BOOL(importantShown);
-		SERIALIZE(ignoreLicense);
 		SetApEntry();
 		
 		if (!isReplacedActor)
@@ -267,13 +263,11 @@ class RandoEnemy : ScriptActor
 	}
 	
 	//----------------------------------
-	// If you don't have the license to kill the enemy, set the damage value to 0
-	// and show the FxEffect indicating they can't take damage.
+	// If you don't have enemy's soul, show the FxEffect.
 	void OnPreDamage(kDamageInfo& in dmgInfo)
 	{
-		if (!hasLicense)
+		if (!hasSoul)
 		{
-			dmgInfo.hits = 0.0f;
 			self.RunFxEvent("InvincibleFlash");
 		}
 	}
@@ -282,13 +276,11 @@ class RandoEnemy : ScriptActor
 	// When the replacement dies, kill the original actor to trigger any events.
 	// Note that simply setting Health to 0 does not work.
 	//
-	// If the player doesn't have the "license to kill" the actor, "Mark" it with
-	// false so that the actor will persist when the map is reloaded. OnDeath
-	// can be called in this case if the actor falls into a pit; this is a failsafe
-	// for that case.
+	// If the player doesn't have the enemy's soul, "Mark" it with
+	// false so that the actor will persist when the map is reloaded.
 	void OnDeath(kDamageInfo& in dmgInfo)
 	{
-		if (!hasLicense)
+		if (!hasSoul)
 		{
 			self.Mark(false);
 			return;
@@ -329,7 +321,7 @@ class RandoEnemy : ScriptActor
 	{
 		if ((self.Flags() & AF_HIDDEN) == 0)
 		{
-			HandleLicenseUpdates();
+			HandleSoulUpdates();
 			
 			// If this enemy is a check, show the important indicator when it's visible
 			if (g_markEnemies && !importantShown && apEntry !is null)

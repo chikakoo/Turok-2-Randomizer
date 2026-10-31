@@ -131,7 +131,7 @@
 #define RANDO_UI_TEXTURE_WARP_BOSS 27
 #define RANDO_UI_TEXTURE_TOGGLE_IMPORTANT_PICKUPS 28
 #define RANDO_UI_TEXTURE_TOGGLE_IMPORTANT_ENEMIES 29
-#define RANDO_UI_TEXTURE_LICENSE_BACKGROUND 30
+#define RANDO_UI_TEXTURE_SOULS_BACKGROUND 30
 
 // ---------
 // Missing enemies
@@ -157,8 +157,8 @@
 #define kActor_AI_LordOfTheFlesh 402
 
 // ---------
-// Enemy licenses (actor id + RANDO_INVENTORY_ITEM_OFFSET)
-#define kActor_InventoryItem_RaptoidLicense 400200
+// Enemy souls (actor id + RANDO_INVENTORY_ITEM_OFFSET)
+#define kActor_InventoryItem_RaptoidSoul 400200
 
 // ---------
 // Map intros without constants

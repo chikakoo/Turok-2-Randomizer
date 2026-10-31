@@ -516,14 +516,14 @@ void SendDeathLink(void)
 }
 
 //---------------------------
-// Enemy licenses
-void RaptoidLicense(void)
+// Enemy souls
+void RaptoidSoul(void)
 {
-	TryGetInventoryItem(kActor_InventoryItem_RaptoidLicense);
+	TryGetInventoryItem(kActor_InventoryItem_RaptoidSoul);
 }
 
 //TODO
-void SpiderHatchlingLicense(void)
-{
-	LocalPlayer.Inventory().Give(kActor_AI_SpiderHatchling + RANDO_INVENTORY_ITEM_OFFSET);
-}
+//void SpiderHatchlingSoul(void)
+//{
+//	LocalPlayer.Inventory().Give(kActor_AI_SpiderSoul + RANDO_INVENTORY_ITEM_OFFSET);
+//}

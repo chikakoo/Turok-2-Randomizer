@@ -1,5 +1,5 @@
 //----------------------------------
-// ScriptObject for enemy licenses.
+// ScriptObject for random ammo packs.
 //----------------------------------
 class RandoAmmoPack : RandoPickupObject
 {
