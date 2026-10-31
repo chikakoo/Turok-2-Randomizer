@@ -126,16 +126,6 @@ class RandoEnemy : ScriptActor
 		}
 	}
 	
-	void TestSoul()
-	{
-		int enemyType = self.Type();
-		if (isReplacedActor && originalActor !is null)
-		{
-			enemyType = originalActor.Type();
-		}
-		hasSoul = GetInventoryItemCollectedTotal(enemyType) > 0;
-	}
-	
 	//----------------------------------
 	// Initializes the enemy soul flag based on the enemy and settings.
 	// If no soul, remove the actor if set to No Spawn.
@@ -273,29 +263,28 @@ class RandoEnemy : ScriptActor
 	}
 	
 	//----------------------------------
-	// If you don't have enemy's soul, show the FxEffect.
+	// If you don't have enemy's soul...
+	// - Show the FX effect for hitting the enemy
+	// - If the enemy would die, remove them from the map before the event triggers
 	void OnPreDamage(kDamageInfo& in dmgInfo)
 	{
 		if (!hasSoul)
 		{
 			self.RunFxEvent("InvincibleFlash");
+			
+			if (self.Health() - dmgInfo.hits <= 0.0f)
+			{
+				// TODO: spawn a particle for the enemy dying without a soul
+				self.Remove();
+			}
 		}
 	}
 	
 	//----------------------------------
 	// When the replacement dies, kill the original actor to trigger any events.
 	// Note that simply setting Health to 0 does not work.
-	//
-	// If the player doesn't have the enemy's soul, "Mark" it with
-	// false so that the actor will persist when the map is reloaded.
 	void OnDeath(kDamageInfo& in dmgInfo)
 	{
-		if (!hasSoul)
-		{
-			self.Mark(false);
-			return;
-		}
-		
 		if (apEntry !is null)
 		{		
 			apEntry.SendCheckToAP();
@@ -347,13 +336,8 @@ class RandoEnemy : ScriptActor
 			self.Flags() &= ~AF_IMPORTANT;
 		}
 	
-	
-		if (OPTION_ENEMIZER == 0 &&
-			(OPTION_ENEMY_SOULS != ENEMY_SOULS_NO_TRIGGERS || hasSoul))
+		if (OPTION_ENEMIZER == 0)
 		{
-		
-	Sys.Print("REPLACED: " + isReplacedActor + "  HI: " + (originalActor is null));
-	Sys.Print("SOUL: " + OPTION_ENEMY_SOULS + "  HI: " + hasSoul);
 			return;
 		}
 		

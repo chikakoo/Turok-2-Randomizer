@@ -1182,6 +1182,14 @@ final class TurokBore : TurokWeapon
         {
             return;
         }
+		
+		// Rando - don't target anything if you don't have the soul (it won't kill the enemy)
+        RandoEnemy@ actorScript = cast<RandoEnemy@>(GetScript(self.GetTarget()));
+        if (actorScript !is null && !actorScript.hasSoul)
+        {
+            return;
+        }
+        // End Rando
         
         self.PlayTactile("tactile/CERBFIR1.bnvib", kexVibrationPlayer::CHANNEL_WEAPON, kexVibrationPlayer::POSITION_RIGHT);
         
