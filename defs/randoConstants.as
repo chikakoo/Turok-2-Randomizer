@@ -159,6 +159,7 @@
 // ---------
 // Enemy souls (actor id + RANDO_INVENTORY_ITEM_OFFSET)
 #define kActor_InventoryItem_RaptoidSoul 400200
+#define kActor_InventoryItem_EndtrailSoul 400201
 
 // ---------
 // Map intros without constants

@@ -126,6 +126,16 @@ class RandoEnemy : ScriptActor
 		}
 	}
 	
+	void TestSoul()
+	{
+		int enemyType = self.Type();
+		if (isReplacedActor && originalActor !is null)
+		{
+			enemyType = originalActor.Type();
+		}
+		hasSoul = GetInventoryItemCollectedTotal(enemyType) > 0;
+	}
+	
 	//----------------------------------
 	// Initializes the enemy soul flag based on the enemy and settings.
 	// If no soul, remove the actor if set to No Spawn.
@@ -136,8 +146,8 @@ class RandoEnemy : ScriptActor
 		{
 			hasSoul = true;
 		}
-		else if (!CheckForSoulAndUpdateFlags() &&
-			OPTION_ENEMY_SOULS == ENEMY_SOULS_NO_SPAWNS)
+		
+		else if (!CheckForSoulAndUpdateFlags() && OPTION_ENEMY_SOULS == ENEMY_SOULS_NO_SPAWNS)
 		{
 			if (originalActor !is null)
 			{
@@ -337,8 +347,13 @@ class RandoEnemy : ScriptActor
 			self.Flags() &= ~AF_IMPORTANT;
 		}
 	
-		if (OPTION_ENEMIZER == 0)
+	
+		if (OPTION_ENEMIZER == 0 &&
+			(OPTION_ENEMY_SOULS != ENEMY_SOULS_NO_TRIGGERS || hasSoul))
 		{
+		
+	Sys.Print("REPLACED: " + isReplacedActor + "  HI: " + (originalActor is null));
+	Sys.Print("SOUL: " + OPTION_ENEMY_SOULS + "  HI: " + hasSoul);
 			return;
 		}
 		

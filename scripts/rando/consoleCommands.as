@@ -522,6 +522,11 @@ void RaptoidSoul(void)
 	TryGetInventoryItem(kActor_InventoryItem_RaptoidSoul);
 }
 
+void EndtrailSoul(void)
+{
+	TryGetInventoryItem(kActor_InventoryItem_EndtrailSoul);
+}
+
 //TODO
 //void SpiderHatchlingSoul(void)
 //{

@@ -696,3 +696,30 @@ RaptoidSoul kActor_InventoryItem_RaptoidSoul
 		altTexture            2
     End_Component
 }
+
+EndtrailSoul kActor_InventoryItem_EndtrailSoul
+{
+    className                   "kexInventoryPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
+	pickup.pickupMessage 		"Endtrail Soul"
+    
+    initialScale              "10.0 10.0 10.0" //"0.2 0.2 0.2"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+	Begin_Component "kexRenderMeshComponent"
+		mesh "char/ui/ui.skinnedmesh"
+		anim "anims/none.anim"
+        //mesh         "char/Endtrail.skinnedmesh"
+		//anim         "anims/Endtrail.anim"
+    End_Component
+    Begin_Component "kexScriptComponent"
+        scriptClass           "RandoEnemySoul"
+        triggerRadius         81.92
+		altTexture            3
+    End_Component
+}
