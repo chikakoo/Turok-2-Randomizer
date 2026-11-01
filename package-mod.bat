@@ -4,6 +4,7 @@
 setlocal enabledelayedexpansion
 
 set "allFolders=actorfx anims cinemas char defs gfx localization materials models particles scripts textures"
+set "metaFile=mod_version.meta"
 
 :: Create an output directory to work in
 set "outputDir=output"
@@ -26,6 +27,16 @@ echo Creating final archive...
 pushd "%outputDir%"
 7z a -tzip "Turok2Mod.zip" "*.kpf" >nul
 popd
+
+if exist %metaFile% (
+	echo Including %metaFile%...
+	
+	pushd "%outputDir%"
+	7z a -tzip "Turok2Mod.zip" "../%metaFile%" >nul
+	popd
+) else (
+	echo Skipping %metaFile% (not found)
+)
 
 :: Clean up the kpfs
 del "%outputDir%\*.kpf" >nul 2>&1
