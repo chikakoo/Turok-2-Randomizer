@@ -1,0 +1,34 @@
+fx[1] =
+{
+    typeID = 10003
+    {
+        bFadeout = 1
+        bUserScale = 1
+        bScaleLerp = 1
+        spawnSound = 0
+        shader = "progs/worldcolorfx"
+        softness = 1.0
+        sprite = "sprites/flareball"
+        animtype = 2
+        frames = 13
+        probability = 100
+        visibility = 2
+        instances = 1
+        animSpeed = 30
+        alert = 2
+        scale = { 7.640625 7.640625 11.25 }
+        scaleInc = { 0.000000 0.000000 -1.195313 }
+        farScale = 0.800000
+        nearScale = 1.500000
+        shadowScale = 1.000000
+        direction = { 0.000000 1.000000 0.000000 }
+        bounceEnergy = 1.000000
+        whiteColor1 = { 0.000000 0.000000 0.000000 }
+        whiteColor2 = { 0.000000 0.000000 0.000000 }
+        blackColor1 = { 0.616 0.439 0.949 }
+        blackColor2 = { 0.616 0.439 0.949 }
+        hueRandom = 0.000000
+        saturationRandom = 0.000000
+        brightnessRandom = 0.000000
+    }
+}

@@ -7,7 +7,7 @@
 #define DF_DEATHLINK 1 << 31
 
 // Custom particles
-#define kParticle_EnemyInvincible 10003
+#define kParticle_NoSoulDeath 10003
 
 // Inventory items add 400000 to the existing id to get
 // the "how many have I ever collected" value

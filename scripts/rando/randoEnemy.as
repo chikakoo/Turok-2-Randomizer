@@ -10,8 +10,6 @@ enum EnemySoulsType
 
 class RandoEnemy : ScriptActor
 {
-	int m_soulFxCooldown = 0;
-	
 	// The original actor (that this one replaced; null if not replaced)
 	kActor@ originalActor;
 	
@@ -128,33 +126,14 @@ class RandoEnemy : ScriptActor
 	
 	//----------------------------------
 	// Initializes the enemy soul flag based on the enemy and settings.
+	// Also plays the FxEffect to make it transparent/blue
 	// If no soul, remove the actor if set to No Spawn.
 	void InitializeSoul()
 	{
-		// TODO: handle that one 3-3 enemy...
-		if (OPTION_ENEMY_SOULS == ENEMY_SOULS_NONE || self.TID() <= 0)
+		if (OPTION_ENEMY_SOULS == ENEMY_SOULS_NONE)
 		{
 			hasSoul = true;
-		}
-		
-		else if (!CheckForSoulAndUpdateFlags() && OPTION_ENEMY_SOULS == ENEMY_SOULS_NO_SPAWNS)
-		{
-			if (originalActor !is null)
-			{
-				originalActor.Remove();
-			}
-			self.Remove();
-		}
-	}
-	
-	//----------------------------------
-	// Sets the flags based on the whether the player has the actor's soul.
-	// Returns whether the player has the soul.
-	bool CheckForSoulAndUpdateFlags()
-	{
-		if (hasSoul)
-		{
-			return true;
+			return;
 		}
 		
 		int enemyType = self.Type();
@@ -162,29 +141,22 @@ class RandoEnemy : ScriptActor
 		{
 			enemyType = originalActor.Type();
 		}
-		
 		hasSoul = GetInventoryItemCollectedTotal(enemyType) > 0;
-		return hasSoul;
-	}
-	
-	//----------------------------------
-	// Updates soul flags if necessary.
-	// If there is no soul, play the FxEffect on a cooldown.
-	void HandleSoulUpdates()
-	{
-		if (CheckForSoulAndUpdateFlags())
+		
+		if (!hasSoul)
 		{
-			return;
-		}
-
-		if (m_soulFxCooldown > 0)
-		{
-			m_soulFxCooldown--;
-		}
-		else 
-		{
-			self.RunFxEvent("InvincibleFade");
-			m_soulFxCooldown = 120;
+			if (OPTION_ENEMY_SOULS == ENEMY_SOULS_NO_SPAWNS)
+			{
+				if (originalActor !is null)
+				{
+					originalActor.Remove();
+				}
+				self.Remove();
+			}
+			else
+			{
+				self.RunFxEvent("NoSoulTransparent");
+			}
 		}
 	}
 	
@@ -225,6 +197,7 @@ class RandoEnemy : ScriptActor
 		SERIALIZE(processedSpawn);
 		SERIALIZE(neverReplacedActor);
 		SERIALIZE(importantShown);
+		SERIALIZE(hasSoul);
 	}
 	
 	//----------------------------------
@@ -238,6 +211,7 @@ class RandoEnemy : ScriptActor
 		DESERIALIZE_BOOL(processedSpawn);
 		DESERIALIZE_BOOL(neverReplacedActor);
 		DESERIALIZE_BOOL(importantShown);
+		DESERIALIZE_BOOL(hasSoul);
 		SetApEntry();
 		
 		if (!isReplacedActor)
@@ -264,19 +238,18 @@ class RandoEnemy : ScriptActor
 	
 	//----------------------------------
 	// If you don't have enemy's soul...
-	// - Show the FX effect for hitting the enemy
 	// - If the enemy would die, remove them from the map before the event triggers
 	void OnPreDamage(kDamageInfo& in dmgInfo)
 	{
-		if (!hasSoul)
+		if (!hasSoul && (self.Health() - dmgInfo.hits <= 0.0f))
 		{
-			self.RunFxEvent("InvincibleFlash");
-			
-			if (self.Health() - dmgInfo.hits <= 0.0f)
-			{
-				// TODO: spawn a particle for the enemy dying without a soul
-				self.Remove();
-			}
+			float halfHeight = self.WorldComponent().Height() / 2;
+			kVec3 spawnPosition = kVec3(
+				self.Origin().x, 
+				self.Origin().y, 
+				self.Origin().z + halfHeight);
+			ParticleFactory.Spawn(kParticle_NoSoulDeath, self, spawnPosition, kQuat(0, 0, 0), Math::vecZero);
+			self.Remove();
 		}
 	}
 	
@@ -318,16 +291,15 @@ class RandoEnemy : ScriptActor
 	// - Else, set the original to hidden if it's ever shown for some reason
 	void OnTick(void)
 	{
-		if ((self.Flags() & AF_HIDDEN) == 0)
+		// If this enemy is a check and we have the soul, show the important indicator when it's visible
+		if (hasSoul && 
+			(self.Flags() & AF_HIDDEN) == 0 && 
+			g_markEnemies && 
+			!importantShown && 
+			apEntry !is null)
 		{
-			HandleSoulUpdates();
-			
-			// If this enemy is a check, show the important indicator when it's visible
-			if (g_markEnemies && !importantShown && apEntry !is null)
-			{
-				self.Flags() |= AF_IMPORTANT;
-				importantShown = true;
-			}
+			self.Flags() |= AF_IMPORTANT;
+			importantShown = true;
 		}
 		
 		// Handles linked enemies
