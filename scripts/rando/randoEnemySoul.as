@@ -3,7 +3,6 @@
 //----------------------------------
 class RandoEnemySoul : RandoPickupObject
 {
-	int altTexture;
 	RandoEnemySoul(kActor @actor)
 	{
 		super(actor);
@@ -11,7 +10,11 @@ class RandoEnemySoul : RandoPickupObject
 		// Set the texture of the actor
 		if (self.RenderMeshComponent() !is null && self.Definition() !is null)
 		{
-			self.RenderMeshComponent().AltTexture() = altTexture;
+			int altTextureIndex;
+			if (self.Definition().GetInt("rando.altTexture", altTextureIndex))
+			{
+				self.RenderMeshComponent().AltTexture() = altTextureIndex - 1;
+			}
 		}
 	}
 }

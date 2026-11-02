@@ -677,23 +677,21 @@ RaptoidSoul kActor_InventoryItem_RaptoidSoul
     flags.noDamage              TRUE
     pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
 	pickup.pickupMessage 		"Raptoid Soul"
+	rando.altTexture			1
     
-    initialScale              "10.0 10.0 10.0" //"0.2 0.2 0.2"
+    initialScale              "0.2 0.2 0.2"
     Begin_Component "kexWorldComponent"
         radius                81.92
         height                81.92
         bNonSolid             TRUE
     End_Component
 	Begin_Component "kexRenderMeshComponent"
-		mesh "char/ui/ui.skinnedmesh"
+		mesh "char/Enemy_Soul.skinnedmesh"
 		anim "anims/none.anim"
-        //mesh         "char/Raptoid.skinnedmesh"
-		//anim         "anims/Raptoid.anim"
     End_Component
     Begin_Component "kexScriptComponent"
         scriptClass           "RandoEnemySoul"
         triggerRadius         81.92
-		altTexture            2
     End_Component
 }
 
@@ -704,22 +702,20 @@ EndtrailSoul kActor_InventoryItem_EndtrailSoul
     flags.noDamage              TRUE
     pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
 	pickup.pickupMessage 		"Endtrail Soul"
+	rando.altTexture			2
     
-    initialScale              "10.0 10.0 10.0" //"0.2 0.2 0.2"
+    initialScale              "0.2 0.2 0.2"
     Begin_Component "kexWorldComponent"
         radius                81.92
         height                81.92
         bNonSolid             TRUE
     End_Component
 	Begin_Component "kexRenderMeshComponent"
-		mesh "char/ui/ui.skinnedmesh"
+		mesh "char/Enemy_Soul.skinnedmesh"
 		anim "anims/none.anim"
-        //mesh         "char/Endtrail.skinnedmesh"
-		//anim         "anims/Endtrail.anim"
     End_Component
     Begin_Component "kexScriptComponent"
         scriptClass           "RandoEnemySoul"
         triggerRadius         81.92
-		altTexture            3
     End_Component
 }

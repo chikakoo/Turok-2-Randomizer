@@ -39,6 +39,15 @@
 	texture_30 "textures/ui/soul_background.png"
 }
 
+"textures/white.png"
+{
+	speed 1
+	animated 0
+
+	texture_1 "textures/enemy_souls/raptoid.png"
+	texture_2 "textures/enemy_souls/endtrail.png"
+}
+
 // ------------------------------
 // End Rando TextureSets
 // ------------------------------

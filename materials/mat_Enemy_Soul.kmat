@@ -1,0 +1,34 @@
+material Enemy_Soul_Border {
+	cull back
+	param "uLimitAlpha" 0 "0"
+	param "uReflective" 0 "1"
+	param "uPseduoColor" 0 "0"
+	sort default
+	surface_type default
+	depthtest
+	color_environment "0.000000 0.000000 0.000000 1.000000"
+	color_diffuse "1.000000 1.000000 1.000000 1.000000"
+
+	sampler "diffuse" 0 "textures/Enemy_Soul_Border.png" {
+		filter		linear
+		wrap		repeat
+	}
+}
+
+material Enemy_Image {
+	cull back
+	param "uLimitAlpha" 0 "0"
+	param "uReflective" 0 "0"
+	param "uPseduoColor" 0 "0"
+	sort default
+	surface_type default
+	depthtest
+	color_environment "0.000000 0.000000 0.000000 1.000000"
+	color_diffuse "1.000000 1.000000 1.000000 1.000000"
+
+	sampler "diffuse" 0 "textures/white.png" {
+		filter		linear_anisotropic
+		wrap		repeat
+	}
+}
+
