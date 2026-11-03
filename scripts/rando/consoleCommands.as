@@ -134,6 +134,35 @@ void Help(void)
 	Sys.Print("ProgressiveWarpL4");
 	Sys.Print("ProgressiveWarpL5");
 	Sys.Print("ProgressiveWarpL6");
+	Sys.Print("RaptoidSoul");
+	Sys.Print("EndtrailSoul");
+	Sys.Print("CompySoul");
+	Sys.Print("RaptorSoul");
+	Sys.Print("LeaperSoul");
+	Sys.Print("SpiderHatchlingSoul");
+	Sys.Print("DeadmanSoul");
+	Sys.Print("LordOfTheDeadSoul");
+	Sys.Print("SisterOfDespairSoul");
+	Sys.Print("WarClubSoul");
+	Sys.Print("GunnerSoul");
+	Sys.Print("JuggernautSoul");
+	Sys.Print("CaveWormSoul");
+	Sys.Print("WaspSoul");
+	Sys.Print("BlindSentinelSoul");
+	Sys.Print("GuardianSoul");
+	Sys.Print("NalaSoul");
+	Sys.Print("CaveSpiderSoul");
+	Sys.Print("FirebornSoul");
+	Sys.Print("DroneSoul");
+	Sys.Print("WorkerSoul");
+	Sys.Print("MiteSoul");
+	Sys.Print("SoldierSoul");
+	Sys.Print("BioBotSoul");
+	Sys.Print("TrooperSoul");
+	Sys.Print("EliteGuardSoul");
+	Sys.Print("FleshSentinelSoul");
+	Sys.Print("DeathGuardSoul");
+	Sys.Print("LordOfTheFleshSoul");
 }
 
 // --------------------------
@@ -527,8 +556,137 @@ void EndtrailSoul(void)
 	TryGetInventoryItem(kActor_InventoryItem_EndtrailSoul);
 }
 
-//TODO
-//void SpiderHatchlingSoul(void)
-//{
-//	LocalPlayer.Inventory().Give(kActor_AI_SpiderSoul + RANDO_INVENTORY_ITEM_OFFSET);
-//}
+void CompySoul(void)
+{
+	TryGetInventoryItem(kActor_InventoryItem_CompySoul);
+}
+
+void RaptorSoul(void)
+{
+	TryGetInventoryItem(kActor_InventoryItem_RaptorSoul);
+}
+
+void LeaperSoul(void)
+{
+	TryGetInventoryItem(kActor_InventoryItem_LeaperSoul);
+}
+
+void SpiderHatchlingSoul(void)
+{
+	TryGetInventoryItem(kActor_InventoryItem_SpiderHatchlingSoul);
+}
+
+void DeadmanSoul(void)
+{
+	TryGetInventoryItem(kActor_InventoryItem_DeadmanSoul);
+}
+
+void LordOfTheDeadSoul(void)
+{
+	TryGetInventoryItem(kActor_InventoryItem_LordOfTheDeadSoul);
+}
+
+void SisterOfDespairSoul(void)
+{
+	TryGetInventoryItem(kActor_InventoryItem_SisterOfDespairSoul);
+}
+
+void WarClubSoul(void)
+{
+	TryGetInventoryItem(kActor_InventoryItem_WarClubSoul);
+}
+
+void GunnerSoul(void)
+{
+	TryGetInventoryItem(kActor_InventoryItem_GunnerSoul);
+}
+
+void JuggernautSoul(void)
+{
+	TryGetInventoryItem(kActor_InventoryItem_JuggernautSoul);
+}
+
+void CaveWormSoul(void)
+{
+	TryGetInventoryItem(kActor_InventoryItem_CaveWormSoul);
+}
+
+void WaspSoul(void)
+{
+	TryGetInventoryItem(kActor_InventoryItem_WaspSoul);
+}
+
+void BlindSentinelSoul(void)
+{
+	TryGetInventoryItem(kActor_InventoryItem_BlindSentinelSoul);
+}
+
+void GuardianSoul(void)
+{
+	TryGetInventoryItem(kActor_InventoryItem_GuardianSoul);
+}
+
+void NalaSoul(void)
+{
+	TryGetInventoryItem(kActor_InventoryItem_NalaSoul);
+}
+
+void CaveSpiderSoul(void)
+{
+	TryGetInventoryItem(kActor_InventoryItem_CaveSpiderSoul);
+}
+
+void FirebornSoul(void)
+{
+	TryGetInventoryItem(kActor_InventoryItem_FirebornSoul);
+}
+
+void DroneSoul(void)
+{
+	TryGetInventoryItem(kActor_InventoryItem_DroneSoul);
+}
+
+void WorkerSoul(void)
+{
+	TryGetInventoryItem(kActor_InventoryItem_WorkerSoul);
+}
+
+void MiteSoul(void)
+{
+	TryGetInventoryItem(kActor_InventoryItem_MiteSoul);
+}
+
+void SoldierSoul(void)
+{
+	TryGetInventoryItem(kActor_InventoryItem_SoldierSoul);
+}
+
+void BioBotSoul(void)
+{
+	TryGetInventoryItem(kActor_InventoryItem_BioBotSoul);
+}
+
+void TrooperSoul(void)
+{
+	TryGetInventoryItem(kActor_InventoryItem_TrooperSoul);
+}
+
+void EliteGuardSoul(void)
+{
+	TryGetInventoryItem(kActor_InventoryItem_EliteGuardSoul);
+}
+
+void FleshSentinelSoul(void)
+{
+	TryGetInventoryItem(kActor_InventoryItem_FleshSentinelSoul);
+}
+
+void DeathGuardSoul(void)
+{
+	TryGetInventoryItem(kActor_InventoryItem_DeathGuardSoul);
+}
+
+void LordOfTheFleshSoul(void)
+{
+	TryGetInventoryItem(kActor_InventoryItem_LordOfTheFleshSoul);
+}

@@ -160,6 +160,39 @@
 // Enemy souls (actor id + RANDO_INVENTORY_ITEM_OFFSET)
 #define kActor_InventoryItem_RaptoidSoul 400200
 #define kActor_InventoryItem_EndtrailSoul 400201
+#define kActor_InventoryItem_CompySoul 405000
+#define kActor_InventoryItem_RaptorSoul 400300
+
+#define kActor_InventoryItem_LeaperSoul 401000
+#define kActor_InventoryItem_SpiderHatchlingSoul 400502
+#define kActor_InventoryItem_DeadmanSoul 400800
+#define kActor_InventoryItem_LordOfTheDeadSoul 400803
+#define kActor_InventoryItem_SisterOfDespairSoul 400804
+
+#define kActor_InventoryItem_WarClubSoul 400600
+#define kActor_InventoryItem_GunnerSoul 400602
+#define kActor_InventoryItem_JuggernautSoul 400603
+#define kActor_InventoryItem_CaveWormSoul 400505
+#define kActor_InventoryItem_WaspSoul 400604
+
+#define kActor_InventoryItem_BlindSentinelSoul 400500
+#define kActor_InventoryItem_GuardianSoul 400501
+#define kActor_InventoryItem_NalaSoul 400507
+#define kActor_InventoryItem_CaveSpiderSoul 400503
+#define kActor_InventoryItem_FirebornSoul 400203
+
+#define kActor_InventoryItem_DroneSoul 400709
+#define kActor_InventoryItem_WorkerSoul 400708
+#define kActor_InventoryItem_MiteSoul 400707
+#define kActor_InventoryItem_SoldierSoul 400710
+
+#define kActor_InventoryItem_BioBotSoul 400901
+#define kActor_InventoryItem_TrooperSoul 400900
+#define kActor_InventoryItem_EliteGuardSoul 400902
+
+#define kActor_InventoryItem_FleshSentinelSoul 400400
+#define kActor_InventoryItem_DeathGuardSoul 400401
+#define kActor_InventoryItem_LordOfTheFleshSoul 400402
 
 // ---------
 // Map intros without constants

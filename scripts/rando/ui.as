@@ -331,39 +331,36 @@ class RandoUI
 		AddObtainedSoulIcon(kActor_AI_Endtrail, 1, 0);
 		AddObtainedSoulIcon(kActor_AI_Compy, 2, 0);
 		AddObtainedSoulIcon(kActor_AI_Raptor, 3, 0);
-		AddObtainedSoulIcon(kActor_AI_Leaper, 4, 0);
-		AddObtainedSoulIcon(kActor_AI_SpiderHatchling, 5, 0);
-
-		AddObtainedSoulIcon(kActor_AI_Deadman, 0, 1);
-		AddObtainedSoulIcon(kActor_AI_LordOfTheDead, 1, 1);
-		AddObtainedSoulIcon(kActor_AI_SisterOfDespair, 2, 1);
-		AddObtainedSoulIcon(kActor_AI_WarClub, 3, 1);
-		AddObtainedSoulIcon(kActor_AI_Gunner, 4, 1);
-		AddObtainedSoulIcon(kActor_AI_Juggernaut, 5, 1);
-
-		AddObtainedSoulIcon(kActor_AI_CaveWorm, 0, 2);
-		AddObtainedSoulIcon(kActor_AI_SwampWasp, 1, 2);
-		AddObtainedSoulIcon(kActor_AI_Sentinel, 2, 2);
-		AddObtainedSoulIcon(kActor_AI_Guardian, 3, 2);
-		AddObtainedSoulIcon(kActor_AI_Nala, 4, 2);
-		AddObtainedSoulIcon(kActor_AI_CaveSpider, 5, 2);
-
-		AddObtainedSoulIcon(kActor_AI_Fireborn, 0, 3);
-		AddObtainedSoulIcon(kActor_AI_FleshWorm, 1, 3);
-		AddObtainedSoulIcon(kActor_AI_Grub, 2, 3);
-		AddObtainedSoulIcon(kActor_AI_Drone, 3, 3);
-		AddObtainedSoulIcon(kActor_AI_Worker, 4, 3);
-		AddObtainedSoulIcon(kActor_AI_Mite, 5, 3);
-
-		AddObtainedSoulIcon(kActor_AI_Soldier, 0, 4);
-		AddObtainedSoulIcon(kActor_AI_BioBot, 1, 4);
-		AddObtainedSoulIcon(kActor_AI_Trooper, 2, 4);
-		AddObtainedSoulIcon(kActor_AI_EliteGuard, 3, 4);
-		AddObtainedSoulIcon(kActor_AI_MotherGrub, 4, 4);
-
-		AddObtainedSoulIcon(kActor_AI_FleshSentinel, 0, 5);
-		AddObtainedSoulIcon(kActor_AI_DeathGuard, 1, 5);
-		AddObtainedSoulIcon(kActor_AI_LordOfTheFlesh, 2, 5);
+		
+		AddObtainedSoulIcon(kActor_AI_Leaper, 0, 1);
+		AddObtainedSoulIcon(kActor_AI_SpiderHatchling, 1, 1);
+		AddObtainedSoulIcon(kActor_AI_Deadman, 2, 1);
+		AddObtainedSoulIcon(kActor_AI_LordOfTheDead, 3, 1);
+		AddObtainedSoulIcon(kActor_AI_SisterOfDespair, 4, 1);
+		
+		AddObtainedSoulIcon(kActor_AI_WarClub, 0, 2);
+		AddObtainedSoulIcon(kActor_AI_Gunner, 1, 2);
+		AddObtainedSoulIcon(kActor_AI_Juggernaut, 2, 2);
+		AddObtainedSoulIcon(kActor_AI_CaveWorm, 3, 2);
+		AddObtainedSoulIcon(kActor_AI_SwampWasp, 4, 2);
+		
+		AddObtainedSoulIcon(kActor_AI_Sentinel, 0, 3);
+		AddObtainedSoulIcon(kActor_AI_Guardian, 1, 3);
+		AddObtainedSoulIcon(kActor_AI_Nala, 2, 3);
+		AddObtainedSoulIcon(kActor_AI_CaveSpider, 3, 3);
+		AddObtainedSoulIcon(kActor_AI_Fireborn, 4, 3);
+		
+		AddObtainedSoulIcon(kActor_AI_Drone, 0, 4);
+		AddObtainedSoulIcon(kActor_AI_Worker, 1, 4);
+		AddObtainedSoulIcon(kActor_AI_Mite, 2, 4);
+		AddObtainedSoulIcon(kActor_AI_Soldier, 3, 4);
+		
+		AddObtainedSoulIcon(kActor_AI_BioBot, 0, 5);
+		AddObtainedSoulIcon(kActor_AI_Trooper, 1, 5);
+		AddObtainedSoulIcon(kActor_AI_EliteGuard, 2, 5);
+		AddObtainedSoulIcon(kActor_AI_FleshSentinel, 3, 5);
+		AddObtainedSoulIcon(kActor_AI_DeathGuard, 4, 5);
+		AddObtainedSoulIcon(kActor_AI_LordOfTheFlesh, 5, 5);
 	}
 	
 	// --------------------------

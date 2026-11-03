@@ -719,3 +719,678 @@ EndtrailSoul kActor_InventoryItem_EndtrailSoul
         triggerRadius         81.92
     End_Component
 }
+
+CompySoul kActor_InventoryItem_CompySoul
+{
+    className                   "kexInventoryPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
+	pickup.pickupMessage 		"Compy Soul"
+	rando.altTexture			3
+    
+    initialScale              "0.2 0.2 0.2"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+	Begin_Component "kexRenderMeshComponent"
+		mesh "char/Enemy_Soul.skinnedmesh"
+		anim "anims/none.anim"
+    End_Component
+    Begin_Component "kexScriptComponent"
+        scriptClass           "RandoEnemySoul"
+        triggerRadius         81.92
+    End_Component
+}
+
+RaptorSoul kActor_InventoryItem_RaptorSoul
+{
+    className                   "kexInventoryPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
+	pickup.pickupMessage 		"Raptor Soul"
+	rando.altTexture			4
+    
+    initialScale              "0.2 0.2 0.2"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+	Begin_Component "kexRenderMeshComponent"
+		mesh "char/Enemy_Soul.skinnedmesh"
+		anim "anims/none.anim"
+    End_Component
+    Begin_Component "kexScriptComponent"
+        scriptClass           "RandoEnemySoul"
+        triggerRadius         81.92
+    End_Component
+}
+
+LeaperSoul kActor_InventoryItem_LeaperSoul
+{
+    className                   "kexInventoryPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
+	pickup.pickupMessage 		"Leaper Soul"
+	rando.altTexture			5
+    
+    initialScale              "0.2 0.2 0.2"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+	Begin_Component "kexRenderMeshComponent"
+		mesh "char/Enemy_Soul.skinnedmesh"
+		anim "anims/none.anim"
+    End_Component
+    Begin_Component "kexScriptComponent"
+        scriptClass           "RandoEnemySoul"
+        triggerRadius         81.92
+    End_Component
+}
+
+SpiderHatchlingSoul kActor_InventoryItem_SpiderHatchlingSoul
+{
+    className                   "kexInventoryPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
+	pickup.pickupMessage 		"Spider Hatchling Soul"
+	rando.altTexture			6
+    
+    initialScale              "0.2 0.2 0.2"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+	Begin_Component "kexRenderMeshComponent"
+		mesh "char/Enemy_Soul.skinnedmesh"
+		anim "anims/none.anim"
+    End_Component
+    Begin_Component "kexScriptComponent"
+        scriptClass           "RandoEnemySoul"
+        triggerRadius         81.92
+    End_Component
+}
+
+DeadmanSoul kActor_InventoryItem_DeadmanSoul
+{
+    className                   "kexInventoryPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
+	pickup.pickupMessage 		"Deadman Soul"
+	rando.altTexture			7
+    
+    initialScale              "0.2 0.2 0.2"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+	Begin_Component "kexRenderMeshComponent"
+		mesh "char/Enemy_Soul.skinnedmesh"
+		anim "anims/none.anim"
+    End_Component
+    Begin_Component "kexScriptComponent"
+        scriptClass           "RandoEnemySoul"
+        triggerRadius         81.92
+    End_Component
+}
+
+LordOfTheDeadSoul kActor_InventoryItem_LordOfTheDeadSoul
+{
+    className                   "kexInventoryPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
+	pickup.pickupMessage 		"Lord of the Dead Soul"
+	rando.altTexture			8
+    
+    initialScale              "0.2 0.2 0.2"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+	Begin_Component "kexRenderMeshComponent"
+		mesh "char/Enemy_Soul.skinnedmesh"
+		anim "anims/none.anim"
+    End_Component
+    Begin_Component "kexScriptComponent"
+        scriptClass           "RandoEnemySoul"
+        triggerRadius         81.92
+    End_Component
+}
+
+SisterOfDespairSoul kActor_InventoryItem_SisterOfDespairSoul
+{
+    className                   "kexInventoryPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
+	pickup.pickupMessage 		"Sister of Despair Soul"
+	rando.altTexture			9
+    
+    initialScale              "0.2 0.2 0.2"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+	Begin_Component "kexRenderMeshComponent"
+		mesh "char/Enemy_Soul.skinnedmesh"
+		anim "anims/none.anim"
+    End_Component
+    Begin_Component "kexScriptComponent"
+        scriptClass           "RandoEnemySoul"
+        triggerRadius         81.92
+    End_Component
+}
+
+WarClubSoul kActor_InventoryItem_WarClubSoul
+{
+    className                   "kexInventoryPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
+	pickup.pickupMessage 		"War Club Soul"
+	rando.altTexture			10
+    
+    initialScale              "0.2 0.2 0.2"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+	Begin_Component "kexRenderMeshComponent"
+		mesh "char/Enemy_Soul.skinnedmesh"
+		anim "anims/none.anim"
+    End_Component
+    Begin_Component "kexScriptComponent"
+        scriptClass           "RandoEnemySoul"
+        triggerRadius         81.92
+    End_Component
+}
+
+GunnerSoul kActor_InventoryItem_GunnerSoul
+{
+    className                   "kexInventoryPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
+	pickup.pickupMessage 		"Gunner Soul"
+	rando.altTexture			11
+    
+    initialScale              "0.2 0.2 0.2"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+	Begin_Component "kexRenderMeshComponent"
+		mesh "char/Enemy_Soul.skinnedmesh"
+		anim "anims/none.anim"
+    End_Component
+    Begin_Component "kexScriptComponent"
+        scriptClass           "RandoEnemySoul"
+        triggerRadius         81.92
+    End_Component
+}
+
+JuggernautSoul kActor_InventoryItem_JuggernautSoul
+{
+    className                   "kexInventoryPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
+	pickup.pickupMessage 		"Juggernaut Soul"
+	rando.altTexture			12
+    
+    initialScale              "0.2 0.2 0.2"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+	Begin_Component "kexRenderMeshComponent"
+		mesh "char/Enemy_Soul.skinnedmesh"
+		anim "anims/none.anim"
+    End_Component
+    Begin_Component "kexScriptComponent"
+        scriptClass           "RandoEnemySoul"
+        triggerRadius         81.92
+    End_Component
+}
+
+CaveWormSoul kActor_InventoryItem_CaveWormSoul
+{
+    className                   "kexInventoryPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
+	pickup.pickupMessage 		"Cave Worm Soul"
+	rando.altTexture			13
+    
+    initialScale              "0.2 0.2 0.2"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+	Begin_Component "kexRenderMeshComponent"
+		mesh "char/Enemy_Soul.skinnedmesh"
+		anim "anims/none.anim"
+    End_Component
+    Begin_Component "kexScriptComponent"
+        scriptClass           "RandoEnemySoul"
+        triggerRadius         81.92
+    End_Component
+}
+
+WaspSoul kActor_InventoryItem_WaspSoul
+{
+    className                   "kexInventoryPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
+	pickup.pickupMessage 		"Wasp Soul"
+	rando.altTexture			14
+    
+    initialScale              "0.2 0.2 0.2"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+	Begin_Component "kexRenderMeshComponent"
+		mesh "char/Enemy_Soul.skinnedmesh"
+		anim "anims/none.anim"
+    End_Component
+    Begin_Component "kexScriptComponent"
+        scriptClass           "RandoEnemySoul"
+        triggerRadius         81.92
+    End_Component
+}
+
+BlindSentinelSoul kActor_InventoryItem_BlindSentinelSoul
+{
+    className                   "kexInventoryPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
+	pickup.pickupMessage 		"Blind Sentinel Soul"
+	rando.altTexture			15
+    
+    initialScale              "0.2 0.2 0.2"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+	Begin_Component "kexRenderMeshComponent"
+		mesh "char/Enemy_Soul.skinnedmesh"
+		anim "anims/none.anim"
+    End_Component
+    Begin_Component "kexScriptComponent"
+        scriptClass           "RandoEnemySoul"
+        triggerRadius         81.92
+    End_Component
+}
+
+GuardianSoul kActor_InventoryItem_GuardianSoul
+{
+    className                   "kexInventoryPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
+	pickup.pickupMessage 		"Guardian Soul"
+	rando.altTexture			16
+    
+    initialScale              "0.2 0.2 0.2"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+	Begin_Component "kexRenderMeshComponent"
+		mesh "char/Enemy_Soul.skinnedmesh"
+		anim "anims/none.anim"
+    End_Component
+    Begin_Component "kexScriptComponent"
+        scriptClass           "RandoEnemySoul"
+        triggerRadius         81.92
+    End_Component
+}
+
+NalaSoul kActor_InventoryItem_NalaSoul
+{
+    className                   "kexInventoryPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
+	pickup.pickupMessage 		"Nala Soul"
+	rando.altTexture			17
+    
+    initialScale              "0.2 0.2 0.2"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+	Begin_Component "kexRenderMeshComponent"
+		mesh "char/Enemy_Soul.skinnedmesh"
+		anim "anims/none.anim"
+    End_Component
+    Begin_Component "kexScriptComponent"
+        scriptClass           "RandoEnemySoul"
+        triggerRadius         81.92
+    End_Component
+}
+
+CaveSpiderSoul kActor_InventoryItem_CaveSpiderSoul
+{
+    className                   "kexInventoryPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
+	pickup.pickupMessage 		"Cave Spider Soul"
+	rando.altTexture			18
+    
+    initialScale              "0.2 0.2 0.2"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+	Begin_Component "kexRenderMeshComponent"
+		mesh "char/Enemy_Soul.skinnedmesh"
+		anim "anims/none.anim"
+    End_Component
+    Begin_Component "kexScriptComponent"
+        scriptClass           "RandoEnemySoul"
+        triggerRadius         81.92
+    End_Component
+}
+
+FirebornSoul kActor_InventoryItem_FirebornSoul
+{
+    className                   "kexInventoryPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
+	pickup.pickupMessage 		"Fireborn Soul"
+	rando.altTexture			19
+    
+    initialScale              "0.2 0.2 0.2"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+	Begin_Component "kexRenderMeshComponent"
+		mesh "char/Enemy_Soul.skinnedmesh"
+		anim "anims/none.anim"
+    End_Component
+    Begin_Component "kexScriptComponent"
+        scriptClass           "RandoEnemySoul"
+        triggerRadius         81.92
+    End_Component
+}
+
+DroneSoul kActor_InventoryItem_DroneSoul
+{
+    className                   "kexInventoryPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
+	pickup.pickupMessage 		"Drone Soul"
+	rando.altTexture			20
+    
+    initialScale              "0.2 0.2 0.2"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+	Begin_Component "kexRenderMeshComponent"
+		mesh "char/Enemy_Soul.skinnedmesh"
+		anim "anims/none.anim"
+    End_Component
+    Begin_Component "kexScriptComponent"
+        scriptClass           "RandoEnemySoul"
+        triggerRadius         81.92
+    End_Component
+}
+
+WorkerSoul kActor_InventoryItem_WorkerSoul
+{
+    className                   "kexInventoryPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
+	pickup.pickupMessage 		"Worker Soul"
+	rando.altTexture			21
+    
+    initialScale              "0.2 0.2 0.2"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+	Begin_Component "kexRenderMeshComponent"
+		mesh "char/Enemy_Soul.skinnedmesh"
+		anim "anims/none.anim"
+    End_Component
+    Begin_Component "kexScriptComponent"
+        scriptClass           "RandoEnemySoul"
+        triggerRadius         81.92
+    End_Component
+}
+
+MiteSoul kActor_InventoryItem_MiteSoul
+{
+    className                   "kexInventoryPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
+	pickup.pickupMessage 		"Mite Soul"
+	rando.altTexture			22
+    
+    initialScale              "0.2 0.2 0.2"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+	Begin_Component "kexRenderMeshComponent"
+		mesh "char/Enemy_Soul.skinnedmesh"
+		anim "anims/none.anim"
+    End_Component
+    Begin_Component "kexScriptComponent"
+        scriptClass           "RandoEnemySoul"
+        triggerRadius         81.92
+    End_Component
+}
+
+SoldierSoul kActor_InventoryItem_SoldierSoul
+{
+    className                   "kexInventoryPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
+	pickup.pickupMessage 		"Soldier Soul"
+	rando.altTexture			23
+    
+    initialScale              "0.2 0.2 0.2"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+	Begin_Component "kexRenderMeshComponent"
+		mesh "char/Enemy_Soul.skinnedmesh"
+		anim "anims/none.anim"
+    End_Component
+    Begin_Component "kexScriptComponent"
+        scriptClass           "RandoEnemySoul"
+        triggerRadius         81.92
+    End_Component
+}
+
+BioBotSoul kActor_InventoryItem_BioBotSoul
+{
+    className                   "kexInventoryPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
+	pickup.pickupMessage 		"Bio-Bot Soul"
+	rando.altTexture			24
+    
+    initialScale              "0.2 0.2 0.2"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+	Begin_Component "kexRenderMeshComponent"
+		mesh "char/Enemy_Soul.skinnedmesh"
+		anim "anims/none.anim"
+    End_Component
+    Begin_Component "kexScriptComponent"
+        scriptClass           "RandoEnemySoul"
+        triggerRadius         81.92
+    End_Component
+}
+
+TrooperSoul kActor_InventoryItem_TrooperSoul
+{
+    className                   "kexInventoryPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
+	pickup.pickupMessage 		"Trooper Soul"
+	rando.altTexture			25
+    
+    initialScale              "0.2 0.2 0.2"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+	Begin_Component "kexRenderMeshComponent"
+		mesh "char/Enemy_Soul.skinnedmesh"
+		anim "anims/none.anim"
+    End_Component
+    Begin_Component "kexScriptComponent"
+        scriptClass           "RandoEnemySoul"
+        triggerRadius         81.92
+    End_Component
+}
+
+EliteGuardSoul kActor_InventoryItem_EliteGuardSoul
+{
+    className                   "kexInventoryPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
+	pickup.pickupMessage 		"Elite Guard Soul"
+	rando.altTexture			26
+    
+    initialScale              "0.2 0.2 0.2"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+	Begin_Component "kexRenderMeshComponent"
+		mesh "char/Enemy_Soul.skinnedmesh"
+		anim "anims/none.anim"
+    End_Component
+    Begin_Component "kexScriptComponent"
+        scriptClass           "RandoEnemySoul"
+        triggerRadius         81.92
+    End_Component
+}
+
+FleshSentinelSoul kActor_InventoryItem_FleshSentinelSoul
+{
+    className                   "kexInventoryPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
+	pickup.pickupMessage 		"Flesh Sentinel Soul"
+	rando.altTexture			27
+    
+    initialScale              "0.2 0.2 0.2"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+	Begin_Component "kexRenderMeshComponent"
+		mesh "char/Enemy_Soul.skinnedmesh"
+		anim "anims/none.anim"
+    End_Component
+    Begin_Component "kexScriptComponent"
+        scriptClass           "RandoEnemySoul"
+        triggerRadius         81.92
+    End_Component
+}
+
+DeathGuardSoul kActor_InventoryItem_DeathGuardSoul
+{
+    className                   "kexInventoryPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
+	pickup.pickupMessage 		"Death Guard Soul"
+	rando.altTexture			28
+    
+    initialScale              "0.2 0.2 0.2"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+	Begin_Component "kexRenderMeshComponent"
+		mesh "char/Enemy_Soul.skinnedmesh"
+		anim "anims/none.anim"
+    End_Component
+    Begin_Component "kexScriptComponent"
+        scriptClass           "RandoEnemySoul"
+        triggerRadius         81.92
+    End_Component
+}
+
+LordOfTheFleshSoul kActor_InventoryItem_LordOfTheFleshSoul
+{
+    className                   "kexInventoryPickup"
+    placeable                   TRUE
+    flags.noDamage              TRUE
+    pickup.pickupSound          "sounds/shaders/Health Pickup Sound.ksnd"
+	pickup.pickupMessage 		"Lord of the Flesh Soul"
+	rando.altTexture			29
+    
+    initialScale              "0.2 0.2 0.2"
+    Begin_Component "kexWorldComponent"
+        radius                81.92
+        height                81.92
+        bNonSolid             TRUE
+    End_Component
+	Begin_Component "kexRenderMeshComponent"
+		mesh "char/Enemy_Soul.skinnedmesh"
+		anim "anims/none.anim"
+    End_Component
+    Begin_Component "kexScriptComponent"
+        scriptClass           "RandoEnemySoul"
+        triggerRadius         81.92
+    End_Component
+}
