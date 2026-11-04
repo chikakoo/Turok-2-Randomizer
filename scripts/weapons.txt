@@ -113,7 +113,7 @@ class TurokWeapon : ScriptObject
 		}
 		
 		// Infinite ammo adds an extra upgrade
-		int normalAmmoUpgrades = OPTION_INFINITE_AMMO_UPGRADE 
+		int normalAmmoUpgrades = OPTION_INFINITE_AMMO_UPGRADES
 			? OPTION_PROGRESSIVE_AMMO_COUNT - 1 
 			: OPTION_PROGRESSIVE_AMMO_COUNT;
 		int unobtainedNormalUpgrades = normalAmmoUpgrades - GetInventoryItemCollectedTotal(pickupId);
@@ -130,7 +130,7 @@ class TurokWeapon : ScriptObject
 				self.Owner().ConsumeAmmo(extraAmmoToConsume);
 			}
 		}
-		else if (unobtainedNormalUpgrades < 0 && OPTION_INFINITE_AMMO_UPGRADE)
+		else if (unobtainedNormalUpgrades < 0 && OPTION_INFINITE_AMMO_UPGRADES)
 		{
 			if (isAltAmmo)
 			{
