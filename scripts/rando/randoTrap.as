@@ -15,7 +15,6 @@ enum EnemyTrapType
 
 class RandoTrap : RandoPickupObject
 {
-	int trapType;
 	RandoTrap(kActor @actor)
 	{
 		super(actor);
@@ -25,7 +24,11 @@ class RandoTrap : RandoPickupObject
 	// Triggers the trap based on the type.
 	void AfterReplacementTouched() override
 	{
-		TriggerTrap(trapType);
+		int trapType;
+		if (self.Definition() !is null && self.Definition().GetInt("rando.trapType", trapType))
+		{
+			TriggerTrap(trapType);
+		}
 	}
 }
 
