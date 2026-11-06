@@ -371,7 +371,7 @@ class RandoUI
 		const int &in xPosition,
 		const int &in yPosition)
 	{
-		if (GetInventoryItemCollectedTotal(enemyActorId) > 0)
+		if (HasEnemySoul(enemyActorId))
 		{
 			AddImage(
 				RANDO_UI_TEXTURE_COMPLETE, 

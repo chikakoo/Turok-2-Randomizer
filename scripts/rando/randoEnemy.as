@@ -145,7 +145,7 @@ class RandoEnemy : ScriptActor
 		{
 			enemyType = originalActor.Type();
 		}
-		hasSoul = GetInventoryItemCollectedTotal(enemyType) > 0;
+		hasSoul = HasEnemySoul(enemyType);
 
 		if (!hasSoul)
 		{
@@ -267,6 +267,12 @@ class RandoEnemy : ScriptActor
 				dmgInfo.hits = 0;
 				self.Health() = 100.0f;
 				self.Flags() |= AF_HIDDEN;
+				
+				if (self.Type() == kActor_AI_EliteGuard && self.RenderMeshComponent() !is null)
+				{
+					// HotPoint 15 is the particle generator for the gun
+					self.RenderMeshComponent().ToggleHotPoint(15, false);
+				}
 			}
 			else
 			{
@@ -390,4 +396,11 @@ class RandoEnemy : ScriptActor
 			originalActor.Flags() |= AF_HIDDEN;
 		}
 	}
+}
+
+//----------------------------------
+// Returns whether the player has the given enemy's soul
+bool HasEnemySoul(const int &in enemyType)
+{
+	return GetInventoryItemCollectedTotal(enemyType) > 0;
 }

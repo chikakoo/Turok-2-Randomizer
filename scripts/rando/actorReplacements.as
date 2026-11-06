@@ -678,6 +678,7 @@ bool DoMapSpecificEdits(kActor@ actor, const kStr &in position, const int &in ma
 			{
 				actor.Trigger(LocalPlayer.Actor().CastToActor());
 			}
+			break;
 
 		// Open the door to the last graveyard gate so the player can't get stuck there
 		// Afterwards, disable the component so it can't be closed
@@ -688,7 +689,7 @@ bool DoMapSpecificEdits(kActor@ actor, const kStr &in position, const int &in ma
 				actor.EnableComponent("kexModeStateComponent", false);
 			}
 			break;
-			
+
 		case kLevel_DeathMarsh_2:
 			if (
 				// Grenade Launcher
@@ -709,6 +710,7 @@ bool DoMapSpecificEdits(kActor@ actor, const kStr &in position, const int &in ma
 			{
 				return true;
 			}
+			break;
 	}
 	
 	return false;
