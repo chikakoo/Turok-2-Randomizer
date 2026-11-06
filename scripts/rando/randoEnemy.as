@@ -37,6 +37,9 @@ class RandoEnemy : ScriptActor
 	
 	// Whether the player has this enemy's soul
 	bool hasSoul;
+	
+	// Whether the enemy has been killed without a soul
+	bool soullessDeath;
 
 	//----------------------------------
 	// Constructor
@@ -198,6 +201,7 @@ class RandoEnemy : ScriptActor
 		SERIALIZE(neverReplacedActor);
 		SERIALIZE(importantShown);
 		SERIALIZE(hasSoul);
+		SERIALIZE(soullessDeath);
 	}
 	
 	//----------------------------------
@@ -212,6 +216,7 @@ class RandoEnemy : ScriptActor
 		DESERIALIZE_BOOL(neverReplacedActor);
 		DESERIALIZE_BOOL(importantShown);
 		DESERIALIZE_BOOL(hasSoul);
+		DESERIALIZE_BOOL(soullessDeath);
 		SetApEntry();
 		
 		if (!isReplacedActor)
@@ -238,7 +243,9 @@ class RandoEnemy : ScriptActor
 	
 	//----------------------------------
 	// If you don't have enemy's soul...
-	// - If the enemy would die, remove them from the map before the event triggers
+	// - If the enemy would die, hide them and make sure they don't die
+	// - We cannot remove normal enemies, as it triggers events when loading saves
+	// - Remove spawned enemies so new ones can spawn
 	void OnPreDamage(kDamageInfo& in dmgInfo)
 	{
 		if (!hasSoul && (self.Health() - dmgInfo.hits <= 0.0f))
@@ -249,7 +256,17 @@ class RandoEnemy : ScriptActor
 				self.Origin().y, 
 				self.Origin().z + halfHeight);
 			ParticleFactory.Spawn(kParticle_NoSoulDeath, self, spawnPosition, kQuat(0, 0, 0), Math::vecZero);
-			self.Remove();
+			
+			if (self.TID() > 0)
+			{
+				dmgInfo.hits = 0;
+				self.Health() = 100.0f;
+				self.Flags() = self.Flags() |= AF_HIDDEN;
+			}
+			else
+			{
+				self.Remove();
+			}
 		}
 	}
 	
@@ -291,6 +308,12 @@ class RandoEnemy : ScriptActor
 	// - Else, set the original to hidden if it's ever shown for some reason
 	void OnTick(void)
 	{
+		// If they are "dead", don't do anything
+		if (soullessDeath)
+		{
+			return;
+		}
+	
 		// If this enemy is a check and we have the soul, show the important indicator when it's visible
 		if (hasSoul && 
 			(self.Flags() & AF_HIDDEN) == 0 && 
