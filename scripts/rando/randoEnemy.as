@@ -61,6 +61,7 @@ class RandoEnemy : ScriptActor
 		@originalActor = actor;
 		this.isReplacedActor = true;
 		SetApEntry();
+		InitializeSoul();
 	}
 	
 	//----------------------------------
@@ -132,7 +133,7 @@ class RandoEnemy : ScriptActor
 	// Also plays the FxEffect to make it transparent/blue
 	// If no soul, remove the actor if set to No Spawn.
 	void InitializeSoul()
-	{
+	{		
 		if (OPTION_ENEMY_SOULS == ENEMY_SOULS_NONE)
 		{
 			hasSoul = true;
@@ -145,18 +146,21 @@ class RandoEnemy : ScriptActor
 			enemyType = originalActor.Type();
 		}
 		hasSoul = GetInventoryItemCollectedTotal(enemyType) > 0;
-		
+
 		if (!hasSoul)
 		{
 			if (OPTION_ENEMY_SOULS == ENEMY_SOULS_NO_SPAWNS)
 			{
 				if (originalActor !is null)
 				{
-					originalActor.Remove();
+					originalActor.Flags() |= AF_HIDDEN;
 				}
-				self.Remove();
+				self.Flags() |= AF_HIDDEN;
+				soullessDeath = true;
 			}
-			else
+			
+			// Only show the fx effect if this is the actor you will see
+			else if (OPTION_ENEMIZER == ENEMIZER_NONE || isReplacedActor)
 			{
 				self.RunFxEvent("NoSoulTransparent");
 			}
@@ -257,15 +261,20 @@ class RandoEnemy : ScriptActor
 				self.Origin().z + halfHeight);
 			ParticleFactory.Spawn(kParticle_NoSoulDeath, self, spawnPosition, kQuat(0, 0, 0), Math::vecZero);
 			
+			soullessDeath = true;
 			if (self.TID() > 0)
 			{
 				dmgInfo.hits = 0;
 				self.Health() = 100.0f;
-				self.Flags() = self.Flags() |= AF_HIDDEN;
+				self.Flags() |= AF_HIDDEN;
 			}
 			else
 			{
 				self.Remove();
+				if (originalActor !is null)
+				{
+					originalActor.Remove();
+				}
 			}
 		}
 	}
@@ -308,9 +317,10 @@ class RandoEnemy : ScriptActor
 	// - Else, set the original to hidden if it's ever shown for some reason
 	void OnTick(void)
 	{
-		// If they are "dead", don't do anything
+		// If they are "dead", they should stay hidden
 		if (soullessDeath)
 		{
+			self.Flags() |= AF_HIDDEN;
 			return;
 		}
 	
@@ -331,7 +341,7 @@ class RandoEnemy : ScriptActor
 			self.Flags() &= ~AF_IMPORTANT;
 		}
 	
-		if (OPTION_ENEMIZER == 0)
+		if (OPTION_ENEMIZER == ENEMIZER_NONE)
 		{
 			return;
 		}
