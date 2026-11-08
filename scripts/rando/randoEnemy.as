@@ -304,15 +304,32 @@ class RandoEnemy : ScriptActor
 		
 		// Don't kill the original actor if it's stale to avoid crashes
 		// Also check for other death conditions, just in case
+		bool isSpawn = self.TID() < 0;
 		if (originalActor !is null && 
 			!originalActor.IsStale() &&
-			originalActor.Health() > 0 && 
+			originalActor.Health() > 0 &&
 			((originalActor.Flags() & AF_DEAD) == 0))
 		{
-			kDamageInfo damageInfo;
-			damageInfo.hits = originalActor.Health() * 10.0f;
-			@damageInfo.source = LocalPlayer.Actor().CastToActor();
-			originalActor.InflictDamage(damageInfo);
+			// Spawns can be removed
+			if (isSpawn)
+			{
+				originalActor.Remove();
+			}
+			
+			// Others should be killed so linked events trigger
+			else
+			{
+				kDamageInfo damageInfo;
+				damageInfo.hits = originalActor.Health() * 10.0f;
+				@damageInfo.source = LocalPlayer.Actor().CastToActor();
+				originalActor.InflictDamage(damageInfo);
+			}
+		}
+		
+		// Fade spawns to clear up any actor space
+		if (isSpawn)
+		{
+			self.RunFxEvent("Hostage_Fade");
 		}
 	}
 	
