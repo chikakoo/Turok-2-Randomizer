@@ -1,21 +1,14 @@
 //----------------------------------
 // A script for all enemies that can be randomized.
 //----------------------------------
-enum EnemySoulsType
-{
-	ENEMY_SOULS_NONE = 0,
-	ENEMY_SOULS_NO_SPAWNS = 1,
-	ENEMY_SOULS_NO_TRIGGERS = 2
-}
-
 class RandoEnemy : ScriptActor
 {
 	// The original actor (that this one replaced; null if not replaced)
 	kActor@ originalActor;
 	
-	// The action object entry this is associated with
+	// The ap actor location this is associated with
 	// If null, either enemysanity is off, or this isn't a check anymore
-	ActionObjectEntry@ apEntry;
+	APActorLocation@ apEntry;
 	
 	// Whether this is the replaced actor (i.e. not the original)
 	bool isReplacedActor;
@@ -120,11 +113,11 @@ class RandoEnemy : ScriptActor
 			return;
 		}
 		
-		ActionObjectEntry@ actionObjectEntry;
-		TryGetActionObjectEntryForCurrentMap(self.TID(), actionObjectEntry);
-		if (actionObjectEntry !is null && !actionObjectEntry.isSentToAP && actionObjectEntry.apId > 0)
+		APActorLocation@ apActorLocation;
+		TryGetAPActorLocationForCurrentMap(self.TID(), apActorLocation);
+		if (apActorLocation !is null && !apActorLocation.isSentToAP && apActorLocation.apId > 0)
 		{
-			@apEntry = actionObjectEntry;
+			@apEntry = apActorLocation;
 		}
 	}
 	
@@ -134,7 +127,7 @@ class RandoEnemy : ScriptActor
 	// If no soul, remove the actor if set to No Spawn.
 	void InitializeSoul()
 	{		
-		if (OPTION_ENEMY_SOULS == ENEMY_SOULS_NONE)
+		if (!UsingEnemySouls())
 		{
 			hasSoul = true;
 			return;
@@ -286,21 +279,27 @@ class RandoEnemy : ScriptActor
 	}
 	
 	//----------------------------------
-	// When the replacement dies, kill the original actor to trigger any events.
-	// Note that simply setting Health to 0 does not work.
+	// When the replacement dies...
+	// - Send the actor to AP, if applicable
+	// - Send the soul check, if applicable
+	// - Kill the original actor to trigger any events.
+	//   (setting Health to 0 does not work)
 	void OnDeath(kDamageInfo& in dmgInfo)
 	{
 		if (apEntry !is null)
-		{		
+		{
 			apEntry.SendCheckToAP();
 			self.Flags() &= ~AF_IMPORTANT;
 			@apEntry = null;
 		}
-
+		
+		//TODO: test replaced enemies/enemy traps/spawns
+		TrySendEnemySoulCheck(self);
+		
 		if (!isReplacedActor)
-		{
-			return;
-		}
+        {
+            return;
+        }
 		
 		// Don't kill the original actor if it's stale to avoid crashes
 		// Also check for other death conditions, just in case
@@ -413,6 +412,30 @@ class RandoEnemy : ScriptActor
 			originalActor.Flags() |= AF_HIDDEN;
 		}
 	}
+}
+
+enum EnemySoulsType
+{
+	ENEMY_SOULS_NONE = 0,
+	ENEMY_SOULS_NONE_INCLUDE_CHECKS = 1,
+	ENEMY_SOULS_NO_SPAWNS = 2,
+	ENEMY_SOULS_NO_TRIGGERS = 3
+}
+
+//----------------------------------
+// Returns whether the first unique enemy killed sends a check.
+// Meaning, the setting is any value besides none.
+bool UniqueEnemiesSendChecks()
+{
+	return OPTION_ENEMY_SOULS != ENEMY_SOULS_NONE;
+}
+
+//----------------------------------
+// Returns whether enemy souls are on.
+bool UsingEnemySouls()
+{
+	return OPTION_ENEMY_SOULS == ENEMY_SOULS_NO_SPAWNS ||
+		OPTION_ENEMY_SOULS == ENEMY_SOULS_NO_TRIGGERS;
 }
 
 //----------------------------------

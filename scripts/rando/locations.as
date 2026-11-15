@@ -6,10 +6,10 @@
 // so this class will make use of an array of arrays, keyed by the map id.
 //
 // So, this is an array<array<T@>>, 
-// where T is ReplacementEntry or ActionObjectEntry.
+// where T is ReplacementEntry or APActorLocation.
 //------------------------------
 array<array<ReplacementEntry@>> g_mapReplacements;
-array<array<ActionObjectEntry@>> g_actionObjectEntries;
+array<array<APActorLocation@>> g_apActorLocations;
 array<array<int>> g_mapLevelNumberToMapIds; // To get all maps for a level
 
 enum LevelNumber
@@ -33,11 +33,11 @@ enum LevelNumber
 void InitMapReplacements(void)
 {
     g_mapReplacements.resize(136); // 0–135 inclusive
-	g_actionObjectEntries.resize(136);
+	g_apActorLocations.resize(136);
     for (uint i = 0; i < g_mapReplacements.length(); i++)
     {
         g_mapReplacements[i] = array<ReplacementEntry@>();
-		g_actionObjectEntries[i] = array<ActionObjectEntry@>();
+		g_apActorLocations[i] = array<APActorLocation@>();
     }
 	
 	g_mapLevelNumberToMapIds.resize(LEVEL_UNMAPPED + 1);
@@ -535,9 +535,9 @@ void ResetCollectedStatuses()
 		}
 	}
 	
-	for (uint i = 0; i < g_actionObjectEntries.length(); i++)
+	for (uint i = 0; i < g_apActorLocations.length(); i++)
 	{
-		array<ActionObjectEntry@>@ locations = g_actionObjectEntries[i];
+		array<APActorLocation@>@ locations = g_apActorLocations[i];
 		for (uint j = 0; j < locations.length(); j++)
 		{
 			locations[j].isSentToAP = false;
@@ -559,8 +559,8 @@ void DisplayCollectedLocationsForCurrentMap(const int &in visibleTime = 120)
 	int16 mapId = Game.ActiveMapID();
 	array<ReplacementEntry@>@ replacementLocations = 
 		g_mapReplacements[mapId];
-	array<ActionObjectEntry@>@ actionObjectLocations = 
-		g_actionObjectEntries[mapId];
+	array<APActorLocation@>@ apActorLocations = 
+		g_apActorLocations[mapId];
 		
 	int totalCollected = 0;
 	int totalLocations = 0;
@@ -578,15 +578,15 @@ void DisplayCollectedLocationsForCurrentMap(const int &in visibleTime = 120)
 		}
 	}
 	
-	for (uint i = 0; i < actionObjectLocations.length(); i++)
+	for (uint i = 0; i < apActorLocations.length(); i++)
 	{
-		if (actionObjectLocations[i].apId <= 0)
+		if (apActorLocations[i].apId <= 0)
 		{
 			continue;
 		}
 			
 		totalLocations++;
-		if (actionObjectLocations[i].isSentToAP)
+		if (apActorLocations[i].isSentToAP)
 		{
 			totalCollected++;
 		}
@@ -648,16 +648,16 @@ void CalculateTotalLocationsCheckedForLevel(
 		}
 		
 		// Switches/missions/enemies
-		array<ActionObjectEntry@>@ actionObjectEntries = g_actionObjectEntries[mapIds[i]];
-		for (uint j = 0; j < actionObjectEntries.length(); j++)
+		array<APActorLocation@>@ apActorLocations = g_apActorLocations[mapIds[i]];
+		for (uint j = 0; j < apActorLocations.length(); j++)
 		{
-			if (actionObjectEntries[j].apId <= 0)
+			if (apActorLocations[j].apId <= 0)
 			{
 				continue;
 			}
 			
 			totalLocations++;
-			if (actionObjectEntries[j].isSentToAP)
+			if (apActorLocations[j].isSentToAP)
 			{
 				totalCollected++;
 			}
@@ -740,9 +740,9 @@ void Resync()
 		}
 	}
 	
-	for (uint i = 0; i < g_actionObjectEntries.length(); i++)
+	for (uint i = 0; i < g_apActorLocations.length(); i++)
 	{
-		array<ActionObjectEntry@>@ locations = g_actionObjectEntries[i];
+		array<APActorLocation@>@ locations = g_apActorLocations[i];
 		for (uint j = 0; j < locations.length(); j++)
 		{
 			if (locations[j] !is null && locations[j].isSentToAP)

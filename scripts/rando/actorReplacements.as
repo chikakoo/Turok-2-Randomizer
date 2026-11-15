@@ -714,14 +714,14 @@ bool DoMapSpecificEdits(kActor@ actor, const kStr &in position, const int &in ma
 			
 		// If using enemy souls, force the level key traps closed
 		case kLevel_BlindLair_3:
-			if (OPTION_ENEMY_SOULS != ENEMY_SOULS_NONE && actor.TID() == 79)
+			if (UsingEnemySouls() && actor.TID() == 79)
 			{
 				actor.TriggerMessageID() = DOOR_MSG_CLOSE;
 				actor.Trigger(LocalPlayer.Actor().CastToActor());
 			}
 			break;
 		case kLevel_BlindLair_8:
-			if (OPTION_ENEMY_SOULS != ENEMY_SOULS_NONE && actor.TID() == 109)
+			if (UsingEnemySouls() && actor.TID() == 109)
 			{
 				actor.TriggerMessageID() = DOOR_MSG_CLOSE;
 				actor.Trigger(LocalPlayer.Actor().CastToActor());

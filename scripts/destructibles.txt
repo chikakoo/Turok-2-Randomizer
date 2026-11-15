@@ -333,7 +333,7 @@ class TurokDestructible : ScriptObject
 
 			//--------------------
 			// Rando code
-			TrySendActionObjectToAP(self.TID());
+			TrySendAPActorLocationToAP(self.TID());
 			//--------------------	
             break;
             

@@ -157,6 +157,10 @@
 #define kActor_AI_LordOfTheFlesh 402
 
 // ---------
+// Enemy souls level id
+#define kLevel_EnemySouls 0
+
+// ---------
 // Enemy souls (actor id + RANDO_INVENTORY_ITEM_OFFSET)
 #define kActor_InventoryItem_RaptoidSoul 400200
 #define kActor_InventoryItem_EndtrailSoul 400201

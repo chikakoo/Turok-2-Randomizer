@@ -380,16 +380,16 @@ class RandoPlayerObject : ScriptObject
 			}
 		}
 		
-		// Action objects sent to AP
-		kStr sentToAPActionObjects;
-		for (uint i = 0; i < g_actionObjectEntries.length(); i++)
+		// AP actor locations sent to AP
+		kStr sentToAPActorLocations;
+		for (uint i = 0; i < g_apActorLocations.length(); i++)
 		{
-			array<ActionObjectEntry@>@ locations = g_actionObjectEntries[i];
+			array<APActorLocation@>@ locations = g_apActorLocations[i];
 			for (uint j = 0; j < locations.length(); j++)
 			{
 				if (locations[j].isSentToAP)
 				{
-					sentToAPActionObjects += "" + locations[j].apId + "|";
+					sentToAPActorLocations += "" + locations[j].apId + "|";
 				}
 			}
 		}
@@ -404,9 +404,9 @@ class RandoPlayerObject : ScriptObject
 			SERIALIZE(sentToAPLocations);
 		}
 		
-		if (sentToAPActionObjects.Length() > 0)
+		if (sentToAPActorLocations.Length() > 0)
 		{
-			SERIALIZE(sentToAPActionObjects);
+			SERIALIZE(sentToAPActorLocations);
 		}
 		
 		// Outgoing message queue
@@ -449,7 +449,7 @@ class RandoPlayerObject : ScriptObject
 		
 		DeserializeLocationFlags(dict, "collectedLocations");
 		DeserializeLocationFlags(dict, "sentToAPLocations");
-		DeserializeActionObjectFlags(dict);
+		DeserializeAPActorLocationFlags(dict);
 		
 		// Reset the messages in flight and unset the queue
 		g_outgoingMessageInFlight = false;
@@ -521,10 +521,10 @@ class RandoPlayerObject : ScriptObject
 	// Deserializes the saved location data on the player object:
 	// - Reads the collected locations by converting the trailing pipe string
 	//   and setting the flags on the replacement objects.
-	void DeserializeActionObjectFlags(kDict &in dict)
+	void DeserializeAPActorLocationFlags(kDict &in dict)
 	{
 		kStr data;
-		if (!dict.GetString("sentToAPActionObjects", data))
+		if (!dict.GetString("sentToAPActorLocations", data))
 		{
 			return;
 		}
@@ -537,7 +537,7 @@ class RandoPlayerObject : ScriptObject
 			{
 				int apId = current.Atoi();
 				int mapId = ConvertMapIdFromApId(apId);
-				MarkActionObjectSentToAP(apId, mapId);
+				MarkAPActorLocationSentToAP(apId, mapId);
 				
 				current = "";
 			}

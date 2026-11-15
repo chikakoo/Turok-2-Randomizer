@@ -1,5 +1,5 @@
 //------------------------------
-// Represents an action object that acts as a check
+// Represents an actor location that acts as a check
 // - name: The friendly name of the actor
 // - apId: The location's AP id = MapID### (e.g. 51001 is item 2 on map 51)
 // - tagId: The tag id of the actor - will uniquely identify it on the map
@@ -8,7 +8,7 @@
 // - displayString: The display string to display when collected (only filled for AP items)
 // - isSentToAP: Whether the player has sent the check to AP (used for resyncing)
 //------------------------------
-class ActionObjectEntry
+class APActorLocation
 {
 	kStr name;
 	int apId;
@@ -18,9 +18,9 @@ class ActionObjectEntry
 	kStr displayString;
 	bool isSentToAP;
 	
-	ActionObjectEntry() {}
+	APActorLocation() {}
 	
-	ActionObjectEntry(
+	APActorLocation(
 		const kStr &in name,
 		const int &in apId,
 		const int &in tagId,
@@ -35,7 +35,7 @@ class ActionObjectEntry
 		this.isSentToAP = false;
 	}
 	
-	ActionObjectEntry(
+	APActorLocation(
 		const kStr &in name,
 		const int &in apId,
 		const int &in tagId,
@@ -60,7 +60,11 @@ class ActionObjectEntry
 		{
 			this.isSentToAP = true;
 			g_outgoingMessageQueue.insertLast(apId);
-			DisplayCollectedLocationsForCurrentMap();
+			
+			if (mapId > 0)
+			{
+				DisplayCollectedLocationsForCurrentMap();
+			}
 			
 			if (this.givenActorId > 0)
 			{
@@ -81,15 +85,15 @@ class ActionObjectEntry
 // - apId: The AP id of the location
 // - tagId: The tag of the actor to identify it on the map
 // - givenActorId: The actor id the player will receive
-void AddActionObject(
+void AddAPActorLocation(
 	const kStr &in name, 
 	const int &in apId,
 	const int &in tagId,
 	const int &in givenActorId)
 {
-	ActionObjectEntry @entry = ActionObjectEntry(
+	APActorLocation @entry = APActorLocation(
 		name, apId, tagId, givenActorId);
-    g_actionObjectEntries[entry.mapId].insertLast(entry);
+    g_apActorLocations[entry.mapId].insertLast(entry);
 }
 
 //------------------------------
@@ -98,26 +102,26 @@ void AddActionObject(
 // - apId: The AP id of the location
 // - tagId: The tag of the actor to identify it on the map
 // - displayString: The string to display when the actor is triggered
-void AddActionObject(
+void AddAPActorLocation(
 	const kStr &in name, 
 	const int &in apId,
 	const int &in tagId,
 	const kStr &in displayString = "")
 {
-	ActionObjectEntry @entry = ActionObjectEntry(
+	APActorLocation @entry = APActorLocation(
 		name, apId, tagId, displayString);
-    g_actionObjectEntries[entry.mapId].insertLast(entry);
+    g_apActorLocations[entry.mapId].insertLast(entry);
 }
 
 //------------------------------
-// Tries to send the ActionObject with the matching tag id on the current map to AP.
+// Tries to send the ap actor location with the matching tag id on the current map to AP.
 // If it doesn't exist, it doesn't do anything.
-void TrySendActionObjectToAP(const int &in tagId)
+void TrySendAPActorLocationToAP(const int &in tagId)
 {
-	ActionObjectEntry@ actionObjectEntry;
-	if (TryGetActionObjectEntryForCurrentMap(tagId, actionObjectEntry))
+	APActorLocation@ apActorLocation;
+	if (TryGetAPActorLocationForCurrentMap(tagId, apActorLocation))
 	{
-		actionObjectEntry.SendCheckToAP();
+		apActorLocation.SendCheckToAP();
 	}
 }
 
@@ -125,25 +129,38 @@ void TrySendActionObjectToAP(const int &in tagId)
 // Tries to get the replacement for the given actor id.
 // Will return false if not found.
 // - tagId: The tag id of the entry to get
-// - actionObjectEntry: The retrieved entry
+// - apActorLocation: The retrieved entry
 // Returns true if the replacement was found; false otherwise.
-bool TryGetActionObjectEntryForCurrentMap(
+bool TryGetAPActorLocationForCurrentMap(
 	const int &in tagId,
-	ActionObjectEntry@ &out actionObjectEntry)
+	APActorLocation@ &out apActorLocation)
 {
-	int mapId = Game.ActiveMapID();
-	array<ActionObjectEntry@>@ locations;
-	if (!TryGetActionObjectArray(mapId, locations))
+	return TryGetAPActorLocationForMap(tagId, apActorLocation, Game.ActiveMapID());
+}
+
+//------------------------------
+// Tries to get the replacement for the given actor id.
+// Will return false if not found.
+// - tagId: The tag id of the entry to get
+// - apActorLocation: The retrieved entry
+// Returns true if the replacement was found; false otherwise.
+bool TryGetAPActorLocationForMap(
+	const int &in tagId,
+	APActorLocation@ &out apActorLocation,
+	const int16 &in mapId)
+{
+	array<APActorLocation@>@ locations;
+	if (!TryGetAPActorLocationArray(mapId, locations))
 	{
 		return false;
 	}
 
     for (uint i = 0; i < locations.length(); i++)
     {
-        ActionObjectEntry @entry = locations[i];
+        APActorLocation @entry = locations[i];
         if (entry.tagId == tagId)
         {
-			@actionObjectEntry = entry;
+			@apActorLocation = entry;
             return true;
         }
     }
@@ -151,31 +168,31 @@ bool TryGetActionObjectEntryForCurrentMap(
 }
 
 //------------------------------
-// Tries to get the action object array for the given map id.
+// Tries to get the ap actor location array for the given map id.
 // If not found, locations is null and returns false.
 // If found, locations is the found location and returns true.
-bool TryGetActionObjectArray(
+bool TryGetAPActorLocationArray(
 	const int16 &in mapId, 
-	array<ActionObjectEntry@>@ &out locations)
+	array<APActorLocation@>@ &out locations)
 {
-	if (mapId < 0 || mapId >= int16(g_actionObjectEntries.length()))
+	if (mapId < 0 || mapId >= int16(g_apActorLocations.length()))
 	{
 		@locations = null;
 		return false;
 	}
 	
-	@locations = g_actionObjectEntries[mapId];
+	@locations = g_apActorLocations[mapId];
 	return locations !is null;
 }
 
 //------------------------------
-// Gets the action object entry on the given map with the given AP id.
+// Gets the ap actor location entry on the given map with the given AP id.
 // Returns null if not found.
-ActionObjectEntry@ GetActionObjectWithApId(
+APActorLocation@ GetAPActorLocationWithApId(
 	const int &in apId, const int &in mapId)
 {
-	array<ActionObjectEntry@>@ locations;
-	if (!TryGetActionObjectArray(mapId, locations))
+	array<APActorLocation@>@ locations;
+	if (!TryGetAPActorLocationArray(mapId, locations))
 	{
 		return null;
 	}
@@ -192,13 +209,13 @@ ActionObjectEntry@ GetActionObjectWithApId(
 }
 
 //------------------------------
-// Marks the action object as sent to AP.
+// Marks the ap actor location as sent to AP.
 // Used when loading a save with objects already sent to AP.
 // - apId: The AP id to mark as sent to AP
 // - mapId: The map the object is on
-void MarkActionObjectSentToAP(const int &in apId, const int &in mapId)
+void MarkAPActorLocationSentToAP(const int &in apId, const int &in mapId)
 {
-	ActionObjectEntry@ location = GetActionObjectWithApId(apId, mapId);
+	APActorLocation@ location = GetAPActorLocationWithApId(apId, mapId);
 	if (location !is null)
 	{
 		location.isSentToAP = true;
