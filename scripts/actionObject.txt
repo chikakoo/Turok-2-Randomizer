@@ -480,7 +480,7 @@ class TurokActionObject : ScriptObject
 				
 				//--------------------
 				// Rando code
-				TrySendAPActorLocationToAP(self.TID());
+				TrySendAPActorLocationToAP(self.TID(), Game.ActiveMapID());
 				//--------------------
                 
                 self.ModeStateComponent().SetMode(ACTIONOBJECT_MODE_TRIGGER);

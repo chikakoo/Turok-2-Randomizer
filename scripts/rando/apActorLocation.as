@@ -114,12 +114,12 @@ void AddAPActorLocation(
 }
 
 //------------------------------
-// Tries to send the ap actor location with the matching tag id on the current map to AP.
+// Tries to send the ap actor location with the matching tag id on the given map to AP.
 // If it doesn't exist, it doesn't do anything.
-void TrySendAPActorLocationToAP(const int &in tagId)
+void TrySendAPActorLocationToAP(const int &in tagId, const int16 &in mapId)
 {
 	APActorLocation@ apActorLocation;
-	if (TryGetAPActorLocationForCurrentMap(tagId, apActorLocation))
+	if (TryGetAPActorLocationForMap(tagId, apActorLocation, mapId))
 	{
 		apActorLocation.SendCheckToAP();
 	}

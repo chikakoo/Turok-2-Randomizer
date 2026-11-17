@@ -28,21 +28,17 @@ class RandoEnemySoul : RandoPickupObject
 // These use the enemyType as the tag id
 void TrySendEnemySoulCheck(kActor@ &in enemy)
 {
-	if (enemy !is null && (
+	
+	if (enemy is null ||
 		((enemy.Flags() & (1 << 10)) == 0) || // easy
 		((enemy.Flags() & (1 << 11)) == 0) || // normal
 		((enemy.Flags() & (1 << 12)) == 0) || // hard
 		((enemy.Flags() & (1 << 13)) == 0)) // hardcore
-	)
 	{
 		return;
 	}
 	
-	APActorLocation@ apActorLocation;
-	TryGetAPActorLocationForMap(enemy.Type(), apActorLocation, kLevel_EnemySouls);
-	if (apActorLocation !is null && !apActorLocation.isSentToAP && apActorLocation.apId > 0)
-	{
-		apActorLocation.SendCheckToAP();
-	}
+	// These checks use the inventory actor id as the tag so they can be looked up here
+	TrySendAPActorLocationToAP(enemy.Type() + RANDO_INVENTORY_ITEM_OFFSET, kLevel_EnemySouls);
 }
 
