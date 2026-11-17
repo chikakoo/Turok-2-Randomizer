@@ -132,7 +132,7 @@ class RandoEnemy : ScriptActor
 	// Also plays the FxEffect to make it transparent/blue
 	// If no soul, remove the actor if set to No Spawn.
 	void InitializeSoul()
-	{		
+	{	
 		if (!UsingEnemySouls())
 		{
 			hasSoul = true;
@@ -145,7 +145,7 @@ class RandoEnemy : ScriptActor
 			enemyType = originalActor.Type();
 		}
 		hasSoul = HasEnemySoul(enemyType);
-
+		
 		if (!hasSoul)
 		{
 			if (OPTION_ENEMY_SOULS == ENEMY_SOULS_NO_SPAWNS)
@@ -450,7 +450,11 @@ bool UsingEnemySouls()
 
 //----------------------------------
 // Returns whether the player has the given enemy's soul
+// A few RandoEnemy types don't have soul items, so we'll always return true for those.
 bool HasEnemySoul(const int &in enemyType)
 {
-	return GetInventoryItemCollectedTotal(enemyType) > 0;
+	return enemyType == kActor_AI_FleshWorm ||
+		enemyType == kActor_AI_Grub ||
+		enemyType == kActor_AI_MotherGrub ||
+		GetInventoryItemCollectedTotal(enemyType) > 0;
 }
