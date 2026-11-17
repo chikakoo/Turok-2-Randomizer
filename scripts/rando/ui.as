@@ -403,7 +403,7 @@ class RandoUI
 	void OnWarpHubClicked()
 	{
 		Deactivate();
-		DoPlayerWarp(0, 11999, kLevel_Hub, true);
+		DoPlayerWarp(0, 10099, kLevel_Hub, true);
 	}
 	
 	// --------------------------
