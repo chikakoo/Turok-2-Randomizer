@@ -480,7 +480,14 @@ class TurokActionObject : ScriptObject
 				
 				//--------------------
 				// Rando code
-				TrySendAPActorLocationToAP(self.TID(), Game.ActiveMapID());
+				int16 mapId = Game.ActiveMapID();
+				TrySendAPActorLocationToAP(self.TID(), mapId);
+				
+				// Force the soul gate to send the deadman check to simplify the logic
+				if (mapId == kLevel_RiverOfSouls_5 && self.TID() == 62)
+				{
+					TrySendAPActorLocationToAP(kActor_InventoryItem_DeadmanSoul, kLevel_EnemySouls);
+				}
 				//--------------------
                 
                 self.ModeStateComponent().SetMode(ACTIONOBJECT_MODE_TRIGGER);

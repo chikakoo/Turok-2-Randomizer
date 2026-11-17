@@ -24,6 +24,9 @@ class RandoEnemy : ScriptActor
 	// Whether this was a spawn that we processed
 	bool processedSpawn;
 	
+	// Whether this was a spawned by an enemy trap
+	bool isEnemyTrapSpawn;
+	
 	// Whether the important indicator was shown
 	// Used for performance reasons
 	bool importantShown;
@@ -58,10 +61,13 @@ class RandoEnemy : ScriptActor
 	}
 	
 	//----------------------------------
-	// Sets whether this is a processed spawn
-	void SetProcessedSpawn(const bool &in processedSpawn)
+	// Marks the enemy as an enemy trap.
+	// Marks processed spawn to true, as it has a tag id of -1, but shouldn't be processed.
+	// Sets the enemy trap flag as well.
+	void MarkAsEnemyTrap()
 	{
-		this.processedSpawn = processedSpawn;
+		this.processedSpawn = true;
+		this.isEnemyTrapSpawn = true;
 		if (processedSpawn)
 		{
 			@apEntry = null;
@@ -195,6 +201,7 @@ class RandoEnemy : ScriptActor
 		SERIALIZE(isNotYetShown);
 		SERIALIZE(isNotYetShown);
 		SERIALIZE(processedSpawn);
+		SERIALIZE(isEnemyTrapSpawn);
 		SERIALIZE(neverReplacedActor);
 		SERIALIZE(importantShown);
 		SERIALIZE(hasSoul);
@@ -210,6 +217,7 @@ class RandoEnemy : ScriptActor
 		DESERIALIZE_BOOL(isReplacedActor);
 		DESERIALIZE_BOOL(isNotYetShown);
 		DESERIALIZE_BOOL(processedSpawn);
+		DESERIALIZE_BOOL(isEnemyTrapSpawn);
 		DESERIALIZE_BOOL(neverReplacedActor);
 		DESERIALIZE_BOOL(importantShown);
 		DESERIALIZE_BOOL(hasSoul);
@@ -293,11 +301,12 @@ class RandoEnemy : ScriptActor
 			@apEntry = null;
 		}
 		
-		//TODO: test replaced enemies/enemy traps/spawns
-		TrySendEnemySoulCheck(self);
-		
 		if (!isReplacedActor)
         {
+			if (!isEnemyTrapSpawn)
+			{
+				TrySendEnemySoulCheck(self);
+			}
             return;
         }
 		
@@ -309,9 +318,10 @@ class RandoEnemy : ScriptActor
 			originalActor.Health() > 0 &&
 			((originalActor.Flags() & AF_DEAD) == 0))
 		{
-			// Spawns can be removed
+			// Spawns can be removed, but also try to send the soul check
 			if (isSpawn)
 			{
+				TrySendEnemySoulCheck(originalActor);
 				originalActor.Remove();
 			}
 			

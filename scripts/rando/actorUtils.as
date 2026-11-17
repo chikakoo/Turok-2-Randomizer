@@ -169,11 +169,7 @@ bool TryGivePlayerHealth(int &in actorId)
 // Gets the given item and adds it to your inventory.
 // Will add the item AND the inventory offset.
 // Handles level key packs.
-// If it's a custom inventory item, does not call HandleTrackInventoryItems.
-void TryGetInventoryItem(
-	int &in actorId,
-	bool &in skipNotifications = false,
-	bool &in isCustomInventoryItem = false)
+void TryGetInventoryItem(int &in actorId, bool &in skipNotifications = false)
 {
 	kDictMem@ itemDef = TryGetActorDefWithClass(actorId, "kexInventoryPickup");
 	if (itemDef is null)
@@ -195,11 +191,7 @@ void TryGetInventoryItem(
 	{
 		TryGiveAllLevelKeysForWarp(actorId); // Only gives the keys if necessary
 		LocalPlayer.Inventory().Give(actorId);
-		
-		if (isCustomInventoryItem)
-		{
-			HandleTrackInventoryItems(actorId, itemDef);
-		}
+		HandleTrackInventoryItems(actorId, itemDef);
 	}
 	
 	// Handles giving the nuke if you have 6 parts since the game only does so
@@ -287,33 +279,6 @@ int GetInventoryItemCurrentTotal(int &in actorId)
 int GetInventoryItemCollectedTotal(int &in actorId)
 {
 	return LocalPlayer.Inventory().GetCount(actorId + RANDO_INVENTORY_ITEM_OFFSET);
-}
-
-//---------------------------
-// Spawns the given actor id near the player.
-// Meant to be used for enemy traps.
-void SpawnActorNearPlayer(int &in actorId)
-{
-	kActor @actor = LocalPlayer.Actor().CastToActor();
-	kVec3 initialOrigin = kVec3(actor.Origin());
-	
-	// Adjust the position to a random point around the player
-	float distance = Math::RandRange(300.0f, 500.0f);
-	float angle = Math::RandFloat() * Math::pi * 2.0f;
-	initialOrigin.x += Math::Cos(angle) * distance;
-	initialOrigin.y += Math::Sin(angle) * distance;
-	
-	kVec3 newOrigin;
-	int16 regionIdx = actor.WorldComponent()
-		.GetNearPositionAndRegionIndex(initialOrigin, newOrigin);
-	
-	// Set processed spawn so we don't re-randomize the enemy
-	kActor@ enemy = ActorFactory.Spawn(actorId, newOrigin, 0, 0, 0, true, regionIdx);
-	RandoEnemy@ enemyScript = cast<RandoEnemy@>(GetScript(enemy));
-	if (enemyScript !is null)
-	{
-		enemyScript.SetProcessedSpawn(true);
-	}
 }
 
 //---------------------------
