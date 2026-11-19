@@ -283,9 +283,8 @@ class RandoPlayerObject : ScriptObject
 		// Set outgoing index to 0 to receive all items from AP
 		ResetAPForLoadData(0);
 		
-		// Give max explosive shells to allow the Flare Gun to be 
-		// used and to prevent depots from spawning it prematurely
-		LocalPlayer.GiveWeapon(kWpn_Flare, 1000);
+		// For some reason, the bow no longer has starting ammo
+		LocalPlayer.GiveWeapon(kWpn_Bow, 1000);
 		
 		// Give the starting inventory
 		array<int> startingInventoryItems = { OPTION_STARTING_INVENTORY_ITEMS };
