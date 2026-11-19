@@ -269,10 +269,10 @@ class RandoEnemy : ScriptActor
 				self.Health() = 100.0f;
 				self.Flags() |= AF_HIDDEN;
 				
-				if (self.Type() == kActor_AI_EliteGuard && self.RenderMeshComponent() !is null)
+				// Disable all hotpoints to delete lingering particles
+				for (uint i = 0; i < 16; i++)
 				{
-					// HotPoint 15 is the particle generator for the gun
-					self.RenderMeshComponent().ToggleHotPoint(15, false);
+					self.RenderMeshComponent().ToggleHotPoint(i, false);
 				}
 			}
 			else
