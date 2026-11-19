@@ -1,0 +1,546 @@
+//
+// Copyright(C) 2014-2015 Samuel Villarreal
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either version 2
+// of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// DESCRIPTION:
+//      Door Object Class
+//
+
+//-----------------------------------------------------------------------------
+//
+// Flags
+//
+//-----------------------------------------------------------------------------
+
+const int8 DOOR_FLAG_AUTO_CLOSE             = (1 << 0);
+const int8 DOOR_FLAG_INITIALLY_OPENED       = (1 << 1);
+const int8 DOOR_FLAG_AUTO_OPEN_PLAYER       = (1 << 2);
+const int8 DOOR_FLAG_AUTO_OPEN_ACTOR        = (1 << 3);
+const int8 DOOR_FLAG_AUTO_CLOSE_PLAYER      = (1 << 4);
+const int8 DOOR_FLAG_AUTO_CLOSE_ACTOR       = (1 << 5);
+
+//-----------------------------------------------------------------------------
+//
+// Messages
+//
+//-----------------------------------------------------------------------------
+
+const int8 DOOR_MSG_OPEN                    = 1;
+const int8 DOOR_MSG_CLOSE                   = 2;
+
+//-----------------------------------------------------------------------------
+//
+// Modes
+//
+//-----------------------------------------------------------------------------
+
+enum doorModes
+{
+    DOOR_MODE_OPEN  = 0,
+    DOOR_MODE_CLOSE,
+    NUMDOORMODES
+}
+
+/*
+==============================================================
+InitDoorModeTable
+==============================================================
+*/
+
+void InitDoorModeTable(void)
+{
+    DefineMode("DoorModeTable", DOOR_MODE_OPEN,     "void MODE_OpenSetup(void)",    "void MODE_Open(void)",     0, ANIM_DOOR_OPEN,  "",  0, 0, 0, MF_NOROOTMOTION|MF_NOACCUMULATION);
+    DefineMode("DoorModeTable", DOOR_MODE_CLOSE,    "void MODE_CloseSetup(void)",   "void MODE_Close(void)",    0, ANIM_DOOR_CLOSE, "",  0, 0, 0, MF_NOROOTMOTION|MF_NOACCUMULATION);
+}
+
+/*
+==============================================================
+TurokDoor
+==============================================================
+*/
+
+class TurokDoor : ScriptObject
+{
+    kActor@     self;
+    uint        m_dwFlags;
+    float       m_fOpenDuration;
+    
+    float       m_openDoorEvent;
+    float       m_closeDoorEvent;
+    
+    float       m_fAutoOpenRadius;
+    float       m_fAutoCloseRadius;
+    
+    bool        m_bTriggeredToClose;
+    bool        m_bTriggeredToOpen;
+    float       m_fDelay;
+    
+    bool        m_bInitialOpen;
+    
+    bool        m_bHasCloseEvent;
+    bool        m_bHasOpenEvent;
+    
+    bool        m_bLateTrigger;
+    
+    TurokDoor(kActor @actor)
+    {
+        @self = actor;
+        m_bTriggeredToClose = false;
+        m_bTriggeredToOpen = false;
+        m_bHasCloseEvent = false;
+        m_bHasOpenEvent = false;
+        m_bInitialOpen = false;
+        m_bLateTrigger = false;
+        m_fDelay = 0.0f;
+        
+        self.AddComponent("kexModeStateComponent", true);
+
+        if(!(self.ModeStateComponent() is null))
+        {
+            self.ModeStateComponent().AssignModeTable("DoorModeTable");
+        }
+    }
+    
+    /*
+    ==============================================================
+    OnLevelLoad
+    ==============================================================
+    */
+    
+    void OnLevelLoad(kDictMem@ pDict)
+    {
+        int open, close;
+        
+        pDict.GetInt("flags", m_dwFlags);
+        pDict.GetFloat("openDuration", m_fOpenDuration);
+        pDict.GetInt("openEvent", open);
+        pDict.GetInt("closeEvent", close);
+        pDict.GetFloat("autoOpenRadius", m_fAutoOpenRadius);
+        pDict.GetFloat("autoCloseRadius", m_fAutoCloseRadius);
+        
+        m_fAutoCloseRadius *= 1.25f;
+        
+        m_bHasCloseEvent    = (close != -1);
+        m_bHasOpenEvent     = (open  != -1);
+        
+        m_openDoorEvent     = float(Math::Max(open,  0.0f)) / 127.0f;
+        m_closeDoorEvent    = float(Math::Max(close, 0.0f)) / 127.0f;
+    }
+    
+    /*
+    ==============================================================
+    OnSerialize
+    ==============================================================
+    */
+    
+    void OnSerialize(kDict& out dict)
+    {
+        SERIALIZE(m_dwFlags);
+        SERIALIZE(m_fOpenDuration);
+        SERIALIZE(m_openDoorEvent);
+        SERIALIZE(m_closeDoorEvent);
+        SERIALIZE(m_fAutoOpenRadius);
+        SERIALIZE(m_fAutoCloseRadius);
+        SERIALIZE(m_bTriggeredToOpen);
+        SERIALIZE(m_bTriggeredToClose);
+        SERIALIZE(m_fDelay);
+        SERIALIZE(m_bHasCloseEvent);
+        SERIALIZE(m_bHasOpenEvent);
+        SERIALIZE(m_bInitialOpen);
+        SERIALIZE(m_bLateTrigger);
+    }
+    
+    /*
+    ==============================================================
+    OnSerialize
+    ==============================================================
+    */
+    
+    void OnDeserialize(kDict& in dict)
+    {
+        DESERIALIZE_INT(m_dwFlags);
+        DESERIALIZE_FLOAT(m_fOpenDuration);
+        DESERIALIZE_FLOAT(m_openDoorEvent);
+        DESERIALIZE_FLOAT(m_closeDoorEvent);
+        DESERIALIZE_FLOAT(m_fAutoOpenRadius);
+        DESERIALIZE_FLOAT(m_fAutoCloseRadius);
+        DESERIALIZE_BOOL(m_bTriggeredToOpen);
+        DESERIALIZE_BOOL(m_bTriggeredToClose);
+        DESERIALIZE_FLOAT(m_fDelay);
+        DESERIALIZE_BOOL(m_bHasCloseEvent);
+        DESERIALIZE_BOOL(m_bHasOpenEvent);
+        DESERIALIZE_BOOL(m_bInitialOpen);
+        DESERIALIZE_BOOL(m_bLateTrigger);
+    }
+    
+    /*
+    ==============================================================
+    OnSpawn
+    ==============================================================
+    */
+    
+    void OnSpawn(void)
+    {
+        self.Flags() |= AF_NODAMAGE;
+		
+        // set flag so that they won't get in the way of projectiles
+        if(!(self.RenderMeshComponent() is null))
+        {
+            self.RenderMeshComponent().Flags() |= RMCF_NOEXPANDJOINTS;
+			
+			// Rando
+			
+			// These doors have no collision, so hide them to prevent confusion
+			if (Game.ActiveMapID() == kLevel_LightShip_OBL && 
+				(self.TID() == 47 || self.TID() == 48))
+			{
+				self.Flags() |= AF_HIDDEN;
+			}
+			
+			// End rando
+        }
+        
+        if(self.AnimTrackComponent() is null)
+        {
+            Sys.Warning("Door TID(" + self.TID() + ") has no render mesh or anim track components!");
+            self.Remove();
+            return;
+        }
+        
+        if(self.Deserialized())
+        {
+            return;
+        }
+        
+        if((m_dwFlags & (DOOR_FLAG_AUTO_OPEN_PLAYER|DOOR_FLAG_AUTO_OPEN_ACTOR|
+                         DOOR_FLAG_AUTO_CLOSE_PLAYER|DOOR_FLAG_AUTO_CLOSE_ACTOR)) != 0)
+        {
+            // why the original level designers give them heights of 0.0, I'll never know....
+            // the inconsistencies of data such as this is the reason why everything is
+            // so fucking broken....
+            if(!(self.WorldComponent() is null))
+            {
+                if(self.WorldComponent().Height() <= 0.0f)
+                {
+                    self.WorldComponent().Height() = (GAME_SCALE*8);
+                }
+            }
+        }
+        
+        if(!(self.ModeStateComponent() is null))
+        {
+            if(self.IsMarked())
+            {
+                m_bLateTrigger = true;
+                self.Flags() &= ~AF_IMPORTANT;
+                self.ModeStateComponent().SetMode(DOOR_MODE_OPEN);
+                Event.RunAction(self, null, ACTION_UNBLOCK, Math::vecZero);
+                m_bTriggeredToOpen = true;
+                self.AnimTrackComponent().Set(ANIM_DOOR_OPEN, 0, ANF_STOPPED);
+                self.AnimTrackComponent().SetLastFrame(true);
+                    
+                if((m_dwFlags & DOOR_FLAG_INITIALLY_OPENED) != 0)
+                {
+                    m_bInitialOpen = true;
+                    m_fDelay = 1.0f;
+                }
+                return;
+            }
+            else
+            {
+                if((m_dwFlags & DOOR_FLAG_INITIALLY_OPENED) != 0)
+                {
+                    //m_bInitialOpen = true;
+                    //m_fDelay = 1.0f;
+                    self.ModeStateComponent().SetMode(DOOR_MODE_OPEN);
+                    self.AnimTrackComponent().Set(ANIM_DOOR_OPEN, 0, ANF_STOPPED);
+                    self.AnimTrackComponent().SetLastFrame(true);
+                    Event.RunAction(self, null, ACTION_UNBLOCK, Math::vecZero);
+                }
+                else
+                {
+                    self.ModeStateComponent().SetMode(DOOR_MODE_CLOSE);
+                    self.AnimTrackComponent().Set(ANIM_DOOR_CLOSE, 0, ANF_STOPPED);
+                    self.AnimTrackComponent().SetLastFrame(true);
+                    Event.RunAction(self, null, ACTION_BLOCK, Math::vecZero);
+                }
+            }
+        }
+    }
+    
+    /*
+    ==============================================================
+    OnTick
+    ==============================================================
+    */
+    
+    void OnTick(void)
+    {
+        if(m_bLateTrigger && self.IsMarked())
+        {
+            m_bLateTrigger = false;
+            self.SignalOn();
+            return;
+        }
+        
+        // hack to workaround event links that closes doors flagged
+        // to be initially opened. when marked in the persistent data,
+        // event links are usually the first to auto trigger before doors,
+        // resulting in doors to be permanantly closed upon re-entering
+        // the level. So delay a bit when all marked event links have
+        // finished triggering and then we can safely re-open the door.
+        if(m_bInitialOpen)
+        {
+            m_fDelay -= GAME_DELTA_TIME;
+            if(m_fDelay <= 0)
+            {
+                self.ModeStateComponent().SetMode(DOOR_MODE_OPEN);
+                m_bInitialOpen = false;
+            }
+        }
+    }
+    
+    /*
+    ==============================================================
+    OnTrigger
+    ==============================================================
+    */
+    
+    void OnTrigger(kActor@ pInstigator, const int msg)
+    {
+        switch(self.TriggerMessageID())
+        {
+        case DOOR_MSG_OPEN:
+            if(!self.IsMarked())
+            {
+                self.Flags() &= ~AF_IMPORTANT;
+                self.ModeStateComponent().SetMode(DOOR_MODE_OPEN);
+                self.SignalOn();
+            }
+            break;
+            
+        case DOOR_MSG_CLOSE:
+            self.ModeStateComponent().SetMode(DOOR_MODE_CLOSE);
+            m_bTriggeredToClose = true;
+            self.SignalOff();
+            break;
+            
+        default:
+            break;
+        }
+        
+        //Sys.Print("Door (" + self.TID() + ") recieved MSG: " + self.TriggerMessageID() + " with data: " + self.TriggerData());
+    }
+    
+    /*
+    ==============================================================
+    OnTouch
+    ==============================================================
+    */
+    
+    void OnTouch(kActor@ pInstigator)
+    {
+        if(pInstigator is null)
+        {
+            return;
+        }
+        
+        switch(self.AnimTrackComponent().PlayingID())
+        {
+        case ANIM_DOOR_CLOSE:
+            if(pInstigator.InstanceOf("kexPuppet"))
+            {
+                if((m_dwFlags & DOOR_FLAG_AUTO_OPEN_PLAYER) == 0)
+                {
+                    return;
+                }
+            }
+            else if((m_dwFlags & DOOR_FLAG_AUTO_OPEN_ACTOR) == 0)
+            {
+                return;
+            }
+            
+            if((m_dwFlags & (DOOR_FLAG_AUTO_CLOSE_PLAYER|DOOR_FLAG_AUTO_CLOSE_ACTOR)) != 0)
+            {
+                self.SetTarget(pInstigator);
+                self.WorldComponent().TouchRadius() = m_fAutoCloseRadius;
+                self.WorldComponent().LinkArea();
+            }
+            
+            self.TriggerMessageID() = DOOR_MSG_OPEN;
+            self.Trigger(null);
+            break;
+        }
+    }
+    
+    /*
+    ==============================================================
+    AnimPercentReached
+    
+    Returns true if door has reached a certain percentage through it's
+    current animation
+    ==============================================================
+    */
+    
+    bool AnimPercentReached(const float t)
+    {
+        if(self.AnimTrackComponent() is null)
+        {
+            return true;
+        }
+        
+        if(self.AnimTrackComponent().AnimCount() == 1)
+        {
+            return true;
+        }
+        
+        // anim done?
+        if(self.AnimTrackComponent().CycleCompleted() &&
+            !self.AnimTrackComponent().Blending())
+        {
+            return true;
+        }
+        
+        return self.AnimTrackComponent().TrackTime() >= t;
+    }
+    
+    /*
+    ==============================================================
+    SetTimeBeforeClose
+    ==============================================================
+    */
+    
+    void SetTimeBeforeClose(const float delayTime)
+    {
+        // don't set if already a delay going
+        if(delayTime == 0.0f || (delayTime > m_fDelay))
+        {
+            if(delayTime == 0.0f)
+            {
+                self.ModeStateComponent().ModeTime() = 0;
+            }
+            
+            m_fDelay = delayTime;
+        }
+    }
+    
+    /*
+    ==============================================================
+    MODE_OpenSetup
+    ==============================================================
+    */
+    
+    void MODE_OpenSetup(void)
+    {
+        m_fDelay = 0;
+        
+        // record state immediately so it is remembered
+        self.Mark(true);
+
+        if((m_dwFlags & (DOOR_FLAG_AUTO_CLOSE_PLAYER|DOOR_FLAG_AUTO_CLOSE_ACTOR)) != 0)
+        {
+            self.WorldComponent().TouchRadius() = m_fAutoCloseRadius;
+            self.WorldComponent().LinkArea();
+        }
+    }
+    
+    /*
+    ==============================================================
+    MODE_Open
+    ==============================================================
+    */
+    
+    void MODE_Open(void)
+    {
+        if(m_bTriggeredToOpen)
+        {
+            self.AnimTrackComponent().SetLastFrame();
+            m_bTriggeredToOpen = false;
+        }
+        
+        if(m_bHasOpenEvent)
+        {
+            if(AnimPercentReached(m_openDoorEvent))
+            {
+                Event.RunAction(self, null, ACTION_UNBLOCK, Math::vecZero);
+                self.Mark(true);
+            }
+        }
+        
+        if((m_dwFlags & DOOR_FLAG_AUTO_CLOSE) != 0)
+        {
+            if(self.AnimTrackComponent().CycleCompleted())
+            {
+                SetTimeBeforeClose(m_fOpenDuration);
+            }
+        }
+        else if((m_dwFlags & (DOOR_FLAG_AUTO_CLOSE_PLAYER|DOOR_FLAG_AUTO_CLOSE_ACTOR)) != 0)
+        {
+            kActor@ pActor = self.GetTarget();
+            
+            if(!(pActor is null))
+            {
+                if(self.Origin().Distance(pActor.Origin()) > m_fAutoCloseRadius)
+                {
+                    m_fDelay = 0;
+                    @pActor = null;
+                    self.SetTarget(pActor);
+                    self.ModeStateComponent().SetMode(DOOR_MODE_CLOSE);
+                    return;
+                }
+            }
+        }
+        
+        // waiting to close?
+        if(m_fDelay > 0.0f &&
+            (self.ModeStateComponent().ModeTime() >= m_fDelay))
+        {
+            self.ModeStateComponent().SetMode(DOOR_MODE_CLOSE);
+        }
+    }
+    
+    /*
+    ==============================================================
+    MODE_CloseSetup
+    ==============================================================
+    */
+    
+    void MODE_CloseSetup(void)
+    {
+        // record state immediately so it is remembered
+        self.Mark(false);
+        
+        if((m_dwFlags & (DOOR_FLAG_AUTO_OPEN_PLAYER|DOOR_FLAG_AUTO_OPEN_ACTOR)) != 0)
+        {
+            self.WorldComponent().TouchRadius() = m_fAutoOpenRadius;
+            self.WorldComponent().LinkArea();
+        }
+    }
+    
+    /*
+    ==============================================================
+    MODE_Close
+    ==============================================================
+    */
+    
+    void MODE_Close(void)
+    {
+        if(m_bHasCloseEvent && m_bTriggeredToClose)
+        {
+            if(AnimPercentReached(m_closeDoorEvent))
+            {
+                Event.RunAction(self, null, ACTION_BLOCK, Math::vecZero);
+                self.Mark(false);
+            }
+        }
+    }
+};
