@@ -200,7 +200,8 @@ class TurokDoor : ScriptObject
 			// Rando
 			
 			// These doors have no collision, so hide them to prevent confusion
-			if (Game.ActiveMapID() == kLevel_LightShip_OBL && 
+			if (UsingEnemySouls() &&
+				Game.ActiveMapID() == kLevel_LightShip_OBL && 
 				(self.TID() == 47 || self.TID() == 48))
 			{
 				self.Flags() |= AF_HIDDEN;
@@ -329,6 +330,19 @@ class TurokDoor : ScriptObject
             break;
             
         case DOOR_MSG_CLOSE:
+			// Rando - Certain doors are too annoying to have closed using enemy souls.
+			// These are doors that don't block progress, but trap you inside and force you to exit out.
+			// We will not let these doors close.
+			if (UsingEnemySouls())
+			{
+				if ((Game.ActiveMapID() == kLevel_Hive_5 && self.TID() == 92) || // Mite ambush room
+					(Game.ActiveMapID() == kLevel_BlindLair_OBL && self.TID() == 19)) // Oblivion circular room
+				{
+					break;
+				}
+			}
+			// End Rando
+			
             self.ModeStateComponent().SetMode(DOOR_MODE_CLOSE);
             m_bTriggeredToClose = true;
             self.SignalOff();

@@ -727,6 +727,15 @@ bool DoMapSpecificEdits(kActor@ actor, const kStr &in position, const int &in ma
 				actor.Trigger(LocalPlayer.Actor().CastToActor());
 			}
 			break;
+		
+		// If using enemy souls, force the last hive checkpoint room open
+		case kLevel_Hive_8:
+			if (UsingEnemySouls() && actor.TID() == 52)
+			{
+				actor.TriggerMessageID() = DOOR_MSG_OPEN;
+				actor.Trigger(LocalPlayer.Actor().CastToActor());
+			}
+			break;
 	}
 	
 	return false;

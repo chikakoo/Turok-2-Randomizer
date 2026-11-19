@@ -270,9 +270,12 @@ class RandoEnemy : ScriptActor
 				self.Flags() |= AF_HIDDEN;
 				
 				// Disable all hotpoints to delete lingering particles
-				for (uint i = 0; i < 16; i++)
+				if (self.RenderMeshComponent() !is null)
 				{
-					self.RenderMeshComponent().ToggleHotPoint(i, false);
+					for (uint i = 0; i < 32; i++)
+					{
+						self.RenderMeshComponent().ToggleHotPoint(i, false);
+					}
 				}
 			}
 			else
