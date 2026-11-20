@@ -1149,7 +1149,7 @@ class TurokQueenBoss : ScriptObject
 			// ------------------------------------------
 			// Added by Rando to track individual cleared levels
 			LocalPlayer.Inventory().Give(kActor_InventoryItem_FinishedLevel5);
-			TrySendAPActorLocationToAP(kActor_InventoryItem_FinishedLevel5, Game.ActiveMapID());
+			TrySendAPActorLocationToAP(kActor_InventoryItem_FinishedLevel5, kLevel_NonSpecific);
 			// ------------------------------------------
             DoPlayerWarp(0, 15999, kLevel_Hub, true);
         }

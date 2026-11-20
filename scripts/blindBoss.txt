@@ -732,7 +732,7 @@ final class CBlindBossController
 				// ------------------------------------------
 				// Added by Rando to track individual cleared levels
 				LocalPlayer.Inventory().Give(kActor_InventoryItem_FinishedLevel4);
-				TrySendAPActorLocationToAP(kActor_InventoryItem_FinishedLevel4, Game.ActiveMapID());
+				TrySendAPActorLocationToAP(kActor_InventoryItem_FinishedLevel4, kLevel_NonSpecific);
 				// ------------------------------------------
                 DoPlayerWarp(0, 14999, kLevel_Hub, true);
             }

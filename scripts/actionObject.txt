@@ -486,7 +486,7 @@ class TurokActionObject : ScriptObject
 				// Force the soul gate to send the deadman check to simplify the logic
 				if (mapId == kLevel_RiverOfSouls_5 && self.TID() == 62)
 				{
-					TrySendAPActorLocationToAP(kActor_InventoryItem_DeadmanSoul, kLevel_EnemySouls);
+					TrySendAPActorLocationToAP(kActor_InventoryItem_DeadmanSoul, kLevel_NonSpecific);
 				}
 				//--------------------
                 

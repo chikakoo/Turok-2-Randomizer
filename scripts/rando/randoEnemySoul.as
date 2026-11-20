@@ -39,6 +39,6 @@ void TrySendEnemySoulCheck(kActor@ &in enemy)
 	}
 	
 	// These checks use the inventory actor id as the tag so they can be looked up here
-	TrySendAPActorLocationToAP(enemy.Type() + RANDO_INVENTORY_ITEM_OFFSET, kLevel_EnemySouls);
+	TrySendAPActorLocationToAP(enemy.Type() + RANDO_INVENTORY_ITEM_OFFSET, kLevel_NonSpecific);
 }
 

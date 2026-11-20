@@ -158,7 +158,7 @@
 
 // ---------
 // Enemy souls level id
-#define kLevel_EnemySouls 0
+#define kLevel_NonSpecific 0
 
 // ---------
 // Enemy souls (actor id + RANDO_INVENTORY_ITEM_OFFSET)

@@ -286,17 +286,21 @@ class RandoPlayerObject : ScriptObject
 		// For some reason, the bow no longer has starting ammo
 		LocalPlayer.GiveWeapon(kWpn_Bow, 1000);
 		
-		// Give the starting inventory
-		array<int> startingInventoryItems = { OPTION_STARTING_INVENTORY_ITEMS };
-		for (uint i = 0; i < startingInventoryItems.length(); i++)
+		// Give the starting inventory if in offline mode
+		// Online mode will receive it from the server
+		if (OPTION_OFFLINE_MODE)
 		{
-			TryGetInventoryItem(startingInventoryItems[i], true);
-		}
-		
-		array<int> startingWeapons = { OPTION_STARTING_WEAPONS };
-		for (uint i = 0; i < startingWeapons.length(); i++)
-		{
-			TryGivePlayerWeapon(startingWeapons[i], 1000, true);
+			array<int> startingInventoryItems = { OPTION_STARTING_INVENTORY_ITEMS };
+			for (uint i = 0; i < startingInventoryItems.length(); i++)
+			{
+				TryGetInventoryItem(startingInventoryItems[i], true);
+			}
+			
+			array<int> startingWeapons = { OPTION_STARTING_WEAPONS };
+			for (uint i = 0; i < startingWeapons.length(); i++)
+			{
+				TryGivePlayerWeapon(startingWeapons[i], 1000, true);
+			}
 		}
 		
 		SkipCutscene(kLevel_Hub);
