@@ -165,6 +165,7 @@ class TurokTotem : ScriptObject
 				// ------------------------------------------
 				// Added by Rando to track individual cleared levels
 				LocalPlayer.Inventory().Give(kActor_InventoryItem_FinishedLevel1);
+				TrySendAPActorLocationToAP(kActor_InventoryItem_FinishedLevel1, Game.ActiveMapID());
 				// ------------------------------------------
                 DoPlayerWarp(0, 11999, kLevel_Hub, true);
                 break;
@@ -173,6 +174,7 @@ class TurokTotem : ScriptObject
 				// ------------------------------------------
 				// Added by Rando to track individual cleared levels
 				LocalPlayer.Inventory().Give(kActor_InventoryItem_FinishedLevel2);
+				TrySendAPActorLocationToAP(kActor_InventoryItem_FinishedLevel2, Game.ActiveMapID());
 				// ------------------------------------------
                 DoPlayerWarp(0, 12999, kLevel_Hub, true);
                 break;
@@ -181,6 +183,7 @@ class TurokTotem : ScriptObject
 				// ------------------------------------------
 				// Added by Rando to track individual cleared levels
 				LocalPlayer.Inventory().Give(kActor_InventoryItem_FinishedLevel3);
+				TrySendAPActorLocationToAP(kActor_InventoryItem_FinishedLevel3, Game.ActiveMapID());
 				// ------------------------------------------
                 DoPlayerWarp(0, 13999, kLevel_Hub, true);
                 break;
