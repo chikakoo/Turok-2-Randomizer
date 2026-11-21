@@ -34,7 +34,7 @@ class APMemory
 	int ClientPingPending; // 0 or 1
 	
 	// Death link info
-	int SendDeathType; // APDeathLinkType
+	int SendDeathType; // APDeathType (how the player died)
 	int ReceivedDeath; // 0 or 1
 }
 
@@ -128,13 +128,11 @@ enum APDeathType
 }
 
 //---------------------------
-// When receiving a death link, this indicates what we should do with it.
+// Special cases for deathlink.
 enum APDeathLinkType
 {
-	AP_DEATHLINK_NONE = -1,
-	AP_DEATHLINK_DEATH = 0,
-	AP_DEATHLINK_HALF_HEALTH = 1,
-	AP_DEATHLINK_LOW_HEALTH = 2
+	AP_DEATH_LINK_RANDOM = -1,
+	AP_DEATH_LINK_RANDOM_NO_DEATH = -2
 }
 
 void InitAP()

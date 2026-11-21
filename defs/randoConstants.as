@@ -4,7 +4,7 @@
 #define DF_VOID 1 << 7
 
 // Custom flags
-#define DF_DEATHLINK 1 << 31
+#define DF_DEATH_LINK 1 << 31
 
 // Custom particles
 #define kParticle_NoSoulDeath 10003

@@ -668,7 +668,7 @@ class RandoPlayerObject : ScriptObject
 	// We will always set it in case the client is overriding the setting.
 	void OnDeath(kDamageInfo& in damageInfo)
 	{
-		if ((damageInfo.flags & DF_DEATHLINK) != 0)
+		if ((damageInfo.flags & DF_DEATH_LINK) != 0)
 		{
 			return;
 		}

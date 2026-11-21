@@ -191,29 +191,47 @@ void ProcessOutgoingMessages(void)
 // multiple sent before they can all be processed.
 void ProcessDeathLink()
 {
-	if (g_AP.ReceivedDeath == 0)
+	if (g_AP.ReceivedDeath == 0 || OPTION_DEATH_LINK_SEVERITY == 0)
 	{
 		return;
 	}
 	
 	kActor@ player = LocalPlayer.Actor().CastToActor();
 	kDamageInfo damageInfo;
-	switch(OPTION_DEATH_LINK_TYPE)
+	
+	if (OPTION_DEATH_LINK_SEVERITY == AP_DEATH_LINK_RANDOM)
 	{
-		case AP_DEATHLINK_DEATH:
-			damageInfo.flags |= DF_NORMAL | DF_DEATHLINK;
-			@damageInfo.target = @LocalPlayer.Actor().CastToActor();
-			damageInfo.hits = player.Health() * 10;
-			Hud.AddMessage("A mysterious force has killed you!");
-			break;
-		case AP_DEATHLINK_HALF_HEALTH:
-			player.Health() = Math::Max(player.Health() / 2, 1);
-			Hud.AddMessage("A mysterious force has damaged you!");
-			break;
-		case AP_DEATHLINK_LOW_HEALTH:
-			player.Health() = 1;
-			Hud.AddMessage("A mysterious force has damaged you!");
-			break;
+		player.Health() = RandomInt(0, int(Math::Ceil(player.Health())) - 1);
+	}
+	else if (OPTION_DEATH_LINK_SEVERITY == AP_DEATH_LINK_RANDOM_NO_DEATH)
+	{
+		player.Health() = RandomInt(1, int(Math::Ceil(Math::Max(player.Health() - 1, 1))));
+	}
+	else if (OPTION_DEATH_LINK_SEVERITY < 100)
+	{
+		float damageToTake = player.Health() * (OPTION_DEATH_LINK_SEVERITY / 100.0f);
+		float newHealth = player.Health() - damageToTake;
+		player.Health() = Math::Max(newHealth, 1);
+	}
+	
+	if (player.Health() <= 0 || OPTION_DEATH_LINK_SEVERITY >= 100)
+	{
+		// We really need to avoid setting the health to 0 and not damaging the player
+		// because that puts the game in a weird glitched state. Here, we set the health
+		// to 1, and damage the player for 10 to guarantee death and to invoke the death
+		// handling like the game normally does.
+		player.Health() = 1;
+	
+		damageInfo.flags |= DF_NORMAL | DF_DEATH_LINK;
+		@damageInfo.target = @LocalPlayer.Actor().CastToActor();
+		damageInfo.hits = 10;
+		Hud.AddMessage("A mysterious force has killed you!");
+		
+		// TODO: play a mocking line from Adon at random
+	}
+	else
+	{
+		Hud.AddMessage("A mysterious force has damaged you!");
 	}
 	
 	// Only plays the damage sound if not actually dying
