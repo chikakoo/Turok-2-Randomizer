@@ -59,6 +59,12 @@ bool TryTriggerTrap(const int &in actorId)
 		case kActor_Trap_Spam_Ultra_Health:
 			trapType = RANDO_TRAP_TYPE_SPAM;
 			break;
+		case kActor_Trap_Adon_Silver_Health:
+		case kActor_Trap_Adon_Blue_Health:
+		case kActor_Trap_Adon_Full_Health:
+		case kActor_Trap_Adon_Ultra_Health:
+			trapType = RANDO_TRAP_TYPE_ADON;
+			break;
 		default:
 			return false;
 	}
@@ -81,6 +87,9 @@ void TriggerTrap(const int &in trapType)
 			break;
 		case RANDO_TRAP_TYPE_SPAM:
 			HandleSpamTrap();
+			break;
+		case RANDO_TRAP_TYPE_ADON:
+			HandleAdonTrap();
 			break;
 	}
 }
@@ -160,4 +169,11 @@ void HandleSpamTrap()
 	Hud.AddMessage("Received Nuke!                        jk", 600);
 	Hud.AddMessage("SPAMSPAMSPAMSPAMSPAMSPAMSPAMSPAMSPAMSPAMSPAMSPAM", 600);
 	Hud.AddMessage("1 2 3 4 5 6 7 8 9 whatcomesnextiforgot", 600);
+}
+
+//------------------------------
+// Plays a voice line from Adon.
+void HandleAdonTrap()
+{
+	Game.PlayVoice(RandomInt(ADON_VOICE_START, ADON_VOICE_END));
 }

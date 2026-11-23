@@ -1,0 +1,468 @@
+#include "defs/common.txt"
+
+//-------------------
+// Rando voices - added for Adon lines
+Voice 10000 { name "sounds/mp/ADONV002" }
+Voice 10001 { name "sounds/mp/ADONV003" }
+Voice 10002 { name "sounds/mp/ADONV004" }
+Voice 10003 { name "sounds/mp/ADONV005" }
+Voice 10004 { name "sounds/mp/ADONV006" }
+Voice 10005 { name "sounds/mp/ADONV009" }
+Voice 10006 { name "sounds/mp/ADONV011" }
+Voice 10007 { name "sounds/mp/ADONV012" }
+Voice 10008 { name "sounds/mp/ADONV013" }
+Voice 10009 { name "sounds/mp/ADONV014" }
+Voice 10010 { name "sounds/mp/ADONA003" }
+Voice 10011 { name "sounds/mp/ADONA004" }
+Voice 10012 { name "sounds/mp/ADONA005" }
+Voice 10013 { name "sounds/mp/ADONA006" }
+Voice 10014 { name "sounds/mp/ADONA007" }
+Voice 10015 { name "sounds/mp/ADONA008" }
+Voice 10016 { name "sounds/mp/ADONA010" }
+Voice 10017 { name "sounds/mp/ADONA011" }
+Voice 10018 { name "sounds/mp/ADONA013" }
+Voice 10019 { name "sounds/mp/ADONA021" }
+Voice 10020 { name "sounds/mp/ADONA022" }
+Voice 10021 { name "sounds/mp/ADONA023" }
+Voice 10022 { name "sounds/mp/ADONA025" }
+Voice 10023 { name "sounds/mp/ADONA030" }
+Voice 10024 { name "sounds/mp/ADONA032" }
+Voice 10025 { name "sounds/mp/ADONA035" }
+Voice 10026 { name "sounds/mp/ADONA036" }
+Voice 10027 { name "sounds/mp/ADONA038" }
+Voice 10028 { name "sounds/mp/ADONA039" }
+Voice 10029 { name "sounds/mp/ADONA040" }
+Voice 10030 { name "sounds/mp/ADONA041" }
+Voice 10031 { name "sounds/mp/ADONA042" }
+Voice 10032 { name "sounds/mp/ADONA046" }
+Voice 10033 { name "sounds/mp/ADONA050" }
+//-------------------
+
+
+
+Voice kVoice_SaveTotem  { name    "sounds/voices/ADMISN28" }
+Voice 399
+{
+    name "sounds/voices/MISSIONOBJECTIVES01"
+    sub_1 "$vo_missionobjectives01"
+}
+Voice 400
+{
+    name "sounds/voices/ADONSTARTGAME_MERGED"
+    sub_1 "$vo_adonstartgame_1" subtime_1 "0.0"         subtime_de_1 "0.0"
+    sub_2 "$vo_adonstartgame_2" subtime_2 "11.9"        subtime_de_2 "11.9"
+    sub_3 "$vo_adonstartgame_3" subtime_3 "18.2"        subtime_de_3 "18.2"
+    sub_4 "$vo_adonstartgame_4" subtime_4 "27.3"        subtime_de_4 "29.0"
+    sub_5 "$vo_adonstartgame_5" subtime_5 "33.3 40.0"   subtime_de_5 "34.97"
+}
+Voice 401
+{
+    name "sounds/voices/PORTOFADIA"
+    sub_1 "$vo_portofadia"
+}
+Voice 402
+{
+    name "sounds/voices/ADONL1_INTROA"
+    sub_1 "$vo_adonl1_introa"
+}
+Voice 403
+{
+    name "sounds/voices/ACTIVATE3DISTRESSBEACONS"
+    sub_1 "$vo_activate3distressbeacons"
+}
+Voice 405
+{
+    name "sounds/voices/RESCUE4CHILDREN"
+    sub_1 "$vo_rescue4children"
+}
+Voice 407
+{
+    name "sounds/voices/ACTIVATEWARPPORTALS"
+    sub_1 "$vo_activatewarpportals"
+}
+Voice 409
+{
+    name "sounds/voices/ADONL1_OBJ4"
+    sub_1 "$vo_adonl1_obj4"
+}
+Voice 410
+{
+    name "sounds/voices/ADONL1_INTROB_MERGED"
+    sub_1 "$vo_adonl1_introb_1" subtime_1 "0.0"     subtime_de_1 "0.0"
+    sub_2 "$vo_adonl1_introb_2" subtime_2 "6.35"    subtime_de_2 "5.03"
+    sub_3 "$vo_adonl1_introb_3" subtime_3 "13.65"   subtime_de_3 "11.59"
+}
+
+Voice 460
+{
+    name "sounds/voices/ADONTALISMAN_MERGED"
+    sub_1 "$vo_adontalisman_1" subtime_1 "0.0"      subtime_de_1 "0.0"
+    sub_2 "$vo_adontalisman_2" subtime_2 "4.98"     subtime_de_2 "5.82"
+    sub_3 "$vo_adontalisman_3" subtime_3 "9.5"      subtime_de_3 "10.76"
+    sub_4 "$vo_adontalisman_4" subtime_4 "13.95"    subtime_de_4 "14.4"
+    sub_5 "$vo_adontalisman_5" subtime_5 "21.4"     subtime_de_5 "25.9"
+    sub_6 "$vo_adontalisman_6" subtime_6 "26.8"     subtime_de_6 "30.8"
+    sub_7 "$vo_adontalisman_7" subtime_7 "29.7"     subtime_de_7 "33.22"
+}
+
+Voice 361               { name    "sounds/voices/ADMSN001" }
+Voice 363               { name    "sounds/voices/ADMSN004" }
+Voice 365               { name    "sounds/voices/ADMSN006" }
+
+Voice 368               { name    "sounds/voices/ADMSN009" }
+Voice 369               { name    "sounds/voices/ADMSN010" }
+
+Voice 411
+{
+    name "sounds/voices/ADONL2_INTRO_MERGED"
+    sub_1 "$vo_adonl2_intro_1" subtime_1 "0.0"      subtime_de_1 "0.0"
+    sub_2 "$vo_adonl2_intro_2" subtime_2 "8.73"     subtime_de_2 "7.73"
+    sub_3 "$vo_adonl2_intro_3" subtime_3 "19.87"    subtime_de_3 "18.9"
+    sub_4 "$vo_adonl2_intro_4" subtime_4 "28.53"    subtime_de_4 "26.64"
+    sub_5 "$vo_adonl2_intro_5" subtime_5 "35.4"     subtime_de_5 "31.25"
+}
+Voice 412
+{
+    name "sounds/voices/ADONDESTROY2SOULGATES"
+    sub_1 "$vo_adondestroy2soulgates"
+}
+Voice 413
+{
+    name "sounds/voices/ADONL2_OBJ1EDIT2"
+    sub_1 "$vo_adonl2_obj1edit2"
+}
+Voice 414
+{
+    name "sounds/voices/ADONDESTROY3SISTERS"
+    sub_1 "$vo_adondestroy3sisters"
+}
+Voice 416
+{
+    name "sounds/voices/RIVEROFSOULS"
+    sub_1 "$vo_riverofsouls"
+}
+
+Voice 420
+{
+    name "sounds/voices/DEATHMARSHES"
+    sub_1 "$vo_deathmarshes"
+}
+Voice 421
+{
+    name"sounds/voices/ADONL3_INTRO_MERGED"
+    sub_1 "$vo_adonl3_intro_1" subtime_1 "0.0"          subtime_de_1 "0.0"
+    sub_2 "$vo_adonl3_intro_2" subtime_2 "3.08"         subtime_de_2 "3.3"
+    sub_3 "$vo_adonl3_intro_3" subtime_3 "6.86"         subtime_de_3 "7.17"
+    sub_4 "$vo_adonl3_intro_4" subtime_4 "10.85"        subtime_de_4 "11.06"
+    sub_5 "$vo_adonl3_intro_5" subtime_5 "16.8"         subtime_de_5 "17.66"
+    sub_6 "$vo_adonl3_intro_6" subtime_6 "19.2"         subtime_de_6 "21.37"
+    sub_7 "$vo_adonl3_intro_7" subtime_7 "24.5"         subtime_de_7 "25.68"
+    sub_8 "$vo_adonl3_intro_8" subtime_8 "30.95"        subtime_de_8 "32.66"
+    sub_9 "$vo_adonl3_intro_9" subtime_9 "33.65 40.0"   subtime_de_9 "34.5"
+}
+Voice 422
+{
+    name "sounds/voices/RESCUE5PRISONERS"
+    sub_1 "$vo_rescue5prisoners"
+}
+Voice 424
+{
+    name "sounds/voices/DESTROY3AMMOFACILITIES"
+    sub_1 "$vo_destroy3ammofacilities"
+}
+
+Voice 431
+{
+    name "sounds/voices/LAIROFBLIND"
+    sub_1 "$vo_lairofblind"
+}
+Voice 432
+{
+    name "sounds/voices/ADONL4_INTRO_MERGED"
+    sub_1 "$vo_adonl4_intro_1" subtime_1 "0.0"      subtime_de_1 "0.0"
+    sub_2 "$vo_adonl4_intro_2" subtime_2 "2.82"     subtime_de_2 "3.33"
+    sub_3 "$vo_adonl4_intro_3" subtime_3 "9.87"     subtime_de_3 "9.5"
+    sub_4 "$vo_adonl4_intro_4" subtime_4 "14.67"    subtime_de_4 "13.71"
+    sub_5 "$vo_adonl4_intro_5" subtime_5 "20.1"     subtime_de_5 "19.08"
+    sub_6 "$vo_adonl4_intro_6" subtime_6 "24.4"     subtime_de_6 "21.67"
+}
+
+Voice 433
+{
+    name "sounds/voices/ADONSEAL3THERMALVENTS"
+    sub_1 "$vo_adonseal3thermalvents"
+}
+
+Voice 440
+{
+    name "sounds/voices/HIVEOFMANTIDS"
+    sub_1 "$vo_hiveofmantids"
+}
+
+Voice 441
+{
+    name "sounds/voices/ADONL5_INTRO_MERGED"
+    sub_1 "$vo_adonl5_intro_1" subtime_1 "0.0"      subtime_de_1 "0.0"
+    sub_2 "$vo_adonl5_intro_2" subtime_2 "4.06"     subtime_de_2 "3.8"
+    sub_3 "$vo_adonl5_intro_3" subtime_3 "8.47"     subtime_de_3 "7.91"
+    sub_4 "$vo_adonl5_intro_4" subtime_4 "15.88"    subtime_de_4 "15.3"
+    sub_5 "$vo_adonl5_intro_5" subtime_5 "23.7"     subtime_de_5 "23.0"
+    sub_6 "$vo_adonl5_intro_6" subtime_6 "26.6"     subtime_de_6 "25.64"
+    sub_7 "$vo_adonl5_intro_7" subtime_7 "31.2"     subtime_de_7 "31.2"
+}
+Voice 442
+{
+    name "sounds/voices/DESTROY3EMBRYOS"
+    sub_1 "$vo_destroy3embryos"
+}
+Voice 449
+{
+    name "sounds/voices/DESTROYMASTERCOMPUTER"
+    sub_1 "$vo_destroymastercomputer"
+}
+
+Voice 451
+{
+    name "sounds/voices/PRIMAGENLIGHTSHIT" // heh
+    sub_1 "$vo_primagenlightshit"
+}
+Voice 452
+{
+    name "sounds/voices/ADONL6_INTRO_MERGED"
+    sub_1 "$vo_adonl6_intro_1" subtime_1 "0.0"          subtime_de_1 "0.0"
+    sub_2 "$vo_adonl6_intro_2" subtime_2 "3.28"         subtime_de_2 "3.74"
+    sub_3 "$vo_adonl6_intro_3" subtime_3 "9.43 14.3"    subtime_de_3 "7.42"
+}
+Voice 453
+{
+    name "sounds/voices/PURIFYRIVER"
+    sub_1 "$vo_purifyriver"
+}
+Voice 454
+{
+    name "sounds/voices/ADONL6_OBJ1_MERGED"
+    sub_1 "$vo_adonl6_obj1_1" subtime_1 "0.0"   subtime_de_1 "0.0"
+    sub_2 "$vo_adonl6_obj1_2" subtime_2 "6.63"  subtime_de_2 "5.05"
+    sub_3 "$vo_adonl6_obj1_3" subtime_3 "14.0"  subtime_de_3 "12.74"
+}
+Voice 457
+{
+    name "sounds/voices/ADONDESTROY3ASSEMBLYPLANTS"
+    sub_1 "$vo_adondestroy3assemblyplants"
+}
+Voice 458
+{
+    name "sounds/voices/ADONL6_OBJ3EDIT_MERGED"
+    sub_1 "$vo_adonl6_obj3edit_1" subtime_1 "0.0"   subtime_de_1 "0.0"
+    sub_2 "$vo_adonl6_obj3edit_2" subtime_2 "8.68"  subtime_de_2 "7.17"
+    sub_3 "$vo_adonl6_obj3edit_3" subtime_3 "14.1"  subtime_de_3 "12.72"
+    sub_4 "$vo_adonl6_obj3edit_4" subtime_4 "22.0"  subtime_de_4 "17.46"
+}
+
+Voice 462
+{
+    name "sounds/voices/ADONOBLIVION2_MERGED"
+    sub_1 "$vo_adonoblivion2_1" subtime_1 "0.0"     subtime_de_1 "0.31"
+    sub_2 "$vo_adonoblivion2_2" subtime_2 "6.64"    subtime_de_2 "5.25"
+    sub_3 "$vo_adonoblivion2_3" subtime_3 "10.94"   subtime_de_3 "9.85"
+}
+
+Voice 463
+{
+    name "sounds/voices/ADONENDGAME1_MERGED"
+    sub_1 "$vo_adonendgame1_1" subtime_1 "0.0"      subtime_de_1 "0.18"
+    sub_2 "$vo_adonendgame1_2" subtime_2 "2.72"     subtime_de_2 "2.49"
+    sub_3 "$vo_adonendgame1_3" subtime_3 "9.55"     subtime_de_3 "9.75"
+}
+Voice 464
+{
+    name "sounds/voices/ADONENDGAME2_MERGED"
+    sub_1 "$vo_adonendgame2_1" subtime_1 "0.0"      subtime_de_1 "0.17"
+    sub_2 "$vo_adonendgame2_2" subtime_2 "5.8"      subtime_de_2 "6.31"
+    sub_3 "$vo_adonendgame2_3" subtime_3 "11.45"    subtime_de_3 "12.3"
+    sub_4 "$vo_adonendgame2_4" subtime_4 "14.83"    subtime_de_4 "15.1"
+    sub_5 "$vo_adonendgame2_5" subtime_5 "20.89"    subtime_de_5 "22.3"
+    sub_6 "$vo_adonendgame2_6" subtime_6 "24.35"    subtime_de_6 "25.45"
+    sub_7 "$vo_adonendgame2_7" subtime_7 "28.05"    subtime_de_7 "29.82"
+    sub_8 "$vo_adonendgame2_8" subtime_8 "33.32"    subtime_de_8 "32.99"
+    sub_9 "$vo_adonendgame2_9" subtime_9 "35.5"     subtime_de_9 "35.24"
+    sub_10 "$vo_adonendgame2_10" subtime_10 "42.25" subtime_de_10 "42.12"
+}
+Voice 465
+{
+    name "sounds/voices/ADONENDGAME3_MERGED"
+    sub_1 "$vo_adonendgame3_1" subtime_1 "0.0"      subtime_de_1 "0.35"
+    sub_2 "$vo_adonendgame3_2" subtime_2 "4.89"     subtime_de_2 "5.57"
+    sub_3 "$vo_adonendgame3_3" subtime_3 "9.71"     subtime_de_3 "10.25"
+    sub_4 "$vo_adonendgame3_4" subtime_4 "14.89"    subtime_de_4 "16.0"
+}
+
+Voice 610
+{
+    name "sounds/voices/OBLIVION01_MERGED"
+    sub_1 "$vo_oblivion01_1" subtime_1 "1.13"       subtime_de_1 "0.05"
+    sub_2 "$vo_oblivion01_2" subtime_2 "10.86"      subtime_de_2 "7.17"
+    sub_3 "$vo_oblivion01_3" subtime_3 "20.68 33.0" subtime_de_3 "10.01"
+}
+Voice 611
+{
+    name "sounds/voices/OBLIVION02_MERGED"
+    sub_1 "$vo_oblivion02_1" subtime_1 "0.83"       subtime_de_1 "0.0"
+    sub_2 "$vo_oblivion02_2" subtime_2 "14.67"      subtime_de_2 "6.16"
+    sub_3 "$vo_oblivion02_3" subtime_3 "23.54 32.0" subtime_de_3 "9.73"
+}
+Voice 612
+{
+    name "sounds/voices/OBLIVION03_MERGED"
+    sub_1 "$vo_oblivion03_1" subtime_1 "1.08"       subtime_de_1 "0.0"
+    sub_2 "$vo_oblivion03_2" subtime_2 "12.51 24.5" subtime_de_2 "9.37"
+}
+
+Voice 461
+{
+    name "sounds/voices/ADONOBLIVION1_MERGED"
+    sub_1 "$vo_adonoblivion1_1" subtime_1 "0.0"     subtime_de_1 "0.12"
+    sub_2 "$vo_adonoblivion1_2" subtime_2 "4.13"    subtime_de_2 "3.64"
+    sub_3 "$vo_adonoblivion1_3" subtime_3 "8.2"     subtime_de_3 "7.06"
+    sub_4 "$vo_adonoblivion1_4" subtime_4 "11.35"   subtime_de_4 "10.45"
+}
+
+Voice 371               { name    "sounds/voices/ADMISN13" }
+Voice 372               { name    "sounds/voices/ADMISN14" }
+Voice 373               { name    "sounds/voices/ADMISN15" }
+Voice 374               { name    "sounds/voices/ADMISN16" }
+Voice 375               { name    "sounds/voices/ADMISN17" }
+Voice 376               { name    "sounds/voices/ADMISN18" }
+Voice 377               { name    "sounds/voices/ADMISN19" }
+Voice 378               { name    "sounds/voices/ADMISN20" }
+Voice 379               { name    "sounds/voices/ADMISN21" }
+Voice 381               { name    "sounds/voices/ADMISN23" }
+Voice 382               { name    "sounds/voices/ADMISN24" }
+Voice 383               { name    "sounds/voices/ADMISN25" }
+Voice 384               { name    "sounds/voices/ADMISN26" }
+Voice 385               { name    "sounds/voices/ADMISN27" }
+
+Voice 355               { name    "sounds/voices/ADHLT015" }
+Voice 356               { name    "sounds/voices/ADHLT016" }
+
+Voice kVoice_NukePart       { name    "sounds/voices/ADMISN27" }
+Voice kVoice_FullHealth     { name    "sounds/voices/ADHLT001" }
+Voice kVoice_UltraHealth    { name    "sounds/voices/ADHLT002" }
+Voice kVoice_EagleFeather   { name    "sounds/voices/ADWEP029" }
+
+Voice 362               { name    "sounds/voices/ADMSN003" }
+
+Voice 500
+{
+    name "sounds/voices/ADSAV001"
+    sub_1 "$vo_adsav001"
+}
+Voice 510
+{
+    name "sounds/voices/ADSAV011"
+    sub_1 "$vo_adsav011"
+}
+Voice 512
+{
+    name "sounds/voices/ADSAV013"
+    sub_1 "$vo_adsav013"
+}
+
+Voice 600
+{
+    name "sounds/voices/SPIRITHEARTOFFIRE"
+    sub_1 "$vo_spiritheartoffire"
+}
+Voice 601
+{
+    name "sounds/voices/SPIRITLEAPOFFAITH"
+    sub_1 "$vo_spiritleapoffaith"
+}
+Voice 602
+{
+    name "sounds/voices/SPIRITEYEOFTRUTH"
+    sub_1 "$vo_spiriteyeoftruth"
+}
+Voice 603
+{
+    name "sounds/voices/SPIRITBREATHOFLIFE"
+    sub_1 "$vo_spiritbreathoflife"
+}
+Voice 604
+{
+    name "sounds/voices/SPIRITWHISPERERS"
+    sub_1 "$vo_spiritwhisperers"
+}
+Voice 605
+{
+    name "sounds/voices/SPIRITSTOPNOENTER"
+    sub_1 "$vo_spiritstopnoenter"
+}
+Voice 606
+{
+    name "sounds/voices/SPIRITSTOPNOEWELCOME"
+    sub_1 "$vo_spiritstopnoewelcome"
+}
+
+Voice 613
+{
+    name "sounds/voices/OBLIVION04_MERGED"
+    sub_1 "$vo_oblivion04_1" subtime_1 "1.56"       subtime_de_1 "0.0"
+    sub_2 "$vo_oblivion04_2" subtime_2 "16.75 36.0" subtime_de_2 "9.21"
+}
+Voice 614
+{
+    name "sounds/voices/OBLIVION05"
+    sub_1 "$vo_oblivion05" subtime_1 "1.14" subtime_de_1 "0.0"
+}
+
+Voice 1500
+{
+    name "sounds/voices/PRIMMEETATLAST"
+    sub_1 "$vo_primmeetatlast"
+}
+Voice 1501
+{
+    name "sounds/voices/PRIMWELLPREPARED"
+    sub_1 "$vo_primwellprepared"
+}
+
+
+// note: these are called from executable
+Voice kVoice_10Lives    { name    "sounds/voices/ADHLT005" }
+Voice kVoice_9Lives     { name    "sounds/voices/ADHLT006" }
+Voice kVoice_8Lives     { name    "sounds/voices/ADHLT007" }
+Voice kVoice_7Lives     { name    "sounds/voices/ADHLT008" }
+Voice kVoice_6Lives     { name    "sounds/voices/ADHLT009" }
+Voice kVoice_5Lives     { name    "sounds/voices/ADHLT010" }
+Voice kVoice_4Lives     { name    "sounds/voices/ADHLT011" }
+Voice kVoice_3Lives     { name    "sounds/voices/ADHLT012" }
+Voice kVoice_2Lives     { name    "sounds/voices/ADHLT013" }
+Voice kVoice_1Lives     { name    "sounds/voices/ADHLT014" }
+
+Voice kVoice_Weapon01     { name    "sounds/voices/ADWEP001" }
+Voice kVoice_Weapon02     { name    "sounds/voices/ADWEP002" }
+Voice kVoice_Weapon03     { name    "sounds/voices/ADWEP003" }
+Voice kVoice_Weapon04     { name    "sounds/voices/ADWEP004" }
+Voice kVoice_Weapon05     { name    "sounds/voices/ADWEP005" }
+Voice kVoice_Weapon06     { name    "sounds/voices/ADWEP006" }
+Voice kVoice_Weapon07     { name    "sounds/voices/ADWEP007" }
+Voice kVoice_Weapon08     { name    "sounds/voices/ADWEP008" }
+Voice kVoice_Weapon09     { name    "sounds/voices/ADWEP009" }
+Voice kVoice_Weapon10     { name    "sounds/voices/ADWEP010" }
+Voice kVoice_Weapon11     { name    "sounds/voices/ADWEP012" }
+Voice kVoice_Weapon12     { name    "sounds/voices/ADWEP013" }
+Voice kVoice_Weapon13     { name    "sounds/voices/ADWEP014" }
+Voice kVoice_Weapon14     { name    "sounds/voices/ADWEP015" }
+Voice kVoice_Weapon15     { name    "sounds/voices/ADWEP016" }
+Voice kVoice_Weapon16     { name    "sounds/voices/ADWEP017" }
+Voice kVoice_Weapon17     { name    "sounds/voices/ADWEP018" }
+Voice kVoice_Weapon18     { name    "sounds/voices/ADWEP020" }
+Voice kVoice_Weapon19     { name    "sounds/voices/ADWEP021" }
+Voice kVoice_Weapon20     { name    "sounds/voices/ADWEP022" }
+Voice kVoice_Weapon21     { name    "sounds/voices/ADWEP023" }
+Voice kVoice_Weapon22     { name    "sounds/voices/ADWEP024" }
+Voice kVoice_Weapon23     { name    "sounds/voices/ADWEP025" }
+Voice kVoice_Weapon24     { name    "sounds/voices/ADWEP026" }
+Voice kVoice_Weapon25     { name    "sounds/voices/ADWEP027" }
+Voice kVoice_Flashlight   { name    "sounds/voices/ADWEP028" }

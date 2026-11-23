@@ -225,9 +225,8 @@ void ProcessDeathLink()
 		damageInfo.flags |= DF_NORMAL | DF_DEATH_LINK;
 		@damageInfo.target = @LocalPlayer.Actor().CastToActor();
 		damageInfo.hits = 10;
+		HandleAdonTrap();
 		Hud.AddMessage("A mysterious force has killed you!");
-		
-		// TODO: play a mocking line from Adon at random
 	}
 	else
 	{

@@ -6,6 +6,10 @@
 // Custom flags
 #define DF_DEATH_LINK 1 << 31
 
+// Voices
+#define ADON_VOICE_START 10000
+#define ADON_VOICE_END 10033
+
 // Custom particles
 #define kParticle_NoSoulDeath 10003
 
@@ -61,6 +65,7 @@
 #define RANDO_TRAP_TYPE_ENEMY 0
 #define RANDO_TRAP_TYPE_DAMAGE 1
 #define RANDO_TRAP_TYPE_SPAM 2
+#define RANDO_TRAP_TYPE_ADON 3
 
 #define kActor_Trap_Enemy_Silver_Health 900000
 #define kActor_Trap_Enemy_Blue_Health 900001
@@ -76,6 +81,11 @@
 #define kActor_Trap_Spam_Blue_Health 900021
 #define kActor_Trap_Spam_Full_Health 900022
 #define kActor_Trap_Spam_Ultra_Health 900023
+
+#define kActor_Trap_Adon_Silver_Health 900030
+#define kActor_Trap_Adon_Blue_Health 900031
+#define kActor_Trap_Adon_Full_Health 900032
+#define kActor_Trap_Adon_Ultra_Health 900033
 
 #define kActor_InventoryItem_Level1Key 4300
 #define kActor_InventoryItem_Level2Key 4310
