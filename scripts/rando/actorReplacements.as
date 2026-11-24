@@ -578,7 +578,7 @@ void ReplaceActor(kActor@ initialActor, ReplacementEntry@ replacement)
 //----------------------------------
 // Replaces an enemy actor
 void ReplaceEnemyActor(kActor@ initialActor, const bool &in isFromSpawner = false)
-{
+{	
 	// If there's no script here, then we don't want to replace this actor
 	RandoEnemy@ initialActorScript = cast<RandoEnemy@>(GetScript(initialActor));
 	if (initialActorScript is null)
@@ -640,7 +640,14 @@ void ReplaceEnemyActor(kActor@ initialActor, const bool &in isFromSpawner = fals
 	if (enemyScript !is null)
 	{
 		enemyScript.SetOriginalActor(initialActor);
-		enemyScript.SetIsNotYetShown((initialActor.Flags() & AF_HIDDEN) != 0);
+		if (isFromSpawner)
+		{
+			replacedActor.Flags() &= ~AF_HIDDEN;
+		}
+		else
+		{
+			enemyScript.SetIsNotYetShown((initialActor.Flags() & AF_HIDDEN) != 0);
+		}
 	}
 }
 

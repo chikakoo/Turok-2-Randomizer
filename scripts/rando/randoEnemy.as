@@ -72,6 +72,9 @@ class RandoEnemy : ScriptActor
 		{
 			@apEntry = null;
 		}
+		hasSoul = true;
+		soullessDeath = false;
+		self.Flags() &= ~AF_HIDDEN;
 	}
 	
 	//----------------------------------
@@ -163,7 +166,6 @@ class RandoEnemy : ScriptActor
 				self.Flags() |= AF_HIDDEN;
 				soullessDeath = true;
 			}
-			
 			// Only show the fx effect if this is the actor you will see
 			else if (OPTION_ENEMIZER == ENEMIZER_NONE || isReplacedActor)
 			{
@@ -396,10 +398,14 @@ class RandoEnemy : ScriptActor
 			
 			// If we're not processing spawned enemies, don't replace them
 			// Totems will be replaced based on the enemizer setting itself, so handle that separately
-			int16 mapId = Game.ActiveMapID();
 			if (OPTION_ENEMIZER_SPAWNERS == ENEMIZER_SPAWNER_NONE && 
-				!IsTotemLevel(mapId))
+				!IsTotemLevel(Game.ActiveMapID()))
 			{
+				if (!hasSoul)
+				{
+					self.RunFxEvent("NoSoulTransparent");
+				}
+				
 				processedSpawn = true;
 				return;
 			}
