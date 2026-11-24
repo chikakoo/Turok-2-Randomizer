@@ -8,7 +8,7 @@
 
 // Voices
 #define ADON_VOICE_START 10000
-#define ADON_VOICE_END 10033
+#define ADON_VOICE_END 10035
 
 // Custom particles
 #define kParticle_NoSoulDeath 10003
@@ -145,7 +145,7 @@
 
 // ---------
 // Missing enemies
-#define kActor_AI_Compy 5000
+#define kActor_AI_Compy 5000 // Not the real id because they share the same one was leapers (1000)
 
 #define kActor_AI_LordOfTheDead 803
 #define kActor_AI_SisterOfDespair 804
