@@ -1,9 +1,6 @@
 //----------------------------------
 // ScriptObject for enemy souls.
 //----------------------------------
-
-// TODO: reconsider... do the deadmen "die" when the soul gate is destroyed?
-//   If reconsidering, figure out how to do enemy traps... we shouldn't count these.
 class RandoEnemySoul : RandoPickupObject
 {
 	RandoEnemySoul(kActor @actor)

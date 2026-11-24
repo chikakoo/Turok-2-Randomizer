@@ -132,7 +132,10 @@ class RandoEnemy : ScriptActor
 	// Also plays the FxEffect to make it transparent/blue
 	// If no soul, remove the actor if set to No Spawn.
 	void InitializeSoul()
-	{	
+	{
+		hasSoul = false;
+		soullessDeath = false; // Very important for enemizer with no spawns
+	
 		if (!UsingEnemySouls())
 		{
 			hasSoul = true;
@@ -201,7 +204,6 @@ class RandoEnemy : ScriptActor
 	void OnSerialize(kDict &out dict)
     {
 		SERIALIZE(isReplacedActor);
-		SERIALIZE(isNotYetShown);
 		SERIALIZE(isNotYetShown);
 		SERIALIZE(processedSpawn);
 		SERIALIZE(isEnemyTrapSpawn);
