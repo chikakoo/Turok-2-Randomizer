@@ -43,6 +43,14 @@ class RandoEnemy : ScriptActor
     RandoEnemy(kActor @actor)
     {
 		super(@actor);
+		
+		// Leapers and Compies share the same type
+		// Reassign the Compy type based on the initial Health value
+		if (actor.Type() == kActor_AI_Leaper && actor.Health() <= 2.0f)
+		{
+			actor.Type() = kActor_AI_Compy;
+		}
+		
 		SetApEntry();
 		RandomizeScale();
 		InitializeSoul();
@@ -146,13 +154,9 @@ class RandoEnemy : ScriptActor
 		}
 		
 		// Get the enemy type based on the original enemy
-		// Compy shares their id with leapers; check it by the health value
-		kActor@ enemy = isReplacedActor && originalActor !is null
-			? originalActor
-			: self;
-		int enemyType = enemy.Type() == kActor_AI_Leaper && enemy.Health() <= 2.0f
-			? kActor_AI_Compy
-			: enemy.Type();
+		int enemyType = isReplacedActor && originalActor !is null
+			? originalActor.Type()
+			: self.Type();
 			
 		hasSoul = HasEnemySoul(enemyType);
 		if (!hasSoul)
