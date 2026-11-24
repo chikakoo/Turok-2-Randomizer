@@ -145,7 +145,7 @@
 
 // ---------
 // Missing enemies
-#define kActor_AI_Compy 5000 // Not the real id because they share the same one was leapers (1000)
+#define kActor_AI_Compy 5000 // Not the real id because they share it with leapers (1000)
 
 #define kActor_AI_LordOfTheDead 803
 #define kActor_AI_SisterOfDespair 804

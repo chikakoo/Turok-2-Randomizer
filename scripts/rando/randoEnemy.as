@@ -139,13 +139,16 @@ class RandoEnemy : ScriptActor
 			return;
 		}
 		
-		int enemyType = self.Type();
-		if (isReplacedActor && originalActor !is null)
-		{
-			enemyType = originalActor.Type();
-		}
+		// Get the enemy type based on the original enemy
+		// Compy shares their id with leapers; check it by the health value
+		kActor@ enemy = isReplacedActor && originalActor !is null
+			? originalActor
+			: self;
+		int enemyType = enemy.Type() == kActor_AI_Leaper && enemy.Health() <= 2.0f
+			? kActor_AI_Compy
+			: enemy.Type();
+			
 		hasSoul = HasEnemySoul(enemyType);
-		
 		if (!hasSoul)
 		{
 			if (OPTION_ENEMY_SOULS == ENEMY_SOULS_NO_SPAWNS)

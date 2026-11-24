@@ -28,7 +28,6 @@ class RandoEnemySoul : RandoPickupObject
 // These use the enemyType as the tag id
 void TrySendEnemySoulCheck(kActor@ &in enemy)
 {
-	
 	if (enemy is null ||
 		((enemy.Flags() & (1 << 10)) == 0) || // easy
 		((enemy.Flags() & (1 << 11)) == 0) || // normal
