@@ -225,7 +225,6 @@ void ProcessDeathLink()
 		damageInfo.flags |= DF_NORMAL | DF_DEATH_LINK;
 		@damageInfo.target = @LocalPlayer.Actor().CastToActor();
 		damageInfo.hits = 10;
-		HandleAdonTrap();
 		Hud.AddMessage("A mysterious force has killed you!");
 	}
 	else
@@ -235,5 +234,6 @@ void ProcessDeathLink()
 	
 	// Only plays the damage sound if not actually dying
 	player.InflictDamage(damageInfo);
+	HandleAdonTrap();
 	g_AP.ReceivedDeath = 0;
 }

@@ -335,8 +335,10 @@ class TurokDoor : ScriptObject
 			// We will not let these doors close.
 			if (UsingEnemySouls())
 			{
-				if ((Game.ActiveMapID() == kLevel_Hive_5 && self.TID() == 92) || // Mite ambush room
-					(Game.ActiveMapID() == kLevel_BlindLair_OBL && self.TID() == 19)) // Oblivion circular room
+				int16 mapId = Game.ActiveMapID();
+				if ((mapId == kLevel_BlindLair_OBL && self.TID() == 19) || // Oblivion circular room
+					(mapId == kLevel_Hive_5 && self.TID() == 92) || // Mite ambush room
+					(mapId == kLevel_Hive_7 && self.TID() == 39)) // Water secret room
 				{
 					break;
 				}
