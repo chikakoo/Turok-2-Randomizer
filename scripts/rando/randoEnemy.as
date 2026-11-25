@@ -36,6 +36,9 @@ class RandoEnemy : ScriptActor
 	
 	// Whether the enemy has been killed without a soul
 	bool soullessDeath;
+	
+	// Used to only run the fx effect once
+	bool runningSoulFxEffect;
 
 	//----------------------------------
 	// Constructor
@@ -159,22 +162,14 @@ class RandoEnemy : ScriptActor
 			: self.Type();
 			
 		hasSoul = HasEnemySoul(enemyType);
-		if (!hasSoul)
+		if (!hasSoul && OPTION_ENEMY_SOULS == ENEMY_SOULS_NO_SPAWNS)
 		{
-			if (OPTION_ENEMY_SOULS == ENEMY_SOULS_NO_SPAWNS)
+			if (originalActor !is null)
 			{
-				if (originalActor !is null)
-				{
-					originalActor.Flags() |= AF_HIDDEN;
-				}
-				self.Flags() |= AF_HIDDEN;
-				soullessDeath = true;
+				originalActor.Flags() |= AF_HIDDEN;
 			}
-			// Only show the fx effect if this is the actor you will see
-			else if (OPTION_ENEMIZER == ENEMIZER_NONE || isReplacedActor)
-			{
-				self.RunFxEvent("NoSoulTransparent");
-			}
+			self.Flags() |= AF_HIDDEN;
+			soullessDeath = true;
 		}
 	}
 	
@@ -369,6 +364,14 @@ class RandoEnemy : ScriptActor
 			self.Flags() |= AF_HIDDEN;
 			return;
 		}
+		
+		// Show the FX effect if the enemy doesn't have a soul
+		// No spawn shouldn't be affected because it's not visible anyway
+		if (!hasSoul && !runningSoulFxEffect)
+		{
+			self.RunFxEvent("NoSoulTransparent");
+			runningSoulFxEffect = true;
+		}
 	
 		// If this enemy is a check and we have the soul, show the important indicator when it's visible
 		if (hasSoul && 
@@ -381,7 +384,7 @@ class RandoEnemy : ScriptActor
 			importantShown = true;
 		}
 		
-		// Handles linked enemies
+		// Handles enemies sharing the same ap entry
 		if (apEntry !is null && apEntry.isSentToAP)
 		{
 			self.Flags() &= ~AF_IMPORTANT;
@@ -405,11 +408,6 @@ class RandoEnemy : ScriptActor
 			if (OPTION_ENEMIZER_SPAWNERS == ENEMIZER_SPAWNER_NONE && 
 				!IsTotemLevel(Game.ActiveMapID()))
 			{
-				if (!hasSoul)
-				{
-					self.RunFxEvent("NoSoulTransparent");
-				}
-				
 				processedSpawn = true;
 				return;
 			}
