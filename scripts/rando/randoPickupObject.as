@@ -180,15 +180,15 @@ class RandoPickupObject : ScriptObject
 			case 91045:
 			
 			// 5-E3
-			case 96021:
-			case 96022:
-			case 96023:
-			case 96024:
-			case 96025:
 			case 96026:
 			case 96027:
 			case 96028:
 			case 96029:
+			case 96030:
+            case 96031:
+            case 96032:
+            case 96033:
+            case 96034:
 				m_isOverLava = true;
 				break;
 		}
